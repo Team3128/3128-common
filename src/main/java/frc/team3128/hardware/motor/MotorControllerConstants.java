@@ -3,7 +3,7 @@ package frc.team3128.hardware.motor;
 /**
  * Constants for motor control / conversion. Should not be changed.
  */
-public class MotorConstants {
+public class MotorControllerConstants {
 
     public static final double FALCON_ENCODER_RESOLUTION = 2048; // CPR
     public static final double MAG_ENCODER_RESOLUTION = 4096; // CPR

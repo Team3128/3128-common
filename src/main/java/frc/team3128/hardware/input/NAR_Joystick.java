@@ -22,8 +22,8 @@ public class NAR_Joystick {
         buttons = new HashMap<Integer, JoystickButton>();
         stick = new Joystick(deviceNumber);
 
-        // 12 buttons on Logitech Extreme
-        for(int i = 1; i < 13; i++)
+        // Thrustmaster joystick has 16 buttons
+        for(int i = 1; i < 17; i++)
             buttons.put(i, new JoystickButton(stick, i));
 
         povDown = new POVButton(stick, 180);
