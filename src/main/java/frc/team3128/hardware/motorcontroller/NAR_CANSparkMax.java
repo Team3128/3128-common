@@ -1,4 +1,4 @@
-package frc.team3128.hardware.motor;
+package frc.team3128.hardware.motorcontroller;
 
 // import com.revrobotics.RelativeEncoder;
 // import com.revrobotics.CANSparkMax;
@@ -82,7 +82,7 @@ public class NAR_CANSparkMax extends CANSparkMax implements NAR_EMotor {
 	@Override
 	public void follow(NAR_EMotor motor) {
 		if(!(motor instanceof CANSparkMax)) {
-			throw new RuntimeException("bad follow");
+			throw new RuntimeException("Bad follow: NAR_CANSparkMax " + getDeviceId() + " attempted to follow non-CANSparkMax motor controller.");
 		}
 		super.follow((CANSparkMax)motor);
 	}

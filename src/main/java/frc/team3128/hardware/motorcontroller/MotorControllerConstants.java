@@ -1,4 +1,4 @@
-package frc.team3128.hardware.motor;
+package frc.team3128.hardware.motorcontroller;
 
 /**
  * Constants for motor control / conversion. Should not be changed.

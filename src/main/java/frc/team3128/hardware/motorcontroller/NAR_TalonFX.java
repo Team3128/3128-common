@@ -1,4 +1,4 @@
-package frc.team3128.hardware.motor;
+package frc.team3128.hardware.motorcontroller;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.IMotorController;
@@ -65,7 +65,7 @@ public class NAR_TalonFX extends WPI_TalonFX implements NAR_EMotor {
 	@Override
 	public void follow(NAR_EMotor motor) {
 		if(!(motor instanceof IMotorController)) {
-			throw new RuntimeException("bad follow");
+			throw new RuntimeException("Bad follow: NAR_TalonFX " + getDeviceID() + " attempted to follow non-CTRE motor controller.");
 		}
 		super.follow((IMotorController)motor);
 	}
