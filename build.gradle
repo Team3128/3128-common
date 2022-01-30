@@ -26,3 +26,12 @@ dependencies {
     implementation 'org.java-websocket:Java-WebSocket:1.3.8'
     implementation 'net.thefletcher:SparkMaxSim-java:2022.1.1'
 }
+
+jar {
+    from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
+}
+
+// Configure jar and deploy tasks
+wpi.java.configureExecutableTasks(jar)
+wpi.java.configureTestTasks(test)
