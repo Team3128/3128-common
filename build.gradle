@@ -14,9 +14,6 @@ targetCompatibility = JavaVersion.VERSION_11
 
 wpi.maven.useLocal = false
 
-// Set this to true to enable desktop support.
-def includeDesktopSupport = false
-
 // Defining my dependencies. In this case, WPILib (+ friends), and vendor libraries.
 // Also defines JUnit 4.
 dependencies {
@@ -27,11 +24,11 @@ dependencies {
     implementation 'net.thefletcher:SparkMaxSim-java:2022.1.1'
 }
 
-jar {
-    from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
-    duplicatesStrategy = DuplicatesStrategy.INCLUDE
-}
+// jar {
+//     from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
+//     duplicatesStrategy = DuplicatesStrategy.INCLUDE
+// }
 
-// Configure jar and deploy tasks
-wpi.java.configureExecutableTasks(jar)
-wpi.java.configureTestTasks(test)
+// // Configure jar and deploy tasks
+// wpi.java.configureExecutableTasks(jar)
+// wpi.java.configureTestTasks(test)
