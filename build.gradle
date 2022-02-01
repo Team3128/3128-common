@@ -1,5 +1,5 @@
 plugins {
-    id "java-library"
+    id "java"
     id "edu.wpi.first.GradleRIO"
 }
 
@@ -27,7 +27,10 @@ dependencies {
     implementation 'net.thefletcher:SparkMaxSim-java:2022.1.1'
 }
 
+// Daniel - I don't understand this - something about a fat jar???
 jar {
+    from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
+
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     archiveName "common.jar"
 }
