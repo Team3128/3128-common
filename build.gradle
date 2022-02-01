@@ -28,5 +28,6 @@ dependencies {
 }
 
 jar {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     archiveName "common.jar"
 }
