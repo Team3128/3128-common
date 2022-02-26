@@ -1,27 +1,11 @@
 import org.gradle.internal.os.OperatingSystem
 
 pluginManagement {
-    repositories {
-        mavenLocal()
-        gradlePluginPortal()
-        String frcYear = '2022'
-        File frcHome
-        if (OperatingSystem.current().isWindows()) {
-            String publicFolder = System.getenv('PUBLIC')
-            if (publicFolder == null) {
-                publicFolder = "C:\\Users\\Public"
-            }
-            def homeRoot = new File(publicFolder, "wpilib")
-            frcHome = new File(homeRoot, frcYear)
-        } else {
-            def userFolder = System.getProperty("user.home")
-            def homeRoot = new File(userFolder, "wpilib")
-            frcHome = new File(homeRoot, frcYear)
-        }
-        def frcHomeMaven = new File(frcHome, 'maven')
-        maven {
-            name 'frcHome'
-            url frcHomeMaven
-        }
+
+    plugins {
+        id 'edu.wpi.first.GradleRIO' version '2022.2.1'
+        id 'org.java-websocket.Java-WebSocket' version '1.3.8'
+        id 'net.thefletcher.SparkMaxSim-java' version '2022.1.1'
     }
+
 }
