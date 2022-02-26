@@ -25,8 +25,8 @@ public class NAR_Joystick {
     private double xDeadband = 0.05;
     private double yDeadband = 0.05;
     private double zDeadband = 0.05;
-    private double throttleLower = 0.3;
-    private double throttleUpper = 0.8;
+    private double throttleLowerBound = 0.3;
+    private double throttleUpperBound = 0.8;
 
     public NAR_Joystick(int deviceNumber) {
         buttons = new HashMap<Integer, JoystickButton>();
@@ -63,11 +63,11 @@ public class NAR_Joystick {
 
     /**  @return Throttle on [0, 1] where 0 is throttle at bottom, 1 is throttle at top - Default lower bound is 0.3, upper bound is 0.8, so anything below 0.3 returns 0.3, anything above 0.8 returns 1. */
     public double getThrottle() {
-        double mappedThrottle = (1 - stick.getThrottle()) / 2; // maps [-1, 1] to [0, 1]
+        double mappedThrottle = (1 - stick.getThrottle()) / 2;
 
-        if (mappedThrottle < throttleLower)
-            return throttleLower;
-        else if (mappedThrottle > throttleUpper)
+        if (mappedThrottle < throttleLowerBound)
+            return throttleLowerBound;
+        else if (mappedThrottle > throttleUpperBound)
             return 1;
         else
             return mappedThrottle;
@@ -111,15 +111,15 @@ public class NAR_Joystick {
     }
 
     public POVButton getDownPOVButton() {
-        return getPOVButton(4);
+        return getPOVButton(180);
     }
 
     public POVButton getLeftPOVButton() {
-        return getPOVButton(6);
+        return getPOVButton(270);
     }
 
     public POVButton getRightPOVButton() {
-        return getPOVButton(2);
+        return getPOVButton(90);
     }
 
     public void setXDeadband(double xDeadband) {

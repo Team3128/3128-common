@@ -132,13 +132,34 @@ public class Limelight {
         return (targetHeight - cameraHeight) / Math.tan(ty + cameraAngle) - frontDistance;
     }
 
-    public double calculateDistToGroundTarget(double ty, double targetHeight) {
+    public double calculateDistToTopTarget(double targetHeight) {
+        if (!hasValidTarget())
+            return -1;
+        double ty = getValue(LimelightKey.VERTICAL_OFFSET, 5) * Math.PI / 180 * 2/3;
+        double tx = getValue(LimelightKey.HORIZONTAL_OFFSET, 5) * Math.PI / 180;
+        
+        return (targetHeight - cameraHeight) / (Math.tan(ty + cameraAngle)*Math.cos(tx)) - frontDistance; 
+    }
+
+    public double calculateDistToGroundTarget(double targetHeight) {
+        if (!hasValidTarget())
+            return -1;
+        double ty = getValue(LimelightKey.VERTICAL_OFFSET, 5) * Math.PI / 180;
         return (-targetHeight + cameraHeight) * Math.tan(ty + cameraAngle) - frontDistance;
     }
 
     public void setLEDMode(LEDMode mode) {
         limelightTable.getEntry("ledMode").setNumber(mode.getLEDMode());
     }
+
+    public void turnLEDOn() {
+        setLEDMode(LEDMode.ON);
+    }
+
+    public void turnLEDOff() {
+        setLEDMode(LEDMode.OFF);
+    }
+    
 
     public void setStreamMode(StreamMode mode) {
         limelightTable.getEntry("stream").setNumber(mode.getStream());

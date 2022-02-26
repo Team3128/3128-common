@@ -1,6 +1,7 @@
 package frc.team3128.infrastructure;
 
 import edu.wpi.first.wpilibj2.command.PIDSubsystem;
+import frc.team3128.utility.Log;
 import edu.wpi.first.math.controller.PIDController;
 
 public abstract class NAR_PIDSubsystem extends PIDSubsystem{
@@ -40,10 +41,12 @@ public abstract class NAR_PIDSubsystem extends PIDSubsystem{
      * Increment the plateau counter for each iteration that our RPM is at the setpoint. If 
      * the RPM drifts from the setpoint, set plateau count back to zero.
      * @param setpoint The desired setpoint RPM for the PID Loop
+     * @param percentTolerance the percent of the setpoint used as tolerance
      */
-    public void useOutput(double setpoint) {
-        if (getController().atSetpoint() && (setpoint != 0)) {
+    public void checkPlateau(double setpoint, double percentTolerance) {
+        if (Math.abs(getMeasurement()-setpoint) <= (percentTolerance*setpoint) && (setpoint != 0)) {
             plateauCount++;
+            Log.info("plat", plateauCount+"");
         } else {
             plateauCount = 0;
         }
@@ -52,7 +55,7 @@ public abstract class NAR_PIDSubsystem extends PIDSubsystem{
     /**
      * Set plateau counter back to 0 when restarted PID loop
      */
-    public void startPID() {
+    public void resetPlateauCount() {
         plateauCount = 0;
     }
 
