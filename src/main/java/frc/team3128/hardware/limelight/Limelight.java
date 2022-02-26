@@ -19,7 +19,6 @@ public class Limelight {
     public String hostname;
     public double cameraAngle;
     public double cameraHeight;
-    public double targetWidth;
 
     public double frontDistance;
 
@@ -29,20 +28,15 @@ public class Limelight {
      * 
      * @param cameraAngle   - The vertical angle of the limelight
      * @param cameraHeight  - The height off of the ground of the limelight
-     * @param frontDistance - The distance between the front of the robot and the
-     *                      Limelight
-     * @param targetWidth   - The width of the target
+     * @param frontDistance - The distance between the front of the robot and the limelight
      */
-    public Limelight(String hostname, double cameraAngle, double cameraHeight, double frontDistance,
-            double targetWidth) {
+    public Limelight(String hostname, double cameraAngle, double cameraHeight, double frontDistance) {
         this.hostname = hostname;
 
         this.cameraAngle = cameraAngle;
         this.cameraHeight = cameraHeight;
 
         this.frontDistance = frontDistance;
-
-        this.targetWidth = targetWidth;
 
         limelightTable = NetworkTableInstance.getDefault().getTable(hostname);
     }
@@ -121,15 +115,9 @@ public class Limelight {
         return data;
     }
 
-    public double getYPrime(double targetHeight, int n) {
-        if (!hasValidTarget())
-            return -1;
-
-        return calculateYPrimeFromTY(getValue(LimelightKey.VERTICAL_OFFSET, n), targetHeight);
-    }
-
-    public double calculateYPrimeFromTY(double ty, double targetHeight) {
-        return (targetHeight - cameraHeight) / Math.tan(ty + cameraAngle) - frontDistance;
+    public double calculateDistToTopTarget(double targetHeight) {
+        double ty = getValue(LimelightKey.VERTICAL_OFFSET, 2) * Math.PI / 180;
+        return (targetHeight - cameraHeight) / Math.tan(ty + cameraAngle) - frontDistance; 
     }
 
     public double calculateDistToTopTarget(double targetHeight) {
