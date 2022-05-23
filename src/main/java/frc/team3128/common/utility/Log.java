@@ -1,4 +1,4 @@
-package frc.team3128.utility;
+package frc.team3128.common.utility;
 
 import edu.wpi.first.wpilibj.DriverStation;
 

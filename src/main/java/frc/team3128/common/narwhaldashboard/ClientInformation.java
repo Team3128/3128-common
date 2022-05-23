@@ -1,4 +1,4 @@
-package frc.team3128.narwhaldashboard;
+package frc.team3128.common.narwhaldashboard;
 
 import java.util.List;
 

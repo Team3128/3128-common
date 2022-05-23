@@ -1,4 +1,4 @@
-package frc.team3128.narwhaldashboard;
+package frc.team3128.common.narwhaldashboard;
 
 /**
  * A callback to be used with data sent by NarwhalDashboard

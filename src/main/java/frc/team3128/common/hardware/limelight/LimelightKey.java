@@ -1,4 +1,4 @@
-package frc.team3128.hardware.limelight;
+package frc.team3128.common.hardware.limelight;
 
 public enum LimelightKey {
     VALID_TARGET("tv"),

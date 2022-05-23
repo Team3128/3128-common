@@ -1,13 +1,14 @@
-package frc.team3128.infrastructure;
+package frc.team3128.common.infrastructure;
 
 import edu.wpi.first.wpilibj2.command.PIDSubsystem;
-import frc.team3128.utility.Log;
+import frc.team3128.common.utility.Log;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public abstract class NAR_PIDSubsystem extends PIDSubsystem{
     
     // number of successful checks
-    private int plateauCount = 0;
+    protected int plateauCount = 0;
     // threshold value to which plateauCount must reach to be ready
     private int plateauThreshold;
 
@@ -44,12 +45,13 @@ public abstract class NAR_PIDSubsystem extends PIDSubsystem{
      * @param percentTolerance the percent of the setpoint used as tolerance
      */
     public void checkPlateau(double setpoint, double percentTolerance) {
-        if (Math.abs(getMeasurement()-setpoint) <= (percentTolerance*setpoint) && (setpoint != 0)) {
+        if (Math.abs(getMeasurement() - setpoint) <= (percentTolerance * setpoint) && (setpoint != 0)) {
             plateauCount++;
-            Log.info("plat", plateauCount+"");
         } else {
             plateauCount = 0;
         }
+
+        SmartDashboard.putNumber("NAR_PIDSubsystem plateauCount", plateauCount);
     }
 
     /**

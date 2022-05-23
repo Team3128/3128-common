@@ -1,4 +1,4 @@
-package frc.team3128.infrastructure;
+package frc.team3128.common.infrastructure;
 
 import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 

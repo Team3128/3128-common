@@ -1,4 +1,4 @@
-package frc.team3128.hardware.input;
+package frc.team3128.common.hardware.input;
 
 import java.util.HashMap;
 

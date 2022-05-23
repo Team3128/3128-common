@@ -1,4 +1,4 @@
-package frc.team3128.hardware.limelight;
+package frc.team3128.common.hardware.limelight;
 
 public enum StreamMode {
     BOTH(0),
