@@ -5,6 +5,12 @@ import java.util.HashMap;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
+/**
+ * Wrapper for the WPILib XboxController class. 
+ * To adjust for specific controller, change array for button names.
+ * @author Arav Chadha
+ */
+
 public class NAR_XboxController extends XboxController {
 
     private String buttonNames[] = {
@@ -21,14 +27,20 @@ public class NAR_XboxController extends XboxController {
     };
     
     private HashMap<String, Trigger> buttons;
+    private Trigger[] povButtons;
 
     public NAR_XboxController(int port) {
         super(port);
         buttons = new HashMap<String, Trigger>();
+        povButtons = new Trigger[8];
         for (int i = 0; i < 10; i++) {
             int n = i + 1;
-            buttons.put(buttonNames[i], new Trigger (() -> this.getRawButton(n)));
+            buttons.put(buttonNames[i], new Trigger (() -> getRawButton(n)));
         }   
+        for (int i = 0; i < 8; i++) {
+            int n = i;
+            povButtons[i] = new Trigger (() -> getPOV() == n * 45);
+        }
     }
 
     public Trigger getButton(String buttonName) {
@@ -43,24 +55,23 @@ public class NAR_XboxController extends XboxController {
         return new Trigger (() -> getRightTriggerAxis() >= 0.5);
     }
 
-    @Override
-    public double getRightX() {
-        return Math.abs(super.getRightX()) > 0.1 ? super.getRightX():0;
+    public Trigger getPOVButton(int i) {
+        return povButtons[i];
     }
 
-    @Override
-    public double getRightY() {
-        return Math.abs(super.getRightY()) > 0.1 ? -super.getRightY():0;
+    public Trigger getUpPOVButton() {
+        return getPOVButton(0);
     }
 
-    @Override
-    public double getLeftX() {
-        return Math.abs(super.getLeftX()) > 0.1 ? super.getLeftX():0;
+    public Trigger getDownPOVButton() {
+        return getPOVButton(4);
     }
 
-    @Override
-    public double getLeftY() {
-        return Math.abs(super.getLeftY()) > 0.1 ? -super.getLeftY():0;
+    public Trigger getLeftPOVButton() {
+        return getPOVButton(6);
     }
-    
+
+    public Trigger getRightPOVButton() {
+        return getPOVButton(2);
+    }
 }
