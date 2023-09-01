@@ -1,0 +1,19 @@
+{
+    "fileName": "3128-common.json",
+    "name": "3128-common",
+    "version": "0.0.1",
+    "uuid": "ae3fa5a2-78d9-47e8-921a-dba45b889445",
+    "mavenUrls": [
+        "https://jitpack.io"
+    ],
+    "jsonUrl": "https://github.com/Team3128/3128-common/latest/download/3128-common.json",
+    "javaDependencies": [
+        {
+            "groupId": "com.common.lib",
+            "artifactId": "common-java",
+            "version": "0.0.1"
+        }
+    ],
+    "jniDependencies": [],
+    "cppDependencies": []
+}
