@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
+import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
@@ -14,8 +15,8 @@ import edu.wpi.first.wpilibj.shuffleboard.SimpleWidget;
 
 /**
  * Wrapper for {@link Shuffleboard}
- * @author Mason Lam
  * @since 2022 RAPID REACT
+ * @author Mason Lam
  */
 public class NAR_Shuffleboard {
 
@@ -24,7 +25,7 @@ public class NAR_Shuffleboard {
      */
     private static class entryInfo {
         
-        private NetworkTableEntry m_data;
+        private GenericEntry m_data;
 
         private Supplier<Object> m_supply;
 
@@ -189,14 +190,14 @@ public class NAR_Shuffleboard {
      * 
      * @param tabName the title of the tab to select
      * @param name the name of the entry
-     * @param suffix String that goes before PID entry names
+     * @param prefix String that goes before PID entry names
      * @return HashMap with keys "KF","KP","KI","KD", and "SETPOINT"
      */
-    public static HashMap<String,DoubleSupplier> PID_Setup(String tabName, String suffix) {
+    public static HashMap<String,DoubleSupplier> PID_Setup(String tabName, String prefix) {
         ShuffleboardTab tab = Shuffleboard.getTab(tabName);
         HashMap<String,DoubleSupplier> PID = new HashMap<String,DoubleSupplier>();
         for (String i : new String[]{"KF","KP","KI","KD","SETPOINT"}) {
-            NetworkTableEntry entry = tab.add(suffix + "_" + i,0).getEntry();
+            GenericEntry entry = tab.add(prefix + "_" + i,0).getEntry();
             PID.put(i,()-> entry.getDouble(0));
         }
         return PID;
@@ -210,7 +211,7 @@ public class NAR_Shuffleboard {
      * @return Object stored in the entry
      */
     public static Object getValue(String tabName, String name){
-        return tabs.get(tabName).get(name).m_data.getValue();
+        return tabs.get(tabName).get(name).m_data.get().getValue();
     }
 
     /**

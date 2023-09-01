@@ -1,0 +1,17 @@
+{
+    "fileName": "3128-Common.json",
+    "name": "3128-Common",
+    "version": "0.0.1",
+    "uuid": "ae3fa5a2-78d9-47e8-921a-dba45b889445",
+    "mavenUrls": [
+        "ThisNeedsToBeTheRootMavenUrl"
+    ],
+    "jsonUrl": "InsertSomeUrlHere",
+    "javaDependencies": [
+        {
+            "groupId": "com.vendor.frc",
+            "artifactId": "Common-java",
+            "version": "0.0.1"
+        }
+    ]
+}

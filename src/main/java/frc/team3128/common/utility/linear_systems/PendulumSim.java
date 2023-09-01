@@ -3,7 +3,6 @@ package frc.team3128.common.utility.linear_systems;
 import edu.wpi.first.math.MatBuilder;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
-import edu.wpi.first.math.Num;
 import edu.wpi.first.math.numbers.N0;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N2;
@@ -16,6 +15,7 @@ import edu.wpi.first.wpilibj.simulation.LinearSystemSim;
  * 
  * @author Sohan :o
  */
+@SuppressWarnings({"unused"})
 public class PendulumSim extends LinearSystemSim<N4,N1,N4> {
 
     private static final double G = 9.8; //Gravitational Constant

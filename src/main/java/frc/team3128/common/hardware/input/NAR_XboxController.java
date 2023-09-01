@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 /**
  * Wrapper for the WPILib XboxController class. 
  * To adjust for specific controller, change array for button names.
+ * @since 2022 Rapid React
  * @author Arav Chadha
  */
 
@@ -25,6 +26,11 @@ public class NAR_XboxController extends XboxController {
         "LeftStick",
         "RightStick"
     };
+
+    private double leftXDeadband = 0.1;
+    private double leftYDeadband = 0.1;
+    private double rightXDeadband = 0.1;
+    private double rightYDeadband = 0.1;
     
     private HashMap<String, Trigger> buttons;
     private Trigger[] povButtons;
@@ -41,6 +47,12 @@ public class NAR_XboxController extends XboxController {
             int n = i;
             povButtons[i] = new Trigger (() -> getPOV() == n * 45);
         }
+        buttons.put("RightTrigger", new Trigger(()-> getRightTriggerAxis() >= 0.5));
+        buttons.put("LeftTrigger", new Trigger(()-> getLeftTriggerAxis() >= 0.5));
+        buttons.put("LeftPosY", new Trigger(()-> getLeftY() >= 0.5));
+        buttons.put("LeftNegY", new Trigger(()-> getLeftY() <= -0.5));
+        buttons.put("RightPosY", new Trigger(()-> getRightY() >= 0.5));
+        buttons.put("RightNegY", new Trigger(()-> getRightY() <= -0.5));
     }
 
     public Trigger getButton(String buttonName) {
@@ -73,5 +85,33 @@ public class NAR_XboxController extends XboxController {
 
     public Trigger getRightPOVButton() {
         return getPOVButton(2);
+    }
+
+    public void startVibrate() {
+        setRumble(RumbleType.kBothRumble, 0.8);
+    }
+
+    public void stopVibrate() {
+        setRumble(RumbleType.kBothRumble, 0);
+    }
+
+     @Override
+    public double getRightX() {
+        return Math.abs(super.getRightX()) > rightXDeadband ? super.getRightX():0;
+    }
+
+    @Override
+    public double getRightY() {
+        return Math.abs(super.getRightY()) > rightYDeadband ? -super.getRightY():0;
+    }
+
+    @Override
+    public double getLeftX() {
+        return Math.abs(super.getLeftX()) > leftXDeadband ? super.getLeftX():0;
+    }
+
+    @Override
+    public double getLeftY() {
+        return Math.abs(super.getLeftY()) > leftYDeadband ? -super.getLeftY():0;
     }
 }
