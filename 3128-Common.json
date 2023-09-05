@@ -3,10 +3,8 @@
     "name": "3128-Common",
     "version": "0.0.1",
     "uuid": "ae3fa5a2-78d9-47e8-921a-dba45b889445",
-    "mavenUrls": [
-        "ThisNeedsToBeTheRootMavenUrl"
-    ],
-    "jsonUrl": "InsertSomeUrlHere",
+    "mavenUrls": [],
+    "jsonUrl": "https://github.com/Team3128/3128-common/blob/main/3128-Common.json",
     "javaDependencies": [
         {
             "groupId": "com.vendor.frc",

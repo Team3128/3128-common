@@ -189,7 +189,6 @@ public class NAR_Shuffleboard {
      * Creates a quick PID Tuning setup
      * 
      * @param tabName the title of the tab to select
-     * @param name the name of the entry
      * @param prefix String that goes before PID entry names
      * @return HashMap with keys "KF","KP","KI","KD", and "SETPOINT"
      */

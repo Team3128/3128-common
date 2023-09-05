@@ -76,7 +76,7 @@ public class FalconConversions {
     }
 
     /**
-     * @param distancecount Falcon Distance Counts
+     * @param positionCounts Falcon Distance Counts
      * @param circumference Circumference of Wheel
      * @param gearRatio Gear Ratio between Falcon and Mechanism (set to 1 for Falcon RPM)
      * @return Meters traveled

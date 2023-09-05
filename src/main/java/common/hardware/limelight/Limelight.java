@@ -30,7 +30,6 @@ public class Limelight {
      * @param cameraHeight  - The height off of the ground of the limelight
      * @param frontDistance - The distance between the front of the robot and the
      *                      Limelight
-     * @param targetWidth   - The width of the target
      */
     public Limelight(String hostname, double cameraAngle, double cameraHeight, double frontDistance) {
         this.hostname = hostname;
@@ -49,7 +48,6 @@ public class Limelight {
      * Switched from average to median to attempt to mitigate outliers
      * 
      * @param key        - the LimelightKey corresponding to the desired value.
-     * @param numSamples - how many samples of the value to average out.
      * @return
      */
     public double getValue(LimelightKey key) {

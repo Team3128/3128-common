@@ -93,7 +93,7 @@ public class NarwhalDashboard extends WebSocketServer {
     /**
      * Adds an autonomous program to NarwhalDashboard's auto picker
      * 
-     * @param name    - The human-readable name of the autonomous program
+     * @param names    - The human-readable name of the autonomous program
      */
     public static void addAutos(String[] names) {
         autoPrograms.addAll(Arrays.asList(names));

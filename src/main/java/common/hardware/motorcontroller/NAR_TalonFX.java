@@ -100,7 +100,7 @@ public class NAR_TalonFX extends WPI_TalonFX {
 	/**
 	 * Set the controller reference value based on percent output control
 	 *
-	 * @param outputValue The value to set depending on the control mode. For basic duty cycle control this
+	 * @param speed The value to set depending on the control mode. For basic duty cycle control this
 	 *     should be a value between -1 and 1.
 	 */
 	@Override
