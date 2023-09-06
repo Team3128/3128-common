@@ -7,11 +7,9 @@
     "jsonUrl": "https://github.com/Team3128/3128-common/latest/download/3128-Common.json",
     "javaDependencies": [
         {
-            "groupId": "com.vendor.frc",
-            "artifactId": "Vendor-java",
+            "groupId": "com.common.lib",
+            "artifactId": "Common-java",
             "version": "0.0.1"
         }
-    ],
-    "jniDependencies": [],
-    "cppDependencies": []
+    ]
 }
