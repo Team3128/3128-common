@@ -1,5 +1,5 @@
 {
-    "fileName": "3128-Common.json",
+    "fileName": "3128-common.json",
     "name": "3128-Common",
     "version": "0.0.1",
     "uuid": "ae3fa5a2-78d9-47e8-921a-dba45b889445",
@@ -8,7 +8,7 @@
     "javaDependencies": [
         {
             "groupId": "com.common.lib",
-            "artifactId": "Common-java",
+            "artifactId": "common-java",
             "version": "0.0.1"
         }
     ]

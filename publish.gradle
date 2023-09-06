@@ -43,7 +43,7 @@ ext.addTaskToCopyAllOutputs = { task ->
 }
 
 def artifactGroupId = 'com.common.lib'
-def baseArtifactId = 'Common'
+def baseArtifactId = 'common-java'
 def javaBaseName = "_GROUP_com_common_lib_ID_${baseArtifactId}-java_CLS"
 
 task sourcesJar(type: Jar, dependsOn: classes) {
