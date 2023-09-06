@@ -3,7 +3,7 @@ package common.subsystems;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
-import common.utility.NAR_Shuffleboard;
+import common.logging.NAR_Shuffleboard;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.PIDSubsystem;

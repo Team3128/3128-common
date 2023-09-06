@@ -67,9 +67,9 @@ public class NAR_Robot extends IterativeRobotBase {
   // just passed to the JNI bindings.
   private final int m_notifier = NotifierJNI.initializeNotifier();
 
-  private double m_startTime;
+  private static double m_startTime;
 
-  private final PriorityQueue<Callback> m_callbacks = new PriorityQueue<>();
+  private static final PriorityQueue<Callback> m_callbacks = new PriorityQueue<>();
 
   /** Constructor for TimedRobot. */
   protected NAR_Robot() {
@@ -181,7 +181,7 @@ public class NAR_Robot extends IterativeRobotBase {
    * @param callback The callback to run.
    * @param periodSeconds The period at which to run the callback in seconds.
    */
-  public void addPeriodic(Runnable callback, double periodSeconds) {
+  public static void addPeriodic(Runnable callback, double periodSeconds) {
     m_callbacks.add(new Callback(callback, m_startTime, periodSeconds, 0.0));
   }
 
@@ -196,7 +196,7 @@ public class NAR_Robot extends IterativeRobotBase {
    * @param offsetSeconds The offset from the common starting time in seconds. This is useful for
    *     scheduling a callback in a different timeslot relative to TimedRobot.
    */
-  public void addPeriodic(Runnable callback, double periodSeconds, double offsetSeconds) {
+  public static void addPeriodic(Runnable callback, double periodSeconds, double offsetSeconds) {
     m_callbacks.add(new Callback(callback, m_startTime, periodSeconds, offsetSeconds));
   }
 }

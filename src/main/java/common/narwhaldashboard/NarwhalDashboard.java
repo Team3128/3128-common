@@ -18,7 +18,7 @@ import org.json.simple.JSONObject;
 
 import common.hardware.camera.NAR_Camera;
 import common.hardware.camera.NAR_Camera.Pipeline;
-import common.utility.Log;
+import common.logging.Log;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 

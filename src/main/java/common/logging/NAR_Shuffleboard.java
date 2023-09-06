@@ -1,4 +1,4 @@
-package common.utility;
+package common.logging;
 
 import java.util.HashMap;
 import java.util.function.DoubleSupplier;

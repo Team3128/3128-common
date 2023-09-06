@@ -1,4 +1,4 @@
-package common.utility;
+package common.logging;
 
 import edu.wpi.first.wpilibj.DriverStation;
 
