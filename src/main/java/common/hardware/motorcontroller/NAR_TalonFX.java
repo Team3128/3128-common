@@ -9,7 +9,7 @@ import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 
-import common.logging.NAR_Shuffleboard;
+import common.utility.NAR_Shuffleboard;
 
 /**
  * Team 3128's streamlined {@link WPI_TalonFX} class.

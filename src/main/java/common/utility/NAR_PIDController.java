@@ -1,4 +1,4 @@
-package common.controller;
+package common.utility;
 
 import java.util.function.DoubleSupplier;
 

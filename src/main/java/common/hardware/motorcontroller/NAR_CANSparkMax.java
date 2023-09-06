@@ -11,7 +11,7 @@ import com.revrobotics.REVLibError;
 import com.revrobotics.SparkMaxRelativeEncoder;
 import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 
-import common.logging.NAR_Shuffleboard;
+import common.utility.NAR_Shuffleboard;
 
 /**
  * Team 3128's streamlined {@link CANSparkMax} class.
