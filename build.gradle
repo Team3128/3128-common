@@ -1,19 +1,109 @@
 plugins {
-  id 'java'
-  id 'google-test'
-  id 'edu.wpi.first.wpilib.repositories.WPILibRepositoriesPlugin' version '2020.2'
-  id 'edu.wpi.first.NativeUtils' version '2023.11.1'
-  id 'edu.wpi.first.GradleJni' version '1.0.0'
-  id 'edu.wpi.first.GradleVsCode' version '1.3.0'
-  id "edu.wpi.first.GradleRIO" version "2023.4.3"
+    id "java-library"
+    id "eclipse"
+	id "edu.wpi.first.GradleRIO" version "2023.4.3"
+    id "org.ajoberstar.grgit" version "3.0.0"
+    id "maven-publish"
+    id "io.github.mosadie.vendorJSON" version "1.0"
 }
 
+group = archivesGroup
+
+// Sets JDK compatibility to JDK 11
 sourceCompatibility = JavaVersion.VERSION_11
 targetCompatibility = JavaVersion.VERSION_11
 
+// Configuration for build task which compiles , generates the javadoc and does the install 
+// of RobotLib in local maven cache.
+// Also used by Jitpack/GitHub Actions.
+
+if (System.getProperty("local")) {
+	println("This is a local Compile:")
+	version = "local"
+}
+else {
+	println("This is a versioned Compile:")
+	version = LibraryVersion
+}
+                    // Version identifier used for local maven cache and github releases.
+					// Should stay as "local". This allows the robot* projects on the
+					// same PC as RobotLib to pull from the local cache with the fixed
+					// version name "local" and so always be pointing at the current RobotLib
+					// version including those under development and not have to be updated
+					// each time the robotlib version changes. Release to the world via github
+					// is based on actual version numbers and robotLib.json.
+					//
+					// When starting a new version you can update LibraryVersion.java,
+					// overview.html and gradle.properties. DO NOT update robotlib.json. It is
+					// maintained by the release github action when you release with github.
+					//
+					// Build in Eclispe using the Build RobotLib or Build RobotLib (Offline) 
+					// run configurations. You can push to github as much as you want.
+					//
+					// When ready to release, make sure the version number and dates are 
+					// correct in the files named above then update README.md. Final push all of your
+                    // changes to GitHub. Also check on github Actions tab if the latest commit has a
+                    // checkmark, indicating GitHub was able to build the code successfully.
+					//
+					// Then on GitHub, create a new release. This will create the release
+					// and then GitHub Actions will be triggered to compile the project and
+					// add the generated files (artifacts) to the release. Additionally, the release
+					// will become available from the Jitpack.io repository. Note that
+					// the IF statement above detects when gradle is running on GitHub Actions
+					// and sets the version varible to the actual version number (instead
+					// of "local") when compiling for release. The release action will update
+					// robolib.json to the new version on github. After release action is complete
+					// you can fetch from github with tags to get the updated robotlib.json and
+					// release tag back into the local git repo.
+					//
+					// When all this is done, other user's robot projects that want the updated
+					// RobotLib, edit their local RobotLib.json to reflect the new version number 
+					// and on next compile, gradle will pull the new library to their PC.
+					//
+					// Or if using VSCode, run the Manage Vendor Libraries (online) command and 
+					// it will detect the new RobotLib version and offer to update the VSCode project.
+					//
+					// Warning: The github release action only works on the master branch. Do not
+					// create releases from other branches.
+					//
+					// Note: the github action files gradleCI.yml and gradleRelease.yml are
+					// located in .github\workflows.
+					//
+
+println("LibraryVersion=" + LibraryVersion + "; compile version=" + version)
+					
+// This task updates the vendor json file for this project to the specified version.					
+vendorJSON {
+    fileName = jsonFileName
+    version = LibraryVersion
+    addJavaArtifact(archivesGroup, archivesBaseName, LibraryVersion)
+}
+
+// This section is to prevent people from accidently deploying this project to a robot. 
+deploy {
+    for (String task : project.gradle.startParameter.taskNames) {
+        if (task == "deploy")
+            throw new GradleException("This is a library project! You can't deploy it to a robot!")
+    }
+}
+
+// Generates Source and Javadoc jars when building.
+java {
+    withJavadocJar();
+    withSourcesJar();
+}
+
+// Look in local maven cache first, then maven central for dependent libraries.
 repositories {
-    mavenCentral()
-    maven {
+	// This is needed to fix problem with the url below redirecting to an http (insecure) url.
+	//maven {
+    //    url "https://www.revrobotics.com/content/sw/color-sensor-v3/sdk/maven/"
+    //    allowInsecureProtocol = true
+    //}
+
+	mavenLocal()
+	mavenCentral()
+	maven {
         url = uri("https://maven.pkg.github.com/Mechanical-Advantage/AdvantageKit")
         credentials {
             username = "Mechanical-Advantage-Bot"
@@ -21,43 +111,106 @@ repositories {
         }
     }
 }
-if (project.hasProperty('releaseMode')) {
-  wpilibRepositories.addAllReleaseRepositories(project)
-} else {
-  wpilibRepositories.addAllDevelopmentRepositories(project)
+
+// Setup eclipse classpath settings, so the javadoc and sources are available in eclipse
+eclipse {
+    classpath {
+        downloadJavadoc = true
+        downloadSources = true
+    }
 }
 
-// Apply Java configuration
+// Defining dependencies. In this case, WPILib (+ friends), and some vendor libraries (NavX, CTRE)
 dependencies {
     implementation wpi.java.deps.wpilib()
     implementation wpi.java.vendor.java()
-    implementation 'edu.wpi.first.cscore:cscore-java:2023.+'
-    implementation 'edu.wpi.first.cameraserver:cameraserver-java:2023.+'
-    implementation 'edu.wpi.first.ntcore:ntcore-java:2023.+'
-    implementation 'edu.wpi.first.wpilibj:wpilibj-java:2023.+'
-    implementation 'edu.wpi.first.wpiutil:wpiutil-java:2023.+'
-    implementation 'edu.wpi.first.wpimath:wpimath-java:2023.+'
-    implementation 'edu.wpi.first.wpiunits:wpiunits-java:2023.+'
-    implementation 'edu.wpi.first.hal:hal-java:2023.+'
-    implementation "org.ejml:ejml-simple:0.41"
-    implementation "com.fasterxml.jackson.core:jackson-annotations:2.12.4"
-    implementation "com.fasterxml.jackson.core:jackson-core:2.12.4"
-    implementation "com.fasterxml.jackson.core:jackson-databind:2.12.4"
-    implementation 'edu.wpi.first.thirdparty.frc2023.opencv:opencv-java:4.6.0-2'
-    implementation 'org.java-websocket:Java-WebSocket:1.3.8'
+
+	implementation 'org.java-websocket:Java-WebSocket:1.3.8'
     implementation group: 'com.googlecode.json-simple', name: 'json-simple', version: '1.1.1'
+        
+    // For reference, here are a few more of the easy to add libraries not currently used:
+   	//implementation pathfinder() (Jaci's)
+   	//implementation openrioMatchData()
+
+   	// Quick guide to keywords:
+   	// api is for libraries that are expected to be needed in the main robot project.
+   	// implementation is for libraries that will not be needed in the main robot project.
+   	// (Both api and implementation keywords will have the library automatically downloaded with RobotLib)
+   	// compileOnly expects the dependency to be provided somewhere else. (Ex. by a main robot project)
+   	// compile means include in the output library jar (see below).
 }
 
-// Set up exports properly
-nativeUtils {
+// These next definitions (branch and hash) attempt to find extra information to add to the the manifest of
+// the robot program jar file.
 
+// Returns either the name of the current branch, or an empty string if no git repo is found.
+def branch = { ->
+    if (grgit == null) { // If there's no git repo.
+        return ""
+    }
+
+    return grgit.branch.current().getName()
 }
 
-model {
+// Returns either the short hash of the last commit or an empty string if no git repo is found.
+def hash = { ->
+    if (grgit == null) { // If there's no git repo.
+        return ""
+    }
+    
+    return grgit.head().abbreviatedId
 }
 
-apply from: 'publish.gradle'
+// Setting up RobotLib Jar File. In this case, adding version information to jar manifest.
+jar {
+    manifest {
+       	attributes("LibraryVersion": LibraryVersion)	// from gradle.properties file.
+       	attributes("Time": new Date().format("yyyy-MM-dd HH:mm:ss"))
+       	attributes("User": System.getProperty("user.name"))
+       	attributes("Branch": branch())
+       	attributes("Commit": hash())
+	}
+}
 
-wrapper {
-  gradleVersion '8.2.1'
+// Create Sources Jar
+//task sourcesJar(type: Jar, dependsOn: classes) {
+//    classifier = 'sources'
+//    from sourceSets.main.allSource
+//}
+
+// When Javadoc is created (./gradlew.bat javadoc) it will be in this directory in the project folder.
+javadoc {
+    destinationDir = file("doc")
+    title = "3128-common"
+    options.overview = "src/main/resources/overview.html"
+    // These options obsolete with move to JDK 17.
+    //options.addBooleanOption "-no-module-directories", true
+    //options.addBooleanOption "-frames", true
+    // This option supresses all Javadoc warnings. Some warnings are usefull but many
+    // we ignore. Should review warnings with any significant changes to the library.
+	options.addStringOption('Xdoclint:all,-missing', '-quiet')
+}
+
+// Create Javadoc Jar
+//task javadocJar(type: Jar, dependsOn: javadoc) {
+//    classifier = 'javadoc'
+//    from javadoc.destinationDir
+//}
+
+// Additional artifacts to publish for JitPack
+artifacts {
+    archives sourcesJar
+    archives javadocJar
+}
+
+// Required as of gradle 7.1.1. Configures PublishToMavenLocal task. This task is required to get our
+// jars published to the local maven repository on this PC for consumption by robot projects on this PC.
+// The PubishToMavenLocal task is executed in the eclipse .launch files that run this build.
+publishing {
+    publications {
+        common(MavenPublication) {
+	    	artifactId = '3128-common'
+            from components.java
+        }
+    }
 }
