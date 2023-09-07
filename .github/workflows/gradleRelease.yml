@@ -1,0 +1,95 @@
+name: Build Release
+
+# Only triggers when a release is published, draft releases do not count.
+# Warning: use no tabs when editing this file
+
+on:
+  release:
+    types: published
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v3
+
+    - name: Get Tag
+      uses: olegtarasov/get-tag@v2.1.2
+      id: getTag
+      with:
+        tagRegex: "v(.*)" # This filters out the `v` from the tag. (Ex: v3.8.0 becomes 3.8.0)
+
+    - name: Set up JDK 11
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'adopt'
+        java-version: 11
+        cache: gradle
+
+    - name: Build 3128-common
+      run: './gradlew build'
+
+    - name: Upload 3128-common Jar
+      id: upload-release-asset 
+      uses: svenstaro/upload-release-action@v2
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }} 
+        file: ./build/libs/3128-common-${{ steps.getTag.outputs.tag }}.jar
+        asset_name: 3128-common-${{ steps.getTag.outputs.tag }}.jar
+        tag: ${{ github.ref }}
+
+    - name: Upload 3128-common JavaDoc Jar
+      id: upload-release-asset-javadoc
+      uses: svenstaro/upload-release-action@v2
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: ./build/libs/3128-common-${{ steps.getTag.outputs.tag }}-javadoc.jar
+        asset_name: 3128-common-${{ steps.getTag.outputs.tag }}-javadoc.jar
+        tag: ${{ github.ref }}
+
+    - name: Upload 3128-common Sources Jar
+      id: upload-release-asset-sources
+      uses: svenstaro/upload-release-action@v2
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: ./build/libs/3128-common-${{ steps.getTag.outputs.tag }}-sources.jar
+        asset_name: 3128-common-${{ steps.getTag.outputs.tag }}-sources.jar
+        tag: ${{ github.ref }}
+
+
+  generateJSON:
+    # The build job (above) must complete successfully in order for this job to run.
+    needs: build
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v3
+
+    - name: Set up JDK 11
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'adopt'
+        java-version: 11
+        cache: gradle
+
+    - name: Generate 3128-common.json
+      run: './gradlew vendorJSON'
+
+    - name: Commit 3128-common.json
+      uses: EndBug/add-and-commit@v9.1.3
+      with:
+        add: './3128-common.json'
+        message: 'Automated - Update 3128-common.json for release'
+
+    - name: Upload 3128-common.json to Release
+      id: upload-release-asset 
+      uses: svenstaro/upload-release-action@v2
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: ./3128-common.json
+        asset_name: 3128-common.json
+        tag: ${{ github.ref }}
