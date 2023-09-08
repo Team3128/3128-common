@@ -5,7 +5,7 @@
   "mavenUrls": [
     "https://jitpack.io"
   ],
-  "jsonUrl": "https://raw.githubusercontent.com/ORF-4450/RobotLib/master/robotlib.json",
+  "jsonUrl": "https://github.com/Team3128/3128-common/latest/download/3128-common.json",
   "fileName": "3128-common.json",
   "javaDependencies": [
     {
