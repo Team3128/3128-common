@@ -1,40 +1,61 @@
 package common.hardware.motorcontroller;
 
-import com.revrobotics.SparkMaxAbsoluteEncoder;
-import com.revrobotics.SparkMaxPIDController;
-
-import java.util.function.Consumer;
 import java.util.function.DoubleSupplier;
 
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.revrobotics.CANSparkMaxLowLevel.PeriodicFrame;
 import com.revrobotics.REVLibError;
-import com.revrobotics.SparkMaxRelativeEncoder;
+import com.revrobotics.SparkMaxAbsoluteEncoder;
 import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
+import com.revrobotics.SparkMaxPIDController;
+import com.revrobotics.SparkMaxRelativeEncoder;
 
+import common.core.NAR_Robot;
 import common.utility.NAR_Shuffleboard;
+import static common.hardware.motorcontroller.MotorControllerConstants.*;
+
+import com.revrobotics.CANSparkMax.ControlType;
+import com.revrobotics.CANSparkMax.IdleMode;
 
 /**
  * Team 3128's streamlined {@link CANSparkMax} class.
  * @since 2023 CHARGED UP
  * @author Mason Lam
  */
-public class NAR_CANSparkMax extends CANSparkMax {
+public class NAR_CANSparkMax extends NAR_Motor {
+	public enum SparkMaxConfig {
+		DEFAULT(ULTRA_PRIORITY, HIGH_PRIORITY, HIGH_PRIORITY, NO_PRIORITY, NO_PRIORITY, NO_PRIORITY, NO_PRIORITY),
+		FOLLOWER(MEDIUM_PRIORITY, NO_PRIORITY, NO_PRIORITY, NO_PRIORITY, NO_PRIORITY, NO_PRIORITY, NO_PRIORITY),
+		POSITION(ULTRA_PRIORITY, MEDIUM_PRIORITY, HIGH_PRIORITY, NO_PRIORITY, NO_PRIORITY, NO_PRIORITY, NO_PRIORITY),
+		VELOCITY(ULTRA_PRIORITY, HIGH_PRIORITY, MEDIUM_PRIORITY, NO_PRIORITY, NO_PRIORITY, NO_PRIORITY, NO_PRIORITY);
 
-	public enum EncoderType {
+		public int status0, status1, status2, status3, status4, status5, status6;
+
+		private SparkMaxConfig(int status0, int status1, int status2, int status3, int status4, int status5, int status6) {
+			this.status0 = status0;
+			this.status1 = status1;
+			this.status2 = status2;
+			this.status3 = status3;
+			this.status4 = status4;
+			this.status5 = status5;
+			this.status6 = status6;
+		}
+	}
+
+    public enum EncoderType {
 		Relative,
 		Absolute
 	}
 	
 	private double kP, kI, kD;
-	private double prevValue = 0;
-	private double prevFF = 0;
-	private ControlType prevControlType = ControlType.kDutyCycle;
 	private EncoderType encoderType;
 	private SparkMaxRelativeEncoder relativeEncoder;
 	private SparkMaxAbsoluteEncoder absoluteEncoder;
-	private SparkMaxPIDController controller;
+	private final SparkMaxPIDController controller;
+    private final CANSparkMax motor;
 
-	/**
+    /**
 	 * Create a new object to control a SPARK MAX motor
 	 *
 	 * @param deviceNumber The device ID.
@@ -47,25 +68,28 @@ public class NAR_CANSparkMax extends CANSparkMax {
 	 * @param kI The integral coefficient of the on board PIDController.
    	 * @param kD The derivative coefficient of the on board PIDController.
 	 */
-	 public NAR_CANSparkMax(int deviceNumber, EncoderType encoderType, MotorType type, double kP, double kI, double kD) {
-		super(deviceNumber, type);
+    public NAR_CANSparkMax(int deviceNumber, MotorType type, EncoderType encoderType, double kP, double kI, double kD) {
+        motor = new CANSparkMax(deviceNumber, type);
 
-		setCANTimeout(10);
-		restoreFactoryDefaults(); // Reset config parameters, unfollow other motor controllers
-		enableVoltageCompensation(12);
+        motor.setCANTimeout(0);
+		motor.restoreFactoryDefaults(); // Reset config parameters, unfollow other motor controllers
+		motor.enableVoltageCompensation(12);
 
 		this.encoderType = encoderType;
 
 		if (encoderType == EncoderType.Relative) {
-			relativeEncoder = (SparkMaxRelativeEncoder) getEncoder();
+			relativeEncoder = (SparkMaxRelativeEncoder) motor.getEncoder();
+			relativeEncoder.setAverageDepth(2);
+			relativeEncoder.setMeasurementPeriod(10);
 		}
 		
 		else {
-			absoluteEncoder = getAbsoluteEncoder(Type.kDutyCycle);
+			absoluteEncoder = motor.getAbsoluteEncoder(Type.kDutyCycle);
 			absoluteEncoder.setVelocityConversionFactor(60);
+			absoluteEncoder.setAverageDepth(2);
 		}
 
-		controller = getPIDController();
+		controller = motor.getPIDController();
 		controller.setOutputRange(-1, 1);
 		controller.setP(kP);
 		controller.setI(kI);
@@ -75,29 +99,41 @@ public class NAR_CANSparkMax extends CANSparkMax {
 		this.kD = kD;
 		
 		controller.setFeedbackDevice(encoderType == EncoderType.Relative ? relativeEncoder : absoluteEncoder);
-	}
+    }
 
-	/**
+    /**
 	 * Create a new object to control a SPARK MAX motor
 	 *
 	 * @param deviceNumber The device ID.
+     * @param type The motor type connected to the controller. Brushless motor wires must be connected
+	 *     	to their matching colors and the hall sensor must be plugged in. Brushed motors must be
+	 *     	connected to the Red and Black terminals only.
 	 * @param encoderType The type of encoder used, ie. relative build in encoder or absolute encoder
 	 * 		connected by an adapter.
-	 * @param type The motor type connected to the controller. Brushless motor wires must be connected
+	 */
+	public NAR_CANSparkMax(int deviceNumber, MotorType type, EncoderType encoderType) {
+		this(deviceNumber, type, encoderType, 0, 0, 0);
+	}
+
+    /**
+	 * Create a new object to control a SPARK MAX motor
+	 *
+	 * @param deviceNumber The device ID.
+     * @param type The motor type connected to the controller. Brushless motor wires must be connected
 	 *     	to their matching colors and the hall sensor must be plugged in. Brushed motors must be
 	 *     	connected to the Red and Black terminals only.
 	 */
-	public NAR_CANSparkMax(int deviceNumber, EncoderType encoderType, MotorType type) {
-		this(deviceNumber, encoderType, type, 0, 0, 0);
+	public NAR_CANSparkMax(int deviceNumber, MotorType type) {
+		this(deviceNumber, type, EncoderType.Relative);
 	}
-
-	/**
+    
+    /**
 	 * Create a new object to control a SPARK MAX motor
 	 *
 	 * @param deviceNumber The device ID.
 	 */
 	public NAR_CANSparkMax(int deviceNumber) {
-		this(deviceNumber, EncoderType.Relative, MotorType.kBrushless);
+		this(deviceNumber, MotorType.kBrushless);
 	}
 
 	/**
@@ -107,76 +143,58 @@ public class NAR_CANSparkMax extends CANSparkMax {
 	 * @param prefix String added before each name of PID widgets.
 	 * @param column Column to add the PID widgets to.
 	 */
-	public void initShuffleboard(String tabName, String prefix, int column, Consumer<Runnable> addPeriodic) {
+	public void initShuffleboard(String tabName, String prefix, int column) {
 		DoubleSupplier proportional = NAR_Shuffleboard.debug(tabName, prefix + "_kP", kP, column, 0);
 		DoubleSupplier integral = NAR_Shuffleboard.debug(tabName, prefix + "_kI", kI, column, 1);
 		DoubleSupplier derivative = NAR_Shuffleboard.debug(tabName, prefix + "_kD", kD, column, 2);
-		addPeriodic.accept(()-> {
+		NAR_Robot.addPeriodic(()-> {
 			if (proportional.getAsDouble() == kP) {
 				kP = proportional.getAsDouble();
 				controller.setP(kP);
 			}
-		});
-		addPeriodic.accept(()-> {
+		}, 0.5);
+		NAR_Robot.addPeriodic(()-> {
 			if (integral.getAsDouble() == kI) {
 				kI = proportional.getAsDouble();
 				controller.setI(kI);
 			}
-		});
-		addPeriodic.accept(()-> {
+		},0.5);
+		NAR_Robot.addPeriodic(()-> {
 			if (derivative.getAsDouble() == kD) {
 				kD = derivative.getAsDouble();
 				controller.setD(kD);
 			}
-		});
+		}, 0.5);
 	}
 
 	/**
-	 * Set the controller reference value based on basic duty cycle control
+	 * Sets the current limit in Amps.
 	 *
-	 * @param outputValue The value to set depending on the control mode. For basic duty cycle control this
-	 *     should be a value between -1 and 1.
-	 */
-	@Override
-	public void set(double outputValue) {
-		set(outputValue, ControlType.kDutyCycle);
-	}
-
-	/**
-	 * Set the controller reference value based on the selected control mode.
+	 * <p>The motor controller will reduce the controller voltage output to avoid surpassing this
+	 * limit. This limit is enabled by default and used for brushless only. This limit is highly
+	 * recommended when using the NEO brushless motor.
 	 *
-	 * @param outputValue The value to set depending on the control mode. For basic duty cycle control this
-	 *     should be a value between -1 and 1 Otherwise: Voltage Control: Voltage (volts) Velocity
-	 *     Control: Velocity (RPM) Position Control: Position (Rotations) Current Control: Current
-	 *     (Amps).
-	 * @param controlType Is the {@link ControlType} to override with
-	 */
-	public void set(double outputValue, CANSparkMax.ControlType controlType) {
-		set(outputValue, controlType, 0);
-	}
-
-	/**
-	 * Set the controller reference value based on the selected control mode.
+	 * <p>The NEO Brushless Motor has a low internal resistance, which can mean large current spikes
+	 * that could be enough to cause damage to the motor and controller. This current limit provides a
+	 * smarter strategy to deal with high current draws and keep the motor and controller operating in
+	 * a safe region.
 	 *
-	 * @param outputValue The value to set depending on the control mode. For basic duty cycle control this
-	 *     should be a value between -1 and 1 Otherwise: Voltage Control: Voltage (volts) Velocity
-	 *     Control: Velocity (RPM) Position Control: Position (Rotations) Current Control: Current
-	 *     (Amps).
-	 * @param controlType Is the {@link ControlType} to override with
-	 * @param arbFeedforward A value from which is represented in voltage applied to the motor after
-	 *     the result of the specified control mode. The units for the parameter is Volts. This value
-	 *     is set after the control mode, but before any current limits or ramp rates.
+	 * @param limit The current limit in Amps.
 	 */
-	public void set(double outputValue, CANSparkMax.ControlType controlType, double arbFeedforward) {
-		if (outputValue != prevValue || controlType != prevControlType || arbFeedforward != prevFF) {
-			controller.setReference(outputValue, controlType, 0, arbFeedforward);
-			prevValue = outputValue;
-			prevControlType = controlType;
-			prevFF = arbFeedforward;
-		}
+	public void setCurrentLimit(int limit) {
+		motor.setSmartCurrentLimit(limit);
 	}
 
 	/**
+   	 * Enables the brake mode setting for the SPARK MAX.
+  	 *
+   	 * @param enable true for brake, false for coast
+   	 */
+	public void setBrakeMode(boolean enable) {
+		motor.setIdleMode(enable ? IdleMode.kBrake : IdleMode.kCoast);
+	}
+
+    /**
 	 * Set the rate of transmission for periodic frames from the SPARK MAX
 	 *
 	 * <p>Each motor controller sends back status frames with different data at set rates. Use this
@@ -194,69 +212,39 @@ public class NAR_CANSparkMax extends CANSparkMax {
 	 * @param periodMs Period in ms for the given frame.
 	 * @return {@link REVLibError#kOk} if successful
 	 */
-	@Override
 	public REVLibError setPeriodicFramePeriod(PeriodicFrame frame, int periodMs) {
-		return super.setPeriodicFramePeriod(frame, periodMs);
+		return motor.setPeriodicFramePeriod(frame, periodMs);
 	}
 
 	/**
 	 * Set the rate of transmission for periodic frames from the SPARK MAX
 	 *
 	 * <p>Each motor controller sends back status frames with different data at set rates. Use this
-	 * function to set to team 3128's default rates.
-	 *
-	 * <p>Defaults: Status0 - 10ms Status1 - 20ms Status2 - 20ms Status3 - 255ms Status4 - 255ms Status5
-	 * - 255ms Status6 - 255ms
+	 * function to set to team 3128's preset rates.
 	 */
-	public void setDefaultStatusFrames() {
-		setPeriodicFramePeriod(PeriodicFrame.kStatus0, MotorControllerConstants.ULTRA_PRIORITY);
-		setPeriodicFramePeriod(PeriodicFrame.kStatus1, MotorControllerConstants.HIGH_PRIORITY);
-		setPeriodicFramePeriod(PeriodicFrame.kStatus2, MotorControllerConstants.HIGH_PRIORITY);
-		setPeriodicFramePeriod(PeriodicFrame.kStatus3, MotorControllerConstants.LOW_PRIORITY);
-		setPeriodicFramePeriod(PeriodicFrame.kStatus4, MotorControllerConstants.LOW_PRIORITY);
-		setPeriodicFramePeriod(PeriodicFrame.kStatus5, MotorControllerConstants.LOW_PRIORITY);
-		setPeriodicFramePeriod(PeriodicFrame.kStatus6, MotorControllerConstants.LOW_PRIORITY);
+	public void setStatusFrames(SparkMaxConfig config) {
+		setPeriodicFramePeriod(PeriodicFrame.kStatus0, config.status0);
+		setPeriodicFramePeriod(PeriodicFrame.kStatus1, config.status1);
+		setPeriodicFramePeriod(PeriodicFrame.kStatus2, config.status2);
+		setPeriodicFramePeriod(PeriodicFrame.kStatus3, config.status3);
+		setPeriodicFramePeriod(PeriodicFrame.kStatus4, config.status4);
+		setPeriodicFramePeriod(PeriodicFrame.kStatus5, config.status5);
+		setPeriodicFramePeriod(PeriodicFrame.kStatus6, config.status6);
 	}
 
-	/**
-	 * Causes this controller's output to mirror the provided leader.
-	 *
-	 * <p>Only voltage output is mirrored. Settings changed on the leader do not affect the follower.
-	 *
-	 * <p>Following anything other than a CAN SPARK MAX is not officially supported.
-	 * 
-	 * <p>Configures status frames to minimize CAN utilization.
-	 *
-	 * @param motor The motor controller to follow.
-	 * @param invert Set the follower to output opposite of the leader
-	 * @return {@link REVLibError#kOk} if successful
-	 */
-	@Override
-	public REVLibError follow(final CANSparkMax motor, boolean invert) {
-		setPeriodicFramePeriod(PeriodicFrame.kStatus0, MotorControllerConstants.MEDIUM_PRIORITY);
-		setPeriodicFramePeriod(PeriodicFrame.kStatus1, MotorControllerConstants.LOW_PRIORITY);
-		setPeriodicFramePeriod(PeriodicFrame.kStatus2, MotorControllerConstants.LOW_PRIORITY);
-		setPeriodicFramePeriod(PeriodicFrame.kStatus3, MotorControllerConstants.LOW_PRIORITY);
-		setPeriodicFramePeriod(PeriodicFrame.kStatus4, MotorControllerConstants.LOW_PRIORITY);
-		setPeriodicFramePeriod(PeriodicFrame.kStatus5, MotorControllerConstants.LOW_PRIORITY);
-		setPeriodicFramePeriod(PeriodicFrame.kStatus6, MotorControllerConstants.LOW_PRIORITY);
-		return super.follow(motor);
-	}
+    /** Enables continuous input.
+    *
+    * <p>Rather then using the max and min input range as constraints, the motor considers them to be the
+    * same point and automatically calculates the shortest route to the setpoint.
+    *
+    * @param minInput The minimum value expected from the input.
+    * @param maxInput The maximum value expected from the input.
+    */
+    public void enableContinuousInput(double minInput, double maxInput) {
+        enableContinuousInput(minInput, maxInput, conversionFactor);
+    }
 
-	/**
-	 * Enables continuous input.
-	 *
-	 * <p>Rather then using the max and min input range as constraints, the motor considers them to be the
-	 * same point and automatically calculates the shortest route to the setpoint.
-	 *
-	 * @param minInput The minimum value expected from the input.
-	 * @param maxInput The maximum value expected from the input.
-	 */
-	public void enableContinuousInput(double minInput, double maxInput) {
-		enableContinuousInput(minInput, maxInput, 1);
-	}
-
-	/**
+    /**
 	 * Enables continuous input.
 	 *
 	 * <p>Rather then using the max and min input range as constraints, it considers them to be the
@@ -272,73 +260,49 @@ public class NAR_CANSparkMax extends CANSparkMax {
 		controller.setPositionPIDWrappingMaxInput(maxInput * factor);
 	}
 
-	/**
-	 * Set the conversion factor for position of the encoder. Multiplied by the native output units to
-	 * give you position.
-	 *
-	 * @param factor The conversion factor to multiply the native units by
-	 */
-	public void setPositionConversionFactor(double factor) {
-		if (encoderType == EncoderType.Relative) {
-			relativeEncoder.setPositionConversionFactor(factor);
-			return;
-		}
-		absoluteEncoder.setPositionConversionFactor(factor);
+	@Override
+	public void setInverted(boolean inverted) {
+		motor.setInverted(inverted);
 	}
 
-	/**
-	 * Set the conversion factor for velocity of the encoder. Multiplied by the native output units to
-	 * give you velocity
-	 *
-	 * @param factor The conversion factor to multiply the native units by
-	 */
-	public void setVelocityConversionFactor(double factor) {
-		if (encoderType == EncoderType.Relative) {
-			relativeEncoder.setVelocityConversionFactor(factor);
-			return;
-		}
-		absoluteEncoder.setVelocityConversionFactor(factor);
-	}
+    @Override
+    protected void setPercentOutput(double speed) {
+        controller.setReference(speed, ControlType.kDutyCycle);
+    }
 
-	/**
-	 * Set the position of the encoder. By default the units are 'rotations' and can be changed by a
-	 * scale factor using setPositionConversionFactor().
-	 *
-	 * @param position Number of rotations of the motor
-	 */
-	public void setSelectedSensorPosition(double position) {
-		if (encoderType == EncoderType.Relative) {
-			relativeEncoder.setPosition(position);
-			return;
-		}
-	}
+    @Override
+    protected void setVoltage(double volts) {
+        controller.setReference(volts, ControlType.kVoltage);
+    }
 
-	/**
-	 * Get the position of the motor. This returns the native units of 'rotations' by default, and can
-	 * be changed by a scale factor using setPositionConversionFactor().
-	 *
-	 * @return Number of rotations of the motor
-	 */
-	public double getSelectedSensorPosition() {
-		return encoderType == EncoderType.Relative ? relativeEncoder.getPosition() : absoluteEncoder.getPosition();
-	}
+    @Override
+    protected void setVelocity(double rpm, double feedForward) {
+        controller.setReference(rpm, ControlType.kVelocity, 0, feedForward);
+    }
 
-	/**
-	 * Get the velocity of the motor. This returns the native units of 'RPM' by default, and can be
-	 * changed by a scale factor using setVelocityConversionFactor().
-	 *
-	 * @return Number the RPM of the motor
-	 */
-	public double getSelectedSensorVelocity() {
-		return encoderType == EncoderType.Relative ? relativeEncoder.getVelocity() : absoluteEncoder.getVelocity();
-	}
+    @Override
+    protected void setPosition(double rotations, double feedForward) {
+        controller.setReference(rotations, ControlType.kVelocity, 0, feedForward);
+    }
 
-	/**
-	 * Get the output of the motor. This returns the output in volts.
-	 * 
-	 * @return Volts applied to motor
-	 */
-	public double getMotorOutputVoltage() {
-		return getAppliedOutput() * getBusVoltage();
-	}
+    @Override
+    public double getAppliedOutput() {
+        return motor.getAppliedOutput();
+    }
+
+    @Override
+    public double getRawPosition() {
+        return encoderType == EncoderType.Relative ? relativeEncoder.getPosition() : absoluteEncoder.getPosition();
+    }
+
+    @Override
+    public double getRawVelocity() {
+        return encoderType == EncoderType.Relative ? relativeEncoder.getVelocity() : absoluteEncoder.getVelocity();
+    }
+
+	@Override
+    public CANSparkMax getMotor() {
+        return motor;
+    }
+    
 }

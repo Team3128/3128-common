@@ -13,6 +13,7 @@ public class MotorControllerConstants {
     public static final double SPARKMAX_ENCODER_RESOLUTION = 42; // CPR
     public static final double SPARKMAX_RPM_TO_NUpS = SPARKMAX_ENCODER_RESOLUTION / 60; // rotations/min -> counts/sec
 
+    public static final int NO_PRIORITY = 65535;
     public static final int LOW_PRIORITY = 255;
     public static final int MEDIUM_PRIORITY = 45;
     public static final int HIGH_PRIORITY = 20;

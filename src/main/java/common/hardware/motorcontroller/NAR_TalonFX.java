@@ -1,29 +1,29 @@
 package common.hardware.motorcontroller;
 
-import java.util.function.Consumer;
-import java.util.function.DoubleSupplier;
-
-import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 
+import common.core.NAR_Robot;
 import common.utility.NAR_Shuffleboard;
+
+import static common.hardware.motorcontroller.MotorControllerConstants.*;
+
+import java.util.function.Consumer;
+import java.util.function.DoubleSupplier;
 
 /**
  * Team 3128's streamlined {@link WPI_TalonFX} class.
  * @since 2023 CHARGED UP
  * @author Mason Lam
  */
-public class NAR_TalonFX extends WPI_TalonFX {
+public class NAR_TalonFX extends NAR_Motor{
 
-	private double kP, kI, kD;
-	private double prevValue = 0;
-	private ControlMode prevControlMode = ControlMode.Disabled;
-	private double prevFF = 0;
+    private final WPI_TalonFX motor;
+    private double kP, kI, kD;
 
-	/**
+    /**
 	 * Create a new object to control a Falcon 500 motor
 	 *
 	 * @param deviceNumber The device ID.
@@ -32,22 +32,22 @@ public class NAR_TalonFX extends WPI_TalonFX {
 	 * @param kI The integral coefficient of the on board PIDController.
    	 * @param kD The derivative coefficient of the on board PIDController.
 	 */
-	public NAR_TalonFX(int deviceNumber, String canBus, double kP, double kI, double kD) {
-		super(deviceNumber, canBus);
+    public NAR_TalonFX(int deviceNumber, String canBus, double kP, double kI, double kD) {
+        motor = new WPI_TalonFX(deviceNumber, canBus);
 
-		configVoltageCompSaturation(12, 10);
-		enableVoltageCompensation(true);
+        motor.configVoltageCompSaturation(12, 10);
+		motor.enableVoltageCompensation(true);
 
-		this.kP = kP;
+        this.kP = kP;
 		this.kI = kI;
 		this.kD = kD;
 
-		config_kP(0, kP);
-		config_kI(0, kI);
-		config_kD(0, kD);
-	}
+		motor.config_kP(0, kP);
+		motor.config_kI(0, kI);
+		motor.config_kD(0, kD);
+    }
 
-	/**
+    /**
 	 * Create a new object to control a Falcon 500 motor
 	 *
 	 * @param deviceNumber The device ID.
@@ -66,7 +66,7 @@ public class NAR_TalonFX extends WPI_TalonFX {
 		this(deviceNumber, "");
 	}
 
-	/**
+    /**
 	 * Adds a PID tuning setup to a specific shuffleboard tab. Editing a value on the tab 
 	 * will automatically update the value on the controller.
 	 * @param tabName The title of the tab to select.
@@ -77,77 +77,27 @@ public class NAR_TalonFX extends WPI_TalonFX {
 		DoubleSupplier proportional = NAR_Shuffleboard.debug(tabName, prefix + "_kP", kP, column, 0);
 		DoubleSupplier integral = NAR_Shuffleboard.debug(tabName, prefix + "_kI", kI, column, 1);
 		DoubleSupplier derivative = NAR_Shuffleboard.debug(tabName, prefix + "_kD", kD, column, 2);
-		addPeriodic.accept(()-> {
+		NAR_Robot.addPeriodic(()-> {
 			if (proportional.getAsDouble() == kP) {
 				kP = proportional.getAsDouble();
-				config_kP(0, kP);
+				motor.config_kP(0, kP);
 			}
-		});
-		addPeriodic.accept(()-> {
+		}, 0.5);
+		NAR_Robot.addPeriodic(()-> {
 			if (integral.getAsDouble() == kI) {
 				kI = proportional.getAsDouble();
-				config_kI(0, kI);
+				motor.config_kI(0, kI);
 			}
-		});
-		addPeriodic.accept(()-> {
+		}, 0.5);
+		NAR_Robot.addPeriodic(()-> {
 			if (derivative.getAsDouble() == kD) {
 				kD = derivative.getAsDouble();
-				config_kD(0, kD);
+				motor.config_kD(0, kD);
 			}
-		});
+		}, 0.5);
 	}
 
-	/**
-	 * Set the controller reference value based on percent output control
-	 *
-	 * @param speed The value to set depending on the control mode. For basic duty cycle control this
-	 *     should be a value between -1 and 1.
-	 */
-	@Override
-	public void set(double speed) {
-		set(speed, ControlMode.PercentOutput);
-	}
-
-	/**
-	 * Set the controller reference value based on the selected control mode.
-	 *
-	 * @param outputValue The value to set depending on the control mode. For basic duty cycle control this
-	 *     should be a value between -1 and 1 Otherwise: Voltage Control: Voltage (volts) Velocity
-	 *     Control: Velocity (RPM) Position Control: Position (Rotations) Current Control: Current
-	 *     (Amps).
-	 * @param controlMode Is the {@link ControlMode} to override with
-	 */
-	public void set(double outputValue, ControlMode controlMode) {
-		set(controlMode, outputValue, DemandType.Neutral, 0);
-	}
-
-	/**
-	 * Set the controller reference value based on the selected control mode.
-	 *
-	 * @param outputValue The value to set depending on the control mode. For basic duty cycle control this
-	 *     should be a value between -1 and 1 Otherwise: Voltage Control: Voltage (volts) Velocity
-	 *     Control: Velocity (RPM) Position Control: Position (Rotations) Current Control: Current
-	 *     (Amps).
-	 * @param controlMode Is the {@link ControlMode} to override with
-	 * @param feedForward A value which is measured in motor output [-1,1] applied to the motor after
-	 *     the result of the specified control mode.
-	 */
-	public void set(double outputValue, ControlMode controlMode, double feedForward) {
-		if (controlMode == ControlMode.Position) {
-			outputValue *= MotorControllerConstants.FALCON_ENCODER_RESOLUTION;
-		}
-		if (controlMode == ControlMode.Velocity) {
-			outputValue *= MotorControllerConstants.RPM_TO_FALCON;
-		}
-		if (outputValue != prevValue || controlMode != prevControlMode|| feedForward != prevFF) {
-			super.set(controlMode, outputValue, DemandType.ArbitraryFeedForward, feedForward);
-			prevValue = outputValue;
-			prevControlMode = controlMode;
-			prevFF = feedForward;
-		}
-	}
-
-	/**
+    /**
 	 * Set the rate of transmission for status frames from the TalonFX
 	 * <p>Each motor controller sends back status frames with different data at set rates. Use this
 	 * function to change the default rates.
@@ -165,14 +115,12 @@ public class NAR_TalonFX extends WPI_TalonFX {
 	 * 
 	 * @param frame which {@link StatusFrameEnhanced} to be changed.
 	 * @param periodMs Period in ms for the given frame.
-	 * @return Error Code generated by function. 0 indicates no error.
 	 */
-	public ErrorCode setStatusFramePeriod(StatusFrameEnhanced frame, int periodMs) {
-		int timeoutMs = 0;
-		return setStatusFramePeriod(frame, periodMs, timeoutMs);
+	public void setStatusFramePeriod(StatusFrameEnhanced frame, int periodMs) {
+		motor.setStatusFramePeriod(frame, periodMs);
 	}
 
-	/**
+    /**
 	 * Set the rate of transmission for stauts frames from the TalonFX
 	 *
 	 * <p>Each motor controller sends back status frames with different data at set rates. Use this
@@ -194,34 +142,48 @@ public class NAR_TalonFX extends WPI_TalonFX {
 		setStatusFramePeriod(StatusFrameEnhanced.Status_21_FeedbackIntegrated, MotorControllerConstants.LOW_PRIORITY);
 	}
 
-	/**
-	 * Sets the sensor position to the given value.
-	 *
-	 * @param sensorPos Position to set for the selected sensor (in rotations).
-	 * @return Error Code generated by function. 0 indicates no error.
-	 */
-	@Override
-	public ErrorCode setSelectedSensorPosition(double sensorPos) {
-		return super.setSelectedSensorPosition(sensorPos * MotorControllerConstants.FALCON_ENCODER_RESOLUTION); //Rotations to nu
-	}
+    @Override
+    public void setInverted(boolean inverted) {
+        motor.setInverted(inverted);
+    }
 
-	/**
-	 * Get the selected sensor velocity.
-	 *
-	 * @return sensor velocity in rotations per minute (RPM)
-	 */
-	@Override
-	public double getSelectedSensorVelocity() {
-		return super.getSelectedSensorVelocity() * 600 / MotorControllerConstants.FALCON_ENCODER_RESOLUTION; // convert nu/100ms to rpm
-	}
+    @Override
+    protected void setPercentOutput(double speed) {
+        motor.set(speed);
+    }
 
-	/**
-	 * Get the selected sensor position
-	 *
-	 * @return Position of selected sensor (in rotations).
-	 */
-	@Override
-	public double getSelectedSensorPosition() {
-		return super.getSelectedSensorPosition() / MotorControllerConstants.FALCON_ENCODER_RESOLUTION; // convert nu to rotations
-	}
+    @Override
+    protected void setVoltage(double volts) {
+        motor.set(volts / 12.0);
+    }
+
+    @Override
+    protected void setVelocity(double rpm, double feedForward) {
+        motor.set(ControlMode.Velocity, rpm * RPM_TO_FALCON, DemandType.ArbitraryFeedForward, feedForward / 12.0);
+    }
+
+    @Override
+    protected void setPosition(double rotations, double feedForward) {
+        motor.set(ControlMode.Position, rotations * FALCON_ENCODER_RESOLUTION, DemandType.ArbitraryFeedForward, feedForward / 12.0);
+    }
+
+    @Override
+    public double getAppliedOutput() {
+        return motor.getMotorOutputPercent();
+    }
+
+    @Override
+    public double getRawPosition() {
+        return motor.getSelectedSensorPosition() / MotorControllerConstants.FALCON_ENCODER_RESOLUTION;
+    }
+
+    @Override
+    public double getRawVelocity() {
+        return motor.getSelectedSensorVelocity() / MotorControllerConstants.RPM_TO_FALCON;
+    }
+    
+    @Override
+    public WPI_TalonFX getMotor() {
+        return motor;
+    }
 }
