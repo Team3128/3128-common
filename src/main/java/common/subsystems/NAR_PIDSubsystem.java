@@ -3,9 +3,11 @@ package common.subsystems;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
+import common.utility.Controller;
 import common.utility.NAR_Shuffleboard;
+import common.utility.Controller.PController;
+import common.utility.Controller.VController;
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.PIDSubsystem;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -15,10 +17,9 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
  * @author Mason Lam
  */
 public abstract class NAR_PIDSubsystem extends SubsystemBase {
-    protected final PIDController m_controller;
+    protected final Controller m_controller;
     protected boolean m_enabled;
     private DoubleSupplier kS, kV, kG;
-    private DoubleSupplier kG_Function;
     private BooleanSupplier debug;
     private DoubleSupplier setpoint;
     private double min, max;
@@ -27,39 +28,30 @@ public abstract class NAR_PIDSubsystem extends SubsystemBase {
      * Creates a new PIDSubsystem.
      *
      * @param controller the PIDController to use
-     * @param kS The static gain.
-     * @param kV The velocity gain.
-     * @param kG The gravity gain.
      */
-    public NAR_PIDSubsystem(PIDController controller, double kS, double kV, double kG) {
+    public NAR_PIDSubsystem(Controller controller) {
         m_controller = controller;
-        this.kG_Function = () -> 1;
-        initShuffleboard(kS, kV, kG);
+        controller.setMeasurementSource(()-> getMeasurement());
+        controller.addOutput(this::useOutput);
+        initShuffleboard();
         min = Double.NEGATIVE_INFINITY;
         max = Double.POSITIVE_INFINITY;
-    }
-
-    /**
-     * Creates a new PIDSubsystem.
-     *
-     * @param controller the PIDController to use
-     */
-    public NAR_PIDSubsystem(PIDController controller) {
-        this(controller, 0, 0, 0);
     }
 
     @Override
     public void periodic() {
         if (m_enabled) {
-            double output = m_controller.calculate(getMeasurement());
-            output += Math.copySign(kS.getAsDouble(), output);
-            output += kV.getAsDouble() * getSetpoint();
-            output += kG_Function.getAsDouble() * kG.getAsDouble();
-            useOutput(output, getSetpoint());
+            m_controller.useOutput();
         }
+
+        if (kS.getAsDouble() != m_controller.kS) m_controller.kS = kS.getAsDouble();
+        if (kV != null) 
+            if (kV.getAsDouble() != m_controller.kV) m_controller.kV = kV.getAsDouble();
+        if (kG != null) 
+            if (kG.getAsDouble() != m_controller.kG) m_controller.kG = kG.getAsDouble();
     }
 
-    private void initShuffleboard(double kS, double kV, double kG) {
+    private void initShuffleboard() {
         NAR_Shuffleboard.addComplex(getName(), "PID_Controller", m_controller, 0, 0);
 
         NAR_Shuffleboard.addData(getName(), "Enabled", ()-> isEnabled(), 1, 0);
@@ -71,9 +63,14 @@ public abstract class NAR_PIDSubsystem extends SubsystemBase {
         NAR_Shuffleboard.addData(getName(), "DEBUG", ()-> debug.getAsBoolean(), 2, 1);
         setpoint = NAR_Shuffleboard.debug(getName(), "Debug_Setpoint", 0, 2,2);
 
-        this.kS = NAR_Shuffleboard.debug(getName(), "kS", kS, 3, 0);
-        this.kV = NAR_Shuffleboard.debug(getName(), "kV", kV, 3, 1);
-        this.kG = NAR_Shuffleboard.debug(getName(), "kG", kG, 3, 2);
+        if (m_controller instanceof VController) {
+            this.kS = NAR_Shuffleboard.debug(getName(), "kS", m_controller.kS, 3, 0);
+            this.kV = NAR_Shuffleboard.debug(getName(), "kV", m_controller.kV, 3, 1);
+        }
+        if (m_controller instanceof PController) {
+            this.kS = NAR_Shuffleboard.debug(getName(), "kS", m_controller.kS, 3, 0);
+            this.kG = NAR_Shuffleboard.debug(getName(), "kG", m_controller.kG, 3, 1);
+        }
     }
 
     /**
@@ -81,7 +78,7 @@ public abstract class NAR_PIDSubsystem extends SubsystemBase {
      *
      * @return The PIDController
      */
-    public PIDController getController() {
+    public Controller getController() {
         return m_controller;
     }
 
@@ -100,7 +97,7 @@ public abstract class NAR_PIDSubsystem extends SubsystemBase {
      * @param kG_Function the function multiplied to kG
      */
     public void setkG_Function(DoubleSupplier kG_Function) {
-        this.kG_Function = kG_Function;
+        m_controller.kG_Function = kG_Function;
     }
 
     /**
@@ -111,6 +108,19 @@ public abstract class NAR_PIDSubsystem extends SubsystemBase {
     public void startPID(double setpoint) {
         enable();
         m_controller.setSetpoint(MathUtil.clamp(debug.getAsBoolean() ? this.setpoint.getAsDouble() : setpoint, min, max));
+    }
+
+    /**
+     * Enables continuous input.
+     *
+     * <p>Rather then using the max and min input range as constraints, it considers them to be the
+     * same point and automatically calculates the shortest route to the setpoint.
+     *
+     * @param minimumInput The minimum value expected from the input.
+     * @param maximumInput The maximum value expected from the input.
+     */
+    public void enableContinuousInput(double minimumInput, double maximumInput) {
+        m_controller.enableContinuousInput(minimumInput, maximumInput);
     }
 
     /**
@@ -135,9 +145,8 @@ public abstract class NAR_PIDSubsystem extends SubsystemBase {
      * Uses the output from the PIDController.
      *
      * @param output the output of the PIDController
-     * @param setpoint the setpoint of the PIDController (for feedforward)
      */
-    protected abstract void useOutput(double output, double setpoint);
+    protected abstract void useOutput(double output);
 
     /**
      * Returns the measurement of the process variable used by the PIDController.
@@ -155,7 +164,7 @@ public abstract class NAR_PIDSubsystem extends SubsystemBase {
     /** Disables the PID control. Sets output to zero. */
     public void disable() {
         m_enabled = false;
-        useOutput(0, 0);
+        useOutput(0);
     }
 
     /**
