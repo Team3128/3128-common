@@ -4,6 +4,7 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
+import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 
 import common.core.NAR_Robot;
@@ -140,6 +141,10 @@ public class NAR_TalonFX extends NAR_Motor{
 		setStatusFramePeriod(StatusFrameEnhanced.Status_13_Base_PIDF0, MotorControllerConstants.LOW_PRIORITY);
 		setStatusFramePeriod(StatusFrameEnhanced.Status_14_Turn_PIDF1, MotorControllerConstants.LOW_PRIORITY);
 		setStatusFramePeriod(StatusFrameEnhanced.Status_21_FeedbackIntegrated, MotorControllerConstants.LOW_PRIORITY);
+	}
+
+	public void configAllSettings(TalonFXConfiguration config) {
+		motor.configAllSettings(config);
 	}
 
     @Override
