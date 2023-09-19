@@ -25,10 +25,11 @@ import com.revrobotics.CANSparkMax.IdleMode;
  */
 public class NAR_CANSparkMax extends NAR_Motor {
 	public enum SparkMaxConfig {
-		DEFAULT(ULTRA_PRIORITY, HIGH_PRIORITY, HIGH_PRIORITY, NO_PRIORITY, NO_PRIORITY, NO_PRIORITY, NO_PRIORITY),
+		DEFAULT(MAX_PRIORITY, HIGH_PRIORITY, HIGH_PRIORITY, NO_PRIORITY, NO_PRIORITY, NO_PRIORITY, NO_PRIORITY),
 		FOLLOWER(MEDIUM_PRIORITY, NO_PRIORITY, NO_PRIORITY, NO_PRIORITY, NO_PRIORITY, NO_PRIORITY, NO_PRIORITY),
-		POSITION(ULTRA_PRIORITY, MEDIUM_PRIORITY, HIGH_PRIORITY, NO_PRIORITY, NO_PRIORITY, NO_PRIORITY, NO_PRIORITY),
-		VELOCITY(ULTRA_PRIORITY, HIGH_PRIORITY, MEDIUM_PRIORITY, NO_PRIORITY, NO_PRIORITY, NO_PRIORITY, NO_PRIORITY);
+		POSITION(MAX_PRIORITY, MEDIUM_PRIORITY, HIGH_PRIORITY, NO_PRIORITY, NO_PRIORITY, NO_PRIORITY, NO_PRIORITY),
+		VELOCITY(MAX_PRIORITY, HIGH_PRIORITY, MEDIUM_PRIORITY, NO_PRIORITY, NO_PRIORITY, NO_PRIORITY, NO_PRIORITY),
+		ABSOLUTE(MAX_PRIORITY, NO_PRIORITY, NO_PRIORITY, NO_PRIORITY, NO_PRIORITY, HIGH_PRIORITY, HIGH_PRIORITY);
 
 		public int status0, status1, status2, status3, status4, status5, status6;
 
@@ -200,13 +201,13 @@ public class NAR_CANSparkMax extends NAR_Motor {
 	 * <p>Each motor controller sends back status frames with different data at set rates. Use this
 	 * function to change the default rates.
 	 * 
-	 * <p><b>Status 1</b>: Applied Output, Faults, Sticky Faults, isFollower
-	 * <p><b>Status 2</b>: Motor Velocity, Motor Temperature, Motor Voltage, Motor Current
-	 * <p><b>Status 3</b>: Motor Position
-	 * <p><b>Status 4</b>: Analog Sensor Voltage, Analog Sensor Velocity, Analog Sensor Position
-	 * <p><b>Status 5</b>: Alternate Encoder Velocity
-	 * <p><b>Status 6</b>: Duty Cycle Absolute Encoder Position, Duty Cycle Absolute Encoder Absolute Angle
-	 * <p><b>Status 7</b>: Duty Cycle Absolute Encoder Velocity, Duty Cycle Absolute Encoder Frequency
+	 * <p><b>Status 0</b>: Applied Output, Faults, Sticky Faults, isFollower
+	 * <p><b>Status 1</b>: Motor Velocity, Motor Temperature, Motor Voltage, Motor Current
+	 * <p><b>Status 2</b>: Motor Position
+	 * <p><b>Status 3</b>: Analog Sensor Voltage, Analog Sensor Velocity, Analog Sensor Position
+	 * <p><b>Status 4</b>: Alternate Encoder Velocity
+	 * <p><b>Status 5</b>: Duty Cycle Absolute Encoder Position, Duty Cycle Absolute Encoder Absolute Angle
+	 * <p><b>Status 6</b>: Duty Cycle Absolute Encoder Velocity, Duty Cycle Absolute Encoder Frequency
 	 * 
 	 * @param frame Which type of {@link PeriodicFrame} to change the period of
 	 * @param periodMs Period in ms for the given frame.
@@ -289,6 +290,11 @@ public class NAR_CANSparkMax extends NAR_Motor {
     public double getAppliedOutput() {
         return motor.getAppliedOutput();
     }
+	
+	@Override
+	public void resetRawPosition(double rotations) {
+		if (encoderType == EncoderType.Relative) relativeEncoder.setPosition(rotations);
+	}
 
     @Override
     public double getRawPosition() {
@@ -301,8 +307,22 @@ public class NAR_CANSparkMax extends NAR_Motor {
     }
 
 	@Override
+	public void enableVoltageCompensation(double volts) {
+		motor.enableVoltageCompensation(volts);
+	}
+
+	@Override
+	protected void setBrakeMode() {
+		motor.setIdleMode(IdleMode.kBrake);
+	}
+
+	@Override
+	protected void setCoastMode() {
+		motor.setIdleMode(IdleMode.kCoast);
+	}
+
+	@Override
     public CANSparkMax getMotor() {
         return motor;
     }
-    
 }

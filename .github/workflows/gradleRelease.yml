@@ -16,7 +16,7 @@ jobs:
       uses: actions/checkout@v0
 
     - name: Get Tag
-      uses: olegtarasov/get-tag@v0.0.2
+      uses: olegtarasov/get-tag@v0.0.3
       id: getTag
       with:
         tagRegex: "v(.*)" # This filters out the `v` from the tag. (Ex: v3.8.0 becomes 3.8.0)
@@ -80,7 +80,7 @@ jobs:
       run: './gradlew vendorJSON'
 
     - name: Commit 3128-common.json
-      uses: EndBug/add-and-commit@v0.0.2
+      uses: EndBug/add-and-commit@v0.0.3
       with:
         add: './3128-common.json'
         message: 'Automated - Update 3128-common.json for release'

@@ -53,13 +53,18 @@ public class Controller extends PIDController {
         
     }
 
-    public double kS, kV, kG;
-    public DoubleSupplier kG_Function;
     private final LinkedList<DoubleConsumer> consumers;
     private DoubleSupplier measurement;
 
+    protected double kS, kV, kG;
+    protected DoubleSupplier kG_Function;
+
     public Controller(double kP, double kI, double kD, double period) {
         super(kP, kI, kD, period);
+        kS = 0;
+        kV = 0;
+        kG = 0;
+        kG_Function = () -> 1;
         consumers = new LinkedList<DoubleConsumer>();
     }
 
@@ -86,5 +91,33 @@ public class Controller extends PIDController {
             consumer.accept(output);
         }
         return output;
+    }
+
+    public void setkG_Function(DoubleSupplier kG_Function) {
+        this.kG_Function = kG_Function;
+    }
+
+    public void setkS(double kS) {
+        this.kS = kS;
+    }
+
+    public void setkV(double kV) {
+        this.kV = kV;
+    }
+
+    public void setkG(double kG) {
+        this.kG = kG;
+    }
+
+    public double getkS() {
+        return kS;
+    }
+
+    public double getkV() {
+        return kV;
+    }
+    
+    public double getkG() {
+        return kG;
     }
 }

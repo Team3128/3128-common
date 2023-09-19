@@ -33,7 +33,6 @@ public abstract class NAR_PIDSubsystem extends SubsystemBase {
         m_controller = controller;
         controller.setMeasurementSource(()-> getMeasurement());
         controller.addOutput(this::useOutput);
-        initShuffleboard();
         min = Double.NEGATIVE_INFINITY;
         max = Double.POSITIVE_INFINITY;
     }
@@ -44,14 +43,14 @@ public abstract class NAR_PIDSubsystem extends SubsystemBase {
             m_controller.useOutput();
         }
 
-        if (kS.getAsDouble() != m_controller.kS) m_controller.kS = kS.getAsDouble();
+        if (kS.getAsDouble() != m_controller.getkS()) m_controller.setkS(kS.getAsDouble());
         if (kV != null) 
-            if (kV.getAsDouble() != m_controller.kV) m_controller.kV = kV.getAsDouble();
+            if (kV.getAsDouble() != m_controller.getkV()) m_controller.setkV(kV.getAsDouble());
         if (kG != null) 
-            if (kG.getAsDouble() != m_controller.kG) m_controller.kG = kG.getAsDouble();
+            if (kG.getAsDouble() != m_controller.getkG()) m_controller.setkG(kG.getAsDouble());
     }
 
-    private void initShuffleboard() {
+    public void initShuffleboard() {
         NAR_Shuffleboard.addComplex(getName(), "PID_Controller", m_controller, 0, 0);
 
         NAR_Shuffleboard.addData(getName(), "Enabled", ()-> isEnabled(), 1, 0);
@@ -64,12 +63,12 @@ public abstract class NAR_PIDSubsystem extends SubsystemBase {
         setpoint = NAR_Shuffleboard.debug(getName(), "Debug_Setpoint", 0, 2,2);
 
         if (m_controller instanceof VController) {
-            this.kS = NAR_Shuffleboard.debug(getName(), "kS", m_controller.kS, 3, 0);
-            this.kV = NAR_Shuffleboard.debug(getName(), "kV", m_controller.kV, 3, 1);
+            this.kS = NAR_Shuffleboard.debug(getName(), "kS", m_controller.getkS(), 3, 0);
+            this.kV = NAR_Shuffleboard.debug(getName(), "kV", m_controller.getkV(), 3, 1);
         }
         if (m_controller instanceof PController) {
-            this.kS = NAR_Shuffleboard.debug(getName(), "kS", m_controller.kS, 3, 0);
-            this.kG = NAR_Shuffleboard.debug(getName(), "kG", m_controller.kG, 3, 1);
+            this.kS = NAR_Shuffleboard.debug(getName(), "kS", m_controller.getkS(), 3, 0);
+            this.kG = NAR_Shuffleboard.debug(getName(), "kG", m_controller.getkV(), 3, 1);
         }
     }
 
@@ -97,7 +96,7 @@ public abstract class NAR_PIDSubsystem extends SubsystemBase {
      * @param kG_Function the function multiplied to kG
      */
     public void setkG_Function(DoubleSupplier kG_Function) {
-        m_controller.kG_Function = kG_Function;
+        m_controller.setkG_Function(kG_Function);
     }
 
     /**

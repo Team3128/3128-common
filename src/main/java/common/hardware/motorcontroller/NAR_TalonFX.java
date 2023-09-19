@@ -2,6 +2,7 @@ package common.hardware.motorcontroller;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 
@@ -35,8 +36,7 @@ public class NAR_TalonFX extends NAR_Motor{
     public NAR_TalonFX(int deviceNumber, String canBus, double kP, double kI, double kD) {
         motor = new WPI_TalonFX(deviceNumber, canBus);
 
-        motor.configVoltageCompSaturation(12, 10);
-		motor.enableVoltageCompensation(true);
+        enableVoltageCompensation(12);
 
         this.kP = kP;
 		this.kI = kI;
@@ -130,7 +130,7 @@ public class NAR_TalonFX extends NAR_Motor{
 	 * - 255ms Status12 - 255ms  Status13 - 255ms  Status14 - 255ms  Status21 - 255ms
 	 */
 	public void setDefaultStatusFrames() {
-		setStatusFramePeriod(StatusFrameEnhanced.Status_1_General, MotorControllerConstants.ULTRA_PRIORITY);
+		setStatusFramePeriod(StatusFrameEnhanced.Status_1_General, MotorControllerConstants.MAX_PRIORITY);
 		setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, MotorControllerConstants.HIGH_PRIORITY);
 		setStatusFramePeriod(StatusFrameEnhanced.Status_3_Quadrature, MotorControllerConstants.LOW_PRIORITY);
 		setStatusFramePeriod(StatusFrameEnhanced.Status_4_AinTempVbat, MotorControllerConstants.LOW_PRIORITY);
@@ -172,6 +172,11 @@ public class NAR_TalonFX extends NAR_Motor{
         return motor.getMotorOutputPercent();
     }
 
+	@Override
+	public void resetRawPosition(double rotations) {
+		motor.setSelectedSensorPosition(rotations * FALCON_ENCODER_RESOLUTION);
+	}
+
     @Override
     public double getRawPosition() {
         return motor.getSelectedSensorPosition() / MotorControllerConstants.FALCON_ENCODER_RESOLUTION;
@@ -181,6 +186,22 @@ public class NAR_TalonFX extends NAR_Motor{
     public double getRawVelocity() {
         return motor.getSelectedSensorVelocity() / MotorControllerConstants.RPM_TO_FALCON;
     }
+
+	@Override
+	public void enableVoltageCompensation(double volts) {
+		motor.configVoltageCompSaturation(volts);
+		motor.enableVoltageCompensation(true);
+	}
+
+	@Override
+	protected void setBrakeMode() {
+		motor.setNeutralMode(NeutralMode.Brake);
+	}
+
+	@Override
+	protected void setCoastMode() {
+		motor.setNeutralMode(NeutralMode.Coast);
+	}
     
     @Override
     public WPI_TalonFX getMotor() {

@@ -1,81 +1,89 @@
 package common.hardware.motorcontroller;
 
-import com.ctre.phoenix.ErrorCode;
+import static common.hardware.motorcontroller.MotorControllerConstants.*;
 import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.TalonSRXSimCollection;
+import com.ctre.phoenix.motorcontrol.DemandType;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
-import edu.wpi.first.wpilibj.RobotBase;
+public class NAR_TalonSRX extends NAR_Motor {
 
-public class NAR_TalonSRX extends WPI_TalonSRX {
-
-    private double prevValue = 0;
-	private ControlMode prevControlMode = ControlMode.Disabled;
-	private TalonSRXSimCollection motorSim;
+	private WPI_TalonSRX motor;
 
 	/**
 	 * @param deviceNumber device id
 	 */
 	public NAR_TalonSRX(int deviceNumber) {
-		super(deviceNumber);
-
-		if(RobotBase.isSimulation())
-			motorSim = getTalonSRXSimCollection();
-			
-		enableVoltageCompensation(true);
-		configVoltageCompSaturation(12, 10);
+		motor = new WPI_TalonSRX(deviceNumber);
 	}
 
 	@Override
-	public void set(double speed){
-		set(ControlMode.PercentOutput, speed);
+	public void enableVoltageCompensation(double volts) {
+		motor.enableVoltageCompensation(true);
+		motor.configVoltageCompSaturation(12);
 	}
 
 	@Override
-	public void set(ControlMode controlMode, double outputValue) {
-		if (outputValue != prevValue || controlMode != prevControlMode) {
-			super.set(controlMode, outputValue);
-			prevValue = outputValue;
-			prevControlMode = controlMode;
-		}
-	}
-
-	public double getSetpoint() {
-		return prevValue;
-	}
-
-	public ControlMode getControlMode() {
-		return prevControlMode;
-	}
-
-	// getInverted() stuff should only be temporary
-	public void setSimPosition(double pos) {
-		if(super.getInverted()){
-			pos *= -1;
-		}
-		motorSim.setQuadratureRawPosition((int)pos);
-	}
-
-	// getInverted() stuff should only be temporary
-	public void setSimVelocity(double vel) {
-		if(super.getInverted()){
-			vel *= -1;
-		}
-		motorSim.setQuadratureVelocity((int)(vel / 10)); // convert nu/s to nu/100ms
+	protected void setBrakeMode() {
+		motor.setNeutralMode(NeutralMode.Brake);
 	}
 
 	@Override
-	public ErrorCode setSelectedSensorPosition(double n) {
-		return super.setSelectedSensorPosition(n * MotorControllerConstants.TALONSRX_ENCODER_RESOLUTION); //Rotations to nu
+	protected void setCoastMode() {
+		motor.setNeutralMode(NeutralMode.Coast);
 	}
 
 	@Override
-	public double getSelectedSensorVelocity() {
-		return super.getSelectedSensorVelocity() * 600 / MotorControllerConstants.TALONSRX_ENCODER_RESOLUTION; // convert nu/100ms to rpm
+	public void setInverted(boolean inverted) {
+		motor.setInverted(inverted);
 	}
 
 	@Override
-	public double getSelectedSensorPosition() {
-		return super.getSelectedSensorPosition() / MotorControllerConstants.TALONSRX_ENCODER_RESOLUTION; // convert nu to rotations
+	protected void setPercentOutput(double speed) {
+		motor.set(speed);
+	}
+
+	@Override
+	protected void setVoltage(double volts) {
+		motor.set(volts / 12.0);
+	}
+
+	@Override
+	protected void setVelocity(double rpm, double feedForward) {
+		motor.set(ControlMode.Velocity, rpm * RPM_TO_TALONSRX, DemandType.ArbitraryFeedForward, feedForward / 12.0);
+	}
+
+	@Override
+	protected void setPosition(double rotations, double feedForward) {
+		motor.set(ControlMode.Position, rotations * TALONSRX_ENCODER_RESOLUTION, DemandType.ArbitraryFeedForward, feedForward / 12.0);
+	}
+
+	public double getStatorCurrent() {
+		return motor.getStatorCurrent();
+	}
+
+	@Override
+	public double getAppliedOutput() {
+		return motor.getMotorOutputPercent();
+	}
+
+	@Override
+	public void resetRawPosition(double rotations) {
+		motor.setSelectedSensorPosition(rotations * TALONSRX_ENCODER_RESOLUTION);
+	}
+
+	@Override
+	public double getRawPosition() {
+		return motor.getSelectedSensorPosition() / TALONSRX_ENCODER_RESOLUTION;
+	}
+
+	@Override
+	public double getRawVelocity() {
+		return motor.getSelectedSensorVelocity() / RPM_TO_TALONSRX;
+	}
+
+	@Override
+	public WPI_TalonSRX getMotor() {
+		return motor;
 	}
 }

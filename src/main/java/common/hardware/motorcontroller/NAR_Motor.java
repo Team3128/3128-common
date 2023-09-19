@@ -18,7 +18,7 @@ public abstract class NAR_Motor {
                     follower.set(output);
                 }
             }
-        }, 0.02);
+        }, 0.1);
     }
 
     public enum Control {
@@ -26,6 +26,11 @@ public abstract class NAR_Motor {
         Voltage,
         Velocity,
         Position;
+    }
+
+    public enum Neutral {
+        BRAKE,
+        COAST
     }
 
     private final LinkedList<NAR_Motor> followers = new LinkedList<NAR_Motor>();
@@ -38,6 +43,24 @@ public abstract class NAR_Motor {
         leader.followers.add(this);
         leaders.add(leader);
     }
+
+    public abstract void enableVoltageCompensation(double volts);
+
+    public void setNeutralMode(Neutral mode) {
+        switch(mode) {
+            case BRAKE:
+                setBrakeMode();
+                break;
+            case COAST:
+                setCoastMode();
+                break;
+        }
+    }
+
+    protected abstract void setBrakeMode();
+
+    protected abstract void setCoastMode();
+
 
     public void set(double output) {
         set(output, Control.PercentOutput);
@@ -72,6 +95,10 @@ public abstract class NAR_Motor {
         this.conversionFactor = conversionFactor;
     }
 
+    public void resetPosition(double units) {
+        resetPosition(units * conversionFactor);
+    }
+
     public abstract void setInverted(boolean inverted);
 
     protected abstract void setPercentOutput(double speed);
@@ -81,6 +108,8 @@ public abstract class NAR_Motor {
     protected abstract void setVelocity(double rpm, double feedForward);
 
     protected abstract void setPosition(double rotations, double feedForward);
+
+    public abstract void resetRawPosition(double rotations);
 
     public abstract double getAppliedOutput();
 
