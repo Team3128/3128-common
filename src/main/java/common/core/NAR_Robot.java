@@ -14,7 +14,6 @@ import edu.wpi.first.wpilibj.IterativeRobotBase;
 import edu.wpi.first.wpilibj.Timer;
 
 public class NAR_Robot extends IterativeRobotBase {
-
     @SuppressWarnings("MemberName")
   static class Callback implements Comparable<Callback> {
     public Runnable func;

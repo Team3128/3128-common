@@ -1,4 +1,4 @@
-package common.utility;
+package common.core.controllers;
 
 import java.util.LinkedList;
 import java.util.function.DoubleConsumer;
@@ -12,8 +12,8 @@ public class Controller extends PIDController {
     
         public VController(double kS, double kV, double kP, double kI, double kD, double period) {
             super(kP, kI, kD, period);
-            this.kS = kS;
-            this.kV = kV;
+            this.kS = ()-> kS;
+            this.kV = ()-> kV;
         }
     
         public VController(double kS, double kV, double kP, double kI, double kD) {
@@ -23,7 +23,8 @@ public class Controller extends PIDController {
         @Override
         public double calculate(double measurement) {
             final double pid = super.calculate(measurement);
-            return pid + Math.copySign(kS, pid) + kV * getSetpoint();
+            final double ff = !atSetpoint() ? Math.copySign(getkS(), pid) : 0 + getkV() * getSetpoint();
+            return pid + ff;
         }
         
     }
@@ -32,13 +33,13 @@ public class Controller extends PIDController {
     
         public PController(double kS, double kG, double kP, double kI, double kD, double period) {
             super(kP, kI, kD, period);
-            this.kS = kS;
-            this.kG = kG;
+            this.kS = ()-> kS;
+            this.kG = ()-> kG;
             kG_Function = () -> 1;
         }
     
-        public PController(double kS, double kV, double kP, double kI, double kD) {
-            this(kS, kV, kP, kI, kD, 0.02);
+        public PController(double kS, double kG, double kP, double kI, double kD) {
+            this(kS, kG, kP, kI, kD, 0.02);
         }
 
         public void setkG_Function(DoubleSupplier kG_Function) {
@@ -48,7 +49,8 @@ public class Controller extends PIDController {
         @Override
         public double calculate(double measurement) {
             final double pid = super.calculate(measurement);
-            return pid + Math.copySign(kS, pid) + kG * kG_Function.getAsDouble();
+            final double ff = !atSetpoint() ? Math.copySign(getkS(), pid) : 0 + getkG() * kG_Function.getAsDouble();
+            return pid + ff;
         }
         
     }
@@ -56,14 +58,14 @@ public class Controller extends PIDController {
     private final LinkedList<DoubleConsumer> consumers;
     private DoubleSupplier measurement;
 
-    protected double kS, kV, kG;
+    protected DoubleSupplier kS, kV, kG;
     protected DoubleSupplier kG_Function;
 
     public Controller(double kP, double kI, double kD, double period) {
         super(kP, kI, kD, period);
-        kS = 0;
-        kV = 0;
-        kG = 0;
+        kS = ()-> 0;
+        kV = ()-> 0;
+        kG = ()-> 0;
         kG_Function = () -> 1;
         consumers = new LinkedList<DoubleConsumer>();
     }
@@ -98,26 +100,38 @@ public class Controller extends PIDController {
     }
 
     public void setkS(double kS) {
+        setkS(()-> kS);
+    }
+
+    public void setkS(DoubleSupplier kS) {
         this.kS = kS;
     }
 
     public void setkV(double kV) {
+        setkV(()-> kV);
+    }
+
+    public void setkV(DoubleSupplier kV) {
         this.kV = kV;
     }
 
     public void setkG(double kG) {
+        this.kG = ()-> kG;
+    }
+
+    public void setkG(DoubleSupplier kG) {
         this.kG = kG;
     }
 
     public double getkS() {
-        return kS;
+        return kS.getAsDouble();
     }
 
     public double getkV() {
-        return kV;
+        return kV.getAsDouble();
     }
     
     public double getkG() {
-        return kG;
+        return kG.getAsDouble();
     }
 }

@@ -22,7 +22,7 @@ import java.util.function.DoubleSupplier;
  */
 public class NAR_TalonFX extends NAR_Motor{
 
-    private final WPI_TalonFX motor;
+    protected final WPI_TalonFX motor;
     private double kP, kI, kD;
 
     /**
@@ -38,6 +38,7 @@ public class NAR_TalonFX extends NAR_Motor{
         motor = new WPI_TalonFX(deviceNumber, canBus);
 
         enableVoltageCompensation(12);
+		motor.configFactoryDefault();
 
         this.kP = kP;
 		this.kI = kI;

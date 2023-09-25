@@ -8,7 +8,7 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 public class NAR_TalonSRX extends NAR_Motor {
 
-	private WPI_TalonSRX motor;
+	protected WPI_TalonSRX motor;
 
 	/**
 	 * @param deviceNumber device id
@@ -20,7 +20,7 @@ public class NAR_TalonSRX extends NAR_Motor {
 	@Override
 	public void enableVoltageCompensation(double volts) {
 		motor.enableVoltageCompensation(true);
-		motor.configVoltageCompSaturation(12);
+		motor.configVoltageCompSaturation(volts);
 	}
 
 	@Override

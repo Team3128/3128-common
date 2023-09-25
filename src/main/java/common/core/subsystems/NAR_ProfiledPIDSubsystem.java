@@ -1,4 +1,4 @@
-package common.subsystems;
+package common.core.subsystems;
 
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;

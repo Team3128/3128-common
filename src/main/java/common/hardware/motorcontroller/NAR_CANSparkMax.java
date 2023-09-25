@@ -54,7 +54,7 @@ public class NAR_CANSparkMax extends NAR_Motor {
 	private SparkMaxRelativeEncoder relativeEncoder;
 	private SparkMaxAbsoluteEncoder absoluteEncoder;
 	private final SparkMaxPIDController controller;
-    private final CANSparkMax motor;
+    protected final CANSparkMax motor;
 
     /**
 	 * Create a new object to control a SPARK MAX motor
@@ -184,15 +184,6 @@ public class NAR_CANSparkMax extends NAR_Motor {
 	 */
 	public void setCurrentLimit(int limit) {
 		motor.setSmartCurrentLimit(limit);
-	}
-
-	/**
-   	 * Enables the brake mode setting for the SPARK MAX.
-  	 *
-   	 * @param enable true for brake, false for coast
-   	 */
-	public void setBrakeMode(boolean enable) {
-		motor.setIdleMode(enable ? IdleMode.kBrake : IdleMode.kCoast);
 	}
 
     /**

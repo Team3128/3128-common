@@ -1,12 +1,12 @@
-package common.subsystems;
+package common.core.subsystems;
 
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
-import common.utility.Controller;
+import common.core.controllers.Controller;
+import common.core.controllers.Controller.PController;
+import common.core.controllers.Controller.VController;
 import common.utility.NAR_Shuffleboard;
-import common.utility.Controller.PController;
-import common.utility.Controller.VController;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.PIDSubsystem;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -19,7 +19,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public abstract class NAR_PIDSubsystem extends SubsystemBase {
     protected final Controller m_controller;
     protected boolean m_enabled;
-    private DoubleSupplier kS, kV, kG;
     private BooleanSupplier debug;
     private DoubleSupplier setpoint;
     private double min, max;
@@ -42,12 +41,6 @@ public abstract class NAR_PIDSubsystem extends SubsystemBase {
         if (m_enabled) {
             m_controller.useOutput();
         }
-
-        if (kS.getAsDouble() != m_controller.getkS()) m_controller.setkS(kS.getAsDouble());
-        if (kV != null) 
-            if (kV.getAsDouble() != m_controller.getkV()) m_controller.setkV(kV.getAsDouble());
-        if (kG != null) 
-            if (kG.getAsDouble() != m_controller.getkG()) m_controller.setkG(kG.getAsDouble());
     }
 
     public void initShuffleboard() {
@@ -63,12 +56,12 @@ public abstract class NAR_PIDSubsystem extends SubsystemBase {
         setpoint = NAR_Shuffleboard.debug(getName(), "Debug_Setpoint", 0, 2,2);
 
         if (m_controller instanceof VController) {
-            this.kS = NAR_Shuffleboard.debug(getName(), "kS", m_controller.getkS(), 3, 0);
-            this.kV = NAR_Shuffleboard.debug(getName(), "kV", m_controller.getkV(), 3, 1);
+            m_controller.setkS(NAR_Shuffleboard.debug(getName(), "kS", m_controller.getkS(), 3, 0));
+            m_controller.setkV(NAR_Shuffleboard.debug(getName(), "kV", m_controller.getkV(), 3, 1));
         }
         if (m_controller instanceof PController) {
-            this.kS = NAR_Shuffleboard.debug(getName(), "kS", m_controller.getkS(), 3, 0);
-            this.kG = NAR_Shuffleboard.debug(getName(), "kG", m_controller.getkV(), 3, 1);
+            m_controller.setkS(NAR_Shuffleboard.debug(getName(), "kS", m_controller.getkS(), 3, 0));
+            m_controller.setkG(NAR_Shuffleboard.debug(getName(), "kG", m_controller.getkG(), 3, 1));
         }
     }
 
@@ -79,6 +72,15 @@ public abstract class NAR_PIDSubsystem extends SubsystemBase {
      */
     public Controller getController() {
         return m_controller;
+    }
+
+    /**
+     * Sets the error which is considered tolerable for use with atSetpoint().
+     *
+     * @param positionTolerance Position error which is tolerable.
+     */
+    public void setTolerance(double positionTolerance) {
+        m_controller.setTolerance(positionTolerance);
     }
 
     /**

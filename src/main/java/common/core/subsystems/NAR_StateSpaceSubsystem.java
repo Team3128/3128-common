@@ -1,4 +1,4 @@
-package common.subsystems;
+package common.core.subsystems;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.system.LinearSystemLoop;
