@@ -37,7 +37,8 @@ public abstract class NAR_Motor {
     private double prevValue = 0;
     private Control prevMode = Control.PercentOutput;
     private double prevFeedForward = 0;
-    protected double conversionFactor = 1;
+    protected double unitConversionFactor = 1;
+    protected double timeConversionFactor = 1;
 
     public void follow(NAR_Motor leader) {
         leader.followers.add(this);
@@ -91,12 +92,16 @@ public abstract class NAR_Motor {
         }
     }
 
-    public void setConversionFactor(double conversionFactor) {
-        this.conversionFactor = conversionFactor;
+    public void setUnitConversionFactor(double conversionFactor) {
+        this.unitConversionFactor = conversionFactor;
+    }
+
+    public void setTimeConversionFactor(double conversionFactor) {
+        this.timeConversionFactor = conversionFactor;
     }
 
     public void resetPosition(double units) {
-        resetPosition(units * conversionFactor);
+        resetPosition(units * unitConversionFactor);
     }
 
     public abstract void setInverted(boolean inverted);
@@ -109,21 +114,21 @@ public abstract class NAR_Motor {
 
     protected abstract void setPosition(double rotations, double feedForward);
 
-    public abstract void resetRawPosition(double rotations);
+    protected abstract void resetRawPosition(double rotations);
 
     public abstract double getAppliedOutput();
 
     public double getPosition() {
-        return getRawPosition() / conversionFactor;
+        return getRawPosition() / unitConversionFactor;
     }
 
     public double getVelocity() {
-        return getRawVelocity() / conversionFactor;
+        return getRawVelocity() / unitConversionFactor / timeConversionFactor;
     }
 
-    public abstract double getRawPosition();
+    protected abstract double getRawPosition();
 
-    public abstract double getRawVelocity();
+    protected abstract double getRawVelocity();
 
     public abstract MotorController getMotor();
 }

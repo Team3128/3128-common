@@ -233,7 +233,7 @@ public class NAR_CANSparkMax extends NAR_Motor {
     * @param maxInput The maximum value expected from the input.
     */
     public void enableContinuousInput(double minInput, double maxInput) {
-        enableContinuousInput(minInput, maxInput, conversionFactor);
+        enableContinuousInput(minInput, maxInput, unitConversionFactor);
     }
 
     /**
@@ -274,7 +274,7 @@ public class NAR_CANSparkMax extends NAR_Motor {
 
     @Override
     protected void setPosition(double rotations, double feedForward) {
-        controller.setReference(rotations, ControlType.kVelocity, 0, feedForward);
+        controller.setReference(rotations, ControlType.kPosition, 0, feedForward);
     }
 
     @Override
@@ -283,17 +283,17 @@ public class NAR_CANSparkMax extends NAR_Motor {
     }
 	
 	@Override
-	public void resetRawPosition(double rotations) {
+	protected void resetRawPosition(double rotations) {
 		if (encoderType == EncoderType.Relative) relativeEncoder.setPosition(rotations);
 	}
 
     @Override
-    public double getRawPosition() {
+    protected double getRawPosition() {
         return encoderType == EncoderType.Relative ? relativeEncoder.getPosition() : absoluteEncoder.getPosition();
     }
 
     @Override
-    public double getRawVelocity() {
+    protected double getRawVelocity() {
         return encoderType == EncoderType.Relative ? relativeEncoder.getVelocity() : absoluteEncoder.getVelocity();
     }
 

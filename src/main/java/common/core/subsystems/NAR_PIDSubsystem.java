@@ -4,8 +4,8 @@ import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
 import common.core.controllers.Controller;
-import common.core.controllers.Controller.PController;
-import common.core.controllers.Controller.VController;
+import common.core.controllers.PController;
+import common.core.controllers.VController;
 import common.utility.NAR_Shuffleboard;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.PIDSubsystem;

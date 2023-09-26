@@ -179,17 +179,17 @@ public class NAR_TalonFX extends NAR_Motor{
     }
 
 	@Override
-	public void resetRawPosition(double rotations) {
+	protected void resetRawPosition(double rotations) {
 		motor.setSelectedSensorPosition(rotations * FALCON_ENCODER_RESOLUTION);
 	}
 
     @Override
-    public double getRawPosition() {
+    protected double getRawPosition() {
         return motor.getSelectedSensorPosition() / MotorControllerConstants.FALCON_ENCODER_RESOLUTION;
     }
 
     @Override
-    public double getRawVelocity() {
+    protected double getRawVelocity() {
         return motor.getSelectedSensorVelocity() / MotorControllerConstants.RPM_TO_FALCON;
     }
 
