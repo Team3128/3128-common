@@ -21,3 +21,5 @@ library and then generate a release on Github and Jitpack.
 
 ### Thanks to team 4450
 This common repo is based on robotLib made by team 4450.
+
+### @author Mason Lam, William Yuan
