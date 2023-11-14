@@ -4,8 +4,6 @@ import java.util.LinkedList;
 import java.util.function.DoubleConsumer;
 import java.util.function.DoubleSupplier;
 
-import com.revrobotics.CANSparkMax;
-
 import common.core.subsystems.NAR_PIDSubsystem;
 import common.hardware.motorcontroller.NAR_Motor;
 import edu.wpi.first.math.controller.PIDController;
@@ -29,7 +27,7 @@ public class Controller extends PIDController {
      * <p>Defaults kS, kV, kG to 0.
      * <p>Defaults kG_Function to 1.
      * <p>Initiliazes consumers.
-     * @see LinkedList<DoubleConsumer> consumers: includes void functions that accept double values.
+     * @see LinkedList consumers: includes void functions that accept double values.
      * 
      * @param kP The proportional coefficient of the on board PIDController.
      * @param kI The integral coefficient of the on board PIDController.
@@ -51,7 +49,7 @@ public class Controller extends PIDController {
      * <p>Defaults kS, kV, kG to 0.
      * <p>Defaults kG_Function to 1.
      * <p>Initiliazes consumers.
-     * @see LinkedList<DoubleConsumer> consumers: includes void functions that accept double values.
+     * @see LinkedList consumers: includes void functions that accept double values.
      * 
      * @param kP The proportional coefficient of the on board {@link PIDController}.
      * @param kI The integral coefficient of the on board {@link PIDController}.
@@ -70,7 +68,7 @@ public class Controller extends PIDController {
     }
     /**
      * Adds a motor set method to consumers to be later used during PID logic.
-     * @see LinkedList<DoubleConsumer> consumers: includes void functions that accept double values.
+     * @see LinkedList consumers: includes void functions that accept double values.
      * @param motor Created {@link NAR_Motor} object.
      */
     public void addMotor(NAR_Motor motor) {
@@ -78,7 +76,7 @@ public class Controller extends PIDController {
     }
     /**
      * Adds a useOutput method to consumers to be later used during PID logic.
-     * @see LinkedList<DoubleConsumer> consumers: includes void functions that accept double values.
+     * @see LinkedList consumers: includes void functions that accept double values.
      * @param output {@code useOutput()} from {@link NAR_PIDSubsystem} as a DoubleSupplier
      */
     public void addOutput(DoubleConsumer output) {
@@ -87,7 +85,7 @@ public class Controller extends PIDController {
     /**
      * Calculates the output based on calculations from the measurement, then gives each DoubleConsumer in consumers the output as an argument.
      * @return calculated output based on calculations from the measurement
-     * @see LinkedList<DoubleConsumer> consumers: includes void functions that accept double values.
+     * @see LinkedList consumers: includes void functions that accept double values.
      */
     public double useOutput() {
         if (measurement == null) return 0;

@@ -22,6 +22,8 @@ public abstract class NAR_PIDSubsystem extends SubsystemBase {
     private BooleanSupplier debug;
     private DoubleSupplier setpoint;
     private double min, max;
+    private double safetyThresh;
+    private double plateauCount;
 
     /**
      * Creates a new PIDSubsystem.
@@ -34,12 +36,17 @@ public abstract class NAR_PIDSubsystem extends SubsystemBase {
         controller.addOutput(this::useOutput);
         min = Double.NEGATIVE_INFINITY;
         max = Double.POSITIVE_INFINITY;
+        safetyThresh = 5;
+        plateauCount = 0;
     }
 
     @Override
     public void periodic() {
         if (m_enabled) {
             m_controller.useOutput();
+            if (plateauCount * 0.02 > safetyThresh) disable();
+            if (atSetpoint()) plateauCount = 0;
+            else plateauCount ++;
         }
     }
 
@@ -72,6 +79,14 @@ public abstract class NAR_PIDSubsystem extends SubsystemBase {
      */
     public Controller getController() {
         return m_controller;
+    }
+
+    /**
+     * Sets the safetyThreshold to disable PID if setpoint is not reached
+     * @param timeSeconds the time in seconds for the safety threshold
+     */
+    public void setSafetyThresh(double timeSeconds) {
+        safetyThresh = timeSeconds;
     }
 
     /**
@@ -159,6 +174,7 @@ public abstract class NAR_PIDSubsystem extends SubsystemBase {
     /** Enables the PID control. Resets the controller. */
     public void enable() {
         m_enabled = true;
+        plateauCount = 0;
         m_controller.reset();
     }
 

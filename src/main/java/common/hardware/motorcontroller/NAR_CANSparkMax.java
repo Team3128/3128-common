@@ -100,6 +100,8 @@ public class NAR_CANSparkMax extends NAR_Motor {
 		this.kD = kD;
 		
 		controller.setFeedbackDevice(encoderType == EncoderType.Relative ? relativeEncoder : absoluteEncoder);
+
+		motor.burnFlash();
     }
 
     /**
