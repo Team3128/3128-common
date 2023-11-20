@@ -83,7 +83,6 @@ jobs:
       uses: EndBug/add-and-commit@v9.1.3
       with:
         add: './3128-common.json'
-        branch: 'main'
         message: 'Automated - Update 3128-common.json for release'
 
     - name: Upload 3128-common.json to Release
