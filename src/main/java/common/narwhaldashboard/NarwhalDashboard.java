@@ -120,7 +120,7 @@ public class NarwhalDashboard extends WebSocketServer {
 
     /** 
      * Called after connecting to the web server
-	 * @param conn The <tt>WebSocket</tt> instance this event is occuring on.
+	 * @param conn The WebSocket instance this event is occuring on.
 	 * @param handshake The handshake of the websocket instance
 	 */
     @SuppressWarnings("unchecked")
@@ -197,7 +197,7 @@ public class NarwhalDashboard extends WebSocketServer {
 
     /**
 	 * Called when a message from the web server is sent
-	 * @param conn The <tt>WebSocket</tt> instance this event is occurring on.
+	 * @param conn The WebSocket instance this event is occurring on.
 	 * @param message The UTF-8 decoded message that was received.
 	 */
     @Override

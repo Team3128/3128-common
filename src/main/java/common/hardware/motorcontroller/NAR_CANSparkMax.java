@@ -24,6 +24,9 @@ import com.revrobotics.CANSparkMax.IdleMode;
  * @author Mason Lam
  */
 public class NAR_CANSparkMax extends NAR_Motor {
+	/**
+	 * Team 3128's status frames
+	 */
 	public enum SparkMaxConfig {
 		DEFAULT(MAX_PRIORITY, HIGH_PRIORITY, HIGH_PRIORITY, NO_PRIORITY, NO_PRIORITY, NO_PRIORITY, NO_PRIORITY),
 		FOLLOWER(MEDIUM_PRIORITY, NO_PRIORITY, NO_PRIORITY, NO_PRIORITY, NO_PRIORITY, NO_PRIORITY, NO_PRIORITY),
@@ -44,6 +47,9 @@ public class NAR_CANSparkMax extends NAR_Motor {
 		}
 	}
 
+	/**
+	 * Type of encoder used
+	 */
     public enum EncoderType {
 		Relative,
 		Absolute
@@ -250,8 +256,15 @@ public class NAR_CANSparkMax extends NAR_Motor {
 	 */
 	public void enableContinuousInput(double minInput, double maxInput, double factor) {
 		controller.setPositionPIDWrappingEnabled(true);
-		controller.setPositionPIDWrappingMinInput(minInput * factor);
-		controller.setPositionPIDWrappingMaxInput(maxInput * factor);
+		controller.setPositionPIDWrappingMinInput(minInput / factor);
+		controller.setPositionPIDWrappingMaxInput(maxInput / factor);
+	}
+
+	/**
+	 * Burns all settings to flash; stores settings between power cycles
+	 */
+	public void burnFlash() {
+		motor.burnFlash();
 	}
 
 	@Override
@@ -262,11 +275,6 @@ public class NAR_CANSparkMax extends NAR_Motor {
     @Override
     protected void setPercentOutput(double speed) {
         controller.setReference(speed, ControlType.kDutyCycle);
-    }
-
-    @Override
-    protected void setVoltage(double volts) {
-        controller.setReference(volts, ControlType.kVoltage);
     }
 
     @Override

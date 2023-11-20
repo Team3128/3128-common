@@ -159,11 +159,6 @@ public class NAR_TalonFX extends NAR_Motor{
     }
 
     @Override
-    protected void setVoltage(double volts) {
-        motor.set(volts / 12.0);
-    }
-
-    @Override
     protected void setVelocity(double rpm, double feedForward) {
         motor.set(ControlMode.Velocity, rpm * RPM_TO_FALCON, DemandType.ArbitraryFeedForward, feedForward / 12.0);
     }

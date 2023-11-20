@@ -5,7 +5,7 @@ import edu.wpi.first.math.geometry.Transform2d;
 /**
  * Represents and holds the specs of a camera.
  * 
- * @since 2023 Charged Up
+ * @since 2022 RAPID REACT
  * @author Mason Lam, William Yuan
  */
 public class Camera {

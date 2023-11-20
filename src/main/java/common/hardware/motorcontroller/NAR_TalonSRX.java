@@ -6,6 +6,11 @@ import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
+/**
+ * Team 3128's streamlined {@link WPI_TalonSRX} class.
+ * @since 2023 CHARGED UP
+ * @author Mason Lam
+ */
 public class NAR_TalonSRX extends NAR_Motor {
 
 	protected WPI_TalonSRX motor;
@@ -41,11 +46,6 @@ public class NAR_TalonSRX extends NAR_Motor {
 	@Override
 	protected void setPercentOutput(double speed) {
 		motor.set(speed);
-	}
-
-	@Override
-	protected void setVoltage(double volts) {
-		motor.set(volts / 12.0);
 	}
 
 	@Override

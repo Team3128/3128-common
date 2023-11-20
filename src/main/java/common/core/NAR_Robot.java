@@ -13,6 +13,11 @@ import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.wpilibj.IterativeRobotBase;
 import edu.wpi.first.wpilibj.Timer;
 
+/**
+ * Team 3128's Robot class that includes advantageScope and addPeriodic
+ * @since 2023 CHARGED UP
+ * @author Mason Lam
+ */
 public class NAR_Robot extends IterativeRobotBase {
     @SuppressWarnings("MemberName")
   static class Callback implements Comparable<Callback> {
