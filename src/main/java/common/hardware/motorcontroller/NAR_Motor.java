@@ -92,7 +92,7 @@ public abstract class NAR_Motor {
     }
 
     /**
-     * Changes the units the motor measures position in, ie. rotations -> degrees
+     * Changes the units the motor measures position in, ie. rotations degrees
      * @param conversionFactor Conversion factor to change position units
      */
     public void setUnitConversionFactor(double conversionFactor) {
@@ -100,7 +100,7 @@ public abstract class NAR_Motor {
     }
 
     /**
-     * Changes the units the motor measures time/velocity in, ie. rotations per minute -> rotations per second
+     * Changes the units the motor measures time/velocity in, ie. rotations per minute rotations per second
      * @param conversionFactor Conversion factor to change time units
      */
     public void setTimeConversionFactor(double conversionFactor) {
