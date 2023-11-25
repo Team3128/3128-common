@@ -14,7 +14,7 @@ import edu.wpi.first.wpilibj.shuffleboard.SimpleWidget;
 
 /**
  * Team 3128's wrapper class for {@link Shuffleboard}
- * @since 2022 RAPID REACT
+ * @since 2022 Rapid React
  * @author Mason Lam
  */
 public class NAR_Shuffleboard {

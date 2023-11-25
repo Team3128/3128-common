@@ -5,7 +5,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 /**
  * Custom GenericHID class for team 3128's button board setup
- * @since 2023 Charged UP
+ * @since 2023 Charged Up
  * @author Peter Ma, Arav Chadha, Mason Lam
  */
 public class NAR_ButtonBoard {

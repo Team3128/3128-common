@@ -15,7 +15,7 @@ import edu.wpi.first.wpilibj.Timer;
 
 /**
  * Team 3128's Robot class that includes advantageScope and addPeriodic
- * @since 2023 CHARGED UP
+ * @since 2023 Charged Up
  * @author Mason Lam
  */
 public class NAR_Robot extends IterativeRobotBase {

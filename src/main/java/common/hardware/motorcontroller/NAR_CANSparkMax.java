@@ -20,19 +20,20 @@ import com.revrobotics.CANSparkMax.IdleMode;
 
 /**
  * Team 3128's streamlined {@link CANSparkMax} class.
- * @since 2023 CHARGED UP
+ * @since 2023 Charged Up
  * @author Mason Lam
  */
 public class NAR_CANSparkMax extends NAR_Motor {
+	public static boolean shouldBurn = false;
 	/**
 	 * Team 3128's status frames
 	 */
 	public enum SparkMaxConfig {
 		DEFAULT(MAX_PRIORITY, HIGH_PRIORITY, HIGH_PRIORITY, NO_PRIORITY, NO_PRIORITY, NO_PRIORITY, NO_PRIORITY),
 		FOLLOWER(MEDIUM_PRIORITY, NO_PRIORITY, NO_PRIORITY, NO_PRIORITY, NO_PRIORITY, NO_PRIORITY, NO_PRIORITY),
-		POSITION(MAX_PRIORITY, MEDIUM_PRIORITY, HIGH_PRIORITY, NO_PRIORITY, NO_PRIORITY, NO_PRIORITY, NO_PRIORITY),
-		VELOCITY(MAX_PRIORITY, HIGH_PRIORITY, MEDIUM_PRIORITY, NO_PRIORITY, NO_PRIORITY, NO_PRIORITY, NO_PRIORITY),
-		ABSOLUTE(MAX_PRIORITY, NO_PRIORITY, NO_PRIORITY, NO_PRIORITY, NO_PRIORITY, HIGH_PRIORITY, HIGH_PRIORITY);
+		POSITION(MEDIUM_PRIORITY, HIGH_PRIORITY, MAX_PRIORITY, NO_PRIORITY, NO_PRIORITY, NO_PRIORITY, NO_PRIORITY),
+		VELOCITY(MEDIUM_PRIORITY, MAX_PRIORITY, HIGH_PRIORITY, NO_PRIORITY, NO_PRIORITY, NO_PRIORITY, NO_PRIORITY),
+		ABSOLUTE(MEDIUM_PRIORITY, NO_PRIORITY, NO_PRIORITY, NO_PRIORITY, NO_PRIORITY, HIGH_PRIORITY, HIGH_PRIORITY);
 
 		public int status0, status1, status2, status3, status4, status5, status6;
 
@@ -77,10 +78,10 @@ public class NAR_CANSparkMax extends NAR_Motor {
 	 */
     public NAR_CANSparkMax(int deviceNumber, MotorType type, EncoderType encoderType, double kP, double kI, double kD) {
         motor = new CANSparkMax(deviceNumber, type);
-
-        motor.setCANTimeout(0);
 		motor.restoreFactoryDefaults(); // Reset config parameters, unfollow other motor controllers
-		motor.enableVoltageCompensation(12);
+		motor.setCANTimeout(canSparkMaxTimeout);
+		enableVoltageCompensation(12.0);
+		setCurrentLimit(type == MotorType.kBrushless ? NEO_CurrentLimit : NEO_550CurrentLimit);
 
 		this.encoderType = encoderType;
 
@@ -108,7 +109,7 @@ public class NAR_CANSparkMax extends NAR_Motor {
 		
 		controller.setFeedbackDevice(encoderType == EncoderType.Relative ? relativeEncoder : absoluteEncoder);
 
-		motor.burnFlash();
+		if (shouldBurn) motor.burnFlash();
     }
 
     /**
@@ -233,6 +234,11 @@ public class NAR_CANSparkMax extends NAR_Motor {
 		setPeriodicFramePeriod(PeriodicFrame.kStatus6, config.status6);
 	}
 
+	@Override
+	public void setDefaultStatusFrames() {
+		setStatusFrames(SparkMaxConfig.DEFAULT);
+	}
+
     /** Enables continuous input.
     *
     * <p>Rather then using the max and min input range as constraints, the motor considers them to be the
@@ -241,31 +247,37 @@ public class NAR_CANSparkMax extends NAR_Motor {
     * @param minInput The minimum value expected from the input.
     * @param maxInput The maximum value expected from the input.
     */
+	@Override
     public void enableContinuousInput(double minInput, double maxInput) {
-        enableContinuousInput(minInput, maxInput, unitConversionFactor);
-    }
-
-    /**
-	 * Enables continuous input.
-	 *
-	 * <p>Rather then using the max and min input range as constraints, it considers them to be the
-	 * same point and automatically calculates the shortest route to the setpoint.
-	 *
-	 * @param minInput The minimum value expected from the input.
-	 * @param maxInput The maximum value expected from the input.
-	 * @param factor The conversion factor to multiply the inputs by.
-	 */
-	public void enableContinuousInput(double minInput, double maxInput, double factor) {
+        super.enableContinuousInput(minInput, maxInput);
 		controller.setPositionPIDWrappingEnabled(true);
-		controller.setPositionPIDWrappingMinInput(minInput / factor);
-		controller.setPositionPIDWrappingMaxInput(maxInput / factor);
-	}
+		controller.setPositionPIDWrappingMinInput(minInput / unitConversionFactor);
+		controller.setPositionPIDWrappingMaxInput(maxInput / unitConversionFactor);
+    }
 
 	/**
 	 * Burns all settings to flash; stores settings between power cycles
 	 */
 	public void burnFlash() {
 		motor.burnFlash();
+	}
+
+	/**
+     * Sets a motor's output based on the leader's
+     * @param leader The motor to follow
+	 * @param invert Whether or not to invert motor output
+     */
+	public void follow(NAR_CANSparkMax leader, boolean invert) {
+		motor.follow(leader.getMotor(), invert);
+	}
+
+	@Override
+	public void follow(NAR_Motor leader) {
+		if (leader instanceof NAR_CANSparkMax) {
+			follow((NAR_CANSparkMax) leader, false);
+			return;
+		}
+		super.follow(leader);
 	}
 
 	@Override
@@ -292,6 +304,11 @@ public class NAR_CANSparkMax extends NAR_Motor {
     public double getAppliedOutput() {
         return motor.getAppliedOutput();
     }
+
+	@Override
+	public double getStallCurrent() {
+		return motor.getOutputCurrent();
+	}
 	
 	@Override
 	protected void resetRawPosition(double rotations) {

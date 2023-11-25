@@ -13,7 +13,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 /**
  * A subsystem based off of {@link ProfiledPIDSubsystem} 
- * @since 2023 CHARGED UP
+ * @since 2023 Charged Up
  * @author Mason Lam
  */
 public abstract class NAR_ProfiledPIDSubsystem extends SubsystemBase {

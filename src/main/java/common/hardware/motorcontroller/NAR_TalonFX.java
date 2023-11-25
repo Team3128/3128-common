@@ -2,6 +2,7 @@ package common.hardware.motorcontroller;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
+import com.ctre.phoenix.motorcontrol.IMotorController;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
 import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
@@ -17,7 +18,7 @@ import java.util.function.DoubleSupplier;
 
 /**
  * Team 3128's streamlined {@link WPI_TalonFX} class.
- * @since 2023 CHARGED UP
+ * @since 2023 Charged Up
  * @author Mason Lam
  */
 public class NAR_TalonFX extends NAR_Motor{
@@ -123,7 +124,7 @@ public class NAR_TalonFX extends NAR_Motor{
 	}
 
     /**
-	 * Set the rate of transmission for stauts frames from the TalonFX
+	 * Set the rate of transmission for status frames from the TalonFX
 	 *
 	 * <p>Each motor controller sends back status frames with different data at set rates. Use this
 	 * function to set to team 3128's default rates.
@@ -131,21 +132,49 @@ public class NAR_TalonFX extends NAR_Motor{
 	 * <p>Defaults: Status1 - 10ms Status2 - 20ms Status3 - 255ms Status4 - 255ms Status8 - 255ms Status10
 	 * - 255ms Status12 - 255ms  Status13 - 255ms  Status14 - 255ms  Status21 - 255ms
 	 */
+	@Override
 	public void setDefaultStatusFrames() {
 		setStatusFramePeriod(StatusFrameEnhanced.Status_1_General, MotorControllerConstants.MAX_PRIORITY);
 		setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, MotorControllerConstants.HIGH_PRIORITY);
 		setStatusFramePeriod(StatusFrameEnhanced.Status_3_Quadrature, MotorControllerConstants.LOW_PRIORITY);
-		setStatusFramePeriod(StatusFrameEnhanced.Status_4_AinTempVbat, MotorControllerConstants.LOW_PRIORITY);
+		setStatusFramePeriod(StatusFrameEnhanced.Status_4_AinTempVbat, MotorControllerConstants.MEDIUM_PRIORITY);
 		setStatusFramePeriod(StatusFrameEnhanced.Status_8_PulseWidth, MotorControllerConstants.LOW_PRIORITY);
 		setStatusFramePeriod(StatusFrameEnhanced.Status_10_MotionMagic, MotorControllerConstants.LOW_PRIORITY);
 		setStatusFramePeriod(StatusFrameEnhanced.Status_12_Feedback1, MotorControllerConstants.LOW_PRIORITY);
-		setStatusFramePeriod(StatusFrameEnhanced.Status_13_Base_PIDF0, MotorControllerConstants.LOW_PRIORITY);
+		setStatusFramePeriod(StatusFrameEnhanced.Status_13_Base_PIDF0, MotorControllerConstants.HIGH_PRIORITY);
 		setStatusFramePeriod(StatusFrameEnhanced.Status_14_Turn_PIDF1, MotorControllerConstants.LOW_PRIORITY);
 		setStatusFramePeriod(StatusFrameEnhanced.Status_21_FeedbackIntegrated, MotorControllerConstants.LOW_PRIORITY);
 	}
 
+	/**
+	 * Configures the motor settings
+	 * @param config See the {@link TalonFXConfiguration} class
+	 */
 	public void configAllSettings(TalonFXConfiguration config) {
 		motor.configAllSettings(config);
+	}
+
+	/**
+     * Sets a motor's output based on the leader's
+     * @param leader The motor to follow
+     */
+	public void follow(IMotorController leader) {
+		motor.follow(leader);
+	}
+
+	@Override
+	public void follow(NAR_Motor leader) {
+		if (leader instanceof NAR_TalonFX) {
+			final NAR_TalonFX brushlessLeader = (NAR_TalonFX) leader;
+			follow(brushlessLeader.getMotor());
+		}
+		else if (leader instanceof NAR_TalonSRX) {
+			final NAR_TalonFX brushedLeader = (NAR_TalonFX) leader;
+			follow(brushedLeader.getMotor());
+		}
+		else {
+			super.follow(leader);
+		}
 	}
 
     @Override
@@ -172,6 +201,11 @@ public class NAR_TalonFX extends NAR_Motor{
     public double getAppliedOutput() {
         return motor.getMotorOutputPercent();
     }
+
+	@Override
+	public double getStallCurrent() {
+		return motor.getStatorCurrent();
+	}
 
 	@Override
 	protected void resetRawPosition(double rotations) {

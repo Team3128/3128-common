@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 /**
  * A subsystem based off of {@link PIDSubsystem} 
- * @since 2023 CHARGED UP
+ * @since 2023 Charged Up
  * @author Mason Lam
  */
 public abstract class NAR_PIDSubsystem extends SubsystemBase {
@@ -49,6 +49,9 @@ public abstract class NAR_PIDSubsystem extends SubsystemBase {
         }
     }
 
+    /**
+     * Initializes shuffleboard with debug elements for PID + FF values.
+     */
     public void initShuffleboard() {
         NAR_Shuffleboard.addComplex(getName(), "PID_Controller", m_controller, 0, 0);
 

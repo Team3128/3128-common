@@ -2,6 +2,8 @@ package common.hardware.motorcontroller;
 
 /**
  * Constants for motor control / conversion. Should not be changed.
+ * @since 2022 Rapid React
+ * @author Mason Lam <-Blame this guy for any wrong numbers
  */
 public class MotorControllerConstants {
 
@@ -16,9 +18,12 @@ public class MotorControllerConstants {
 
     public static final int NO_PRIORITY = 65535;
     public static final int LOW_PRIORITY = 255;
-    public static final int MEDIUM_PRIORITY = 45;
+    public static final int MEDIUM_PRIORITY = 100;
     public static final int HIGH_PRIORITY = 20;
     public static final int MAX_PRIORITY = 10;
 
+    public static final int canSparkMaxTimeout = 500; //ms
+
     public static final int NEO_CurrentLimit = 40; //amps
+    public static final int NEO_550CurrentLimit = 20; //amps
 }

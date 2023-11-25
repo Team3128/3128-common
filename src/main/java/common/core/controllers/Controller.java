@@ -11,7 +11,7 @@ import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 /**
  * Team 3128's streamlined {@link PIDController} class.
  * 
- * @since 2023 CHARGED UP
+ * @since 2023 Charged Up
  * @author Mason Lam, William Yuan
  */
 public class Controller extends PIDController {
@@ -115,7 +115,6 @@ public class Controller extends PIDController {
     public void addMotor(MotorController motor) {
         addOutput(motor::set);
     }
-    
 
     /**
      * Adds an output source for controller to send output

@@ -8,8 +8,8 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 
 /**
- * Team 3128's motor class wrapper replacement for {@link MotorController}
- * @since CHARGED UP 2023
+ * Team 3128's motor class replacement for {@link MotorController}
+ * @since Charged Up 2023
  * @author Mason Lam
  */
 public abstract class NAR_Motor {
@@ -47,8 +47,19 @@ public abstract class NAR_Motor {
     private double prevValue = 0;
     private Control prevMode = Control.PercentOutput;
     private double prevFeedForward = 0;
+    private double minInput;
+    private double maxInput;
+    private boolean isContinuous = false;
     protected double unitConversionFactor = 1;
     protected double timeConversionFactor = 1;
+
+    /**
+     * Sets motor output power in volts
+     * @param volts The voltage of the motor from -12 to 12
+     */
+    public void setVolts(double volts) {
+        set(volts / 12.0);
+    }
 
     /**
      * Sets motor output power
@@ -86,9 +97,25 @@ public abstract class NAR_Motor {
                 setVelocity(value / unitConversionFactor * timeConversionFactor, feedForward);
                 break;
             case Position:
-                setPosition(value / unitConversionFactor, feedForward);
+                final double position = value / unitConversionFactor;
+                setPosition(isContinuous ? MathUtil.inputModulus(position, minInput, maxInput) : position, feedForward);
                 break;
         }
+    }
+
+    /** Enables continuous input.
+    *
+    * <p>Rather then using the max and min input range as constraints, the motor considers them to be the
+    * same point and automatically calculates the shortest route to the setpoint.
+    * <p> WARNING: Do not use with onBoard PID control with CTRE devices, works with SparkMax.
+    *
+    * @param minInput The minimum value expected from the input.
+    * @param maxInput The maximum value expected from the input.
+    */
+    public void enableContinuousInput(double minInput, double maxInput) {
+        this.minInput = Math.min(minInput, maxInput);
+        this.maxInput = Math.max(minInput, maxInput);
+        isContinuous = true;
     }
 
     /**
@@ -154,11 +181,18 @@ public abstract class NAR_Motor {
     public abstract double getAppliedOutput();
 
     /**
+     * Returns the current going to the motor, increasing values means the motor is stalling
+     * @return Double measuring the stall current of the motor
+     */
+    public abstract double getStallCurrent();
+
+    /**
      * Returns the current motor position, default unit - rotations
      * @return Double measuring motor position
      */
     public double getPosition() {
-        return getRawPosition() * unitConversionFactor;
+        final double position = getRawPosition() * unitConversionFactor;
+        return isContinuous ? MathUtil.inputModulus(position, minInput, maxInput) : position;
     }
 
     /**
@@ -182,7 +216,7 @@ public abstract class NAR_Motor {
     protected abstract double getRawVelocity();
 
     /**
-     * Sets a motor's output based on anothers
+     * Sets a motor's output based on the leader's
      * @param leader The motor to follow
      */
     public void follow(NAR_Motor leader) {
@@ -220,6 +254,11 @@ public abstract class NAR_Motor {
      * @param volts The max volts the motor goes too
      */
     public abstract void enableVoltageCompensation(double volts);
+
+    /**
+     * Set the status frame rate to Team 3128's defaults
+     */
+    public abstract void setDefaultStatusFrames();
 
     /**
      * Returns the motor object controlling the motion
