@@ -14,10 +14,6 @@ public class NAR_Joystick {
 
     private final Trigger[] buttons;
 
-    /**
-     * POV convention: 0 = up, 45 = top right, 90 = right, 135 = buttom right, 180 = down, 225 = bottom left, 270 = left, 315 = top left
-     * We assign indices as angle / 45 [0,7]
-     */
     private final Trigger[] povButtons;
 
     private double xDeadband = 0.05;
@@ -28,12 +24,12 @@ public class NAR_Joystick {
 
     /**
      * Creates a new NAR_Joystick object
-     * @param deviceNumber The port the joystick is connected on driver station
+     * @param port The port the joystick is connected on driver station
      */
-    public NAR_Joystick(int deviceNumber) {
+    public NAR_Joystick(int port) {
         buttons = new Trigger[16];
         povButtons = new Trigger[8];
-        stick = new Joystick(deviceNumber);
+        stick = new Joystick(port);
 
         // Thrustmaster joystick has 16 buttons
 
@@ -80,6 +76,16 @@ public class NAR_Joystick {
     public double getThrottle() {
         double mappedThrottle = MathUtil.clamp((1 - stick.getThrottle()) / 2, throttleLowerBound, throttleUpperBound);
         return mappedThrottle;
+    }
+
+    /**
+     * Sets the throttle bounds for the joystick.
+     * @param lowerBound [0, 1] lowest possible throttle value.
+     * @param upperBound [0, 1] highest possible throttle value.
+     */
+    public void setThrottleBounds(double lowerBound, double upperBound) {
+        throttleLowerBound = lowerBound;
+        throttleUpperBound = upperBound;
     }
 
     /**

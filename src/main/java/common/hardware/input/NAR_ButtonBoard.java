@@ -1,54 +1,46 @@
 package common.hardware.input;
 
-import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 /**
- * Wrapper for the WPILib Joystick class. Works with device that can be recognized as joystick as driverstation.
+ * Custom GenericHID class for team 3128's button board setup
  * @since 2023 Charged UP
- * @author Peter Ma, Arav Chadha
+ * @author Peter Ma, Arav Chadha, Mason Lam
  */
 public class NAR_ButtonBoard {
 
-    private Joystick stick;
+    private GenericHID device;
 
     private Trigger[] buttons;
 
-    public NAR_ButtonBoard(int deviceNumber) {
+    /**
+     * Creates a new button board object.
+     * @param port The port on DriverStation the button board is connected to.
+     */
+    public NAR_ButtonBoard(int port) {
         buttons = new Trigger[16];
-        stick = new Joystick(deviceNumber);
+        device = new GenericHID(port);
 
-        // 2023 btnboard has 12 buttons & 4 axis direction
-
+        // 2023 buttonBoard has 12 buttons & 4 axis direction
         for (int i = 0; i < 12; i++) {
             int buttonId = i;
-            buttons[buttonId] = new Trigger(() -> stick.getRawButton(buttonId + 1)); 
+            buttons[buttonId] = new Trigger(() -> device.getRawButton(buttonId + 1)); 
         }
 
-        buttons[12] = new Trigger(() -> stick.getX() == -1.0);
-        buttons[13] = new Trigger(() -> stick.getX() == 1.0);
-        buttons[14] = new Trigger(() -> stick.getY() == 1.0);
-        buttons[15] = new Trigger(() -> stick.getY() == -1.0);
+        buttons[12] = new Trigger(() -> device.getRawAxis(0) == -1.0);
+        buttons[13] = new Trigger(() -> device.getRawAxis(0) == 1.0);
+        buttons[14] = new Trigger(() -> device.getRawAxis(1) == 1.0);
+        buttons[15] = new Trigger(() -> device.getRawAxis(1) == -1.0);
             
     }
 
+    /**
+     * Returns a button on the board
+     * @param i The ID of the button
+     * @return Trigger to store the command to run
+     */
     public Trigger getButton(int i) {
         return buttons[i-1];
-    }
-
-    public Trigger getPosXButton() {
-        return buttons[12];
-    }
-
-    public Trigger getNegXButton() {
-        return buttons[13];
-    }
-
-    public Trigger getPosYButton() {
-        return buttons[14];
-    }
-
-    public Trigger getNegYButton() {
-        return buttons[15];
     }
 }

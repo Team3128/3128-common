@@ -86,6 +86,7 @@ public class NAR_CANSparkMax extends NAR_Motor {
 
 		if (encoderType == EncoderType.Relative) {
 			relativeEncoder = (SparkMaxRelativeEncoder) motor.getEncoder();
+			//No clue what this does, but Mechanical Advantage does this so it must be good
 			relativeEncoder.setAverageDepth(2);
 			relativeEncoder.setMeasurementPeriod(10);
 		}

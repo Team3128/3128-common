@@ -19,7 +19,7 @@ import edu.wpi.first.wpilibj.Timer;
  * @author Mason Lam
  */
 public class NAR_Robot extends IterativeRobotBase {
-    @SuppressWarnings("MemberName")
+  @SuppressWarnings("MemberName")
   static class Callback implements Comparable<Callback> {
     public Runnable func;
     public double period;
