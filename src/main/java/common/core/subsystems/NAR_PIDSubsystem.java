@@ -4,8 +4,7 @@ import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
 import common.core.controllers.Controller;
-import common.core.controllers.PController;
-import common.core.controllers.VController;
+import common.core.controllers.Controller.Type;
 import common.utility.NAR_Shuffleboard;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.PIDSubsystem;
@@ -28,7 +27,7 @@ public abstract class NAR_PIDSubsystem extends SubsystemBase {
     /**
      * Creates a new PIDSubsystem.
      *
-     * @param controller the PIDController to use
+     * @param controller the Controller to use
      */
     public NAR_PIDSubsystem(Controller controller) {
         m_controller = controller;
@@ -62,20 +61,22 @@ public abstract class NAR_PIDSubsystem extends SubsystemBase {
         NAR_Shuffleboard.addData(getName(), "DEBUG", ()-> debug.getAsBoolean(), 2, 1);
         setpoint = NAR_Shuffleboard.debug(getName(), "Debug_Setpoint", 0, 2,2);
 
-        if (m_controller instanceof VController) {
-            m_controller.setkS(NAR_Shuffleboard.debug(getName(), "kS", m_controller.getkS(), 3, 0));
+        if (m_controller.getType() == Type.DEFAULT) return;
+
+        m_controller.setkS(NAR_Shuffleboard.debug(getName(), "kS", m_controller.getkS(), 3, 0));
+
+        if (m_controller.getType() == Type.VELOCITY) {
             m_controller.setkV(NAR_Shuffleboard.debug(getName(), "kV", m_controller.getkV(), 3, 1));
         }
-        if (m_controller instanceof PController) {
-            m_controller.setkS(NAR_Shuffleboard.debug(getName(), "kS", m_controller.getkS(), 3, 0));
+        else {
             m_controller.setkG(NAR_Shuffleboard.debug(getName(), "kG", m_controller.getkG(), 3, 1));
         }
     }
 
     /**
-     * Returns the PIDController object controlling the subsystem
+     * Returns the Controller object controlling the subsystem
      *
-     * @return The PIDController
+     * @return The Controller
      */
     public Controller getController() {
         return m_controller;

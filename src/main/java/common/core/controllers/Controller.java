@@ -4,9 +4,9 @@ import java.util.LinkedList;
 import java.util.function.DoubleConsumer;
 import java.util.function.DoubleSupplier;
 
-import common.core.subsystems.NAR_PIDSubsystem;
 import common.hardware.motorcontroller.NAR_Motor;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 
 /**
  * Team 3128's streamlined {@link PIDController} class.
@@ -16,80 +16,139 @@ import edu.wpi.first.math.controller.PIDController;
  */
 public class Controller extends PIDController {
 
+    /**
+     * Setpoint types
+     */
+    public enum Type {
+        VELOCITY,
+        POSITION,
+        DEFAULT;
+    }
+
     private final LinkedList<DoubleConsumer> consumers;
+    private final Type type;
     private DoubleSupplier measurement;
 
     protected DoubleSupplier kS, kV, kG;
     protected DoubleSupplier kG_Function;
+
+    /**
+     * Create a new object to control PID + FF logic for a subsystem.
+     * <p>Sets kP, kI, kD, kS, kV, kG, period values.
+     * 
+     * @param kP The proportional coefficient.
+     * @param kI The integral coefficient.
+     * @param kD The derivative coefficient.
+     * @param kS The static gain.
+     * @param kV The velocity gain.
+     * @param kG The gravity gain.
+     * @param type The type of setpoint used by the controller
+     * @param period The controller's update rate in seconds. Must be non-zero and positive.
+     */
+    public Controller(double kP, double kI, double kD, double kS, double kV, double kG, Type type, double period) {
+        super(kP, kI, kD, period);
+        consumers = new LinkedList<DoubleConsumer>();
+        this.kS = ()-> kS;
+        this.kV = ()-> kV;
+        this.kG = ()-> kG;
+        kG_Function = ()-> 1;
+        this.type = type;
+    }
+
     /**
      * Create a new object to control PID logic for a subsystem.
      * <p>Sets kP, kI, kD, period values.
-     * <p>Defaults kS, kV, kG to 0.
-     * <p>Defaults kG_Function to 1.
-     * <p>Initiliazes consumers.
-     * @see LinkedList consumers: includes void functions that accept double values.
      * 
-     * @param kP The proportional coefficient of the on board PIDController.
-     * @param kI The integral coefficient of the on board PIDController.
-     * @param kD The derivative coefficient of the on board PIDController.
-     * @param period The PID periodic update rate in seconds.
+     * @param kP The proportional coefficient.
+     * @param kI The integral coefficient.
+     * @param kD The derivative coefficient.
+     * @param period The controller's update rate in seconds. Must be non-zero and positive.
      */
     public Controller(double kP, double kI, double kD, double period) {
-        super(kP, kI, kD, period);
-        kS = ()-> 0;
-        kV = ()-> 0;
-        kG = ()-> 0;
-        kG_Function = () -> 1;
-        consumers = new LinkedList<DoubleConsumer>();
+        this(kP, kI, kD, 0, 0, 0, Type.DEFAULT, period);
     }
 
     /**
      * Create a new object to control PID logic for a subsystem.
      * <p>Sets kP, kI, kD values.
-     * <p>Defaults period to 0.02.
-     * <p>Defaults kS, kV, kG to 0.
-     * <p>Defaults kG_Function to 1.
-     * <p>Initiliazes consumers.
-     * @see LinkedList consumers: includes void functions that accept double values.
      * 
-     * @param kP The proportional coefficient of the on board {@link PIDController}.
-     * @param kI The integral coefficient of the on board {@link PIDController}.
-     * @param kD The derivative coefficient of the on board {@link PIDController}.
+     * @param kP The proportional coefficient.
+     * @param kI The integral coefficient.
+     * @param kD The derivative coefficient.
      */
     public Controller(double kP, double kI, double kD) {
         this(kP, kI, kD, 0.02);
     }
 
     /**
-     * Sets the measurement source to be later used during PID logic.
-     * @param measurement {@code getMeasurement()} from {@link NAR_PIDSubsystem} as a DoubleSupplier
+     * Sets a motor's velocity/position as the measurement source
+     * @param motor {@link NAR_Motor} motor type.
+     */
+    public void setMotorMeasurementSource(NAR_Motor motor) {
+        if (type == Type.VELOCITY) {
+            setMeasurementSource(()-> motor.getVelocity());
+            return;
+        }
+        setMeasurementSource(()-> motor.getPosition());
+    }
+
+    /**
+     * Sets the measurement source for PID control.
+     * @param measurement Returns the current state of the system.
      */
     public void setMeasurementSource(DoubleSupplier measurement) {
         this.measurement = measurement;
     }
 
     /**
-     * Adds a motor set method to consumers to be later used during PID logic.
-     * @see LinkedList consumers: includes void functions that accept double values.
-     * @param motor Created {@link NAR_Motor} object.
+     * Adds a motor for controller to send output
+     * @param motor {@link NAR_Motor} motor type.
      */
     public void addMotor(NAR_Motor motor) {
-        consumers.add(motor::set);
+        addOutput(motor::set);
     }
 
     /**
-     * Adds a useOutput method to consumers to be later used during PID logic.
-     * @see LinkedList consumers: includes void functions that accept double values.
-     * @param output {@code useOutput()} from {@link NAR_PIDSubsystem} as a DoubleSupplier
+     * Adds a motor for controller to send output
+     * @param motor {@link MotorController} motor type.
+     */
+    public void addMotor(MotorController motor) {
+        addOutput(motor::set);
+    }
+    
+
+    /**
+     * Adds an output source for controller to send output
+     * @param output Method that takes the controller's output
      */
     public void addOutput(DoubleConsumer output) {
         consumers.add(output);
     }
 
     /**
-     * Calculates the output based on calculations from the measurement, then gives each DoubleConsumer in consumers the output as an argument.
-     * @return calculated output based on calculations from the measurement
-     * @see LinkedList consumers: includes void functions that accept double values.
+     * Returns the next output of the controller.
+     *
+     * @param measurement The current measurement of the process variable.
+     * @return The next controller output.
+     */
+    @Override
+    public double calculate(double measurement) {
+        final double PID_OUTPUT = super.calculate(measurement);
+        if (type == Type.DEFAULT) return PID_OUTPUT;
+        
+        double ff_output = Math.copySign(getkS(), PID_OUTPUT);
+        
+        if (type == Type.VELOCITY) {
+            ff_output += getkV() * getSetpoint();
+            return ff_output + PID_OUTPUT;
+        }
+        ff_output += getkG() * kG_Function.getAsDouble();
+        return ff_output + PID_OUTPUT;
+    }
+
+    /**
+     * Calculates and sends output.
+     * @return Calculated output.
      */
     public double useOutput() {
         if (measurement == null) return 0;
@@ -101,15 +160,7 @@ public class Controller extends PIDController {
     }
 
     /**
-     * Sets the kG_Function to a new DoubleSupplier.
-     * @param kG_Function DoubleSupplier with specified logic.
-     */
-    public void setkG_Function(DoubleSupplier kG_Function) {
-        this.kG_Function = kG_Function;
-    }
-
-    /**
-     * Sets the kS value.
+     * Sets the static gain.
      * @param kS The constant power required to overcome static friction as a double.
      */
     public void setkS(double kS) {
@@ -117,15 +168,15 @@ public class Controller extends PIDController {
     }
 
     /**
-     * Sets the kS value.
-     * @param kS The constant power required to overcome static friction as a DoubleSupplier.
+     * Sets the static gain.
+     * @param kS Modifies kS based on the function.
      */
     public void setkS(DoubleSupplier kS) {
         this.kS = kS;
     }
 
     /**
-     * Sets the kV value.
+     * Sets the velocity gain.
      * @param kV The constant power required to maintain a set velocity as a double.
      */
     public void setkV(double kV) {
@@ -133,15 +184,15 @@ public class Controller extends PIDController {
     }
 
     /**
-     * Sets the kV value.
-     * @param kV The constant power required to maintain a set velocity as a DoubleSupplier.
+     * Sets the velocity gain.
+     * @param kV Modifies kV based on the function.
      */
     public void setkV(DoubleSupplier kV) {
         this.kV = kV;
     }
 
     /**
-     * Sets the kG value.
+     * Sets the gravity gain.
      * @param kG The constant power required to overcome gravity as a double.
      */
     public void setkG(double kG) {
@@ -149,15 +200,32 @@ public class Controller extends PIDController {
     }
 
     /**
-     * Sets the kG value.
-     * @param kG The constant power required to overcome gravity as a DoubleSupplier.
+     * Sets the gravity gain.
+     * @param kG Modifies kG based on the function.
      */
     public void setkG(DoubleSupplier kG) {
         this.kG = kG;
     }
 
     /**
-     * Returns kS.
+     * Sets a function to modify gravity gain based on another factor.
+     * <p>Example use would be a Pivot which would have gravity gain dependent on angle.
+     * @param kG_Function DoubleSupplier with specified logic.
+     */
+    public void setkG_Function(DoubleSupplier kG_Function) {
+        this.kG_Function = kG_Function;
+    }
+
+    /**
+     * Returns the type of setpoint used by the controller
+     * @return {@link Type}: VELOCITY, POSITION, NONE
+     */
+    public Type getType() {
+        return type;
+    }
+
+    /**
+     * Returns static gain.
      * @return returns kS as a double.
      */
     public double getkS() {
@@ -165,7 +233,7 @@ public class Controller extends PIDController {
     }
 
     /**
-     * Returns kV.
+     * Returns velocity gain.
      * @return returns kV as a double.
      */
     public double getkV() {
@@ -173,7 +241,7 @@ public class Controller extends PIDController {
     }
     
     /**
-     * Returns kG.
+     * Returns gravity gain.
      * @return returns kG as a double.
      */
     public double getkG() {
