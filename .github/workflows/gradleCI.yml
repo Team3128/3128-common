@@ -27,3 +27,18 @@ jobs:
         with:
           name: Generated Files
           path: ./build/libs/*
+
+  generateJSON:
+    needs: build
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Generate 3128-common.json
+        run: './gradlew vendorJSON'
+
+      - name: Commit 3128-common.json
+        uses: EndBug/add-and-commit@v9.1.3
+        with:
+          add: './3128-common.json'
+          message: 'Automated - Update 3128-common.json for release'
