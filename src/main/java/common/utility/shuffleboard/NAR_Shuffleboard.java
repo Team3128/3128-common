@@ -1,4 +1,4 @@
-package common.utility;
+package common.utility.shuffleboard;
 
 import java.util.HashMap;
 import java.util.function.DoubleSupplier;

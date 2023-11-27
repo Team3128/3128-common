@@ -1,4 +1,4 @@
-package common.swerveNeo;
+package common.core.swerve;
 
 public class SwerveModuleConstants {
     public final int driveMotorID;

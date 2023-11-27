@@ -1,4 +1,4 @@
-package common.narwhaldashboard;
+package common.utility.narwhaldashboard;
 
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;

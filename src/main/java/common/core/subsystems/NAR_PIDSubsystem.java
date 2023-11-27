@@ -5,7 +5,7 @@ import java.util.function.DoubleSupplier;
 
 import common.core.controllers.Controller;
 import common.core.controllers.Controller.Type;
-import common.utility.NAR_Shuffleboard;
+import common.utility.shuffleboard.NAR_Shuffleboard;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.PIDSubsystem;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;

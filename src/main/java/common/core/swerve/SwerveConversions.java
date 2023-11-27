@@ -1,4 +1,4 @@
-package common.swerveNeo;
+package common.core.swerve;
 
 /**
  * Team 3128's conversion class for Swerve

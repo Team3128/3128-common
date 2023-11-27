@@ -1,4 +1,6 @@
-package common.swerveNeo;
+package common.core.swerve;
+
+import static common.core.swerve.SwerveConstants.*;
 
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
@@ -6,8 +8,6 @@ import com.ctre.phoenix.sensors.AbsoluteSensorRange;
 import com.ctre.phoenix.sensors.CANCoderConfiguration;
 import com.ctre.phoenix.sensors.SensorInitializationStrategy;
 import com.ctre.phoenix.sensors.SensorTimeBase;
-
-import static common.swerveNeo.SwerveConstants.*;
 
 /**
  * Team 3128's defaults

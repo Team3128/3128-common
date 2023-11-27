@@ -12,7 +12,8 @@ import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.SparkMaxRelativeEncoder;
 
 import common.core.NAR_Robot;
-import common.utility.NAR_Shuffleboard;
+import common.utility.shuffleboard.NAR_Shuffleboard;
+
 import static common.hardware.motorcontroller.MotorControllerConstants.*;
 
 import com.revrobotics.CANSparkMax.ControlType;

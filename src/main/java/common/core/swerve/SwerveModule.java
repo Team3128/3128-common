@@ -1,10 +1,13 @@
-package common.swerveNeo;
+package common.core.swerve;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+
+import static common.core.swerve.SwerveConstants.*;
+import static common.core.swerve.SwerveConversions.*;
 
 import com.ctre.phoenix.sensors.CANCoder;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
@@ -15,9 +18,6 @@ import common.hardware.motorcontroller.NAR_TalonFX;
 import common.hardware.motorcontroller.NAR_CANSparkMax.EncoderType;
 import common.hardware.motorcontroller.NAR_Motor.Control;
 import common.hardware.motorcontroller.NAR_Motor.Neutral;
-
-import static common.swerveNeo.SwerveConstants.*;
-import static common.swerveNeo.SwerveConversions.*;
 
 
 /**

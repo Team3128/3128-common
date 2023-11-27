@@ -1,6 +1,6 @@
-package common.swerveNeo;
+package common.core.swerve;
 
-import common.swerveNeo.SwerveModule.ModuleType;
+import common.core.swerve.SwerveModule.ModuleType;
 import edu.wpi.first.math.util.Units;;
 
 /**

@@ -9,7 +9,7 @@ import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 
 import common.core.NAR_Robot;
-import common.utility.NAR_Shuffleboard;
+import common.utility.shuffleboard.NAR_Shuffleboard;
 
 import static common.hardware.motorcontroller.MotorControllerConstants.*;
 
