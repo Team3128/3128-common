@@ -228,6 +228,15 @@ public class NAR_TalonFX extends NAR_Motor{
 		motor.enableVoltageCompensation(true);
 	}
 
+	/**
+	 * We don't use falcons and I can't be bothered to figure out a good way to do this with CTRE
+	 */
+	@Override
+	public void setCurrentLimit(int limit) {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Unimplemented method 'setCurrentLimit'");
+	}
+
 	@Override
 	protected void setBrakeMode() {
 		motor.setNeutralMode(NeutralMode.Brake);

@@ -108,6 +108,15 @@ public class NAR_TalonSRX extends NAR_Motor {
 		motor.configVoltageCompSaturation(volts);
 	}
 
+	/**
+	 * We just burn out our 775's *shrug* and I can't be bothered to figure out a good way to do this with CTRE
+	 */
+	@Override
+	public void setCurrentLimit(int limit) {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Unimplemented method 'setCurrentLimit'");
+	}
+
 	@Override
 	protected void setBrakeMode() {
 		motor.setNeutralMode(NeutralMode.Brake);

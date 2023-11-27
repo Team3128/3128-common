@@ -5,7 +5,7 @@
   "mavenUrls": [
     "https://jitpack.io"
   ],
-  "jsonUrl": "https://github.com/Team3128/3128-common/latest/download/3128-common.json",
+  "jsonUrl": "https://github.com/Team3128/3128-common/releases/latest/download/3128-common.json",
   "fileName": "3128-common.json",
   "javaDependencies": [
     {

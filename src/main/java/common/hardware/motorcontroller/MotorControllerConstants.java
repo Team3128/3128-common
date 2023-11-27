@@ -3,7 +3,7 @@ package common.hardware.motorcontroller;
 /**
  * Constants for motor control / conversion. Should not be changed.
  * @since 2022 Rapid React
- * @author Mason Lam <-Blame this guy for any wrong numbers
+ * @author Mason Lam (Blame this guy for any wrong numbers)
  */
 public class MotorControllerConstants {
 

@@ -255,6 +255,8 @@ public abstract class NAR_Motor {
      */
     public abstract void enableVoltageCompensation(double volts);
 
+    public abstract void setCurrentLimit(int limit);
+
     /**
      * Set the status frame rate to Team 3128's defaults
      */
