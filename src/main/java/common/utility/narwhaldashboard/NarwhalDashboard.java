@@ -82,6 +82,14 @@ public class NarwhalDashboard extends WebSocketServer {
     }
 
     /**
+     * Returns the selectedAuto on the web server
+     * @return A string containing an auto
+     */
+    public String getSelectedAuto() {
+        return selectedAuto;
+    }
+
+    /**
      * Initializes NarwhalDashboard autos and buttons
      */
     private void initDashboard() {
@@ -203,6 +211,7 @@ public class NarwhalDashboard extends WebSocketServer {
     @Override
     public void onMessage(WebSocket conn, String message) {
         Log.info("NarwhalDashboard", message);
+        //Message format category + key + value or category + value, example auto:"exampleAuto"
         final String[] parts = message.split(":");
 
         if (!actionMap.containsKey(parts[0])) return;

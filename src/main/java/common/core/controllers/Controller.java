@@ -56,6 +56,22 @@ public class Controller extends PIDController {
     }
 
     /**
+     * Create a new object to control PID + FF logic for a subsystem.
+     * <p>Sets kP, kI, kD, kS, kV, kG values.
+     * 
+     * @param kP The proportional coefficient.
+     * @param kI The integral coefficient.
+     * @param kD The derivative coefficient.
+     * @param kS The static gain.
+     * @param kV The velocity gain.
+     * @param kG The gravity gain.
+     * @param type The type of setpoint used by the controller
+     */
+    public Controller(double kP, double kI, double kD, double kS, double kV, double kG, Type type) {
+        this(kP, kI, kD, kS, kV, kG, type, 0.02);
+    }
+
+    /**
      * Create a new object to control PID logic for a subsystem.
      * <p>Sets kP, kI, kD, period values.
      * 

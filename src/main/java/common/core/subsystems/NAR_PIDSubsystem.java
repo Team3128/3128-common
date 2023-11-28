@@ -32,7 +32,7 @@ public abstract class NAR_PIDSubsystem extends SubsystemBase {
     public NAR_PIDSubsystem(Controller controller) {
         m_controller = controller;
         controller.setMeasurementSource(()-> getMeasurement());
-        controller.addOutput(this::useOutput);
+        controller.addOutput(output -> useOutput(output, getSetpoint()));
         min = Double.NEGATIVE_INFINITY;
         max = Double.POSITIVE_INFINITY;
         safetyThresh = 5;
@@ -166,7 +166,7 @@ public abstract class NAR_PIDSubsystem extends SubsystemBase {
      *
      * @param output the output of the PIDController
      */
-    protected abstract void useOutput(double output);
+    protected abstract void useOutput(double output, double setpoint);
 
     /**
      * Returns the measurement of the process variable used by the PIDController.
@@ -185,7 +185,7 @@ public abstract class NAR_PIDSubsystem extends SubsystemBase {
     /** Disables the PID control. Sets output to zero. */
     public void disable() {
         m_enabled = false;
-        useOutput(0);
+        useOutput(0, 0);
     }
 
     /**

@@ -51,24 +51,24 @@ public class NAR_Shuffleboard {
     private static HashMap<String, HashMap<String, entryInfo>> tabs = new HashMap<String, HashMap<String,entryInfo>>();;
 
     /**
-   * Creates a new tab entry
-   *
-   * @param tabName the title of the new tab
-   */
+     * Creates a new tab entry
+     *
+     * @param tabName the title of the new tab
+     */
     private static void create_tab(String tabName) {
         tabs.put(tabName, new HashMap<String,entryInfo>());
     }
 
     /**
-   * Displays a value in Shuffleboard
-   *
-   * @param tabName the title of the tab to select
-   * @param name the name of the entry
-   * @param data value to display
-   * @param x -coord of the entry starting from 0
-   * @param y -coord of the entry starting from 0
-   * @return simple widget that can be modified
-   */
+     * Displays a value in Shuffleboard
+     *
+     * @param tabName the title of the tab to select
+     * @param name the name of the entry
+     * @param data value to display
+     * @param x -coord of the entry starting from 0
+     * @param y -coord of the entry starting from 0
+     * @return simple widget that can be modified
+     */
     public static SimpleWidget addData(String tabName, String name, Object data, int x, int y) {
         return addData(tabName, name, data, x, y, 1, 1);
     }
@@ -111,27 +111,27 @@ public class NAR_Shuffleboard {
     }
 
     /**
-   * Displays a value in Shuffleboard
-   *
-   * @param tabName the title of the tab to select
-   * @param name the name of the entry
-   * @param data value to display
-   * @param x -coord of the entry starting from 0
-   * @param y -coord of the entry starting from 0
-   * @param width -of the entry
-   * @param height -of the entry
-   * @return simple widget that can be modified
-   */
-  public static SimpleWidget addData(String tabName, String name, Object data, int x, int y, int width, int height) {
-    if(!tabs.containsKey(tabName)) create_tab(tabName);
-    if (tabs.get(tabName).containsKey(name)) {
-        tabs.get(tabName).get(name).m_data.setValue(data);
-        return tabs.get(tabName).get(name).m_entry;
+     * Displays a value in Shuffleboard
+     *
+     * @param tabName the title of the tab to select
+     * @param name the name of the entry
+     * @param data value to display
+     * @param x -coord of the entry starting from 0
+     * @param y -coord of the entry starting from 0
+     * @param width -of the entry
+     * @param height -of the entry
+     * @return simple widget that can be modified
+     */
+    public static SimpleWidget addData(String tabName, String name, Object data, int x, int y, int width, int height) {
+        if(!tabs.containsKey(tabName)) create_tab(tabName);
+        if (tabs.get(tabName).containsKey(name)) {
+            tabs.get(tabName).get(name).m_data.setValue(data);
+            return tabs.get(tabName).get(name).m_entry;
+        }
+        SimpleWidget entry = Shuffleboard.getTab(tabName).add(name,data).withPosition(x, y).withSize(width,height);
+        tabs.get(tabName).put(name, new entryInfo(entry,null));
+        return entry;
     }
-    SimpleWidget entry = Shuffleboard.getTab(tabName).add(name,data).withPosition(x, y).withSize(width,height);
-    tabs.get(tabName).put(name, new entryInfo(entry,null));
-    return entry;
-}
 
     /**
      * Displays complex values, like subsystems and command, works on all classes that extend sendable
