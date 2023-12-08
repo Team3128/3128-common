@@ -1,14 +1,21 @@
 package common.core.subsystems;
 
+import java.util.HashSet;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
 import common.core.controllers.Controller;
 import common.core.controllers.Controller.Type;
+import common.utility.Log;
+import common.utility.narwhaldashboard.NarwhalDashboard;
 import common.utility.shuffleboard.NAR_Shuffleboard;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.PIDSubsystem;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
+import static edu.wpi.first.wpilibj2.command.Commands.*;
 
 /**
  * A subsystem based off of {@link PIDSubsystem} 
@@ -16,6 +23,34 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
  * @author Mason Lam
  */
 public abstract class NAR_PIDSubsystem extends SubsystemBase {
+
+    public class Test {
+        public double setpoint;
+        public double time;
+        public boolean passedTest;
+        private double startTime;
+        private double endTime;
+
+        /**
+         * Creates a new Test for the PIDSubsystem
+         * @param setpoint The setpoint for the test goes to
+         * @param time The time for the subsystem to reach setpoint
+         */
+        public Test(double setpoint, double time) {
+            this.setpoint = setpoint;
+            this.time = time;
+            passedTest = false;
+            startTime = 0;
+            endTime = 0;
+        }
+
+        private void check() {
+            passedTest = time >= (endTime - startTime);
+        }
+    }
+
+    private HashSet<Test> unitTests = new HashSet<Test>();
+
     protected final Controller m_controller;
     protected boolean m_enabled;
     private BooleanSupplier debug;
@@ -37,6 +72,7 @@ public abstract class NAR_PIDSubsystem extends SubsystemBase {
         max = Double.POSITIVE_INFINITY;
         safetyThresh = 5;
         plateauCount = 0;
+        NarwhalDashboard.getInstance().addUpdate(this.getName(), ()-> hasPassedTest());
     }
 
     @Override
@@ -131,6 +167,38 @@ public abstract class NAR_PIDSubsystem extends SubsystemBase {
     }
 
     /**
+     * Runs the list of unit tests given 
+     * @param tests Tests to be run on the subsystem
+     * @return Sequential Command Group containing all unit tests
+     */
+    public CommandBase runTest(Test... tests) {
+        final CommandBase[] commands = new CommandBase[tests.length];
+        for (int index = 0; index < tests.length; index ++) {
+            commands[index] = runTest(tests[index]);
+        }
+        return sequence(commands);
+    }
+
+    /**
+     * Runs the unit test
+     * @param test Test for the subsystem
+     * @return Command which will run the test
+     */
+    private CommandBase runTest(Test test) {
+        unitTests.add(test);
+        return sequence(
+            runOnce(()-> test.passedTest = false),
+            runOnce(()-> test.startTime = Timer.getFPGATimestamp()),
+            runOnce(()-> startPID(test.setpoint)),
+            waitUntil(()-> atSetpoint()),
+            runOnce(()-> test.endTime = Timer.getFPGATimestamp()),
+            runOnce(()-> test.check()),
+            runOnce(()-> Log.info(this.getName(), "Expected Time: " + test.time + " Actual Time: " + (test.endTime - test.startTime))),
+            either(print(this.getName() + " TEST PASSED"), print(this.getName() + " TEST FAILED"), ()-> test.passedTest)
+        );
+    }
+
+    /**
      * Enables continuous input.
      *
      * <p>Rather then using the max and min input range as constraints, it considers them to be the
@@ -186,6 +254,18 @@ public abstract class NAR_PIDSubsystem extends SubsystemBase {
     public void disable() {
         m_enabled = false;
         useOutput(0, 0);
+    }
+
+    /**
+     * Returns whether or not the subsystem has passed the test
+     * @return True if tests have been passed and false if tests have failed
+     */
+    public boolean hasPassedTest() {
+        if (unitTests.size() == 0) return false;
+        for (final Test test : unitTests) {
+            if (!test.passedTest) return false;
+        }
+        return true;
     }
 
     /**

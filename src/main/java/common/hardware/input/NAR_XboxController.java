@@ -12,12 +12,38 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
  */
 public class NAR_XboxController extends XboxController {
 
+    /**
+     * Enum to represent buttons
+     */
+    public enum XboxButton {
+        kLeftBumper(5, false),
+        kRightBumper(6, false),
+        kLeftStick(9, false),
+        kRightStick(10, false),
+        kA(1, false),
+        kB(2, false),
+        kX(3, false),
+        kY(4, false),
+        kBack(7, false),
+        kStart(8, false),
+        kLeftTrigger(2, true),
+        kRightTrigger(3, true);
+
+        private final int value;
+        private final boolean isAxis;
+
+        private XboxButton(int value, boolean isAxis) {
+            this.value = value;
+            this.isAxis = isAxis;
+        }
+    }
+
     private double leftXDeadband = 0.05;
     private double leftYDeadband = 0.05;
     private double rightXDeadband = 0.05;
     private double rightYDeadband = 0.05;
     
-    private HashMap<String, Trigger> buttons;
+    private HashMap<XboxButton, Trigger> buttons;
     private Trigger[] povButtons;
 
     /**
@@ -26,12 +52,14 @@ public class NAR_XboxController extends XboxController {
      */
     public NAR_XboxController(int port) {
         super(port);
-        buttons = new HashMap<String, Trigger>();
-        for (final Button button : Button.values()) {
-            buttons.put(button.toString(), new Trigger(()-> getRawButton(button.value)));
-        } 
-        buttons.put("RightTrigger", new Trigger(()-> getRightTriggerAxis() >= 0.5));
-        buttons.put("LeftTrigger", new Trigger(()-> getLeftTriggerAxis() >= 0.5));
+        buttons = new HashMap<XboxButton, Trigger>();
+        for (final XboxButton button : XboxButton.values()) {
+            if (button.isAxis) {
+                buttons.put(button, new Trigger(()-> getRawAxis(button.value) >= 0.5));
+                continue;
+            }
+            buttons.put(button, new Trigger(()-> getRawButton(button.value)));
+        }
 
         povButtons = new Trigger[8];
         for (int i = 0; i < 8; i++) {
@@ -41,21 +69,12 @@ public class NAR_XboxController extends XboxController {
     }
 
     /**
-     * Returns the XboxController Button.
-     * @param buttonName Name of the button.
-     * @return Trigger object to add commands to.
-     */
-    public Trigger getButton(String buttonName) {
-        return buttons.get(buttonName);
-    }
-
-    /**
      * Returns the XboxController Button
      * @param button Type of button.
      * @return Trigger object to add commands to.
      */
-    public Trigger getButton(Button button) {
-        return getButton(button.toString());
+    public Trigger getButton(XboxButton button) {
+        return buttons.get(button);
     }
 
     /**

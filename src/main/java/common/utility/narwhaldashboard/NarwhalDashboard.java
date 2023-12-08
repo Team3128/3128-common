@@ -24,8 +24,8 @@ import edu.wpi.first.util.function.BooleanConsumer;
  * @author Mason Lam
  */
 public class NarwhalDashboard extends WebSocketServer {
-    private final HashMap<String, Supplier<Object>> updateMap = new HashMap<String, Supplier<Object>>();
     private final HashMap<String, List<Object>> initMap = new HashMap<String, List<Object>>();
+    private final HashMap<String, Supplier<Object>> updateMap = new HashMap<String, Supplier<Object>>();
     private final HashMap<String, Consumer<String[]>> actionMap = new HashMap<String, Consumer<String[]>>();
 
     private final HashMap<String, BooleanConsumer> buttons = new HashMap<String, BooleanConsumer>();
@@ -51,7 +51,7 @@ public class NarwhalDashboard extends WebSocketServer {
      * connected to by client devices (the DS Laptop, a tablet controller, etc) and
      * begins streaming data.
      */
-    public static void startServer() {
+    private static void startServer() {
         try {
             instance = new NarwhalDashboard(PORT);
             instance.setReuseAddr(true);
@@ -95,7 +95,7 @@ public class NarwhalDashboard extends WebSocketServer {
     private void initDashboard() {
         addUpdate("selectedAuto", ()-> selectedAuto);
         addAction("selectAuto", autoName -> selectAuto(autoName[0]));
-        addAction("button", button -> updateButton(button[0], button[1].equals("down")));
+        addAction("button", button -> updateButton(button[0], button[1].equals("true")));
     }
 
     /**

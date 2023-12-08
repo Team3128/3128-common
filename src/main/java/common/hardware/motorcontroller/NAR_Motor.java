@@ -97,10 +97,26 @@ public abstract class NAR_Motor {
                 setVelocity(value / unitConversionFactor * timeConversionFactor, feedForward);
                 break;
             case Position:
-                final double position = value / unitConversionFactor;
-                setPosition(isContinuous ? MathUtil.inputModulus(position, minInput, maxInput) : position, feedForward);
+                if (isContinuous) {
+                    final double position = getRawPosition() * unitConversionFactor;
+                    final double errorBound = (maxInput - minInput) / 2.0;
+                    final double error = convertInput(value) - convertInput(position);
+                    final double delta = MathUtil.inputModulus(error, -errorBound, errorBound);
+                    setPosition((position + delta) / unitConversionFactor, feedForward);
+                    break;
+                }
+                setPosition(value / unitConversionFactor, feedForward);
                 break;
         }
+    }
+
+    /**
+     * Wraps a measurement value to the min and max input
+     * @param value A measurement value
+     * @return The measurement value wrapped by the min and max input
+     */
+    private double convertInput(double value) {
+        return isContinuous ? MathUtil.inputModulus(value, minInput, maxInput) : value;
     }
 
     /** Enables continuous input.
@@ -192,7 +208,7 @@ public abstract class NAR_Motor {
      */
     public double getPosition() {
         final double position = getRawPosition() * unitConversionFactor;
-        return isContinuous ? MathUtil.inputModulus(position, minInput, maxInput) : position;
+        return convertInput(position);
     }
 
     /**

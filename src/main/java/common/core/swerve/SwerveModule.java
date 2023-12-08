@@ -82,7 +82,7 @@ public class SwerveModule {
         angleMotor.setInverted(angleMotorInvert);
         angleMotor.setUnitConversionFactor(rotationsToDegrees(1, angleGearRatio));
         angleMotor.setNeutralMode(Neutral.COAST);
-        if (angleMotor instanceof NAR_CANSparkMax) angleMotor.enableContinuousInput(-180, 180);
+        angleMotor.enableContinuousInput(-180, 180);
         angleMotor.setDefaultStatusFrames();
         resetToAbsolute();
     }
