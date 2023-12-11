@@ -94,7 +94,7 @@ public class NAR_TalonSRX extends NAR_Motor {
 			follow(brushlessLeader.getMotor());
 		}
 		else if (leader instanceof NAR_TalonSRX) {
-			final NAR_TalonFX brushedLeader = (NAR_TalonFX) leader;
+			final NAR_TalonSRX brushedLeader = (NAR_TalonSRX) leader;
 			follow(brushedLeader.getMotor());
 		}
 		else {

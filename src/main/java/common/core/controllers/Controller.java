@@ -51,8 +51,9 @@ public class Controller extends PIDController {
         this.kS = ()-> kS;
         this.kV = ()-> kV;
         this.kG = ()-> kG;
-        kG_Function = ()-> 1;
         this.type = type;
+
+        kG_Function = ()-> 1;
     }
 
     /**

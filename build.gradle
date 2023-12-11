@@ -162,8 +162,9 @@ def hash = { ->
     return grgit.head().abbreviatedId
 }
 
-// Setting up RobotLib Jar File. In this case, adding version information to jar manifest.
+// Setting up 3128-common Jar File. In this case, adding version information to jar manifest.
 jar {
+	from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
     manifest {
        	attributes("LibraryVersion": LibraryVersion)	// from gradle.properties file.
        	attributes("Time": new Date().format("yyyy-MM-dd HH:mm:ss"))
@@ -171,6 +172,7 @@ jar {
        	attributes("Branch": branch())
        	attributes("Commit": hash())
 	}
+	duplicatesStrategy = DuplicatesStrategy.INCLUDE
 }
 
 // Create Sources Jar

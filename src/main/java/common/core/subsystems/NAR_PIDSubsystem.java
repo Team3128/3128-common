@@ -44,12 +44,15 @@ public abstract class NAR_PIDSubsystem extends SubsystemBase {
             endTime = 0;
         }
 
+        /**
+         * Updates whether or not the test was passed
+         */
         private void check() {
             passedTest = time >= (endTime - startTime);
         }
     }
 
-    private HashSet<Test> unitTests = new HashSet<Test>();
+    private final HashSet<Test> unitTests = new HashSet<Test>();
 
     protected final Controller m_controller;
     protected boolean m_enabled;
@@ -193,7 +196,7 @@ public abstract class NAR_PIDSubsystem extends SubsystemBase {
             waitUntil(()-> atSetpoint()),
             runOnce(()-> test.endTime = Timer.getFPGATimestamp()),
             runOnce(()-> test.check()),
-            runOnce(()-> Log.info(this.getName(), "Expected Time: " + test.time + " Actual Time: " + (test.endTime - test.startTime))),
+            runOnce(()-> Log.info(this.getName() + " Test:", "Expected Time: " + test.time + " Actual Time: " + (test.endTime - test.startTime))),
             either(print(this.getName() + " TEST PASSED"), print(this.getName() + " TEST FAILED"), ()-> test.passedTest)
         );
     }

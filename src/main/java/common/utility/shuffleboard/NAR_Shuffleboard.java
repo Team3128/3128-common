@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
+import common.core.NAR_Robot;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
@@ -18,6 +19,10 @@ import edu.wpi.first.wpilibj.shuffleboard.SimpleWidget;
  * @author Mason Lam
  */
 public class NAR_Shuffleboard {
+
+    static {
+        NAR_Robot.addPeriodic(NAR_Shuffleboard::update, 0.1, 0.01);
+    }
 
     /**
      * Storage class for NAR_Shuffleboard
@@ -226,7 +231,7 @@ public class NAR_Shuffleboard {
     /**
      * Updates every entry
      */
-    public static void update() {
+    private static void update() {
         for(String i : tabs.keySet()){
             for(String j : tabs.get(i).keySet()){
                 tabs.get(i).get(j).update();

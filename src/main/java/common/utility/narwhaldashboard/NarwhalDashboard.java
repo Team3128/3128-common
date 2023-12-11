@@ -15,6 +15,7 @@ import org.java_websocket.server.WebSocketServer;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
+import common.core.NAR_Robot;
 import common.utility.Log;
 import edu.wpi.first.util.function.BooleanConsumer;
 
@@ -79,6 +80,7 @@ public class NarwhalDashboard extends WebSocketServer {
      */
     private NarwhalDashboard(int port) throws UnknownHostException {
         super(new InetSocketAddress(port));
+        NAR_Robot.addPeriodic(this::update, 0.1, 0.01);
     }
 
     /**
@@ -120,7 +122,7 @@ public class NarwhalDashboard extends WebSocketServer {
      * 
      * @param names - The human-readable name of the autonomous program
      */
-    @SuppressWarnings("all")
+    @SuppressWarnings("all")    //I cannot figure out what warning this is
     public void addAutos(String... names) {
         autoPrograms.addAll(Arrays.asList(names));
         addInit("auto", Arrays.asList(names));
@@ -172,7 +174,7 @@ public class NarwhalDashboard extends WebSocketServer {
      * Updates NarwhalDashboard sending data to the web server
      */
     @SuppressWarnings("unchecked")
-    public void update() {
+    private void update() {
         if (conn == null) return;
 
         if (conn.isOpen()) {
