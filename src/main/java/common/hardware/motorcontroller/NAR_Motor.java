@@ -9,7 +9,7 @@ import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 
 /**
  * Team 3128's motor class replacement for {@link MotorController}
- * @since Charged Up 2023
+ * @since 2023 Charged Up
  * @author Mason Lam
  */
 public abstract class NAR_Motor {

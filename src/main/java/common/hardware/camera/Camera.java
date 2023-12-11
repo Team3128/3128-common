@@ -10,34 +10,22 @@ import edu.wpi.first.math.geometry.Transform2d;
  */
 public class Camera {
 
-    public String hostname;
+    public final String name;
 
-    public boolean updatePose;
-  
-    public double height; //inches
+    public final Transform2d offset;
 
-    public double angle;  //degrees
-
-    public double targetHeight; //inches
-
-    public Transform2d offset; //inches
+    public boolean enabled;
 
     /**
      * Creates a new object for a camera.
      * 
-     * @param hostname Name of camera.
-     * @param updatePose Whether or not to update pose in a boolean.
-     * @param cameraHeight Height of the camera in inches
-     * @param cameraAngle Angle of the camera in degrees.
-     * @param targetHeight Height of the target in inches.
-     * @param cameraOffset offset from robot in inches.
+     * @param name Name of camera on photonvision.
+     * @param enabled Whether or not to return results.
+     * @param cameraOffset Offset from robot as a transform2d.
      */
-    public Camera(String hostname, boolean updatePose, double cameraHeight, double cameraAngle, double targetHeight, Transform2d cameraOffset) {
-        this.hostname = hostname;
-        this.updatePose = updatePose;
-        this.height = cameraHeight;
-        this.angle = cameraAngle;
-        this.targetHeight = targetHeight;
+    public Camera(String name, boolean enabled, Transform2d cameraOffset) {
+        this.name = name;
+        this.enabled = enabled;
         this.offset = cameraOffset;
     }
 
