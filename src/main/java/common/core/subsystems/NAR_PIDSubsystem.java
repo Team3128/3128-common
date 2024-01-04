@@ -58,13 +58,18 @@ public abstract class NAR_PIDSubsystem extends SubsystemBase {
         }
     }
 
-    protected final ControllerBase m_controller;
-    protected boolean m_enabled;
+    protected final ControllerBase controller;
+    protected boolean enabled;
     private BooleanSupplier debug;
     private DoubleSupplier setpoint;
     private double min, max;
     private double safetyThresh;
-    private double plateauCount;
+    private Timer safetyTimer = new Timer();
+
+    private double prevMeasurement;
+    private double prevVelocity;
+    private double updateTime;
+    private Timer updateTimer = new Timer();
 
     /**
      * Creates a new PIDSubsystem.
@@ -72,22 +77,37 @@ public abstract class NAR_PIDSubsystem extends SubsystemBase {
      * @param controller the Controller to use
      */
     public NAR_PIDSubsystem(ControllerBase controller) {
-        m_controller = controller;
+        this.controller = controller;
         controller.setMeasurementSource(()-> getMeasurement());
         controller.addOutput(output -> useOutput(output, getSetpoint()));
         min = Double.NEGATIVE_INFINITY;
         max = Double.POSITIVE_INFINITY;
         safetyThresh = 5;
-        plateauCount = 0;
+        prevMeasurement = 0;
+        prevVelocity = 0;
+        updateTime = controller.getPeriod();
+        updateTimer.start();
+        initShuffleboard();
     }
 
     @Override
     public void periodic() {
-        if (m_enabled) {
-            m_controller.useOutput();
-            if (plateauCount * 0.02 > safetyThresh) disable();
-            if (atSetpoint()) plateauCount = 0;
-            else plateauCount ++;
+        if (enabled) {
+            controller.useOutput();
+            if (safetyTimer.hasElapsed(safetyThresh)) disable();
+            if (atSetpoint()) safetyTimer.restart();
+        }
+
+        if (updateTimer.hasElapsed(updateTime)) {
+            final double measurement = getMeasurement();
+            final double velocity = (measurement - prevMeasurement) / updateTimer.get();
+            final double acceleration = (velocity - prevVelocity) / updateTimer.get();
+            NAR_Shuffleboard.addData(getName(), "Measurement", measurement, 1, 1);
+            NAR_Shuffleboard.addData(getName(), "1stDerivative", velocity, 1, 2);
+            NAR_Shuffleboard.addData(getName(), "2ndDerivative", acceleration, 1, 3);
+            prevMeasurement = measurement;
+            prevVelocity = velocity;
+            updateTimer.restart();
         }
     }
 
@@ -95,21 +115,20 @@ public abstract class NAR_PIDSubsystem extends SubsystemBase {
      * Initializes shuffleboard with debug elements for PID + FF values.
      */
     public void initShuffleboard() {
-        NAR_Shuffleboard.addComplex(getName(), "PID_Controller", m_controller, 0, 0);
+        NAR_Shuffleboard.addComplex(getName(), "PID_Controller", controller, 0, 0);
+        NAR_Shuffleboard.addData(getName(), "Setpoint", ()-> getSetpoint(), 0, 2);
 
         NAR_Shuffleboard.addData(getName(), "Enabled", ()-> isEnabled(), 1, 0);
-        NAR_Shuffleboard.addData(getName(), "Measurement", ()-> getMeasurement(), 1, 1);
-        NAR_Shuffleboard.addData(getName(), "Setpoint", ()-> getSetpoint(), 1, 2);
 
         var debugEntry = NAR_Shuffleboard.addData(getName(), "TOGGLE", false, 2, 0).withWidget("Toggle Button");
         debug = ()-> debugEntry.getEntry().getBoolean(false);
         NAR_Shuffleboard.addData(getName(), "DEBUG", ()-> debug.getAsBoolean(), 2, 1);
         setpoint = NAR_Shuffleboard.debug(getName(), "Debug_Setpoint", 0, 2,2);
 
-        m_controller.setkS(NAR_Shuffleboard.debug(getName(), "kS", m_controller.getkS(), 3, 0));
-        m_controller.setkV(NAR_Shuffleboard.debug(getName(), "kV", m_controller.getkV(), 3, 1));
-        m_controller.setkV(NAR_Shuffleboard.debug(getName(), "kA", m_controller.getkV(), 3, 2));
-        m_controller.setkG(NAR_Shuffleboard.debug(getName(), "kG", m_controller.getkG(), 3, 3));
+        controller.setkS(NAR_Shuffleboard.debug(getName(), "kS", controller.getkS(), 3, 0));
+        controller.setkV(NAR_Shuffleboard.debug(getName(), "kV", controller.getkV(), 3, 1));
+        controller.setkV(NAR_Shuffleboard.debug(getName(), "kA", controller.getkV(), 3, 2));
+        controller.setkG(NAR_Shuffleboard.debug(getName(), "kG", controller.getkG(), 3, 3));
     }
 
     /**
@@ -118,12 +137,20 @@ public abstract class NAR_PIDSubsystem extends SubsystemBase {
      * @return The Controller
      */
     public ControllerBase getController() {
-        return m_controller;
+        return controller;
+    }
+
+    /**
+     * Sets the amount of time between measurement logging to account for noisy measurements.
+     * @param timeSeconds The time in seconds between each update.
+     */
+    public void setUpdateTime(double timeSeconds) {
+        updateTime = timeSeconds;
     }
 
     /**
      * Sets the safetyThreshold to disable PID if setpoint is not reached
-     * @param timeSeconds the time in seconds for the safety threshold
+     * @param timeSeconds The time in seconds for the safety threshold
      */
     public void setSafetyThresh(double timeSeconds) {
         safetyThresh = timeSeconds;
@@ -135,7 +162,7 @@ public abstract class NAR_PIDSubsystem extends SubsystemBase {
      * @param positionTolerance Position error which is tolerable.
      */
     public void setTolerance(double positionTolerance) {
-        m_controller.setTolerance(positionTolerance);
+        controller.setTolerance(positionTolerance);
     }
 
     /**
@@ -153,7 +180,7 @@ public abstract class NAR_PIDSubsystem extends SubsystemBase {
      * @param kG_Function the function multiplied to kG
      */
     public void setkG_Function(DoubleSupplier kG_Function) {
-        m_controller.setkG_Function(kG_Function);
+        controller.setkG_Function(kG_Function);
     }
 
     /**
@@ -163,7 +190,7 @@ public abstract class NAR_PIDSubsystem extends SubsystemBase {
      */
     public void startPID(double setpoint) {
         enable();
-        m_controller.setSetpoint(MathUtil.clamp(debug.getAsBoolean() ? this.setpoint.getAsDouble() : setpoint, min, max));
+        controller.setSetpoint(MathUtil.clamp(debug.getAsBoolean() ? this.setpoint.getAsDouble() : setpoint, min, max));
     }
 
     /**
@@ -176,7 +203,7 @@ public abstract class NAR_PIDSubsystem extends SubsystemBase {
      * @param maximumInput The maximum value expected from the input.
      */
     public void enableContinuousInput(double minimumInput, double maximumInput) {
-        m_controller.enableContinuousInput(minimumInput, maximumInput);
+        controller.enableContinuousInput(minimumInput, maximumInput);
     }
 
     /**
@@ -185,7 +212,7 @@ public abstract class NAR_PIDSubsystem extends SubsystemBase {
      * @return The current setpoint
      */
     public double getSetpoint() {
-        return m_controller.getSetpoint();
+        return controller.getSetpoint();
     }
 
     /**
@@ -194,7 +221,7 @@ public abstract class NAR_PIDSubsystem extends SubsystemBase {
      * @return If subsystem is at setpoint
      */
     public boolean atSetpoint() {
-        return m_controller.atSetpoint();
+        return controller.atSetpoint();
     }
 
     /**
@@ -213,14 +240,14 @@ public abstract class NAR_PIDSubsystem extends SubsystemBase {
 
     /** Enables the PID control. Resets the controller. */
     public void enable() {
-        m_enabled = true;
-        plateauCount = 0;
-        m_controller.reset();
+        enabled = true;
+        safetyTimer.restart();
+        controller.reset();
     }
 
     /** Disables the PID control. Sets output to zero. */
     public void disable() {
-        m_enabled = false;
+        enabled = false;
         useOutput(0, 0);
     }
 
@@ -230,6 +257,6 @@ public abstract class NAR_PIDSubsystem extends SubsystemBase {
      * @return Whether the controller is enabled.
      */
     public boolean isEnabled() {
-        return m_enabled;
+        return enabled;
     }
 }
