@@ -15,8 +15,7 @@ public class Controller extends ControllerBase {
      */
     public enum Type {
         VELOCITY,
-        POSITION,
-        DEFAULT;
+        POSITION
     }
 
     private final Type type;
@@ -35,7 +34,7 @@ public class Controller extends ControllerBase {
      * @param period The controller's update rate in seconds. Must be non-zero and positive.
      */
     public Controller(double kP, double kI, double kD, double kS, double kV, double kG, Type type, double period) {
-        super(kP, kI, kD, kS, kV, kG, period);
+        super(kP, kI, kD, kS, kV, 0, kG, period);
         this.type = type;
     }
 
@@ -65,7 +64,7 @@ public class Controller extends ControllerBase {
      * @param period The controller's update rate in seconds. Must be non-zero and positive.
      */
     public Controller(double kP, double kI, double kD, double period) {
-        this(kP, kI, kD, 0, 0, 0, Type.DEFAULT, period);
+        this(kP, kI, kD, 0, 0, 0, Type.POSITION, period);
     }
 
     /**
@@ -93,24 +92,27 @@ public class Controller extends ControllerBase {
     }
 
     /**
-     * Returns the next output of the controller.
-     *
-     * @param measurement The current measurement of the process variable.
-     * @return The next controller output.
+     * Returns the PID output of the controller.
+     * @param measurement the current measurement of the process variable.
+     * @return The controller output due to PID terms.
      */
     @Override
-    public double calculate(double measurement) {
-        final double PID_OUTPUT = super.calculate(measurement);
-        if (type == Type.DEFAULT) return PID_OUTPUT;
-        
-        double ff_output = Math.copySign(getkS(), PID_OUTPUT);
-        
-        if (type == Type.VELOCITY) {
-            ff_output += getkV() * getSetpoint();
-            return ff_output + PID_OUTPUT;
-        }
-        ff_output += getkG() * kG_Function.getAsDouble();
-        return ff_output + PID_OUTPUT;
+    public double calculatePID(double measurement) {
+        return controller.calculate(measurement);
+    }
+
+    /**
+     * Returns the Feed Forward output of the controller.
+     * <p>Uses kS, kG, and optionally kV
+     * @param pidOutput the current measurement of the process variable.
+     * @return The controller output due to Feed Forward terms.
+     */
+    @Override
+    public double calculateFF(double pidOutput) {
+        final double staticGain = Math.copySign(getkS(), pidOutput);
+        final double velocityGain = (type == Type.VELOCITY) ? getkV() * getSetpoint() : 0;
+        final double gravityGain = getkG() * kG_Function.getAsDouble();
+        return staticGain + velocityGain + gravityGain;
     }
 
     /**

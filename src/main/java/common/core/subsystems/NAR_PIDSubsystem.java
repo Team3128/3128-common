@@ -4,8 +4,7 @@ import java.util.HashSet;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
-import common.core.controllers.Controller;
-import common.core.controllers.Controller.Type;
+import common.core.controllers.ControllerBase;
 import common.utility.Log;
 import common.utility.narwhaldashboard.NarwhalDashboard;
 import common.utility.shuffleboard.NAR_Shuffleboard;
@@ -54,7 +53,7 @@ public abstract class NAR_PIDSubsystem extends SubsystemBase {
 
     private final HashSet<Test> unitTests = new HashSet<Test>();
 
-    protected final Controller m_controller;
+    protected final ControllerBase m_controller;
     protected boolean m_enabled;
     private BooleanSupplier debug;
     private DoubleSupplier setpoint;
@@ -67,7 +66,7 @@ public abstract class NAR_PIDSubsystem extends SubsystemBase {
      *
      * @param controller the Controller to use
      */
-    public NAR_PIDSubsystem(Controller controller) {
+    public NAR_PIDSubsystem(ControllerBase controller) {
         m_controller = controller;
         controller.setMeasurementSource(()-> getMeasurement());
         controller.addOutput(output -> useOutput(output, getSetpoint()));
@@ -103,16 +102,10 @@ public abstract class NAR_PIDSubsystem extends SubsystemBase {
         NAR_Shuffleboard.addData(getName(), "DEBUG", ()-> debug.getAsBoolean(), 2, 1);
         setpoint = NAR_Shuffleboard.debug(getName(), "Debug_Setpoint", 0, 2,2);
 
-        if (m_controller.getType() == Type.DEFAULT) return;
-
         m_controller.setkS(NAR_Shuffleboard.debug(getName(), "kS", m_controller.getkS(), 3, 0));
-
-        if (m_controller.getType() == Type.VELOCITY) {
-            m_controller.setkV(NAR_Shuffleboard.debug(getName(), "kV", m_controller.getkV(), 3, 1));
-        }
-        else {
-            m_controller.setkG(NAR_Shuffleboard.debug(getName(), "kG", m_controller.getkG(), 3, 1));
-        }
+        m_controller.setkV(NAR_Shuffleboard.debug(getName(), "kV", m_controller.getkV(), 3, 1));
+        m_controller.setkV(NAR_Shuffleboard.debug(getName(), "kA", m_controller.getkV(), 3, 2));
+        m_controller.setkG(NAR_Shuffleboard.debug(getName(), "kG", m_controller.getkG(), 3, 3));
     }
 
     /**
@@ -120,7 +113,7 @@ public abstract class NAR_PIDSubsystem extends SubsystemBase {
      *
      * @return The Controller
      */
-    public Controller getController() {
+    public ControllerBase getController() {
         return m_controller;
     }
 

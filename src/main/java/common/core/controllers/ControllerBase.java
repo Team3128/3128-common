@@ -10,19 +10,38 @@ import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 
-public class ControllerBase implements Sendable {
+/**
+ * Team 3128's abstract controller class.
+ * 
+ * @since 2023 Charged Up
+ * @author Mason Lam
+ */
+public abstract class ControllerBase implements Sendable {
 
     protected final PIDController controller;
     private final LinkedList<DoubleConsumer> consumers = new LinkedList<DoubleConsumer>();
     protected DoubleSupplier measurement;
 
-    protected DoubleSupplier kS, kV, kG;
+    protected DoubleSupplier kS, kV, kA, kG;
     protected DoubleSupplier kG_Function = ()-> 1;
 
-    public ControllerBase(double kP, double kI, double kD, double kS, double kV, double kG, double period) {
+    /**
+     * Creates a base controller object to control motion.
+     * <p>Sets kP, kI, kD, kS, kV, kA, kG, constraints, period values.
+     * @param kP The proportional coefficient.
+     * @param kI The integral coefficient.
+     * @param kD The derivative coefficient.
+     * @param kS The static gain.
+     * @param kV The velocity gain.
+     * @param kA The acceleration gain.
+     * @param kG The gravity gain.
+     * @param period The controller's update rate in seconds. Must be non-zero and positive.
+     */
+    public ControllerBase(double kP, double kI, double kD, double kS, double kV, double kA, double kG, double period) {
         controller = new PIDController(kP, kI, kD, period);
         this.kS = ()-> kS;
         this.kV = ()-> kV;
+        this.kA = ()-> kA;
         this.kG = ()-> kG;
 
         kG_Function = ()-> 1;
@@ -93,8 +112,23 @@ public class ControllerBase implements Sendable {
      * @return The next controller output.
      */
     public double calculate(double measurement) {
-        return controller.calculate(measurement);
+        final double pidOutput = calculatePID(measurement);
+        return pidOutput + calculateFF(pidOutput);
     }
+
+    /**
+     * Returns the PID output of the controller.
+     * @param measurement the current measurement of the process variable.
+     * @return The controller output due to PID terms.
+     */
+    protected abstract double calculatePID(double measurement);
+
+    /**
+     * Returns the Feed Forward output of the controller.
+     * @param pidOutput the current measurement of the process variable.
+     * @return The controller output due to Feed Forward terms.
+     */
+    protected abstract double calculateFF(double pidOutput);
 
     /**
      * Sets the PID Controller gain parameters.
@@ -214,6 +248,7 @@ public class ControllerBase implements Sendable {
      * @param setpoint The desired setpoint.
      */
     public void setSetpoint(double setpoint) {
+        reset();
         controller.setSetpoint(setpoint);
     }
 
@@ -264,6 +299,14 @@ public class ControllerBase implements Sendable {
     }
 
     /**
+     * Sets the velocity gain.
+     * @param kA Modifies kV based on the function.
+     */
+    public void setkA(DoubleSupplier kA) {
+        this.kA = kA;
+    }
+
+    /**
      * Sets the gravity gain.
      * @param kG The constant power required to overcome gravity as a double.
      */
@@ -302,6 +345,14 @@ public class ControllerBase implements Sendable {
      */
     public double getkV() {
         return kV.getAsDouble();
+    }
+
+    /**
+     * Returns acceleration gain.
+     * @return returns kA as a double.
+     */
+    public double getkA() {
+        return kA.getAsDouble();
     }
     
     /**

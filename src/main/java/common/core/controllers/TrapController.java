@@ -1,49 +1,62 @@
 package common.core.controllers;
 
+import java.util.function.DoubleSupplier;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.util.sendable.SendableBuilder;
 
+/**
+ * Team 3128's streamlined {@link ProfiledPIDController} class.
+ * 
+ * @since 2023 Charged Up
+ * @author Mason Lam
+ */
 public class TrapController extends ControllerBase {
+    private DoubleSupplier systemVelocity;
+
     private TrapezoidProfile.State setpoint = new TrapezoidProfile.State();
     private TrapezoidProfile.State tempSetpoint = new TrapezoidProfile.State();
+    private TrapezoidProfile.State prevSetpoint = new TrapezoidProfile.State();
     private TrapezoidProfile.Constraints constraints;
     private double minimumInput;
     private double maximumInput;
 
     /**
      * Create a new object to control PID + FF logic using a trapezoid profile for a subsystem.
-     * <p>Sets kP, kI, kD, kS, kV, kG, constraints, period values.
+     * <p>Sets kP, kI, kD, kS, kV, kA, kG, constraints, period values.
      * 
      * @param kP The proportional coefficient.
      * @param kI The integral coefficient.
      * @param kD The derivative coefficient.
      * @param kS The static gain.
      * @param kV The velocity gain.
+     * @param kA The acceleration gain.
      * @param kG The gravity gain.
      * @param constraints Constraints for max acceleration and velocity
      * @param period The controller's update rate in seconds. Must be non-zero and positive.
      */
-    public TrapController(double kP, double kI, double kD, double kS, double kV, double kG, TrapezoidProfile.Constraints constraints, double period) {
-        super(kP, kI, kD, kS, kV, kG, period);
+    public TrapController(double kP, double kI, double kD, double kS, double kV, double kA, double kG, TrapezoidProfile.Constraints constraints, double period) {
+        super(kP, kI, kD, kS, kV, kA, kG, period);
         this.constraints = constraints;
+        systemVelocity = ()-> 0;
     }
 
     /**
      * Create a new object to control PID + FF logic using a trapezoid profile for a subsystem.
-     * <p>Sets kP, kI, kD, kS, kV, kG, constraints values.
+     * <p>Sets kP, kI, kD, kS, kV, kA, kG, constraints values.
      * 
      * @param kP The proportional coefficient.
      * @param kI The integral coefficient.
      * @param kD The derivative coefficient.
      * @param kS The static gain.
      * @param kV The velocity gain.
+     * @param kA The acceleration gain.
      * @param kG The gravity gain.
      * @param constraints Constraints for max acceleration and velocity
      */
-    public TrapController(double kP, double kI, double kD, double kS, double kV, double kG, TrapezoidProfile.Constraints constraints) {
-        this(kP, kI, kD, kS, kV, kG, constraints, 0.02);
+    public TrapController(double kP, double kI, double kD, double kS, double kV, double kA, double kG, TrapezoidProfile.Constraints constraints) {
+        this(kP, kI, kD, kS, kV, kA, kG, constraints, 0.02);
     }
 
     /**
@@ -57,7 +70,7 @@ public class TrapController extends ControllerBase {
      * @param period The controller's update rate in seconds. Must be non-zero and positive
      */
     public TrapController(double kP, double kI, double kD, TrapezoidProfile.Constraints constraints, double period) {
-        this(kP, kI, kD, 0, 0, 0, constraints, period);
+        this(kP, kI, kD, 0, 0, 0, 0, constraints, period);
     }
 
     /**
@@ -71,6 +84,14 @@ public class TrapController extends ControllerBase {
      */
     public TrapController(double kP, double kI, double kD, TrapezoidProfile.Constraints constraints) {
         this(kP, kI, kD, constraints, 0.02);
+    }
+
+    /**
+     * Sets the velocity source for resetting the controller.
+     * @param velocitySrc Returns the current velocity of the system.
+     */
+    public void setVelocitySource(DoubleSupplier velocitySrc) {
+        this.systemVelocity = velocitySrc;
     }
 
     /**
@@ -110,9 +131,34 @@ public class TrapController extends ControllerBase {
         }
         final var profile = new TrapezoidProfile(constraints, setpoint, tempSetpoint);
         tempSetpoint = profile.calculate(getPeriod());
-        final double PID_OUTPUT = controller.calculate(measurement, tempSetpoint.position);
-        final double ff_output = Math.copySign(getkS(), PID_OUTPUT) + getkV() * tempSetpoint.velocity + getkG() * kG_Function.getAsDouble();
-        return PID_OUTPUT + ff_output;
+        final double output = super.calculate(measurement);
+        prevSetpoint = tempSetpoint;
+        return output;
+    }
+
+    /**
+     * Returns the PID output of the controller.
+     * @param measurement the current measurement of the process variable.
+     * @return The controller output due to PID terms.
+     */
+    @Override
+    public double calculatePID(double measurement) {
+        return controller.calculate(measurement, tempSetpoint.position);
+    }
+
+    /**
+     * Returns the Feed Forward output of the controller.
+     * <p>Uses kS, kV, kA, and kG
+     * @param pidOutput the current measurement of the process variable.
+     * @return The controller output due to Feed Forward terms.
+     */
+    @Override
+    public double calculateFF(double pidOutput) {
+        final double staticGain = Math.copySign(getkS(), pidOutput);
+        final double velocityGain = getkV() * prevSetpoint.velocity;
+        final double accelGain = getkA() * (tempSetpoint.velocity - prevSetpoint.velocity) / getPeriod();
+        final double gravityGain = getkG() * kG_Function.getAsDouble();
+        return staticGain + velocityGain + accelGain + gravityGain;
     }
 
     /**
@@ -174,8 +220,7 @@ public class TrapController extends ControllerBase {
     /** Resets the previous error and the integral term. */
     @Override
     public void reset() {
-        super.reset();
-        setpoint = new TrapezoidProfile.State(measurement.getAsDouble(), 0);
+        tempSetpoint = new TrapezoidProfile.State(measurement.getAsDouble(), systemVelocity.getAsDouble());
     }
 
     @Override
