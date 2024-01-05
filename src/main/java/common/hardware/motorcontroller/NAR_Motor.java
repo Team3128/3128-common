@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj.motorcontrol.MotorController;
  * @since 2023 Charged Up
  * @author Mason Lam
  */
-public abstract class NAR_Motor {
+public abstract class NAR_Motor implements AutoCloseable {
     private static final HashSet<NAR_Motor> leaders = new HashSet<NAR_Motor>();
 
     static {

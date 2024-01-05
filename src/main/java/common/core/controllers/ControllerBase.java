@@ -16,7 +16,7 @@ import edu.wpi.first.wpilibj.motorcontrol.MotorController;
  * @since 2023 Charged Up
  * @author Mason Lam
  */
-public abstract class ControllerBase implements Sendable {
+public abstract class ControllerBase implements Sendable, AutoCloseable {
 
     protected final PIDController controller;
     private final LinkedList<DoubleConsumer> consumers = new LinkedList<DoubleConsumer>();
@@ -388,5 +388,13 @@ public abstract class ControllerBase implements Sendable {
         builder.addDoubleProperty("i", this::getI, this::setI);
         builder.addDoubleProperty("d", this::getD, this::setD);
         builder.addDoubleProperty("setpoint", this::getSetpoint, this::setSetpoint);
+    }
+
+    /**
+     * Closes the Controller.
+     */
+    @Override
+    public void close() {
+        controller.close();
     }
 }

@@ -24,7 +24,7 @@ import edu.wpi.first.util.function.BooleanConsumer;
  * @since Deep Space 2019
  * @author Mason Lam
  */
-public class NarwhalDashboard extends WebSocketServer {
+public class NarwhalDashboard extends WebSocketServer implements AutoCloseable {
     private final HashMap<String, List<Object>> initMap = new HashMap<String, List<Object>>();
     private final HashMap<String, Supplier<Object>> updateMap = new HashMap<String, Supplier<Object>>();
     private final HashMap<String, Consumer<String[]>> actionMap = new HashMap<String, Consumer<String[]>>();
@@ -265,4 +265,11 @@ public class NarwhalDashboard extends WebSocketServer {
     @Override
     public void onClose(WebSocket conn, int code, String reason, boolean remote) {}
 
+    /**
+     * Closes the dashboard.
+     */
+    @Override
+    public void close() {
+        instance = null;
+    }
 }

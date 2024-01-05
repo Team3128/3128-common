@@ -176,4 +176,12 @@ public class NAR_TalonSRX extends NAR_Motor {
 	public WPI_TalonSRX getMotor() {
 		return motor;
 	}
+
+	/**
+     * Closes the talonSRX motor.
+     */
+    @Override
+    public void close() {
+        motor.close();
+    }
 }

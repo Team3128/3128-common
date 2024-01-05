@@ -13,6 +13,8 @@ import com.revrobotics.SparkMaxRelativeEncoder;
 
 import common.core.NAR_Robot;
 import common.utility.shuffleboard.NAR_Shuffleboard;
+import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.Timer;
 
 import static common.hardware.motorcontroller.MotorControllerConstants.*;
 
@@ -25,7 +27,6 @@ import com.revrobotics.CANSparkMax.IdleMode;
  * @author Mason Lam
  */
 public class NAR_CANSparkMax extends NAR_Motor {
-	public static boolean shouldBurn = false;
 	/**
 	 * Team 3128's status frames
 	 */
@@ -109,8 +110,6 @@ public class NAR_CANSparkMax extends NAR_Motor {
 		this.kD = kD;
 		
 		controller.setFeedbackDevice(encoderType == EncoderType.Relative ? relativeEncoder : absoluteEncoder);
-
-		if (shouldBurn) motor.burnFlash();
     }
 
     /**
@@ -260,8 +259,14 @@ public class NAR_CANSparkMax extends NAR_Motor {
 	/**
 	 * Burns all settings to flash; stores settings between power cycles
 	 */
-	public void burnFlash() {
-		motor.burnFlash();
+	public REVLibError burnFlash() {
+		 if (RobotBase.isSimulation()) return REVLibError.kOk;
+
+		Timer.delay(0.5);
+		REVLibError status = motor.burnFlash();
+		Timer.delay(0.5);
+
+		return status;
 	}
 
 	/**
@@ -345,5 +350,13 @@ public class NAR_CANSparkMax extends NAR_Motor {
 	@Override
     public CANSparkMax getMotor() {
         return motor;
+    }
+
+	/**
+     * Closes the motor.
+     */
+    @Override
+    public void close() {
+        motor.close();
     }
 }

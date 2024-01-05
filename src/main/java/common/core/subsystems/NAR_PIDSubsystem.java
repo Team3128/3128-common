@@ -71,6 +71,8 @@ public abstract class NAR_PIDSubsystem extends SubsystemBase {
     private double updateTime;
     private Timer updateTimer = new Timer();
 
+    private boolean shouldLog = false;
+
     /**
      * Creates a new PIDSubsystem.
      *
@@ -87,7 +89,6 @@ public abstract class NAR_PIDSubsystem extends SubsystemBase {
         prevVelocity = 0;
         updateTime = controller.getPeriod();
         updateTimer.start();
-        initShuffleboard();
     }
 
     @Override
@@ -97,6 +98,8 @@ public abstract class NAR_PIDSubsystem extends SubsystemBase {
             if (safetyTimer.hasElapsed(safetyThresh)) disable();
             if (atSetpoint()) safetyTimer.restart();
         }
+
+        if (!shouldLog) return;
 
         if (updateTimer.hasElapsed(updateTime)) {
             final double measurement = getMeasurement();
@@ -115,6 +118,7 @@ public abstract class NAR_PIDSubsystem extends SubsystemBase {
      * Initializes shuffleboard with debug elements for PID + FF values.
      */
     public void initShuffleboard() {
+        shouldLog = true;
         NAR_Shuffleboard.addComplex(getName(), "PID_Controller", controller, 0, 0);
         NAR_Shuffleboard.addData(getName(), "Setpoint", ()-> getSetpoint(), 0, 2);
 
