@@ -16,6 +16,7 @@ import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public abstract class SwerveBase extends SubsystemBase {
+
     public boolean chassisVelocityCorrection = true;
 
     protected final SwerveDriveKinematics kinematics;
@@ -26,17 +27,17 @@ public abstract class SwerveBase extends SubsystemBase {
     public boolean fieldRelative;
     public double maxSpeed;
 
-    public SwerveBase(double maxSpeed, SwerveDriveKinematics kinematics, Matrix<N3, N1> stateStdDevs, Matrix<N3,N1> visionMeasurementDevs, SwerveModuleConfig... configs) {
+    public SwerveBase(SwerveDriveKinematics kinematics, Matrix<N3, N1> stateStdDevs, Matrix<N3,N1> visionMeasurementDevs, SwerveModuleConfig... configs) {
         this.kinematics = kinematics;
-        this.maxSpeed = maxSpeed;
+        this.maxSpeed = configs[0].maxSpeed;
         fieldRelative = true;
         estimatedPose = new Pose2d();
 
         modules = new SwerveModule[] {
-            new SwerveModule(configs[0], maxSpeed),
-            new SwerveModule(configs[1], maxSpeed),
-            new SwerveModule(configs[2], maxSpeed),
-            new SwerveModule(configs[3], maxSpeed)
+            new SwerveModule(configs[0]),
+            new SwerveModule(configs[1]),
+            new SwerveModule(configs[2]),
+            new SwerveModule(configs[3])
         };
 
         resetEncoders();

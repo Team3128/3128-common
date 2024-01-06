@@ -43,13 +43,12 @@ public class SwerveModule {
     /**
      * Creates a new Swerve Module object
      * @param config Settings for the Swerve Module.
-     * @param maxSpeed The max drive motor speed.
      */
-    public SwerveModule(SwerveModuleConfig config, double maxSpeed){
+    public SwerveModule(SwerveModuleConfig config){
         this.moduleNumber = config.moduleNumber;
         this.driveConfig = config.driveConfig;
         this.angleConfig = config.angleConfig;
-        this.maxSpeed = maxSpeed;
+        this.maxSpeed = config.maxSpeed;
         angleOffset = config.angleOffset;
 
         final PIDFFConfig drivePIDConfig = driveConfig.pidffConfig;
