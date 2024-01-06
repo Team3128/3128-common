@@ -3,7 +3,7 @@ package common.hardware.motorcontroller;
 import java.util.HashSet;
 import java.util.LinkedList;
 
-import common.core.NAR_Robot;
+import common.core.misc.NAR_Robot;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 
@@ -13,17 +13,32 @@ import edu.wpi.first.wpilibj.motorcontrol.MotorController;
  * @author Mason Lam
  */
 public abstract class NAR_Motor implements AutoCloseable {
-    private static final HashSet<NAR_Motor> leaders = new HashSet<NAR_Motor>();
 
-    static {
-        NAR_Robot.addPeriodic(()-> {
-            for (final NAR_Motor leader : leaders) {
-                final double output = leader.getAppliedOutput();
-                for (final NAR_Motor follower : leader.followers) {
-                    follower.set(output);
-                }
-            }
-        }, 0.1);
+    /**
+     * Store conversion factors for motor
+     */
+    public static class MotorConfig {
+        public final double distanceFactor;
+        public final double timeFactor;
+        public final int currentLimit;
+        public final boolean inverted;
+        public final Neutral mode;
+
+        /**
+         * Creates a new motor config
+         * @param distanceFactor Factor to multiply distance units by, ie. rotations
+         * @param timeFactor Factor to multiply time units by, ie. minutes
+         * @param currentLimit The currentLimit for the motor
+         * @param inverted Whether or not the motor is inverted.
+         * @param mode Neutral mode for the motor.
+         */
+        public MotorConfig(double distanceFactor, double timeFactor, int currentLimit, boolean inverted, Neutral mode) {
+            this.distanceFactor = distanceFactor;
+            this.timeFactor = timeFactor;
+            this.currentLimit = currentLimit;
+            this.inverted = inverted;
+            this.mode = mode;
+        }
     }
 
     /**
@@ -41,6 +56,19 @@ public abstract class NAR_Motor implements AutoCloseable {
     public enum Neutral {
         BRAKE,
         COAST
+    }
+
+    private static final HashSet<NAR_Motor> leaders = new HashSet<NAR_Motor>();
+
+    static {
+        NAR_Robot.addPeriodic(()-> {
+            for (final NAR_Motor leader : leaders) {
+                final double output = leader.getAppliedOutput();
+                for (final NAR_Motor follower : leader.followers) {
+                    follower.set(output);
+                }
+            }
+        }, 0.1);
     }
 
     private final LinkedList<NAR_Motor> followers = new LinkedList<NAR_Motor>();
@@ -108,6 +136,18 @@ public abstract class NAR_Motor implements AutoCloseable {
                 setPosition(value / unitConversionFactor, feedForward);
                 break;
         }
+    }
+
+    /**
+     * Configures all major motor settings.
+     * @param config Motor settings.
+     */
+    public void configMotor(MotorConfig config) {
+        setUnitConversionFactor(config.distanceFactor);
+        setTimeConversionFactor(config.timeFactor);
+        setInverted(config.inverted);
+        setCurrentLimit(config.currentLimit);
+        setNeutralMode(config.mode);
     }
 
     /**

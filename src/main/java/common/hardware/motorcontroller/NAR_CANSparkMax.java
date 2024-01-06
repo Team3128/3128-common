@@ -11,7 +11,7 @@ import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.SparkMaxRelativeEncoder;
 
-import common.core.NAR_Robot;
+import common.core.misc.NAR_Robot;
 import common.utility.shuffleboard.NAR_Shuffleboard;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
@@ -353,7 +353,7 @@ public class NAR_CANSparkMax extends NAR_Motor {
     }
 
 	/**
-     * Closes the motor.
+     * Closes the spark.
      */
     @Override
     public void close() {

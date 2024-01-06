@@ -8,7 +8,7 @@ import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
 import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 
-import common.core.NAR_Robot;
+import common.core.misc.NAR_Robot;
 import common.utility.shuffleboard.NAR_Shuffleboard;
 
 import static common.hardware.motorcontroller.MotorControllerConstants.*;

@@ -26,18 +26,12 @@ public class TrapController extends ControllerBase {
      * Create a new object to control PID + FF logic using a trapezoid profile for a subsystem.
      * <p>Sets kP, kI, kD, kS, kV, kA, kG, constraints, period values.
      * 
-     * @param kP The proportional coefficient.
-     * @param kI The integral coefficient.
-     * @param kD The derivative coefficient.
-     * @param kS The static gain.
-     * @param kV The velocity gain.
-     * @param kA The acceleration gain.
-     * @param kG The gravity gain.
+     * @param config PIDFFConfig object containing PID and Feedforward constants.
      * @param constraints Constraints for max acceleration and velocity
      * @param period The controller's update rate in seconds. Must be non-zero and positive.
      */
-    public TrapController(double kP, double kI, double kD, double kS, double kV, double kA, double kG, TrapezoidProfile.Constraints constraints, double period) {
-        super(kP, kI, kD, kS, kV, kA, kG, period);
+    public TrapController(PIDFFConfig config, TrapezoidProfile.Constraints constraints, double period) {
+        super(config, period);
         this.constraints = constraints;
         systemVelocity = ()-> 0;
     }
@@ -46,44 +40,11 @@ public class TrapController extends ControllerBase {
      * Create a new object to control PID + FF logic using a trapezoid profile for a subsystem.
      * <p>Sets kP, kI, kD, kS, kV, kA, kG, constraints values.
      * 
-     * @param kP The proportional coefficient.
-     * @param kI The integral coefficient.
-     * @param kD The derivative coefficient.
-     * @param kS The static gain.
-     * @param kV The velocity gain.
-     * @param kA The acceleration gain.
-     * @param kG The gravity gain.
+     * @param config PIDFFConfig object containing PID and Feedforward constants.
      * @param constraints Constraints for max acceleration and velocity
      */
-    public TrapController(double kP, double kI, double kD, double kS, double kV, double kA, double kG, TrapezoidProfile.Constraints constraints) {
-        this(kP, kI, kD, kS, kV, kA, kG, constraints, 0.02);
-    }
-
-    /**
-     * Create a new object to control PID logic using a trapezoid profile for a subsystem.
-     * <p>Sets kP, kI, kD, constraints, period values.
-     * 
-     * @param kP The proportional coefficient.
-     * @param kI The integral coefficient.
-     * @param kD The derivative coefficient.
-     * @param constraints Constraints for max acceleration and velocity
-     * @param period The controller's update rate in seconds. Must be non-zero and positive
-     */
-    public TrapController(double kP, double kI, double kD, TrapezoidProfile.Constraints constraints, double period) {
-        this(kP, kI, kD, 0, 0, 0, 0, constraints, period);
-    }
-
-    /**
-     * Create a new object to control PID logic using a trapezoid profile for a subsystem.
-     * <p>Sets kP, kI, kD, constraints, values.
-     * 
-     * @param kP The proportional coefficient.
-     * @param kI The integral coefficient.
-     * @param kD The derivative coefficient.
-     * @param constraints Constraints for max acceleration and velocity
-     */
-    public TrapController(double kP, double kI, double kD, TrapezoidProfile.Constraints constraints) {
-        this(kP, kI, kD, constraints, 0.02);
+    public TrapController(PIDFFConfig config, TrapezoidProfile.Constraints constraints) {
+        this(config, constraints, 0.02);
     }
 
     /**

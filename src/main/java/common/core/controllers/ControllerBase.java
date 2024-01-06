@@ -28,21 +28,15 @@ public abstract class ControllerBase implements Sendable, AutoCloseable {
     /**
      * Creates a base controller object to control motion.
      * <p>Sets kP, kI, kD, kS, kV, kA, kG, constraints, period values.
-     * @param kP The proportional coefficient.
-     * @param kI The integral coefficient.
-     * @param kD The derivative coefficient.
-     * @param kS The static gain.
-     * @param kV The velocity gain.
-     * @param kA The acceleration gain.
-     * @param kG The gravity gain.
+     * @param config PIDFFConfig object containing PID and Feedforward constants.
      * @param period The controller's update rate in seconds. Must be non-zero and positive.
      */
-    public ControllerBase(double kP, double kI, double kD, double kS, double kV, double kA, double kG, double period) {
-        controller = new PIDController(kP, kI, kD, period);
-        this.kS = ()-> kS;
-        this.kV = ()-> kV;
-        this.kA = ()-> kA;
-        this.kG = ()-> kG;
+    public ControllerBase(PIDFFConfig config, double period) {
+        controller = new PIDController(config.kP, config.kI, config.kD, period);
+        this.kS = ()-> config.kS;
+        this.kV = ()-> config.kV;
+        this.kA = ()-> config.kA;
+        this.kG = ()-> config.kG;
 
         kG_Function = ()-> 1;
     }

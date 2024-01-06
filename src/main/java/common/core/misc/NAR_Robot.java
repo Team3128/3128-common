@@ -1,4 +1,4 @@
-package common.core;
+package common.core.misc;
 
 import java.lang.reflect.Method;
 import java.util.PriorityQueue;

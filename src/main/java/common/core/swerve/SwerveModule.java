@@ -5,16 +5,15 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-
-import static common.core.swerve.SwerveConstants.*;
-import static common.core.swerve.SwerveConversions.*;
+import edu.wpi.first.wpilibj.Timer;
 
 import com.ctre.phoenix.sensors.CANCoder;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
+import common.core.controllers.PIDFFConfig;
+import common.core.swerve.SwerveModuleConfig.SwerveMotorConfig;
 import common.hardware.motorcontroller.NAR_CANSparkMax;
 import common.hardware.motorcontroller.NAR_Motor;
-import common.hardware.motorcontroller.NAR_TalonFX;
 import common.hardware.motorcontroller.NAR_CANSparkMax.EncoderType;
 import common.hardware.motorcontroller.NAR_Motor.Control;
 import common.hardware.motorcontroller.NAR_Motor.Neutral;
@@ -27,42 +26,43 @@ import common.hardware.motorcontroller.NAR_Motor.Neutral;
  */
 public class SwerveModule {
 
-    public enum ModuleType {
-        FALCON,
-        NEO
-    }
-
     public final int moduleNumber;
     private final double angleOffset;
     private final NAR_Motor angleMotor;
     private final NAR_Motor driveMotor;
     private final CANCoder angleEncoder;
+    private final SwerveMotorConfig driveConfig;
+    private final SwerveMotorConfig angleConfig;
 
-    private final SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(driveKS, driveKV, driveKA);
+    private final SimpleMotorFeedforward feedforward;
+
+    private final double maxSpeed;
 
     private Rotation2d lastAngle;
 
     /**
      * Creates a new Swerve Module object
-     * @param moduleNumber The module number from 0 - 3.
-     * @param moduleConstants The constants for the Swerve module, ie. motor ids.
+     * @param config Settings for the Swerve Module.
+     * @param maxSpeed The max drive motor speed.
      */
-    public SwerveModule(int moduleNumber, SwerveModuleConstants moduleConstants){
-        this.moduleNumber = moduleNumber;
-        angleOffset = moduleConstants.angleOffset;
+    public SwerveModule(SwerveModuleConfig config, double maxSpeed){
+        this.moduleNumber = config.moduleNumber;
+        this.driveConfig = config.driveConfig;
+        this.angleConfig = config.angleConfig;
+        this.maxSpeed = maxSpeed;
+        angleOffset = config.angleOffset;
+
+        final PIDFFConfig drivePIDConfig = driveConfig.pidffConfig;
+        final PIDFFConfig anglePIDConfig = angleConfig.pidffConfig;
+        feedforward = new SimpleMotorFeedforward(drivePIDConfig.kS, drivePIDConfig.kV, drivePIDConfig.kA);
         
         /* Angle Encoder Config */
-        angleEncoder = new CANCoder(moduleConstants.cancoderID);
+        angleEncoder = new CANCoder(config.cancoderID);
+        angleEncoder.configSensorDirection(config.CANCoderinvert);
         configAngleEncoder();
 
-        if (moduleType == ModuleType.NEO) {
-            angleMotor = new NAR_CANSparkMax(moduleConstants.angleMotorID, MotorType.kBrushless, EncoderType.Relative, angleKP, angleKI, angleKD);
-            driveMotor = new NAR_CANSparkMax(moduleConstants.driveMotorID, MotorType.kBrushless, EncoderType.Relative, driveKP, driveKI, driveKD);
-        }
-        else {
-            angleMotor = new NAR_TalonFX(moduleConstants.angleMotorID, canBus, angleKP, angleKI, angleKD);
-            driveMotor = new NAR_TalonFX(moduleConstants.driveMotorID, canBus, driveKP, driveKI, driveKD);
-        }
+        angleMotor = new NAR_CANSparkMax(angleConfig.motorID, MotorType.kBrushless, EncoderType.Relative, anglePIDConfig.kP, anglePIDConfig.kI, anglePIDConfig.kD);
+        driveMotor = new NAR_CANSparkMax(driveConfig.motorID, MotorType.kBrushless, EncoderType.Relative, drivePIDConfig.kP, drivePIDConfig.kI, drivePIDConfig.kA);
 
         /* Angle Motor Config */
         configAngleMotor();
@@ -71,17 +71,14 @@ public class SwerveModule {
         configDriveMotor();
 
         lastAngle = getState().angle;
+        Timer.delay(0.375);
     }
 
     /**
      * Initializes the angle motor
      */
     private void configAngleMotor(){
-        if (angleMotor instanceof NAR_CANSparkMax) angleMotor.setCurrentLimit(angleLimit);
-        if (angleMotor instanceof NAR_TalonFX) ((NAR_TalonFX) angleMotor).configAllSettings(CTREConfigs.swerveAngleFXConfig());
-        angleMotor.setInverted(angleMotorInvert);
-        angleMotor.setUnitConversionFactor(rotationsToDegrees(1, angleGearRatio));
-        angleMotor.setNeutralMode(Neutral.COAST);
+        angleMotor.configMotor(angleConfig.motorConfig);
         angleMotor.enableContinuousInput(-180, 180);
         angleMotor.setDefaultStatusFrames();
         resetToAbsolute();
@@ -91,12 +88,7 @@ public class SwerveModule {
      * Intializes the drive motor
      */
     private void configDriveMotor(){        
-        if (driveMotor instanceof NAR_CANSparkMax) driveMotor.setCurrentLimit(driveLimit);
-        if (driveMotor instanceof NAR_TalonFX) ((NAR_TalonFX) driveMotor).configAllSettings(CTREConfigs.swerveDriveFXConfig());
-        driveMotor.setInverted(driveMotorInvert);
-        driveMotor.setUnitConversionFactor(rotationsToMeters(1, wheelCircumference, driveGearRatio));
-        driveMotor.setTimeConversionFactor(60);
-        driveMotor.setNeutralMode(Neutral.COAST);
+        driveMotor.configMotor(driveConfig.motorConfig);
         driveMotor.resetPosition(0);
         driveMotor.setDefaultStatusFrames();
     }

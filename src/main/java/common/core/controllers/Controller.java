@@ -24,17 +24,12 @@ public class Controller extends ControllerBase {
      * Create a new object to control PID + FF logic for a subsystem.
      * <p>Sets kP, kI, kD, kS, kV, kG, period values.
      * 
-     * @param kP The proportional coefficient.
-     * @param kI The integral coefficient.
-     * @param kD The derivative coefficient.
-     * @param kS The static gain.
-     * @param kV The velocity gain.
-     * @param kG The gravity gain.
+     * @param config PIDFFConfig object containing PID and Feedforward constants.
      * @param type The type of setpoint used by the controller
      * @param period The controller's update rate in seconds. Must be non-zero and positive.
      */
-    public Controller(double kP, double kI, double kD, double kS, double kV, double kG, Type type, double period) {
-        super(kP, kI, kD, kS, kV, 0, kG, period);
+    public Controller(PIDFFConfig config, Type type, double period) {
+        super(config, period);
         this.type = type;
     }
 
@@ -42,41 +37,11 @@ public class Controller extends ControllerBase {
      * Create a new object to control PID + FF logic for a subsystem.
      * <p>Sets kP, kI, kD, kS, kV, kG values.
      * 
-     * @param kP The proportional coefficient.
-     * @param kI The integral coefficient.
-     * @param kD The derivative coefficient.
-     * @param kS The static gain.
-     * @param kV The velocity gain.
-     * @param kG The gravity gain.
+     * @param config PIDFFConfig object containing PID and Feedforward constants.
      * @param type The type of setpoint used by the controller
      */
-    public Controller(double kP, double kI, double kD, double kS, double kV, double kG, Type type) {
-        this(kP, kI, kD, kS, kV, kG, type, 0.02);
-    }
-
-    /**
-     * Create a new object to control PID logic for a subsystem.
-     * <p>Sets kP, kI, kD, period values.
-     * 
-     * @param kP The proportional coefficient.
-     * @param kI The integral coefficient.
-     * @param kD The derivative coefficient.
-     * @param period The controller's update rate in seconds. Must be non-zero and positive.
-     */
-    public Controller(double kP, double kI, double kD, double period) {
-        this(kP, kI, kD, 0, 0, 0, Type.POSITION, period);
-    }
-
-    /**
-     * Create a new object to control PID logic for a subsystem.
-     * <p>Sets kP, kI, kD values.
-     * 
-     * @param kP The proportional coefficient.
-     * @param kI The integral coefficient.
-     * @param kD The derivative coefficient.
-     */
-    public Controller(double kP, double kI, double kD) {
-        this(kP, kI, kD, 0.02);
+    public Controller(PIDFFConfig config, Type type) {
+        this(config, type, 0.02);
     }
 
     /**

@@ -15,7 +15,7 @@ import org.java_websocket.server.WebSocketServer;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
-import common.core.NAR_Robot;
+import common.core.misc.NAR_Robot;
 import common.utility.Log;
 import edu.wpi.first.util.function.BooleanConsumer;
 
