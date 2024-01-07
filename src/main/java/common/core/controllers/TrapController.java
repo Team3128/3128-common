@@ -92,7 +92,7 @@ public class TrapController extends ControllerBase {
         }
         final var profile = new TrapezoidProfile(constraints, setpoint, tempSetpoint);
         tempSetpoint = profile.calculate(getPeriod());
-        final double output = super.calculate(measurement);
+        final double output = super.calculate(measurement, tempSetpoint.position);
         prevSetpoint = tempSetpoint;
         return output;
     }

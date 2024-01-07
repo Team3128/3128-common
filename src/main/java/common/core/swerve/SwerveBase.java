@@ -13,6 +13,7 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public abstract class SwerveBase extends SubsystemBase {
@@ -20,14 +21,14 @@ public abstract class SwerveBase extends SubsystemBase {
     public boolean chassisVelocityCorrection = true;
 
     protected final SwerveDriveKinematics kinematics;
-    protected final SwerveDrivePoseEstimator odometry;
+    protected SwerveDrivePoseEstimator odometry;
     protected final SwerveModule[] modules;
     private Pose2d estimatedPose;
 
     public boolean fieldRelative;
     public double maxSpeed;
 
-    public SwerveBase(SwerveDriveKinematics kinematics, Matrix<N3, N1> stateStdDevs, Matrix<N3,N1> visionMeasurementDevs, SwerveModuleConfig... configs) {
+    public SwerveBase(SwerveDriveKinematics kinematics, SwerveModuleConfig... configs) {
         this.kinematics = kinematics;
         this.maxSpeed = configs[0].maxSpeed;
         fieldRelative = true;
@@ -39,10 +40,13 @@ public abstract class SwerveBase extends SubsystemBase {
             new SwerveModule(configs[2]),
             new SwerveModule(configs[3])
         };
+        Timer.delay(1.5);
 
         resetEncoders();
+    }
 
-        odometry = new SwerveDrivePoseEstimator(kinematics, getGyroRotation2d(), getPositions(), 
+    public void initSwerveOdometry(Matrix<N3, N1> stateStdDevs, Matrix<N3, N1> visionMeasurementDevs) {
+        odometry = new SwerveDrivePoseEstimator(kinematics, getGyroRotation2d(), getPositions(),
                                                 estimatedPose, stateStdDevs, visionMeasurementDevs);
     }
 
