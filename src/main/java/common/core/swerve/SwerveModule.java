@@ -60,7 +60,7 @@ public class SwerveModule {
         configAngleEncoder();
 
         angleMotor = new NAR_CANSparkMax(angleConfig.motorID, MotorType.kBrushless, EncoderType.Relative, anglePIDConfig.kP, anglePIDConfig.kI, anglePIDConfig.kD);
-        driveMotor = new NAR_CANSparkMax(driveConfig.motorID, MotorType.kBrushless, EncoderType.Relative, drivePIDConfig.kP, drivePIDConfig.kI, drivePIDConfig.kA);
+        driveMotor = new NAR_CANSparkMax(driveConfig.motorID, MotorType.kBrushless, EncoderType.Relative, drivePIDConfig.kP, drivePIDConfig.kI, drivePIDConfig.kD);
 
         /* Angle Motor Config */
         configAngleMotor();
