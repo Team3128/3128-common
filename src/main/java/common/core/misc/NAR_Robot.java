@@ -103,16 +103,16 @@ public class NAR_Robot extends IterativeRobotBase {
       final Method periodicAfterUser0 = periodicAfterUser;
       addPeriodic(()-> {
         try {
-          long loopCycleStart = Logger.getInstance().getRealTimestamp();
-          periodicBeforeUser0.invoke(Logger.getInstance());
-          long userCodeStart = Logger.getInstance().getRealTimestamp();
+          long loopCycleStart = Logger.getRealTimestamp();
+          periodicBeforeUser0.invoke(null);
+          long userCodeStart = Logger.getRealTimestamp();
           loopFunc();
-          long loopCycleEnd = Logger.getInstance().getRealTimestamp();
-          Logger.getInstance().recordOutput("LoggedRobot/FullCycleMS", (loopCycleEnd - loopCycleStart) / 1000.0);
-          Logger.getInstance().recordOutput("LoggedRobot/LogPeriodicMS", (userCodeStart - loopCycleStart) / 1000.0);
-          Logger.getInstance().recordOutput("LoggedRobot/UserCodeMS", (loopCycleEnd - userCodeStart) / 1000.0);
+          long loopCycleEnd = Logger.getRealTimestamp();
+          Logger.recordOutput("LoggedRobot/FullCycleMS", (loopCycleEnd - loopCycleStart) / 1000.0);
+          Logger.recordOutput("LoggedRobot/LogPeriodicMS", (userCodeStart - loopCycleStart) / 1000.0);
+          Logger.recordOutput("LoggedRobot/UserCodeMS", (loopCycleEnd - userCodeStart) / 1000.0);
 
-          periodicAfterUser0.invoke(Logger.getInstance());
+          periodicAfterUser0.invoke(null);
         } catch (Exception e) {}
       }, period);
       NotifierJNI.setNotifierName(m_notifier, "TimedRobot");

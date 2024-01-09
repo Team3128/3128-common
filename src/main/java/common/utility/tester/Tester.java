@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import common.utility.Log;
 import common.utility.narwhaldashboard.NarwhalDashboard;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 
@@ -21,7 +21,7 @@ public class Tester {
     public static class UnitTest extends WaitCommand {
 
         protected String testName;
-        protected CommandBase command;
+        protected Command command;
         protected BooleanSupplier passCondition;
         protected TestState testState;
         protected double plateau;
@@ -37,7 +37,7 @@ public class Tester {
          * @param timeOut Time the test has to run before failing.
          * @param requirements Subsystems involved in the test.
          */
-        public UnitTest(String testName, CommandBase command, BooleanSupplier passCondition, double plateau, double timeOut, Subsystem... requirements) {
+        public UnitTest(String testName, Command command, BooleanSupplier passCondition, double plateau, double timeOut, Subsystem... requirements) {
             super(timeOut);
             this.testName = testName;
             this.command = command;
@@ -80,7 +80,7 @@ public class Tester {
     }
 
     /**Collection of tests to be run for a system */
-    public class Test extends CommandBase {
+    public class Test extends Command {
         private final ArrayList<UnitTest> unitTests;
         private final String name;
         private TestState state;

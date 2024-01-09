@@ -20,18 +20,6 @@
 		<nature>org.eclipse.jdt.core.javanature</nature>
 		<nature>org.eclipse.buildship.core.gradleprojectnature</nature>
 	</natures>
-	<linkedResources>
-		<link>
-			<name>gradle/gradleCI.yml</name>
-			<type>1</type>
-			<location>C:/Users/rcorn/workspace/FRC Java/RobotLib/.github/workflows/gradleCI.yml</location>
-		</link>
-		<link>
-			<name>gradle/gradleRelease.yml</name>
-			<type>1</type>
-			<location>C:/Users/rcorn/workspace/FRC Java/RobotLib/.github/workflows/gradleRelease.yml</location>
-		</link>
-	</linkedResources>
 	<filteredResources>
 		<filter>
 			<id>1694063680143</id>

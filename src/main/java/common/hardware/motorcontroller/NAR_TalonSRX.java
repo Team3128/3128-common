@@ -89,11 +89,7 @@ public class NAR_TalonSRX extends NAR_Motor {
 
 	@Override
 	public void follow(NAR_Motor leader) {
-		if (leader instanceof NAR_TalonFX) {
-			final NAR_TalonFX brushlessLeader = (NAR_TalonFX) leader;
-			follow(brushlessLeader.getMotor());
-		}
-		else if (leader instanceof NAR_TalonSRX) {
+		if (leader instanceof NAR_TalonSRX) {
 			final NAR_TalonSRX brushedLeader = (NAR_TalonSRX) leader;
 			follow(brushedLeader.getMotor());
 		}

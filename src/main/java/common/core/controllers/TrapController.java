@@ -18,7 +18,7 @@ public class TrapController extends ControllerBase {
     private TrapezoidProfile.State setpoint = new TrapezoidProfile.State();
     private TrapezoidProfile.State tempSetpoint = new TrapezoidProfile.State();
     private TrapezoidProfile.State prevSetpoint = new TrapezoidProfile.State();
-    private TrapezoidProfile.Constraints constraints;
+    private TrapezoidProfile profile; 
     private double minimumInput;
     private double maximumInput;
 
@@ -32,7 +32,7 @@ public class TrapController extends ControllerBase {
      */
     public TrapController(PIDFFConfig config, TrapezoidProfile.Constraints constraints, double period) {
         super(config, period);
-        this.constraints = constraints;
+        profile = new TrapezoidProfile(constraints);
         systemVelocity = ()-> 0;
     }
 
@@ -90,9 +90,9 @@ public class TrapController extends ControllerBase {
             setpoint.position = goalMinDistance + measurement;
             tempSetpoint.position = setpointMinDistance + measurement;
         }
-        final var profile = new TrapezoidProfile(constraints, setpoint, tempSetpoint);
-        tempSetpoint = profile.calculate(getPeriod());
-        final double output = super.calculate(measurement, tempSetpoint.position);
+        tempSetpoint = profile.calculate(getPeriod(), tempSetpoint, setpoint);
+        controller.setSetpoint(tempSetpoint.position);
+        final double output = super.calculate(measurement);
         prevSetpoint = tempSetpoint;
         return output;
     }
@@ -182,6 +182,7 @@ public class TrapController extends ControllerBase {
     @Override
     public void reset() {
         tempSetpoint = new TrapezoidProfile.State(measurement.getAsDouble(), systemVelocity.getAsDouble());
+        super.reset();
     }
 
     @Override

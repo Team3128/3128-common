@@ -3,13 +3,15 @@ package common.hardware.motorcontroller;
 import java.util.function.DoubleSupplier;
 
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-import com.revrobotics.CANSparkMaxLowLevel.PeriodicFrame;
+import com.revrobotics.CANSparkLowLevel.MotorType;
+import com.revrobotics.CANSparkLowLevel.PeriodicFrame;
+import com.revrobotics.SparkAbsoluteEncoder.Type;
 import com.revrobotics.REVLibError;
-import com.revrobotics.SparkMaxAbsoluteEncoder;
-import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
-import com.revrobotics.SparkMaxPIDController;
-import com.revrobotics.SparkMaxRelativeEncoder;
+import com.revrobotics.SparkAbsoluteEncoder;
+import com.revrobotics.SparkPIDController;
+import com.revrobotics.SparkRelativeEncoder;
+import com.revrobotics.CANSparkBase.ControlType;
+import com.revrobotics.CANSparkBase.IdleMode;
 
 import common.core.misc.NAR_Robot;
 import common.utility.shuffleboard.NAR_Shuffleboard;
@@ -17,9 +19,6 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
 
 import static common.hardware.motorcontroller.MotorControllerConstants.*;
-
-import com.revrobotics.CANSparkMax.ControlType;
-import com.revrobotics.CANSparkMax.IdleMode;
 
 /**
  * Team 3128's streamlined {@link CANSparkMax} class.
@@ -60,9 +59,9 @@ public class NAR_CANSparkMax extends NAR_Motor {
 	
 	private double kP, kI, kD;
 	private EncoderType encoderType;
-	private SparkMaxRelativeEncoder relativeEncoder;
-	private SparkMaxAbsoluteEncoder absoluteEncoder;
-	private final SparkMaxPIDController controller;
+	private SparkRelativeEncoder relativeEncoder;
+	private SparkAbsoluteEncoder absoluteEncoder;
+	private final SparkPIDController controller;
     protected final CANSparkMax motor;
 
     /**
@@ -88,7 +87,7 @@ public class NAR_CANSparkMax extends NAR_Motor {
 		this.encoderType = encoderType;
 
 		if (encoderType == EncoderType.Relative) {
-			relativeEncoder = (SparkMaxRelativeEncoder) motor.getEncoder();
+			relativeEncoder = (SparkRelativeEncoder) motor.getEncoder();
 			//No clue what this does, but Mechanical Advantage does this so it must be good
 			relativeEncoder.setAverageDepth(2);
 			relativeEncoder.setMeasurementPeriod(10);
@@ -163,19 +162,19 @@ public class NAR_CANSparkMax extends NAR_Motor {
 				kP = proportional.getAsDouble();
 				controller.setP(kP);
 			}
-		}, 0.5);
+		}, 0.5, 0.05);
 		NAR_Robot.addPeriodic(()-> {
 			if (integral.getAsDouble() == kI) {
 				kI = proportional.getAsDouble();
 				controller.setI(kI);
 			}
-		},0.5);
+		},0.5, 0.05);
 		NAR_Robot.addPeriodic(()-> {
 			if (derivative.getAsDouble() == kD) {
 				kD = derivative.getAsDouble();
 				controller.setD(kD);
 			}
-		}, 0.5);
+		}, 0.5, 0.05);
 	}
 
 	/**

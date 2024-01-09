@@ -1,7 +1,7 @@
 plugins {
     id "java-library"
     id "eclipse"
-	id "edu.wpi.first.GradleRIO" version "2023.4.3"
+	id "edu.wpi.first.GradleRIO" version "2024.1.1"
     id "org.ajoberstar.grgit" version "3.0.0"
     id "maven-publish"
     id "io.github.mosadie.vendorJSON" version "1.0"
@@ -81,12 +81,12 @@ vendorJSON {
 }
 
 // This section is to prevent people from accidently deploying this project to a robot. 
-deploy {
-    for (String task : project.gradle.startParameter.taskNames) {
-        if (task == "deploy")
-            throw new GradleException("This is a library project! You can't deploy it to a robot!")
-    }
-}
+// deploy {
+//     for (String task : project.gradle.startParameter.taskNames) {
+//         if (task == "deploy")
+//             throw new GradleException("This is a library project! You can't deploy it to a robot!")
+//     }
+// }
 
 // Generates Source and Javadoc jars when building.
 java {

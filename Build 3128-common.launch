@@ -6,7 +6,7 @@
     <booleanAttribute key="build_scans_enabled" value="false"/>
     <stringAttribute key="gradle_distribution" value="GRADLE_DISTRIBUTION(WRAPPER)"/>
     <stringAttribute key="gradle_user_home" value=""/>
-    <stringAttribute key="java_home" value="C:\Users\Public\wpilib\2023\jdk"/>
+    <stringAttribute key="java_home" value="C:\Users\Public\wpilib\2024\jdk"/>
     <listAttribute key="jvm_arguments"/>
     <booleanAttribute key="offline_mode" value="false"/>
     <listAttribute key="org.eclipse.debug.ui.favoriteGroups">

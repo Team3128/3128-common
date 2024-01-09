@@ -6,8 +6,10 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 
-import com.ctre.phoenix.sensors.CANCoder;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.ctre.phoenix6.configs.MagnetSensorConfigs;
+import com.ctre.phoenix6.hardware.CANcoder;
+import com.ctre.phoenix6.signals.SensorDirectionValue;
+import com.revrobotics.CANSparkLowLevel.MotorType;
 
 import common.core.controllers.PIDFFConfig;
 import common.core.swerve.SwerveModuleConfig.SwerveMotorConfig;
@@ -29,7 +31,7 @@ public class SwerveModule {
     private final double angleOffset;
     private final NAR_Motor angleMotor;
     private final NAR_Motor driveMotor;
-    private final CANCoder angleEncoder;
+    private final CANcoder angleEncoder;
     private final SwerveMotorConfig driveConfig;
     private final SwerveMotorConfig angleConfig;
 
@@ -55,9 +57,9 @@ public class SwerveModule {
         feedforward = new SimpleMotorFeedforward(drivePIDConfig.kS, drivePIDConfig.kV, drivePIDConfig.kA);
         
         /* Angle Encoder Config */
-        angleEncoder = new CANCoder(config.cancoderID);
-        angleEncoder.configSensorDirection(config.CANCoderinvert);
-        configAngleEncoder();
+        angleEncoder = new CANcoder(config.cancoderID);
+        final SensorDirectionValue direction = config.CANCoderinvert ? SensorDirectionValue.CounterClockwise_Positive : SensorDirectionValue.Clockwise_Positive;
+        angleEncoder.getConfigurator().apply(new MagnetSensorConfigs().withSensorDirection(direction).withMagnetOffset(config.angleOffset));
 
         angleMotor = new NAR_CANSparkMax(angleConfig.motorID, MotorType.kBrushless, EncoderType.Relative, anglePIDConfig.kP, anglePIDConfig.kI, anglePIDConfig.kD);
         driveMotor = new NAR_CANSparkMax(driveConfig.motorID, MotorType.kBrushless, EncoderType.Relative, drivePIDConfig.kP, drivePIDConfig.kI, drivePIDConfig.kD);
@@ -88,14 +90,6 @@ public class SwerveModule {
         driveMotor.configMotor(driveConfig.motorConfig);
         driveMotor.resetPosition(0);
         driveMotor.setDefaultStatusFrames();
-    }
-
-    /**
-     * Configures the CANCoder
-     */
-    private void configAngleEncoder(){        
-        angleEncoder.configFactoryDefault();
-        angleEncoder.configAllSettings(CTREConfigs.swerveCancoderConfig());
     }
 
     /**
@@ -157,7 +151,7 @@ public class SwerveModule {
      * Returns the current angle of the CANCoder
      */
     public Rotation2d getCanCoder(){
-        return Rotation2d.fromDegrees(MathUtil.inputModulus(angleEncoder.getAbsolutePosition() - angleOffset, -180, 180));
+        return Rotation2d.fromDegrees(MathUtil.inputModulus(angleEncoder.getAbsolutePosition().getValueAsDouble() * 180 - angleOffset, -180, 180));
     }
 
     /**
