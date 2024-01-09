@@ -7,7 +7,10 @@ import java.util.ArrayList;
 
 import common.utility.Log;
 import common.utility.narwhaldashboard.NarwhalDashboard;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Subsystem;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 
 /**
  * Team 3128's Tester utility class used to run system checks at competitions.
@@ -15,50 +18,69 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 public class Tester {
     
     /**System test */
-    public static class UnitTest {
+    public static class UnitTest extends WaitCommand {
 
         protected String testName;
         protected CommandBase command;
-        protected BooleanSupplier condition;
+        protected BooleanSupplier passCondition;
         protected TestState testState;
+        protected double plateau;
         protected double timeOut;
+        private Timer passTimer;
 
         /**
          * Creates a unit test.
          * @param testName Name of the test.
          * @param command Command to run for the test.
-         * @param condition Condition to see if the test passed.
+         * @param passCondition Condition to see if the test passed.
+         * @param plateau How long the pass condition needs to be true.
          * @param timeOut Time the test has to run before failing.
+         * @param requirements Subsystems involved in the test.
          */
-        public UnitTest(String testName, CommandBase command, BooleanSupplier condition, double timeOut) {
+        public UnitTest(String testName, CommandBase command, BooleanSupplier passCondition, double plateau, double timeOut, Subsystem... requirements) {
+            super(timeOut);
             this.testName = testName;
             this.command = command;
-            this.condition = condition;
+            this.passCondition = passCondition;
             this.timeOut = timeOut;
             testState = TestState.FAILED;
+            passTimer = new Timer();
+            addRequirements(requirements);
         }
 
-        /**
-         * Returns a command that runs the test.
-         */
-        public CommandBase runTest() {
-            return sequence(
-                runOnce(()-> testState = TestState.RUNNING),
-                deadline(
-                    waitUntil(condition).withTimeout(timeOut),
-                    command
-                ),
-                runOnce(()-> {
-                    testState = condition.getAsBoolean() ? TestState.PASSED : TestState.FAILED;
-                    if (testState == TestState.PASSED) Log.info(testName, testName + "TEST PASSED");
-                    else Log.info(testName, "TEST FAILED");
-                })
-            );
+        @Override
+        public void initialize() {
+            Log.info(testName, "Test Running");
+            super.initialize();
+            command.initialize();
+            passTimer.reset();
+            testState = TestState.RUNNING;
+        }
+
+        @Override
+        public void execute() {
+            command.execute();
+            if (!passCondition.getAsBoolean()) {
+                passTimer.reset();
+            }
+        }
+
+        public void end(boolean interrupted) {
+            testState = TestState.FAILED;
+            if (passCondition.getAsBoolean()) {
+                testState = TestState.PASSED;
+            }
+            Log.info(testName, "Test " + testState.toString());
+        }
+
+        @Override
+        public boolean isFinished() {
+            return super.isFinished() || passTimer.hasElapsed(plateau);
         }
     }
 
     /**Collection of tests to be run for a system */
-    private class Test extends CommandBase {
+    public class Test extends CommandBase {
         private final ArrayList<UnitTest> unitTests;
         private final String name;
         private TestState state;
@@ -93,7 +115,7 @@ public class Tester {
             state = TestState.RUNNING;
             Log.info(name, "TEST RUNNING");
             if (unitTests.size() == 0) state = TestState.FAILED;
-            else unitTests.get(0).runTest().schedule();
+            else unitTests.get(0).schedule();
         }
 
         @Override
@@ -111,7 +133,8 @@ public class Tester {
                         state = TestState.PASSED;
                         return;
                     }
-                    unitTests.get(curIndex).runTest().schedule();
+                    unitTests.get(curIndex).beforeStarting(waitSeconds(2)).schedule();
+                    break;
                 default:
             }
         }
@@ -124,6 +147,10 @@ public class Tester {
         @Override
         public boolean isFinished() {
             return state != TestState.RUNNING;
+        }
+
+        public TestState getTestState() {
+            return state;
         }
     }
 

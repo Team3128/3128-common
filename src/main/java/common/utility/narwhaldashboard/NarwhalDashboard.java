@@ -171,6 +171,17 @@ public class NarwhalDashboard extends WebSocketServer implements AutoCloseable {
     }
 
     /**
+     * Sends a message to console.log on Narwhal Dashboard.
+     * @param message Message to be logged on dashboard
+     */
+    @SuppressWarnings("unchecked")
+    public void sendMessage(String message) {
+        final JSONObject obj = new JSONObject();
+        obj.put("Message", message);
+        conn.send(obj.toJSONString());
+    }
+
+    /**
      * Updates NarwhalDashboard sending data to the web server
      */
     @SuppressWarnings("unchecked")

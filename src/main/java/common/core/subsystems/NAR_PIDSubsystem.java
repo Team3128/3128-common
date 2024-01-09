@@ -10,11 +10,8 @@ import common.utility.tester.Tester;
 import common.utility.tester.Tester.UnitTest;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.PIDSubsystem;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
-import static edu.wpi.first.wpilibj2.command.Commands.*;
 
 /**
  * A subsystem based off of {@link PIDSubsystem} 
@@ -34,27 +31,20 @@ public abstract class NAR_PIDSubsystem extends SubsystemBase {
          * Creates a setpoint test for the system.
          * @param testName Name of the test.
          * @param setpoint Setpoint for the system to try and reach.
+         * @param plateau Time the subsystem has to hold the setpoint.
          * @param timeOut The time the system has to reach the setpoint.
          */
-        public SetpointTest(String testName, double setpoint, double timeOut) {
-            super(testName, runOnce(()-> startPID(setpoint)), ()-> atSetpoint(), timeOut);
+        public SetpointTest(String testName, double setpoint, double plateau, double timeOut) {
+            super(testName, runOnce(()-> startPID(setpoint)), ()-> atSetpoint(), plateau, timeOut);
             prevTime = 0;
             Tester.getInstance().addTest(getName(), this);
         }
 
-        /**
-         * Returns a command that runs the test.
-         */
         @Override
-        public CommandBase runTest() {
-            return sequence(
-                runOnce(()-> prevTime = Timer.getFPGATimestamp()),
-                super.runTest(),
-                runOnce(()-> {
-                    Log.info(testName, "Expected Time: " + timeOut);
-                    Log.info(testName, "Actual Time: " + (Timer.getFPGATimestamp() - prevTime));
-                })
-            );
+        public void end(boolean interrupted) {
+            super.end(interrupted);
+            Log.info(testName, "Expected Time: " + timeOut);
+            Log.info(testName, "Actual Time: " + (Timer.getFPGATimestamp() - prevTime));
         }
     }
 
