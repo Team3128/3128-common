@@ -9,12 +9,12 @@ plugins {
 
 group = archivesGroup
 
-// Sets JDK compatibility to JDK 11
-sourceCompatibility = JavaVersion.VERSION_11
-targetCompatibility = JavaVersion.VERSION_11
+// Sets JDK compatibility to JDK 17
+sourceCompatibility = JavaVersion.VERSION_17
+targetCompatibility = JavaVersion.VERSION_17
 
 // Configuration for build task which compiles , generates the javadoc and does the install 
-// of RobotLib in local maven cache.
+// of 3128-common in local maven cache.
 // Also used by Jitpack/GitHub Actions.
 
 if (System.getProperty("local")) {
@@ -27,17 +27,17 @@ else {
 }
                     // Version identifier used for local maven cache and github releases.
 					// Should stay as "local". This allows the robot* projects on the
-					// same PC as RobotLib to pull from the local cache with the fixed
-					// version name "local" and so always be pointing at the current RobotLib
+					// same PC as 3128-common to pull from the local cache with the fixed
+					// version name "local" and so always be pointing at the current 3128-common
 					// version including those under development and not have to be updated
-					// each time the robotlib version changes. Release to the world via github
-					// is based on actual version numbers and robotLib.json.
+					// each time the 3128-common version changes. Release to the world via github
+					// is based on actual version numbers and 3128-common.json.
 					//
 					// When starting a new version you can update LibraryVersion.java,
-					// overview.html and gradle.properties. DO NOT update robotlib.json. It is
+					// overview.html and gradle.properties. DO NOT update 3128-common.json. It is
 					// maintained by the release github action when you release with github.
 					//
-					// Build in Eclispe using the Build RobotLib or Build RobotLib (Offline) 
+					// Build in Eclispe using the Build 3128-common or Build 3128-common (Offline) 
 					// run configurations. You can push to github as much as you want.
 					//
 					// When ready to release, make sure the version number and dates are 
@@ -53,15 +53,15 @@ else {
 					// and sets the version varible to the actual version number (instead
 					// of "local") when compiling for release. The release action will update
 					// robolib.json to the new version on github. After release action is complete
-					// you can fetch from github with tags to get the updated robotlib.json and
+					// you can fetch from github with tags to get the updated 3128-common.json and
 					// release tag back into the local git repo.
 					//
 					// When all this is done, other user's robot projects that want the updated
-					// RobotLib, edit their local RobotLib.json to reflect the new version number 
+					// 3128-common, edit their local 3128-common.json to reflect the new version number 
 					// and on next compile, gradle will pull the new library to their PC.
 					//
 					// Or if using VSCode, run the Manage Vendor Libraries (online) command and 
-					// it will detect the new RobotLib version and offer to update the VSCode project.
+					// it will detect the new 3128-common version and offer to update the VSCode project.
 					//
 					// Warning: The github release action only works on the master branch. Do not
 					// create releases from other branches.
@@ -136,7 +136,7 @@ dependencies {
    	// Quick guide to keywords:
    	// api is for libraries that are expected to be needed in the main robot project.
    	// implementation is for libraries that will not be needed in the main robot project.
-   	// (Both api and implementation keywords will have the library automatically downloaded with RobotLib)
+   	// (Both api and implementation keywords will have the library automatically downloaded with 3128-common)
    	// compileOnly expects the dependency to be provided somewhere else. (Ex. by a main robot project)
    	// compile means include in the output library jar (see below).
 }
