@@ -3,6 +3,7 @@ package common.core.misc;
 import java.lang.reflect.Method;
 import java.util.PriorityQueue;
 
+import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.hal.DriverStationJNI;
@@ -19,6 +20,7 @@ import edu.wpi.first.wpilibj.Timer;
  * @author Mason Lam
  */
 public class NAR_Robot extends IterativeRobotBase {
+
     @SuppressWarnings("MemberName")
     static class Callback implements Comparable<Callback> {
       public Runnable func;
@@ -93,7 +95,7 @@ public class NAR_Robot extends IterativeRobotBase {
       Method periodicAfterUser = null;   //Method to get the periodicAfterUser method from Logger
       try {
           periodicBeforeUser = Logger.class.getDeclaredMethod("periodicBeforeUser");
-          periodicAfterUser = Logger.class.getDeclaredMethod("periodicAfterUser");
+          periodicAfterUser = Logger.class.getDeclaredMethod("periodicAfterUser", long.class, long.class);
       } catch (NoSuchMethodException | SecurityException e) {}
 
       periodicBeforeUser.setAccessible(true);     //set the method to be accessible
@@ -101,6 +103,7 @@ public class NAR_Robot extends IterativeRobotBase {
 
       final Method periodicBeforeUser0 = periodicBeforeUser;
       final Method periodicAfterUser0 = periodicAfterUser;
+
       addPeriodic(()-> {
         try {
           long loopCycleStart = Logger.getRealTimestamp();
@@ -108,11 +111,7 @@ public class NAR_Robot extends IterativeRobotBase {
           long userCodeStart = Logger.getRealTimestamp();
           loopFunc();
           long loopCycleEnd = Logger.getRealTimestamp();
-          Logger.recordOutput("LoggedRobot/FullCycleMS", (loopCycleEnd - loopCycleStart) / 1000.0);
-          Logger.recordOutput("LoggedRobot/LogPeriodicMS", (userCodeStart - loopCycleStart) / 1000.0);
-          Logger.recordOutput("LoggedRobot/UserCodeMS", (loopCycleEnd - userCodeStart) / 1000.0);
-
-          periodicAfterUser0.invoke(null);
+          periodicAfterUser0.invoke(null, loopCycleEnd - userCodeStart, userCodeStart - loopCycleStart);
         } catch (Exception e) {}
       }, period);
       NotifierJNI.setNotifierName(m_notifier, "TimedRobot");

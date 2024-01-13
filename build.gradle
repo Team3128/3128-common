@@ -10,8 +10,8 @@ plugins {
 group = archivesGroup
 
 // Sets JDK compatibility to JDK 17
-sourceCompatibility = JavaVersion.VERSION_17
-targetCompatibility = JavaVersion.VERSION_17
+sourceCompatibility = JavaVersion.VERSION_11
+targetCompatibility = JavaVersion.VERSION_11
 
 // Configuration for build task which compiles , generates the javadoc and does the install 
 // of 3128-common in local maven cache.
