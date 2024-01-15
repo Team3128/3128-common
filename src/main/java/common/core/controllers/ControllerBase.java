@@ -258,6 +258,9 @@ public abstract class ControllerBase implements Sendable, AutoCloseable {
     /** Resets the previous error and the integral term. */
     public void reset() {
         controller.reset();
+        for (final DoubleConsumer consumer : consumers) {
+            consumer.accept(0);
+        }
     }
 
     /**

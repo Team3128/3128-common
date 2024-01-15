@@ -111,11 +111,12 @@ public abstract class NAR_PIDSubsystem extends SubsystemBase {
         shouldLog = true;
         NAR_Shuffleboard.addComplex(getName(), "PID_Controller", controller, 0, 0);
         NAR_Shuffleboard.addData(getName(), "Setpoint", ()-> getSetpoint(), 0, 2);
+        NAR_Shuffleboard.addData(getName(), "AtSetpoint", ()-> atSetpoint(), 0, 3);
 
         NAR_Shuffleboard.addData(getName(), "Enabled", ()-> isEnabled(), 1, 0);
 
-        var debugEntry = NAR_Shuffleboard.addData(getName(), "TOGGLE", false, 2, 0).withWidget("Toggle Button");
-        debug = ()-> debugEntry.getEntry().getBoolean(false);
+        var debugEntry = NAR_Shuffleboard.addData(getName(), "TOGGLE", false, 2, 0).withWidget("Toggle Button").getEntry();
+        debug = ()-> debugEntry.getBoolean(false);
         NAR_Shuffleboard.addData(getName(), "DEBUG", ()-> debug.getAsBoolean(), 2, 1);
         setpoint = NAR_Shuffleboard.debug(getName(), "Debug_Setpoint", 0, 2,2);
 

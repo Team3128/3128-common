@@ -3,7 +3,7 @@ package common.core.misc;
 import java.lang.reflect.Method;
 import java.util.PriorityQueue;
 
-import org.littletonrobotics.junction.LoggedRobot;
+import org.littletonrobotics.junction.AutoLogOutputManager;
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.hal.DriverStationJNI;
@@ -77,6 +77,8 @@ public class NAR_Robot extends IterativeRobotBase {
 
     private static final PriorityQueue<Callback> m_callbacks = new PriorityQueue<>();
 
+    private final Method periodicAfterUser0;
+
     /** Constructor for TimedRobot. */
     protected NAR_Robot() {
       this(kDefaultPeriod);
@@ -96,13 +98,15 @@ public class NAR_Robot extends IterativeRobotBase {
       try {
           periodicBeforeUser = Logger.class.getDeclaredMethod("periodicBeforeUser");
           periodicAfterUser = Logger.class.getDeclaredMethod("periodicAfterUser", long.class, long.class);
-      } catch (NoSuchMethodException | SecurityException e) {}
+      } catch (NoSuchMethodException | SecurityException e) {
+        e.printStackTrace();
+      }
 
       periodicBeforeUser.setAccessible(true);     //set the method to be accessible
       periodicAfterUser.setAccessible(true);     //set the method to be accessible
 
       final Method periodicBeforeUser0 = periodicBeforeUser;
-      final Method periodicAfterUser0 = periodicAfterUser;
+      periodicAfterUser0 = periodicAfterUser;
 
       addPeriodic(()-> {
         try {
@@ -128,10 +132,23 @@ public class NAR_Robot extends IterativeRobotBase {
     /** Provide an alternate "main loop" via startCompetition(). */
     @Override
     public void startCompetition() {
+      long initStart = Logger.getRealTimestamp();
       robotInit();
 
       if (isSimulation()) {
         simulationInit();
+      }
+
+      long initEnd = Logger.getRealTimestamp();
+
+      try {
+        Method registerFields = AutoLogOutputManager.class.getDeclaredMethod("registerFields", Object.class);
+        registerFields.setAccessible(true);
+        registerFields.invoke(null, this);
+        periodicAfterUser0.invoke(null, initEnd - initStart, 0);
+      }
+      catch (Exception e) {
+        e.printStackTrace();
       }
 
       // Tell the DS that the robot is ready to be enabled

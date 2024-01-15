@@ -231,7 +231,7 @@ public class NAR_Shuffleboard {
     /**
      * Updates every entry
      */
-    private static void update() {
+    public static void update() {
         for(String i : tabs.keySet()){
             for(String j : tabs.get(i).keySet()){
                 tabs.get(i).get(j).update();
