@@ -6,9 +6,7 @@ import java.util.function.DoubleSupplier;
 import java.util.function.DoubleConsumer;
 
 import common.core.controllers.ControllerBase;
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.PIDCommand;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 
 public class NAR_PIDCommand extends Command {
