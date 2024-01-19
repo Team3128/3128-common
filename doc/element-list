@@ -1,3 +1,4 @@
+common.core.commands
 common.core.controllers
 common.core.misc
 common.core.subsystems
