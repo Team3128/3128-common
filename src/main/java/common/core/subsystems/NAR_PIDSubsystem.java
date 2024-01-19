@@ -109,7 +109,7 @@ public abstract class NAR_PIDSubsystem extends SubsystemBase {
      */
     public void initShuffleboard() {
         shouldLog = true;
-        NAR_Shuffleboard.addComplex(getName(), "PID_Controller", controller, 0, 0);
+        NAR_Shuffleboard.addSendable(getName(), "PID_Controller", controller, 0, 0);
         NAR_Shuffleboard.addData(getName(), "Setpoint", ()-> getSetpoint(), 0, 2);
         NAR_Shuffleboard.addData(getName(), "AtSetpoint", ()-> atSetpoint(), 0, 3);
 
