@@ -59,7 +59,7 @@ public class SwerveModule {
         /* Angle Encoder Config */
         angleEncoder = new CANcoder(config.cancoderID);
         final SensorDirectionValue direction = config.CANCoderinvert ? SensorDirectionValue.CounterClockwise_Positive : SensorDirectionValue.Clockwise_Positive;
-        angleEncoder.getConfigurator().apply(new MagnetSensorConfigs().withSensorDirection(direction).withMagnetOffset(config.angleOffset));
+        angleEncoder.getConfigurator().apply(new MagnetSensorConfigs().withSensorDirection(direction));
 
         angleMotor = new NAR_CANSparkMax(angleConfig.motorID, MotorType.kBrushless, EncoderType.Relative, anglePIDConfig.kP, anglePIDConfig.kI, anglePIDConfig.kD);
         driveMotor = new NAR_CANSparkMax(driveConfig.motorID, MotorType.kBrushless, EncoderType.Relative, drivePIDConfig.kP, drivePIDConfig.kI, drivePIDConfig.kD);
