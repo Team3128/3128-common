@@ -274,7 +274,7 @@ public class NAR_Camera extends PhotonCamera {
         Translation2d translation2d = transform.getTranslation().toTranslation2d();
 
         //rotates the x value based on camera pitch offset
-        translation2d = new Translation2d(translation2d.getX()*Math.cos(camera.pitchOffset), translation2d.getY());
+        translation2d = new Translation2d(translation2d.getX() * Math.cos(Units.degreesToRadians(camera.cameraPitch)), translation2d.getY());
 
         final Rotation2d rotation2d = transform.getRotation().toRotation2d().unaryMinus();
 
