@@ -90,15 +90,18 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-first">Modifier and Type</div>
 <div class="table-header col-second">Field</div>
 <div class="table-header col-last">Description</div>
-<div class="col-first even-row-color"><code>boolean</code></div>
-<div class="col-second even-row-color"><code><a href="#enabled" class="member-name-link">enabled</a></code></div>
+<div class="col-first even-row-color"><code>final double</code></div>
+<div class="col-second even-row-color"><code><a href="#cameraPitch" class="member-name-link">cameraPitch</a></code></div>
 <div class="col-last even-row-color">&nbsp;</div>
-<div class="col-first odd-row-color"><code>final <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second odd-row-color"><code><a href="#name" class="member-name-link">name</a></code></div>
+<div class="col-first odd-row-color"><code>boolean</code></div>
+<div class="col-second odd-row-color"><code><a href="#enabled" class="member-name-link">enabled</a></code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
-<div class="col-first even-row-color"><code>final edu.wpi.first.math.geometry.Transform2d</code></div>
-<div class="col-second even-row-color"><code><a href="#offset" class="member-name-link">offset</a></code></div>
+<div class="col-first even-row-color"><code>final <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second even-row-color"><code><a href="#name" class="member-name-link">name</a></code></div>
 <div class="col-last even-row-color">&nbsp;</div>
+<div class="col-first odd-row-color"><code>final edu.wpi.first.math.geometry.Transform2d</code></div>
+<div class="col-second odd-row-color"><code><a href="#offset" class="member-name-link">offset</a></code></div>
+<div class="col-last odd-row-color">&nbsp;</div>
 </div>
 </section>
 </li>
@@ -110,9 +113,10 @@ loadScripts(document, 'script');</script>
 <div class="summary-table two-column-summary">
 <div class="table-header col-first">Constructor</div>
 <div class="table-header col-last">Description</div>
-<div class="col-constructor-name even-row-color"><code><a href="#%3Cinit%3E(java.lang.String,boolean,edu.wpi.first.math.geometry.Transform2d)" class="member-name-link">Camera</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;name,
+<div class="col-constructor-name even-row-color"><code><a href="#%3Cinit%3E(java.lang.String,boolean,edu.wpi.first.math.geometry.Transform2d,double)" class="member-name-link">Camera</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;name,
  boolean&nbsp;enabled,
- edu.wpi.first.math.geometry.Transform2d&nbsp;cameraOffset)</code></div>
+ edu.wpi.first.math.geometry.Transform2d&nbsp;cameraOffset,
+ double&nbsp;cameraPitch)</code></div>
 <div class="col-last even-row-color">
 <div class="block">Creates a new object for a camera.</div>
 </div>
@@ -155,6 +159,12 @@ loadScripts(document, 'script');</script>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">enabled</span></div>
 </section>
 </li>
+<li>
+<section class="detail" id="cameraPitch">
+<h3>cameraPitch</h3>
+<div class="member-signature"><span class="modifiers">public final</span>&nbsp;<span class="return-type">double</span>&nbsp;<span class="element-name">cameraPitch</span></div>
+</section>
+</li>
 </ul>
 </section>
 </li>
@@ -164,11 +174,12 @@ loadScripts(document, 'script');</script>
 <h2>Constructor Details</h2>
 <ul class="member-list">
 <li>
-<section class="detail" id="&lt;init&gt;(java.lang.String,boolean,edu.wpi.first.math.geometry.Transform2d)">
+<section class="detail" id="&lt;init&gt;(java.lang.String,boolean,edu.wpi.first.math.geometry.Transform2d,double)">
 <h3>Camera</h3>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="element-name">Camera</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;name,
  boolean&nbsp;enabled,
- edu.wpi.first.math.geometry.Transform2d&nbsp;cameraOffset)</span></div>
+ edu.wpi.first.math.geometry.Transform2d&nbsp;cameraOffset,
+ double&nbsp;cameraPitch)</span></div>
 <div class="block">Creates a new object for a camera.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
