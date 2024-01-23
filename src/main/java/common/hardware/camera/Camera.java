@@ -16,6 +16,8 @@ public class Camera {
 
     public boolean enabled;
 
+    public final double pitchOffset;
+
     /**
      * Creates a new object for a camera.
      * 
@@ -23,10 +25,11 @@ public class Camera {
      * @param enabled Whether or not to return results.
      * @param cameraOffset Offset from robot as a transform2d.
      */
-    public Camera(String name, boolean enabled, Transform2d cameraOffset) {
+    public Camera(String name, boolean enabled, Transform2d cameraOffset, double pitchOffset) {
         this.name = name;
         this.enabled = enabled;
         this.offset = cameraOffset;
+        this.pitchOffset = pitchOffset;
     }
 
 }

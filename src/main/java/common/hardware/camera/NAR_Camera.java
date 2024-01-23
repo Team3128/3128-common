@@ -251,6 +251,8 @@ public class NAR_Camera extends PhotonCamera {
 
     /**
      * Returns the best target to camera vector as a Transform2d.
+     * <p>
+     * Factors in camera pitch offset.
      * @return Transform2d with coordinate system relative to camera.
      */
     public Transform2d getRelTarget() {
@@ -259,6 +261,8 @@ public class NAR_Camera extends PhotonCamera {
 
     /**
      * Returns an AprilTag to camera vector as a Transform2d.
+     * <p>
+     * Factors in camera pitch offset.
      * @param target An AprilTag.
      * @return Transform2d with coordinate system relative to camera.
      */
@@ -267,7 +271,11 @@ public class NAR_Camera extends PhotonCamera {
 
         final Transform3d transform = getTarget3d(target);
 
-        final Translation2d translation2d = transform.getTranslation().toTranslation2d();
+        Translation2d translation2d = transform.getTranslation().toTranslation2d();
+
+        //rotates the x value based on camera pitch offset
+        translation2d = new Translation2d(translation2d.getX()*Math.cos(camera.pitchOffset), translation2d.getY());
+
         final Rotation2d rotation2d = transform.getRotation().toRotation2d().unaryMinus();
 
         return new Transform2d(translation2d, rotation2d);
