@@ -1,5 +1,6 @@
 package common.hardware.motorcontroller;
 
+import java.util.LinkedList;
 import java.util.function.DoubleSupplier;
 
 import com.revrobotics.CANSparkMax;
@@ -30,6 +31,14 @@ import static common.hardware.motorcontroller.MotorControllerConstants.*;
  * @author Mason Lam
  */
 public class NAR_CANSparkMax extends NAR_Motor {
+
+	private static final LinkedList<NAR_CANSparkMax> instances = new LinkedList<NAR_CANSparkMax>();
+
+	public static void burnFlashAll() {
+		for (final NAR_CANSparkMax spark : instances) {
+			spark.burnFlash();
+		}
+	}
 	/**
 	 * Team 3128's status frames
 	 */
@@ -113,6 +122,7 @@ public class NAR_CANSparkMax extends NAR_Motor {
 		this.kD = kD;
 		
 		controller.setFeedbackDevice(encoderType == EncoderType.Relative ? relativeEncoder : absoluteEncoder);
+		instances.add(this);
     }
 
     /**

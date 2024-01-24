@@ -89,6 +89,7 @@ public class NAR_Shuffleboard {
      * @return SimpleWidget that can be modified
      */
     public static SimpleWidget addData(String tabName, String name, Object data) {
+        if(!tabs.containsKey(tabName)) create_tab(tabName);
         for (int i = 0; i < WINDOW_HEIGHT; i++) {
             for (int j = 0; j < WINDOW_WIDTH; j++) {
                 if (!widgetPositions.get(tabName)[j][i]) return addData(tabName, name, data, j, i, 1, 1);
@@ -106,6 +107,7 @@ public class NAR_Shuffleboard {
      * @return SimpleWidget that can be modified
      */
     public static SimpleWidget addData(String tabName, String name, Supplier<Object> supply) {
+        if(!tabs.containsKey(tabName)) create_tab(tabName);
         for (int i = 0; i < WINDOW_HEIGHT; i++) {
             for (int j = 0; j < WINDOW_WIDTH; j++) {
                 if (!widgetPositions.get(tabName)[j][i]) return addData(tabName, name, supply, j, i, 1, 1);
