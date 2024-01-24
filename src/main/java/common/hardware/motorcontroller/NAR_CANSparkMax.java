@@ -19,11 +19,7 @@ import common.utility.shuffleboard.NAR_Shuffleboard;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
 
-import org.littletonrobotics.junction.Logger;
-import org.littletonrobotics.junction.inputs.LoggableInputs;
-
 import static common.hardware.motorcontroller.MotorControllerConstants.*;
-
 
 /**
  * Team 3128's streamlined {@link CANSparkMax} class.
@@ -34,6 +30,9 @@ public class NAR_CANSparkMax extends NAR_Motor {
 
 	private static final LinkedList<NAR_CANSparkMax> instances = new LinkedList<NAR_CANSparkMax>();
 
+	/**
+	 * Flashes all spark max's
+	 */
 	public static void burnFlashAll() {
 		for (final NAR_CANSparkMax spark : instances) {
 			spark.burnFlash();
