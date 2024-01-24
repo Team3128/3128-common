@@ -18,7 +18,11 @@ import common.utility.shuffleboard.NAR_Shuffleboard;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
 
+import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.inputs.LoggableInputs;
+
 import static common.hardware.motorcontroller.MotorControllerConstants.*;
+
 
 /**
  * Team 3128's streamlined {@link CANSparkMax} class.

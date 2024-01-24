@@ -3,6 +3,9 @@ package common.hardware.motorcontroller;
 import java.util.HashSet;
 import java.util.LinkedList;
 
+import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.inputs.LoggableInputs;
+
 import common.core.misc.NAR_Robot;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.motorcontrol.MotorController;
@@ -68,6 +71,7 @@ public abstract class NAR_Motor implements AutoCloseable {
                     follower.set(output);
                 }
             }
+            Logger.processInputs(null, null);
         }, 0.1);
     }
 

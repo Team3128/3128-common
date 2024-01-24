@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
 
 import org.photonvision.PhotonCamera;
 import org.photonvision.targeting.PhotonPipelineResult;
@@ -17,6 +18,8 @@ import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
+
+import org.littletonrobotics.junction.Logger;
 
 /**
  * Team 3128's streamlined {@link PhotonCamera} class that provides additional functionality and ease of use.
@@ -44,6 +47,8 @@ public class NAR_Camera extends PhotonCamera {
     private static double ambiguityThreshold = 0.5;
     private static boolean multipleTargets = false;
 
+    private static Supplier<Pose2d> poseSupplier;
+
     private final double FIELD_X_LENGTH = Units.inchesToMeters(648);
     private final double FIELD_Y_LENGTH = Units.inchesToMeters(324);
 
@@ -64,11 +69,13 @@ public class NAR_Camera extends PhotonCamera {
      * @param gyro Feeds the angle of the robot.
      * @param odometry Feeds the robot odometry object for vision estimates to update.
      * @param aprilTags Sets the AprilTag positions on the field.
+     * @param poseSupplier Supplies the robot's current pose.
      */
-    public static void setResources(DoubleSupplier gyro, BiConsumer<Pose2d, Double> odometry, HashMap<Integer, Pose2d> aprilTags) {
+    public static void setResources(DoubleSupplier gyro, BiConsumer<Pose2d, Double> odometry, HashMap<Integer, Pose2d> aprilTags, Supplier<Pose2d> poseSupplier) {
         NAR_Camera.gyro = gyro;
         NAR_Camera.odometry = odometry;
         NAR_Camera.aprilTags = aprilTags;
+        NAR_Camera.poseSupplier = poseSupplier;
     }
 
     /**
@@ -114,6 +121,7 @@ public class NAR_Camera extends PhotonCamera {
         if (!result.hasTargets()) {
             targets = null;
             bestTarget = null;
+            Logger.recordOutput("Vision/" + camera.name, poseSupplier.get());
             return;
         }
 
@@ -128,6 +136,7 @@ public class NAR_Camera extends PhotonCamera {
      */
     private void updatePose() {
         final LinkedList<Pose2d> possiblePoses = new LinkedList<Pose2d>();
+        final LinkedList<PhotonTrackedTarget> possibleTargets = new LinkedList<PhotonTrackedTarget>();
 
         // add valid targets to possiblePoses
         for (final PhotonTrackedTarget curTarget : targets) {
@@ -137,16 +146,23 @@ public class NAR_Camera extends PhotonCamera {
             if (!estimate.equals(new Pose2d()) && isValidTarget(curTarget)) {
 
                 possiblePoses.add(estimate);
+                possibleTargets.add(curTarget);
+
             }
 
             // if camera has multiple targets disabled, break after adding first valid target
             if (!multipleTargets) break;
         }
 
+        if(possiblePoses.isEmpty()) Logger.recordOutput("Vision/" + camera.name, poseSupplier.get());
+
         // updates robot with all acceptable poses from possiblePoses
         for (final Pose2d curPos : possiblePoses) {
             if (translationOutOfBounds(curPos.getTranslation())) return;
             odometry.accept(curPos, result.getTimestampSeconds());
+
+            int index = possiblePoses.indexOf(curPos);
+            Logger.recordOutput("Vision/" + camera.name, aprilTags.get(targetId(possibleTargets.get(index))));
         }
     }
 

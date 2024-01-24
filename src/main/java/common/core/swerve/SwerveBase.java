@@ -1,5 +1,7 @@
 package common.core.swerve;
 
+import org.littletonrobotics.junction.Logger;
+
 import common.utility.shuffleboard.NAR_Shuffleboard;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
@@ -80,6 +82,7 @@ public abstract class SwerveBase extends SubsystemBase {
                                         twistVel.dtheta / dtConstant);
         }
         setModuleStates(kinematics.toSwerveModuleStates(velocity));
+        Logger.recordOutput("Swerve/DesiredModuleStates", kinematics.toSwerveModuleStates(velocity));
     }
 
     /**
@@ -170,6 +173,8 @@ public abstract class SwerveBase extends SubsystemBase {
     public void periodic() {
         odometry.update(getGyroRotation2d(), getPositions());
         estimatedPose = odometry.getEstimatedPosition();
+        Logger.recordOutput("Swerve/ActualModuleStates", getStates());
+        Logger.recordOutput("Swerve/RobotRotation", getGyroRotation2d());
     }
 
     public void resetAll() {
