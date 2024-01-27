@@ -61,9 +61,9 @@ public abstract class SwerveBase extends SubsystemBase {
             NAR_Shuffleboard.addData("Swerve", "Angle " + module.moduleNumber, ()-> module.getAngleMotor().getPosition(), 1, module.moduleNumber);
             NAR_Shuffleboard.addData("Swerve", "Drive " + module.moduleNumber, ()-> module.getDriveMotor().getVelocity(), 2, module.moduleNumber);
         }
-        NAR_Shuffleboard.addData("Swerve", "Pose", estimatedPose.toString(), 3, 0, 4, 1);
-        NAR_Shuffleboard.addData("Swerve", "Field Velocity", getFieldVelocity().toString(), 3, 2, 4, 1);
-        NAR_Shuffleboard.addData("Swerve", "Gyro", getYaw(), 7, 0, 2, 2).withWidget("Gyro");
+        NAR_Shuffleboard.addData("Swerve", "Pose", ()-> estimatedPose.toString(), 3, 0, 4, 1);
+        NAR_Shuffleboard.addData("Swerve", "Field Velocity", ()-> getFieldVelocity().toString(), 3, 2, 4, 1);
+        NAR_Shuffleboard.addData("Swerve", "Gyro", ()-> getYaw(), 7, 0, 2, 2).withWidget("Gyro");
     }
 
     public void drive(Translation2d translation, double rotation, boolean fieldRelative) {
