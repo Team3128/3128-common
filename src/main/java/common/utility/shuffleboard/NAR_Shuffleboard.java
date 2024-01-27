@@ -59,7 +59,7 @@ public class NAR_Shuffleboard {
         }
     }
 
-    public static int WINDOW_WIDTH = 8;
+    public static int WINDOW_WIDTH = 9;
     public static int WINDOW_HEIGHT = 4;
 
     private static final HashMap<String, HashMap<String, widgetInfo>> tabs = new HashMap<String, HashMap<String,widgetInfo>>();
@@ -157,8 +157,10 @@ public class NAR_Shuffleboard {
      * @return simple widget that can be modified
      */
     public static SimpleWidget addData(String tabName, String name, Supplier<Object> supply, int x, int y, int width, int height){
-        if(!tabs.containsKey(tabName)) create_tab(tabName);
-        fillEntryPositions(x,y,width,height, tabName);
+        if(!tabs.containsKey(tabName)) { 
+            create_tab(tabName);
+            fillEntryPositions(x,y,width,height, tabName);
+        }
         if(tabs.get(tabName).containsKey(name)) {
             tabs.get(tabName).get(name).m_supply = supply;
             return tabs.get(tabName).get(name).m_widget;
@@ -181,8 +183,10 @@ public class NAR_Shuffleboard {
     * @return simple widget that can be modified
     */
     public static SimpleWidget addData(String tabName, String name, Object data, int x, int y, int width, int height) {
-        if(!tabs.containsKey(tabName)) create_tab(tabName);
-        fillEntryPositions(x,y,width,height,tabName);
+        if(!tabs.containsKey(tabName)) {
+            create_tab(tabName);
+            fillEntryPositions(x,y,width,height,tabName);
+        }
         if (tabs.get(tabName).containsKey(name)) {
             tabs.get(tabName).get(name).m_entry.setValue(data);
             return tabs.get(tabName).get(name).m_widget;
@@ -221,8 +225,10 @@ public class NAR_Shuffleboard {
      */
     public static ComplexWidget addSendable(String tabName, String name, Sendable data, int x, int y, int width, int height) {
         try {
-            if(!tabs.containsKey(tabName)) create_tab(tabName);
-            fillEntryPositions(x, y, width, height, tabName);
+            if(!tabs.containsKey(tabName)) {
+                create_tab(tabName);
+                fillEntryPositions(x, y, width, height, tabName);
+            }
             return Shuffleboard.getTab(tabName).add(name, data).withPosition(x,y).withSize(width, height);
         }
         catch(Exception e) {
@@ -245,8 +251,10 @@ public class NAR_Shuffleboard {
      */
     public static ComplexWidget addVideoStream(String tabName, String name, String cameraName, String URL, int x, int y, int width, int height) {
         try {
-            if (!tabs.containsKey(tabName)) create_tab(tabName);
-            fillEntryPositions(x, y, width, height, tabName);
+            if (!tabs.containsKey(tabName)) {
+                create_tab(tabName);
+                fillEntryPositions(x, y, width, height, tabName);
+            }
 
             ComplexWidget videoStream = Shuffleboard.getTab(tabName)
             .addCamera(name, cameraName, URL)
