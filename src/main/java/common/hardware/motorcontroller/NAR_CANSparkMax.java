@@ -90,6 +90,7 @@ public class NAR_CANSparkMax extends NAR_Motor {
    	 * @param kD The derivative coefficient of the on board PIDController.
 	 */
     public NAR_CANSparkMax(int deviceNumber, MotorType type, EncoderType encoderType, double kP, double kI, double kD) {
+		super(deviceNumber);
         motor = new CANSparkMax(deviceNumber, type);
 		motor.restoreFactoryDefaults(); // Reset config parameters, unfollow other motor controllers
 		motor.setCANTimeout(canSparkMaxTimeout);

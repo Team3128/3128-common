@@ -9,9 +9,6 @@ import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
 import com.ctre.phoenix.motorcontrol.can.TalonSRXConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
-import org.littletonrobotics.junction.Logger;
-import org.littletonrobotics.junction.inputs.LoggableInputs;
-
 /**
  * Team 3128's streamlined {@link WPI_TalonSRX} class.
  * @since 2023 Charged Up
@@ -25,6 +22,7 @@ public class NAR_TalonSRX extends NAR_Motor {
 	 * @param deviceNumber device id
 	 */
 	public NAR_TalonSRX(int deviceNumber) {
+		super(deviceNumber);
 		motor = new WPI_TalonSRX(deviceNumber);
 	}
 

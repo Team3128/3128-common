@@ -3,9 +3,8 @@ package common.hardware.motorcontroller;
 import java.util.HashSet;
 import java.util.LinkedList;
 
+import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.Logger;
-import org.littletonrobotics.junction.inputs.LoggableInputs;
-
 import common.core.misc.NAR_Robot;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.motorcontrol.MotorController;
@@ -15,8 +14,7 @@ import edu.wpi.first.wpilibj.motorcontrol.MotorController;
  * @since 2023 Charged Up
  * @author Mason Lam
  */
-public abstract class NAR_Motor implements AutoCloseable {
-
+public abstract class NAR_Motor implements AutoCloseable{
     /**
      * Store conversion factors for motor
      */
@@ -53,6 +51,7 @@ public abstract class NAR_Motor implements AutoCloseable {
         Position;
     }
 
+
     /**
      * Motor states when no voltage is applied
      */
@@ -63,6 +62,8 @@ public abstract class NAR_Motor implements AutoCloseable {
 
     private static final HashSet<NAR_Motor> leaders = new HashSet<NAR_Motor>();
 
+    
+
     static {
         NAR_Robot.addPeriodic(()-> {
             for (final NAR_Motor leader : leaders) {
@@ -71,7 +72,6 @@ public abstract class NAR_Motor implements AutoCloseable {
                     follower.set(output);
                 }
             }
-            Logger.processInputs(null, null);
         }, 0.1);
     }
 
@@ -84,6 +84,31 @@ public abstract class NAR_Motor implements AutoCloseable {
     private boolean isContinuous = false;
     protected double unitConversionFactor = 1;
     protected double timeConversionFactor = 1;
+
+    @AutoLog
+	public static class NAR_MotorIO{ 
+        public double inputPower = 0;
+        public double appliedOutput = 0;
+        public double stallCurrent = 0;
+        public double velocity = 0;
+	}
+
+    private NAR_MotorIOAutoLogged io;
+
+    public void updateIO(NAR_MotorIOAutoLogged io){
+        io.inputPower = prevValue;
+        io.appliedOutput = getAppliedOutput();
+        io.stallCurrent = getStallCurrent();
+        io.velocity = getVelocity();
+    }
+
+    public NAR_Motor(int id){
+        io = new NAR_MotorIOAutoLogged();
+        NAR_Robot.addPeriodic(()-> {
+            updateIO(io);
+            Logger.processInputs("Motors/" + id, io);
+        }, 0.02);
+    }
 
     /**
      * Sets motor output power in volts

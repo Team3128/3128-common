@@ -27,7 +27,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class NAR_Shuffleboard {
 
     static {
-        NAR_Robot.addPeriodic(NAR_Shuffleboard::update, 0.1, 0.01);
+        NAR_Robot.addPeriodic(NAR_Shuffleboard::update, 0.02);
     }
 
     private NAR_Shuffleboard() {}

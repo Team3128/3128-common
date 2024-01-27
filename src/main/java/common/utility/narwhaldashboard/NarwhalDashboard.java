@@ -80,7 +80,7 @@ public class NarwhalDashboard extends WebSocketServer implements AutoCloseable {
      */
     private NarwhalDashboard(int port) throws UnknownHostException {
         super(new InetSocketAddress(port));
-        NAR_Robot.addPeriodic(this::update, 0.1, 0.01);
+        NAR_Robot.addPeriodic(this::update, 0.02);
     }
 
     /**
