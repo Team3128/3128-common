@@ -1,6 +1,6 @@
 {
   "name": "3128-common",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "uuid": "ae3fa5a2-78d9-47e8-921a-dba45b889445",
   "frcYear": "2024",
   "mavenUrls": [
@@ -12,7 +12,7 @@
     {
       "groupId": "com.github.Team3128",
       "artifactId": "3128-common",
-      "version": "1.2.0"
+      "version": "1.2.1"
     }
   ],
   "jniDependencies": [],
