@@ -113,9 +113,12 @@ implements <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base
 <div class="col-last odd-row-color">
 <div class="block">Store conversion factors for motor</div>
 </div>
-<div class="col-first even-row-color"><code>static enum&nbsp;</code></div>
-<div class="col-second even-row-color"><code><a href="NAR_Motor.Neutral.html" class="type-name-link" title="enum class in common.hardware.motorcontroller">NAR_Motor.Neutral</a></code></div>
-<div class="col-last even-row-color">
+<div class="col-first even-row-color"><code>static class&nbsp;</code></div>
+<div class="col-second even-row-color"><code><a href="NAR_Motor.NAR_MotorIO.html" class="type-name-link" title="class in common.hardware.motorcontroller">NAR_Motor.NAR_MotorIO</a></code></div>
+<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-first odd-row-color"><code>static enum&nbsp;</code></div>
+<div class="col-second odd-row-color"><code><a href="NAR_Motor.Neutral.html" class="type-name-link" title="enum class in common.hardware.motorcontroller">NAR_Motor.Neutral</a></code></div>
+<div class="col-last odd-row-color">
 <div class="block">Motor states when no voltage is applied</div>
 </div>
 </div>
@@ -147,7 +150,7 @@ implements <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base
 <div class="summary-table two-column-summary">
 <div class="table-header col-first">Constructor</div>
 <div class="table-header col-last">Description</div>
-<div class="col-constructor-name even-row-color"><code><a href="#%3Cinit%3E()" class="member-name-link">NAR_Motor</a>()</code></div>
+<div class="col-constructor-name even-row-color"><code><a href="#%3Cinit%3E(int)" class="member-name-link">NAR_Motor</a><wbr>(int&nbsp;id)</code></div>
 <div class="col-last even-row-color">&nbsp;</div>
 </div>
 </section>
@@ -307,6 +310,9 @@ implements <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Sets motor output power in volts</div>
 </div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#updateIO(common.hardware.motorcontroller.NAR_MotorIOAutoLogged)" class="member-name-link">updateIO</a><wbr>(common.hardware.motorcontroller.NAR_MotorIOAutoLogged&nbsp;io)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 </div>
 </div>
 </div>
@@ -348,9 +354,9 @@ implements <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base
 <h2>Constructor Details</h2>
 <ul class="member-list">
 <li>
-<section class="detail" id="&lt;init&gt;()">
+<section class="detail" id="&lt;init&gt;(int)">
 <h3>NAR_Motor</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="element-name">NAR_Motor</span>()</div>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="element-name">NAR_Motor</span><wbr><span class="parameters">(int&nbsp;id)</span></div>
 </section>
 </li>
 </ul>
@@ -361,6 +367,12 @@ implements <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base
 <section class="method-details" id="method-detail">
 <h2>Method Details</h2>
 <ul class="member-list">
+<li>
+<section class="detail" id="updateIO(common.hardware.motorcontroller.NAR_MotorIOAutoLogged)">
+<h3>updateIO</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">updateIO</span><wbr><span class="parameters">(common.hardware.motorcontroller.NAR_MotorIOAutoLogged&nbsp;io)</span></div>
+</section>
+</li>
 <li>
 <section class="detail" id="setVolts(double)">
 <h3>setVolts</h3>

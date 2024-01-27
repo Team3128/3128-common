@@ -181,9 +181,10 @@ loadScripts(document, 'script');</script>
 <div class="block">Returns whether or not the camera sees a target.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#setResources(java.util.function.DoubleSupplier,java.util.function.BiConsumer,java.util.HashMap)" class="member-name-link">setResources</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/DoubleSupplier.html" title="class or interface in java.util.function" class="external-link">DoubleSupplier</a>&nbsp;gyro,
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#setResources(java.util.function.DoubleSupplier,java.util.function.BiConsumer,java.util.HashMap,java.util.function.Supplier)" class="member-name-link">setResources</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/DoubleSupplier.html" title="class or interface in java.util.function" class="external-link">DoubleSupplier</a>&nbsp;gyro,
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/BiConsumer.html" title="class or interface in java.util.function" class="external-link">BiConsumer</a>&lt;edu.wpi.first.math.geometry.Pose2d,<wbr><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Double.html" title="class or interface in java.lang" class="external-link">Double</a>&gt;&nbsp;odometry,
- <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/HashMap.html" title="class or interface in java.util" class="external-link">HashMap</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Integer.html" title="class or interface in java.lang" class="external-link">Integer</a>,<wbr>edu.wpi.first.math.geometry.Pose2d&gt;&nbsp;aprilTags)</code></div>
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/HashMap.html" title="class or interface in java.util" class="external-link">HashMap</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Integer.html" title="class or interface in java.lang" class="external-link">Integer</a>,<wbr>edu.wpi.first.math.geometry.Pose2d&gt;&nbsp;aprilTags,
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Supplier.html" title="class or interface in java.util.function" class="external-link">Supplier</a>&lt;edu.wpi.first.math.geometry.Pose2d&gt;&nbsp;poseSupplier)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
 <div class="block">Sets the necessary resources for cameras to function.</div>
 </div>
@@ -264,17 +265,19 @@ loadScripts(document, 'script');</script>
 <h2>Method Details</h2>
 <ul class="member-list">
 <li>
-<section class="detail" id="setResources(java.util.function.DoubleSupplier,java.util.function.BiConsumer,java.util.HashMap)">
+<section class="detail" id="setResources(java.util.function.DoubleSupplier,java.util.function.BiConsumer,java.util.HashMap,java.util.function.Supplier)">
 <h3>setResources</h3>
 <div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">setResources</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/DoubleSupplier.html" title="class or interface in java.util.function" class="external-link">DoubleSupplier</a>&nbsp;gyro,
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/BiConsumer.html" title="class or interface in java.util.function" class="external-link">BiConsumer</a>&lt;edu.wpi.first.math.geometry.Pose2d,<wbr><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Double.html" title="class or interface in java.lang" class="external-link">Double</a>&gt;&nbsp;odometry,
- <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/HashMap.html" title="class or interface in java.util" class="external-link">HashMap</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Integer.html" title="class or interface in java.lang" class="external-link">Integer</a>,<wbr>edu.wpi.first.math.geometry.Pose2d&gt;&nbsp;aprilTags)</span></div>
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/HashMap.html" title="class or interface in java.util" class="external-link">HashMap</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Integer.html" title="class or interface in java.lang" class="external-link">Integer</a>,<wbr>edu.wpi.first.math.geometry.Pose2d&gt;&nbsp;aprilTags,
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Supplier.html" title="class or interface in java.util.function" class="external-link">Supplier</a>&lt;edu.wpi.first.math.geometry.Pose2d&gt;&nbsp;poseSupplier)</span></div>
 <div class="block">Sets the necessary resources for cameras to function.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>gyro</code> - Feeds the angle of the robot.</dd>
 <dd><code>odometry</code> - Feeds the robot odometry object for vision estimates to update.</dd>
 <dd><code>aprilTags</code> - Sets the AprilTag positions on the field.</dd>
+<dd><code>poseSupplier</code> - Supplies the robot's current pose.</dd>
 </dl>
 </section>
 </li>
