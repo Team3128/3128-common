@@ -29,11 +29,12 @@ public abstract class SwerveBase extends SubsystemBase {
     protected SwerveDrivePoseEstimator odometry;
     protected final SwerveModule[] modules;
     private Pose2d estimatedPose;
+    private boolean useShuffleboard = false;
 
     public boolean fieldRelative;
     public double maxSpeed;
 
-    public SwerveBase(SwerveDriveKinematics kinematics, SwerveModuleConfig... configs) {
+    public SwerveBase(SwerveDriveKinematics kinematics, Matrix<N3, N1> stateStdDevs, Matrix<N3, N1> visionMeasurementDevs, SwerveModuleConfig... configs) {
         this.kinematics = kinematics;
         this.maxSpeed = configs[0].maxSpeed;
         fieldRelative = true;
@@ -48,21 +49,21 @@ public abstract class SwerveBase extends SubsystemBase {
         Timer.delay(1.5);
 
         resetEncoders();
-    }
 
-    public void initSwerveOdometry(Matrix<N3, N1> stateStdDevs, Matrix<N3, N1> visionMeasurementDevs) {
-        odometry = new SwerveDrivePoseEstimator(kinematics, getGyroRotation2d(), getPositions(),
+        odometry = new SwerveDrivePoseEstimator(kinematics, new Rotation2d(), getPositions(),
                                                 estimatedPose, stateStdDevs, visionMeasurementDevs);
     }
 
     public void initShuffleboard() {
+        useShuffleboard = true;
         for (SwerveModule module : modules) {
             NAR_Shuffleboard.addData("Swerve", "module " + module.moduleNumber, ()-> module.getCanCoder().getDegrees(), 0, module.moduleNumber);
             NAR_Shuffleboard.addData("Swerve", "Angle " + module.moduleNumber, ()-> module.getAngleMotor().getPosition(), 1, module.moduleNumber);
             NAR_Shuffleboard.addData("Swerve", "Drive " + module.moduleNumber, ()-> module.getDriveMotor().getVelocity(), 2, module.moduleNumber);
         }
-        NAR_Shuffleboard.addData("Swerve", "Pose", ()-> estimatedPose.toString(), 3, 0, 3, 1);
-        NAR_Shuffleboard.addData("Swerve", "Velocity", ()-> getRobotVelocity().toString(), 3, 1, 3, 1);
+        NAR_Shuffleboard.addData("Swerve", "Pose", estimatedPose.toString(), 3, 0, 4, 1);
+        NAR_Shuffleboard.addData("Swerve", "Field Velocity", getFieldVelocity().toString(), 3, 2, 4, 1);
+        NAR_Shuffleboard.addData("Swerve", "Gyro", getYaw(), 7, 0, 2, 2).withWidget("Gyro");
     }
 
     public void drive(Translation2d translation, double rotation, boolean fieldRelative) {
@@ -176,6 +177,11 @@ public abstract class SwerveBase extends SubsystemBase {
         estimatedPose = odometry.getEstimatedPosition();
         Logger.recordOutput("Swerve/ActualModuleStates", getStates());
         Logger.recordOutput("Swerve/RobotRotation", getGyroRotation2d());
+        if (useShuffleboard) {
+            final ChassisSpeeds robotVelocity = getRobotVelocity();
+            NAR_Shuffleboard.addData("Swerve", "Robot Velocity", robotVelocity.toString(), 3, 1, 4, 1);
+            NAR_Shuffleboard.addData("Swerve", "Velocity", Math.hypot(robotVelocity.vxMetersPerSecond, robotVelocity.vyMetersPerSecond), 3, 3, 1, 1);
+        }
     }
 
     public void resetAll() {
