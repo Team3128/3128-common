@@ -21,7 +21,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 /**
  * Team 3128's Wrapper class for {@link Shuffleboard}
- * @since 2022 RAPID REACT
+ * @since 2022 Rapid React
  * @author Mason Lam, Arav Chadha, Peter Ma
  */
 public class NAR_Shuffleboard {

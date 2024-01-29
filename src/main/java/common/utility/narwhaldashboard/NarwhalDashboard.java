@@ -122,10 +122,9 @@ public class NarwhalDashboard extends WebSocketServer implements AutoCloseable {
      * 
      * @param names - The human-readable name of the autonomous program
      */
-    @SuppressWarnings("all")    //I cannot figure out what warning this is
     public void addAutos(String... names) {
         autoPrograms.addAll(Arrays.asList(names));
-        addInit("auto", Arrays.asList(names));
+        addInit("auto", Arrays.asList((Object[]) names));
     }
 
     /** 

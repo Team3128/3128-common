@@ -10,4 +10,5 @@ common.hardware.motorcontroller
 common.utility
 common.utility.narwhaldashboard
 common.utility.shuffleboard
+common.utility.sysid
 common.utility.tester
