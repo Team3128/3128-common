@@ -222,7 +222,8 @@ public abstract class NAR_PIDSubsystem extends SubsystemBase {
     /**
      * Uses the output from the PIDController.
      *
-     * @param output the output of the PIDController
+     * @param output The output of the PIDController
+     * @param setpoint The setpoint of the controller.
      */
     protected abstract void useOutput(double output, double setpoint);
 
