@@ -1,16 +1,19 @@
 package common.core.misc;
 
 import java.lang.reflect.Method;
+import java.time.LocalDateTime;
 import java.util.PriorityQueue;
 
 import org.littletonrobotics.junction.AutoLogOutputManager;
 import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
 import edu.wpi.first.hal.DriverStationJNI;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.NotifierJNI;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.IterativeRobotBase;
 import edu.wpi.first.wpilibj.Timer;
 
@@ -184,6 +187,48 @@ public class NAR_Robot extends IterativeRobotBase {
           m_callbacks.add(callback);
         }
       }
+    }
+
+    public static enum LoggingState {
+      FULLMATCH,
+      SESSION
+    }
+
+    /**
+     * Add a data receiver for Adv Kit logging to a USB drive.
+     * @param port true if USB drive is plugged into the top port, false if it is plugged into the bottom port.
+     */
+    public static void addReceiver(boolean port, LoggingState state){
+      String info = "";
+      if(state == LoggingState.FULLMATCH){
+        info += DriverStation.getEventName() + "_" + 
+                DriverStation.getMatchType() + "_" + 
+                DriverStation.getMatchNumber() + "_" + 
+                DriverStation.getAlliance() + "_" + 
+                DriverStation.getLocation();
+      }
+      else{
+        info += LocalDateTime.now().getMonthValue() + "_" + 
+                  LocalDateTime.now().getDayOfMonth() + "_" + 
+                  LocalDateTime.now().getYear() + "_T_" + 
+                  LocalDateTime.now().getHour() + "_" + 
+                  LocalDateTime.now().getMinute() + "_" + 
+                  LocalDateTime.now().getSecond();
+      }
+
+      if(port){
+        try{
+          Logger.addDataReceiver(new WPILOGWriter("/media/sda1/" + "matches" + "/" + info + ".wpilog"));
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+      }else{
+        try{
+          Logger.addDataReceiver(new WPILOGWriter("/media/sda2/" + "sessions" + "/" + info + ".wpilog"));
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+      }            
     }
 
     /** Ends the main loop in startCompetition(). */
