@@ -211,16 +211,22 @@ public class NAR_Robot extends IterativeRobotBase {
                   LocalDateTime.now().getYear() + "_T_" + 
                   LocalDateTime.now().getHour() + "_" + 
                   LocalDateTime.now().getMinute();
+      String folder = "";
+      if(state == LoggingState.SESSION){
+        folder = "sessions";
+      }else{
+        folder = "matches";
+      }
 
       if(port){
         try{
-          Logger.addDataReceiver(new WPILOGWriter("/media/sda1/" + "matches" + "/" + info + ".wpilog"));
+          Logger.addDataReceiver(new WPILOGWriter("/media/sda1/" + folder + "/" + info + ".wpilog"));
         }catch(Exception e){
             e.printStackTrace();
         }
       }else{
         try{
-          Logger.addDataReceiver(new WPILOGWriter("/media/sda2/" + "sessions" + "/" + info + ".wpilog"));
+          Logger.addDataReceiver(new WPILOGWriter("/media/sda2/" + folder + "/" + info + ".wpilog"));
         }catch(Exception e){
             e.printStackTrace();
         }
