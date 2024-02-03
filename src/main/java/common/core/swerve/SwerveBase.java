@@ -2,6 +2,7 @@ package common.core.swerve;
 
 import org.littletonrobotics.junction.Logger;
 
+import common.hardware.motorcontroller.NAR_Motor.Control;
 import common.utility.shuffleboard.NAR_Shuffleboard;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
@@ -124,6 +125,13 @@ public abstract class SwerveBase extends SubsystemBase {
         }
     }
 
+    public void setVoltage(double volts) {
+        for (final SwerveModule module : modules) {
+            module.getDriveMotor().setVolts(volts);
+            module.getAngleMotor().set(0, Control.Position);
+        }
+    }
+
     public Pose2d getPose() {
         return new Pose2d(estimatedPose.getTranslation(), getGyroRotation2d());
     }
@@ -240,6 +248,11 @@ public abstract class SwerveBase extends SubsystemBase {
     public ChassisSpeeds getRobotVelocity()
     {
         return kinematics.toChassisSpeeds(getStates());
+    }
+
+    public double getVelocity() {
+        final ChassisSpeeds speeds = getRobotVelocity();
+        return Math.hypot(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond);
     }
 
     public SwerveModule[] getModules() {

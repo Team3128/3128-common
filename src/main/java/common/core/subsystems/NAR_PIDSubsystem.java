@@ -122,7 +122,7 @@ public abstract class NAR_PIDSubsystem extends SubsystemBase {
 
         controller.setkS(NAR_Shuffleboard.debug(getName(), "kS", controller.getkS(), 3, 0));
         controller.setkV(NAR_Shuffleboard.debug(getName(), "kV", controller.getkV(), 3, 1));
-        controller.setkV(NAR_Shuffleboard.debug(getName(), "kA", controller.getkV(), 3, 2));
+        controller.setkA(NAR_Shuffleboard.debug(getName(), "kA", controller.getkA(), 3, 2));
         controller.setkG(NAR_Shuffleboard.debug(getName(), "kG", controller.getkG(), 3, 3));
     }
 
