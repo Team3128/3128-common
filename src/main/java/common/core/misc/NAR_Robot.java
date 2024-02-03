@@ -197,24 +197,20 @@ public class NAR_Robot extends IterativeRobotBase {
     /**
      * Add a data receiver for Adv Kit logging to a USB drive.
      * @param port true if USB drive is plugged into the top port, false if it is plugged into the bottom port.
+     * @param state session logging or full match logging.
      */
     public static void addReceiver(boolean port, LoggingState state){
       String info = "";
       if(state == LoggingState.FULLMATCH){
-        info += DriverStation.getEventName() + "_" + 
+        info += DriverStation.getMatchNumber() + "_" + 
                 DriverStation.getMatchType() + "_" + 
-                DriverStation.getMatchNumber() + "_" + 
-                DriverStation.getAlliance() + "_" + 
-                DriverStation.getLocation();
+                DriverStation.getEventName() + "_";
       }
-      else{
         info += LocalDateTime.now().getMonthValue() + "_" + 
                   LocalDateTime.now().getDayOfMonth() + "_" + 
                   LocalDateTime.now().getYear() + "_T_" + 
                   LocalDateTime.now().getHour() + "_" + 
-                  LocalDateTime.now().getMinute() + "_" + 
-                  LocalDateTime.now().getSecond();
-      }
+                  LocalDateTime.now().getMinute();
 
       if(port){
         try{
