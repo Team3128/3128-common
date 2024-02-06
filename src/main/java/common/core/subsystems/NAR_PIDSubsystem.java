@@ -1,5 +1,7 @@
 package common.core.subsystems;
 
+import static edu.wpi.first.wpilibj2.command.Commands.waitSeconds;
+
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
@@ -7,6 +9,7 @@ import common.core.controllers.ControllerBase;
 import common.utility.Log;
 import common.utility.shuffleboard.NAR_Shuffleboard;
 import common.utility.tester.Tester;
+import common.utility.tester.Tester.TestState;
 import common.utility.tester.Tester.UnitTest;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.Timer;
@@ -24,7 +27,9 @@ public abstract class NAR_PIDSubsystem extends SubsystemBase {
      * UnitTest specifically for PIDSubsystems.
      */
     public class SetpointTest extends UnitTest {
-
+        private final double timeOut;
+        private final double plateau;
+        private final Timer timer;
         private double prevTime;
 
         /**
@@ -35,16 +40,44 @@ public abstract class NAR_PIDSubsystem extends SubsystemBase {
          * @param timeOut The time the system has to reach the setpoint.
          */
         public SetpointTest(String testName, double setpoint, double plateau, double timeOut) {
-            super(testName, runOnce(()-> startPID(setpoint)), ()-> atSetpoint(), plateau, timeOut);
+            super(testName, runOnce(()-> startPID(setpoint)).andThen(waitSeconds(timeOut)));
+            this.plateau = plateau;
+            this.timeOut = 0;
+            timer = new Timer();
             prevTime = 0;
-            Tester.getInstance().addTest(getName(), this);
+        }
+
+        @Override
+        public void initialize() {
+            super.initialize();
+            timer.restart();
+            prevTime = Timer.getFPGATimestamp();
+        }
+
+        @Override
+        public void execute() {
+            super.execute();
+            if (!atSetpoint()) timer.reset();
         }
 
         @Override
         public void end(boolean interrupted) {
-            super.end(interrupted);
             Log.info(testName, "Expected Time: " + timeOut);
             Log.info(testName, "Actual Time: " + (Timer.getFPGATimestamp() - prevTime));
+            if (timer.hasElapsed(plateau)) testState = TestState.PASSED;
+            testState = TestState.FAILED;
+        }
+
+        @Override
+        public boolean isFinished() {
+            return super.isFinished() || timer.hasElapsed(plateau);
+        }
+
+        /**
+         * Add the test to the a Subsystem test
+         */
+        public void add() {
+            Tester.getInstance().addTest(getName(), this);
         }
     }
 
