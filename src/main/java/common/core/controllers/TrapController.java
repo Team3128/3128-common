@@ -115,7 +115,7 @@ public class TrapController extends ControllerBase {
      */
     @Override
     public double calculateFF(double pidOutput) {
-        final double staticGain = Math.copySign(getkS(), pidOutput);
+        final double staticGain = !atSetpoint() ? Math.copySign(getkS(), pidOutput) : 0;
         final double velocityGain = getkV() * prevSetpoint.velocity;
         final double accelGain = getkA() * (tempSetpoint.velocity - prevSetpoint.velocity) / getPeriod();
         final double gravityGain = getkG() * kG_Function.getAsDouble();

@@ -248,6 +248,14 @@ public abstract class NAR_PIDSubsystem extends SubsystemBase {
     }
 
     /**
+     * Return whether the subsystem is in debug mode.
+     * @return Boolean, true being in debug, false being not in debug.
+     */
+    public boolean isDebug() {
+        return debug.getAsBoolean();
+    }
+
+    /**
      * Returns whether the controller is enabled.
      *
      * @return Whether the controller is enabled.

@@ -74,7 +74,7 @@ public class Controller extends ControllerBase {
      */
     @Override
     public double calculateFF(double pidOutput) {
-        final double staticGain = Math.copySign(getkS(), pidOutput);
+        final double staticGain = !atSetpoint() ? Math.copySign(getkS(), pidOutput) : 0;
         final double velocityGain = (type == Type.VELOCITY) ? getkV() * getSetpoint() : 0;
         final double gravityGain = getkG() * kG_Function.getAsDouble();
         return staticGain + velocityGain + gravityGain;
