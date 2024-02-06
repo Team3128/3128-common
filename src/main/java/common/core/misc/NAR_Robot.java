@@ -191,7 +191,8 @@ public class NAR_Robot extends IterativeRobotBase {
 
     public static enum LoggingState {
       FULLMATCH,
-      SESSION
+      SESSION,
+      NONE
     }
 
     /**
@@ -200,6 +201,10 @@ public class NAR_Robot extends IterativeRobotBase {
      * @param state session logging or full match logging.
      */
     public static void addReceiver(boolean port, LoggingState state){
+      if(state == LoggingState.NONE){
+        return;
+      }
+      
       String info = "";
       if(state == LoggingState.FULLMATCH){
         info += DriverStation.getMatchNumber() + "_" + 
