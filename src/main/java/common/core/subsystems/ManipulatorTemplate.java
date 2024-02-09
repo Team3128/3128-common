@@ -71,7 +71,7 @@ public abstract class ManipulatorTemplate extends SubsystemBase {
      * @param power The power of the motor on [-1, 1]
      */
     protected void setPower(double power){
-        final double output = debug.getAsBoolean() ? powerSetpoint.getAsDouble() : power;
+        final double output = (debug != null && debug.getAsBoolean()) ? powerSetpoint.getAsDouble() : power;
         for (final NAR_Motor motor : motors) {
             motor.set(output);
         }
@@ -113,8 +113,8 @@ public abstract class ManipulatorTemplate extends SubsystemBase {
     public void initShuffleboard() {
         NAR_Shuffleboard.addData("Manipulator", "Object Present", ()-> hasObjectPresent(), 0, 0);
         NAR_Shuffleboard.addData("Manipulator", "Manip current", () -> getCurrent(), 0, 1);
-        var debugEntry = NAR_Shuffleboard.addData(getName(), "TOGGLE", false, 1, 0).withWidget("Toggle Button");
-        debug = ()-> debugEntry.getEntry().getBoolean(false);
+        NAR_Shuffleboard.addData(getName(), "TOGGLE", false, 1, 0).withWidget("Toggle Button").getEntry();
+        debug = NAR_Shuffleboard.getBoolean(getName(), "TOGGLE");
         NAR_Shuffleboard.addData(getName(), "DEBUG", ()-> debug.getAsBoolean(), 1, 1);
         powerSetpoint = NAR_Shuffleboard.debug(getName(), "Debug_Setpoint", 0, 1,2);
     }

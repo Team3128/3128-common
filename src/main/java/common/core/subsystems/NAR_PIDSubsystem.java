@@ -128,7 +128,6 @@ public abstract class NAR_PIDSubsystem extends SubsystemBase {
             final double measurement = getMeasurement();
             final double velocity = (measurement - prevMeasurement) / updateTimer.get();
             final double acceleration = (velocity - prevVelocity) / updateTimer.get();
-            NAR_Shuffleboard.addData(getName(), "Measurement", measurement, 1, 1);
             NAR_Shuffleboard.addData(getName(), "1stDerivative", velocity, 1, 2);
             NAR_Shuffleboard.addData(getName(), "2ndDerivative", acceleration, 1, 3);
             prevMeasurement = measurement;
@@ -147,9 +146,10 @@ public abstract class NAR_PIDSubsystem extends SubsystemBase {
         NAR_Shuffleboard.addData(getName(), "AtSetpoint", ()-> atSetpoint(), 0, 3);
 
         NAR_Shuffleboard.addData(getName(), "Enabled", ()-> isEnabled(), 1, 0);
+        NAR_Shuffleboard.addData(getName(), "Measurement", ()-> getMeasurement(), 1, 1);
 
-        var debugEntry = NAR_Shuffleboard.addData(getName(), "TOGGLE", false, 2, 0).withWidget("Toggle Button").getEntry();
-        debug = ()-> debugEntry.getBoolean(false);
+        NAR_Shuffleboard.addData(getName(), "TOGGLE", false, 2, 0).withWidget("Toggle Button");
+        debug = NAR_Shuffleboard.getBoolean(getName(), "TOGGLE");
         NAR_Shuffleboard.addData(getName(), "DEBUG", ()-> debug.getAsBoolean(), 2, 1);
         setpoint = NAR_Shuffleboard.debug(getName(), "Debug_Setpoint", 0, 2,2);
 
@@ -218,7 +218,7 @@ public abstract class NAR_PIDSubsystem extends SubsystemBase {
      */
     public void startPID(double setpoint) {
         enable();
-        controller.setSetpoint(MathUtil.clamp(debug.getAsBoolean() ? this.setpoint.getAsDouble() : setpoint, min, max));
+        controller.setSetpoint(MathUtil.clamp((debug != null && debug.getAsBoolean()) ? this.setpoint.getAsDouble() : setpoint, min, max));
     }
 
     /**

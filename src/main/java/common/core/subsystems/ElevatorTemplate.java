@@ -68,7 +68,7 @@ public abstract class ElevatorTemplate extends NAR_PIDSubsystem {
      * @param power Power the motor is run at.
      * @return Command setting elevator power.
      */
-    public Command setElevator(double power){
+    public Command runElevator(double power){
         return runOnce(() -> setPower(power));
     }
     

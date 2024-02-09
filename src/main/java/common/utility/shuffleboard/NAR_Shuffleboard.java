@@ -2,7 +2,9 @@ package common.utility.shuffleboard;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
+import java.util.function.LongSupplier;
 import java.util.function.Supplier;
 
 import com.ctre.phoenix.sensors.WPI_PigeonIMU;
@@ -10,6 +12,7 @@ import com.ctre.phoenix.sensors.WPI_PigeonIMU;
 import common.core.misc.NAR_Robot;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.networktables.GenericEntry;
+import edu.wpi.first.networktables.NetworkTableValue;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
@@ -24,6 +27,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
  * @since 2022 Rapid React
  * @author Mason Lam, Arav Chadha, Peter Ma
  */
+@SuppressWarnings("unused")
 public class NAR_Shuffleboard {
 
     static {
@@ -232,6 +236,7 @@ public class NAR_Shuffleboard {
             return Shuffleboard.getTab(tabName).add(name, data).withPosition(x,y).withSize(width, height);
         }
         catch(Exception e) {
+            e.printStackTrace();
             return null;
         }
     }
@@ -264,6 +269,7 @@ public class NAR_Shuffleboard {
             return videoStream;
         }
         catch(Exception e) {
+            e.printStackTrace();
             return null;
         }
     }
@@ -331,22 +337,80 @@ public class NAR_Shuffleboard {
      * @return DoubleSupplier containing the value in the widget
      */
     public static DoubleSupplier debug(String tabName, String name, double Default, int x, int y) {
-        if(!tabs.containsKey(tabName)){
-            create_tab(tabName);
-        }
-        SimpleWidget tab = addData(tabName, name, Default, x, y);
-        return ()-> tab.getEntry().getDouble(Default);
+        final GenericEntry tab = addData(tabName, name, Default, x, y).getEntry();
+        return ()-> tab.getDouble(Default);
     }
 
     /**
-     * Get the value from an widget
+     * Get the network table reference of a widget.
+     * 
+     * @param tabName the title of the tab to select
+     * @param name the name of the widget.
+     * @return NetworkTableValue of the widget
+     */
+    public static NetworkTableValue getValue(String tabName, String name){
+        final NetworkTableValue entry = tabs.get(tabName).get(name).m_entry.get();
+        return entry;
+    }
+
+    /**
+     * Get the value reference of a widget storing objects.
      * 
      * @param tabName the title of the tab to select
      * @param name the name of the widget
-     * @return Object stored in the widget
+     * @return ObjectSupplier referencing the widget
      */
-    public static Object getValue(String tabName, String name){
-        return tabs.get(tabName).get(name).m_entry.get().getValue();
+    public static Supplier<Object> getObject(String tabName, String name){
+        final NetworkTableValue entry = tabs.get(tabName).get(name).m_entry.get();
+        return ()-> entry.getValue();
+    }
+
+    /**
+     * Get the value reference of a widget storing longs.
+     * 
+     * @param tabName the title of the tab to select
+     * @param name the name of the widget
+     * @return LongSupplier referencing the widget
+     */
+    public static LongSupplier getLong(String tabName, String name){
+        final NetworkTableValue entry = tabs.get(tabName).get(name).m_entry.get();
+        return ()-> entry.getInteger();
+    }
+
+    /**
+     * Get the value reference of a widget storing doubles.
+     * 
+     * @param tabName the title of the tab to select
+     * @param name the name of the widget
+     * @return DoubleSupplier referencing the widget
+     */
+    public static DoubleSupplier getDouble(String tabName, String name){
+        final NetworkTableValue entry = tabs.get(tabName).get(name).m_entry.get();
+        return ()-> entry.getDouble();
+    }
+
+    /**
+     * Get the value reference of a widget storing booleans.
+     * 
+     * @param tabName the title of the tab to select
+     * @param name the name of the widget
+     * @return BooleanSupplier referencing the widget
+     */
+    public static BooleanSupplier getBoolean(String tabName, String name){
+        final NetworkTableValue entry = tabs.get(tabName).get(name).m_entry.get();
+        return ()-> entry.getBoolean();
+    }
+
+    /**
+     * Get the value reference of a widget storing Strings.
+     * 
+     * @param tabName the title of the tab to select
+     * @param name the name of the widget
+     * @return StringSupplier referencing the widget
+     */
+    public static Supplier<String> getString(String tabName, String name){
+        final NetworkTableValue entry = tabs.get(tabName).get(name).m_entry.get();
+        return ()-> entry.getString();
     }
 
     /**

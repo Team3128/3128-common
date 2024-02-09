@@ -6,6 +6,7 @@ import java.util.ArrayList;
 
 import common.utility.Log;
 import common.utility.narwhaldashboard.NarwhalDashboard;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 
@@ -74,9 +75,12 @@ public class Tester {
     }
 
     /**Collection of tests to be run for a system */
-    public class Test extends Command {
+    public static class Test extends Command {
         private final ArrayList<UnitTest> unitTests;
         private final String name;
+        private final Timer passTimer;
+        private double timeBetweenTests;
+        private UnitTest testToSchedule;
         private TestState state;
         private int curIndex;
 
@@ -87,8 +91,10 @@ public class Tester {
         private Test(String name) {
             unitTests = new ArrayList<UnitTest>();
             this.name = name;
+            this.timeBetweenTests = 0;
             state = TestState.FAILED;
             curIndex = 0;
+            passTimer = new Timer();
             NarwhalDashboard.getInstance().addUpdate(name, ()-> state);
             NarwhalDashboard.getInstance().addButton(name, (boolean pressed) -> {
                 if (pressed) this.schedule();
@@ -107,6 +113,9 @@ public class Tester {
         public void initialize() {
             curIndex = 0;
             state = TestState.RUNNING;
+            testToSchedule = null;
+            passTimer.stop();
+            passTimer.reset();
             Log.info(name, "TEST RUNNING");
             if (unitTests.size() == 0) state = TestState.FAILED;
             else unitTests.get(0).schedule();
@@ -115,6 +124,13 @@ public class Tester {
         @Override
         public void execute() {
             if (unitTests.size() == 0) return;
+            if (passTimer.hasElapsed(timeBetweenTests) && testToSchedule != null) {
+                passTimer.stop();
+                passTimer.reset();
+                state = TestState.RUNNING;
+                testToSchedule.schedule();
+                testToSchedule = null;
+            }
 
             final UnitTest test = unitTests.get(curIndex);
             switch(test.testState) {
@@ -123,11 +139,10 @@ public class Tester {
                     return;
                 case PASSED:
                     curIndex ++;
-                    if (curIndex == unitTests.size()) {
-                        state = TestState.PASSED;
-                        return;
+                    state = TestState.PASSED;
+                    if (curIndex < unitTests.size()) {
+                        unitTests.get(curIndex).schedule();
                     }
-                    unitTests.get(curIndex).schedule();
                     break;
                 default:
             }
@@ -140,11 +155,23 @@ public class Tester {
 
         @Override
         public boolean isFinished() {
-            return state != TestState.RUNNING;
+            return state == TestState.FAILED || curIndex == unitTests.size();
         }
 
+        /**
+         * Returns whether or not the test has passed, failed, or is running.
+         * @return The current state of the test.
+         */
         public TestState getTestState() {
             return state;
+        }
+
+        /**
+         * Sets the time between each test.
+         * @param time Time between tests.
+         */
+        public void setTimeBetweenTests(double time) {
+            timeBetweenTests = time;
         }
     }
 
@@ -164,9 +191,11 @@ public class Tester {
         return instance;
     }
 
-    private Tester() {}
+    private final HashMap<String, Test> systemTests;
 
-    public HashMap<String, Test> systemTests = new HashMap<String, Test>();
+    private Tester() {
+        systemTests = new HashMap<String, Test>();
+    }
 
     /**
      * Adds a unit test to be run for a system.
@@ -178,6 +207,16 @@ public class Tester {
             systemTests.put(name, new Test(name));
         }
         systemTests.get(name).addTest(test);
+    }
+
+    /**
+     * Returns a Test for the robot.
+     * @param name Name of the test or system.
+     * @return A Test.
+     */
+    public Test getTest(String name) {
+        return systemTests.get(name);
+    
     }
 
     /**

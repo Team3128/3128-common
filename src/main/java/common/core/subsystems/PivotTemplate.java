@@ -18,7 +18,7 @@ public abstract class PivotTemplate extends NAR_PIDSubsystem{
      * @param controller Controller to control motor output.
      * @param motors Pivot motors.
      */
-    public PivotTemplate(ControllerBase controller, double angleOffset, NAR_Motor...motors){
+    public PivotTemplate(ControllerBase controller, NAR_Motor...motors){
         super(controller);
         this.motors = motors;
         configMotors();
@@ -58,7 +58,7 @@ public abstract class PivotTemplate extends NAR_PIDSubsystem{
      * @param setpoint Setpoint the pivot goes to.
      * @return Command setting pivot setpoint.
      */
-    public Command pivot(double setpoint){
+    public Command pivotTo(double setpoint){
         return runOnce(() -> startPID(setpoint));
     }
     
@@ -67,7 +67,7 @@ public abstract class PivotTemplate extends NAR_PIDSubsystem{
      * @param power Power the motor is run at.
      * @return Command setting pivot power.
      */
-    public Command setPivot(double power){
+    public Command runPivot(double power){
         return runOnce(() -> setPower(power));
     }
     

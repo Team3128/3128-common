@@ -30,7 +30,6 @@ public abstract class SwerveBase extends SubsystemBase {
     protected SwerveDrivePoseEstimator odometry;
     protected final SwerveModule[] modules;
     private Pose2d estimatedPose;
-    private boolean useShuffleboard = false;
 
     public boolean fieldRelative;
     public double maxSpeed;
@@ -56,13 +55,14 @@ public abstract class SwerveBase extends SubsystemBase {
     }
 
     public void initShuffleboard() {
-        useShuffleboard = true;
-        for (SwerveModule module : modules) {
-            NAR_Shuffleboard.addData("Swerve", "module " + module.moduleNumber, ()-> module.getCanCoder().getDegrees(), 0, module.moduleNumber);
-            NAR_Shuffleboard.addData("Swerve", "Angle " + module.moduleNumber, ()-> module.getAngleMotor().getPosition(), 1, module.moduleNumber);
-            NAR_Shuffleboard.addData("Swerve", "Drive " + module.moduleNumber, ()-> module.getDriveMotor().getVelocity(), 2, module.moduleNumber);
+        for (final SwerveModule module : modules) {
+            NAR_Shuffleboard.addData("Swerve", "CANcoder " + module.moduleNumber, ()-> module.getCanCoder().getDegrees(), 0, module.moduleNumber);
+            NAR_Shuffleboard.addData("Swerve", "Angle Motor " + module.moduleNumber, ()-> module.getState().angle.getDegrees(), 1, module.moduleNumber);
+            NAR_Shuffleboard.addData("Swerve", "Drive Motor" + module.moduleNumber, ()-> module.getState().speedMetersPerSecond, 2, module.moduleNumber);
         }
         NAR_Shuffleboard.addData("Swerve", "Pose", ()-> estimatedPose.toString(), 3, 0, 4, 1);
+        NAR_Shuffleboard.addData("Swerve", "Robot Velocity", getRobotVelocity().toString(), 3, 1, 4, 1);
+        NAR_Shuffleboard.addData("Swerve", "Velocity", getVelocity(), 3, 3, 1, 1);
         NAR_Shuffleboard.addData("Swerve", "Field Velocity", ()-> getFieldVelocity().toString(), 3, 2, 4, 1);
         NAR_Shuffleboard.addData("Swerve", "Gyro", ()-> getYaw(), 7, 0, 2, 2).withWidget("Gyro");
     }
@@ -185,11 +185,6 @@ public abstract class SwerveBase extends SubsystemBase {
         estimatedPose = odometry.getEstimatedPosition();
         Logger.recordOutput("Swerve/ActualModuleStates", getStates());
         Logger.recordOutput("Swerve/RobotRotation", getGyroRotation2d());
-        if (useShuffleboard) {
-            final ChassisSpeeds robotVelocity = getRobotVelocity();
-            NAR_Shuffleboard.addData("Swerve", "Robot Velocity", robotVelocity.toString(), 3, 1, 4, 1);
-            NAR_Shuffleboard.addData("Swerve", "Velocity", Math.hypot(robotVelocity.vxMetersPerSecond, robotVelocity.vyMetersPerSecond), 3, 3, 1, 1);
-        }
     }
 
     public void resetAll() {

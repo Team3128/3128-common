@@ -66,6 +66,7 @@ public class CmdSysId extends Command {
 
     @Override
     public void initialize() {
+        data.clear();
         setVoltage(0.0);
         timer.restart();
     }

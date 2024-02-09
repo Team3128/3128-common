@@ -9,6 +9,12 @@ import common.core.controllers.ControllerBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 
+/**
+ * Team 3128's PIDCommand that uses a ControllerBase to control an output.
+ * 
+ * @since 2024 Crescendo
+ * @author Mason Lam
+ */
 public class NAR_PIDCommand extends Command {
     /** Controller. */
     protected final ControllerBase controller;
@@ -44,7 +50,13 @@ public class NAR_PIDCommand extends Command {
         controller.useOutput();
     }
 
-    public void end() {
+    @Override
+    public void end(boolean interrupted) {
         controller.reset();
+    }
+
+    @Override
+    public boolean isFinished() {
+        return controller.atSetpoint();
     }
 }

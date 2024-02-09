@@ -123,4 +123,15 @@ public class FFCharacterization {
     public double getkA() {
         return kA;
     }
+
+    /**
+     * Clears the data stored in the FFCharacterization object.
+     */
+    public void clear() {
+        velocityData.clear();
+        voltageData.clear();
+        timeData.clear();
+        accelerationData.clear();
+        adjustedVoltageData.clear();
+    }
 }

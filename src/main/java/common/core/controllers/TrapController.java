@@ -1,8 +1,11 @@
 package common.core.controllers;
 
 import java.util.function.DoubleSupplier;
+
+import common.utility.narwhaldashboard.NarwhalDashboard;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.util.sendable.SendableBuilder;
 
@@ -13,15 +16,17 @@ import edu.wpi.first.util.sendable.SendableBuilder;
  * @author Mason Lam
  */
 public class TrapController extends ControllerBase {
+    public static boolean shouldLog = false;
+
     private DoubleSupplier systemVelocity;
 
     private TrapezoidProfile.State setpoint = new TrapezoidProfile.State();
     private TrapezoidProfile.State tempSetpoint = new TrapezoidProfile.State();
     private TrapezoidProfile.State prevSetpoint = new TrapezoidProfile.State();
+    private SimpleMotorFeedforward feedforward;
     private TrapezoidProfile profile; 
     private double minimumInput;
     private double maximumInput;
-
     /**
      * Create a new object to control PID + FF logic using a trapezoid profile for a subsystem.
      * <p>Sets kP, kI, kD, kS, kV, kA, kG, constraints, period values.
@@ -33,6 +38,7 @@ public class TrapController extends ControllerBase {
     public TrapController(PIDFFConfig config, TrapezoidProfile.Constraints constraints, double period) {
         super(config, period);
         profile = new TrapezoidProfile(constraints);
+        feedforward = new SimpleMotorFeedforward(getkS(), getkV(), getkA());
         systemVelocity = ()-> 0;
     }
 
@@ -90,6 +96,7 @@ public class TrapController extends ControllerBase {
             setpoint.position = goalMinDistance + measurement;
             tempSetpoint.position = setpointMinDistance + measurement;
         }
+        if (shouldLog) NarwhalDashboard.getInstance().sendMessage("Position: " + tempSetpoint.position + "Velocity: " + tempSetpoint.velocity);
         tempSetpoint = profile.calculate(getPeriod(), tempSetpoint, setpoint);
         controller.setSetpoint(tempSetpoint.position);
         final double output = super.calculate(measurement);
@@ -115,11 +122,10 @@ public class TrapController extends ControllerBase {
      */
     @Override
     public double calculateFF(double pidOutput) {
-        final double staticGain = !atSetpoint() ? Math.copySign(getkS(), pidOutput) : 0;
-        final double velocityGain = getkV() * prevSetpoint.velocity;
-        final double accelGain = getkA() * (tempSetpoint.velocity - prevSetpoint.velocity) / getPeriod();
+        final double simpleGain = feedforward.calculate(prevSetpoint.velocity, tempSetpoint.velocity, getPeriod());
         final double gravityGain = getkG() * kG_Function.getAsDouble();
-        return staticGain + velocityGain + accelGain + gravityGain;
+        if (shouldLog) NarwhalDashboard.getInstance().sendMessage("Simple Gain: " + simpleGain + "Gravity Gain: " + gravityGain);
+        return simpleGain + gravityGain;
     }
 
     /**
@@ -156,6 +162,8 @@ public class TrapController extends ControllerBase {
      */
     public void setSetpoint(TrapezoidProfile.State setpoint) {
         this.setpoint = setpoint;
+        feedforward = new SimpleMotorFeedforward(getkS(), getkV(), getkA());
+        reset();
     }
 
     /**
