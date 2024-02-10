@@ -175,6 +175,7 @@ public class NarwhalDashboard extends WebSocketServer implements AutoCloseable {
      */
     @SuppressWarnings("unchecked")
     public void sendMessage(String message) {
+        if (conn == null) return;
         final JSONObject obj = new JSONObject();
         obj.put("Message", message);
         conn.send(obj.toJSONString());
