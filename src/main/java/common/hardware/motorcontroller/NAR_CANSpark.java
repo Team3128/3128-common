@@ -3,6 +3,8 @@ package common.hardware.motorcontroller;
 import java.util.LinkedList;
 import java.util.function.DoubleSupplier;
 
+import com.revrobotics.CANSparkBase;
+import com.revrobotics.CANSparkFlex;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkLowLevel.PeriodicFrame;
@@ -14,6 +16,7 @@ import com.revrobotics.SparkRelativeEncoder;
 import com.revrobotics.CANSparkBase.ControlType;
 import com.revrobotics.CANSparkBase.IdleMode;
 
+import common.core.controllers.PIDFFConfig;
 import common.core.misc.NAR_Robot;
 import common.utility.shuffleboard.NAR_Shuffleboard;
 import edu.wpi.first.wpilibj.RobotBase;
@@ -22,19 +25,19 @@ import edu.wpi.first.wpilibj.Timer;
 import static common.hardware.motorcontroller.MotorControllerConstants.*;
 
 /**
- * Team 3128's streamlined {@link CANSparkMax} class.
+ * Team 3128's streamlined {@link CANSparkBase} class.
  * @since 2023 Charged Up
  * @author Mason Lam
  */
-public class NAR_CANSparkMax extends NAR_Motor {
+public class NAR_CANSpark extends NAR_Motor {
 
-	private static final LinkedList<NAR_CANSparkMax> instances = new LinkedList<NAR_CANSparkMax>();
+	private static final LinkedList<NAR_CANSpark> instances = new LinkedList<NAR_CANSpark>();
 
 	/**
 	 * Flashes all spark max's
 	 */
 	public static void burnFlashAll() {
-		for (final NAR_CANSparkMax spark : instances) {
+		for (final NAR_CANSpark spark : instances) {
 			spark.burnFlash();
 		}
 	}
@@ -68,34 +71,43 @@ public class NAR_CANSparkMax extends NAR_Motor {
 		Relative,
 		Absolute
 	}
+
+	/**
+	 * Type of controller used
+	 */
+	public enum ControllerType {
+		CAN_SPARK_MAX,
+		CAN_SPARK_FLEX
+	}
 	
 	private double kP, kI, kD;
 	private EncoderType encoderType;
 	private SparkRelativeEncoder relativeEncoder;
 	private SparkAbsoluteEncoder absoluteEncoder;
 	private final SparkPIDController controller;
-    protected final CANSparkMax motor;
+    protected final CANSparkBase motor;
 
     /**
-	 * Create a new object to control a SPARK MAX motor
+	 * Create a new object to control a SPARK motor
 	 *
 	 * @param deviceNumber The device ID.
+	 * @param controllerType The type of controller used, ie. CAN_SPARK_MAX or CAN_SPARK_FLEX
 	 * @param encoderType The type of encoder used, ie. relative build in encoder or absolute encoder
 	 * 		connected by an adapter.
-	 * @param type The motor type connected to the controller. Brushless motor wires must be connected
+	 * @param motorType The motor type connected to the controller. Brushless motor wires must be connected
 	 *     	to their matching colors and the hall sensor must be plugged in. Brushed motors must be
 	 *     	connected to the Red and Black terminals only.
 	 * @param kP The proportional coefficient of the on board PIDController.
 	 * @param kI The integral coefficient of the on board PIDController.
    	 * @param kD The derivative coefficient of the on board PIDController.
 	 */
-    public NAR_CANSparkMax(int deviceNumber, MotorType type, EncoderType encoderType, double kP, double kI, double kD) {
+    public NAR_CANSpark(int deviceNumber, ControllerType controllerType, MotorType motorType, EncoderType encoderType, double kP, double kI, double kD) {
 		super(deviceNumber);
-        motor = new CANSparkMax(deviceNumber, type);
+        motor = controllerType == ControllerType.CAN_SPARK_MAX ? new CANSparkMax(deviceNumber, motorType) : new CANSparkFlex(deviceNumber, motorType);
 		motor.restoreFactoryDefaults(); // Reset config parameters, unfollow other motor controllers
 		motor.setCANTimeout(canSparkMaxTimeout);
 		enableVoltageCompensation(12.0);
-		setCurrentLimit(type == MotorType.kBrushless ? NEO_CurrentLimit : NEO_550CurrentLimit);
+		setCurrentLimit(motorType == MotorType.kBrushless ? NEO_CurrentLimit : NEO_550CurrentLimit);
 
 		this.encoderType = encoderType;
 
@@ -126,38 +138,50 @@ public class NAR_CANSparkMax extends NAR_Motor {
     }
 
     /**
-	 * Create a new object to control a SPARK MAX motor
+	 * Create a new object to control a SPARK motor
 	 *
 	 * @param deviceNumber The device ID.
-     * @param type The motor type connected to the controller. Brushless motor wires must be connected
+	 * @param controllerType The type of controller used, ie. CAN_SPARK_MAX or CAN_SPARK_FLEX
+     * @param motorType The motor type connected to the controller. Brushless motor wires must be connected
 	 *     	to their matching colors and the hall sensor must be plugged in. Brushed motors must be
 	 *     	connected to the Red and Black terminals only.
 	 * @param encoderType The type of encoder used, ie. relative build in encoder or absolute encoder
 	 * 		connected by an adapter.
 	 */
-	public NAR_CANSparkMax(int deviceNumber, MotorType type, EncoderType encoderType) {
-		this(deviceNumber, type, encoderType, 0, 0, 0);
+	public NAR_CANSpark(int deviceNumber, ControllerType controllerType, MotorType motorType, EncoderType encoderType) {
+		this(deviceNumber, controllerType, motorType, encoderType, 0, 0, 0);
 	}
 
     /**
-	 * Create a new object to control a SPARK MAX motor
+	 * Create a new object to control a SPARK motor
 	 *
 	 * @param deviceNumber The device ID.
-     * @param type The motor type connected to the controller. Brushless motor wires must be connected
+	 * @param controllerType The type of controller used, ie. CAN_SPARK_MAX or CAN_SPARK_FLEX
+     * @param motorType The motor type connected to the controller. Brushless motor wires must be connected
 	 *     	to their matching colors and the hall sensor must be plugged in. Brushed motors must be
 	 *     	connected to the Red and Black terminals only.
 	 */
-	public NAR_CANSparkMax(int deviceNumber, MotorType type) {
-		this(deviceNumber, type, EncoderType.Relative);
+	public NAR_CANSpark(int deviceNumber, ControllerType controllerType, MotorType motorType) {
+		this(deviceNumber, controllerType, motorType, EncoderType.Relative);
 	}
     
     /**
+	 * Create a new object to control a SPARK motor
+	 *
+	 * @param deviceNumber The device ID.
+	 * @param controllerType The type of controller used, ie. CAN_SPARK_MAX or CAN_SPARK_FLEX
+	 */
+	public NAR_CANSpark(int deviceNumber, ControllerType controllerType) {
+		this(deviceNumber, controllerType, MotorType.kBrushless);
+	}
+
+	/**
 	 * Create a new object to control a SPARK MAX motor
 	 *
 	 * @param deviceNumber The device ID.
 	 */
-	public NAR_CANSparkMax(int deviceNumber) {
-		this(deviceNumber, MotorType.kBrushless);
+	public NAR_CANSpark(int deviceNumber) {
+		this(deviceNumber, ControllerType.CAN_SPARK_MAX, MotorType.kBrushless);
 	}
 
 	/**
@@ -189,6 +213,16 @@ public class NAR_CANSparkMax extends NAR_Motor {
 				controller.setD(kD);
 			}
 		}, 0.5, 0.05);
+	}
+
+	/**
+	 * Set the PID values for the controller.
+	 * @param config PIDFFConfig containing kP, kI, and kD values.
+	 */
+	public void setPID(PIDFFConfig config) {
+		controller.setP(config.kP);
+		controller.setI(config.kI);
+		controller.setD(config.kD);
 	}
 
 	/**
@@ -287,14 +321,14 @@ public class NAR_CANSparkMax extends NAR_Motor {
      * @param leader The motor to follow
 	 * @param invert Whether or not to invert motor output
      */
-	public void follow(NAR_CANSparkMax leader, boolean invert) {
+	public void follow(NAR_CANSpark leader, boolean invert) {
 		motor.follow(leader.getMotor(), invert);
 	}
 
 	@Override
 	public void follow(NAR_Motor leader) {
-		if (leader instanceof NAR_CANSparkMax) {
-			follow((NAR_CANSparkMax) leader, false);
+		if (leader instanceof NAR_CANSpark) {
+			follow((NAR_CANSpark) leader, false);
 			return;
 		}
 		super.follow(leader);
@@ -361,7 +395,7 @@ public class NAR_CANSparkMax extends NAR_Motor {
 	}
 
 	@Override
-    public CANSparkMax getMotor() {
+    public CANSparkBase getMotor() {
         return motor;
     }
 

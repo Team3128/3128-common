@@ -9,13 +9,10 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import com.ctre.phoenix6.configs.MagnetSensorConfigs;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
-import com.revrobotics.CANSparkLowLevel.MotorType;
-
 import common.core.controllers.PIDFFConfig;
 import common.core.swerve.SwerveModuleConfig.SwerveMotorConfig;
-import common.hardware.motorcontroller.NAR_CANSparkMax;
+import common.hardware.motorcontroller.NAR_CANSpark;
 import common.hardware.motorcontroller.NAR_Motor;
-import common.hardware.motorcontroller.NAR_CANSparkMax.EncoderType;
 import common.hardware.motorcontroller.NAR_Motor.Control;
 import common.hardware.motorcontroller.NAR_Motor.Neutral;
 
@@ -29,8 +26,8 @@ public class SwerveModule {
 
     public final int moduleNumber;
     private final double angleOffset;
-    private final NAR_Motor angleMotor;
-    private final NAR_Motor driveMotor;
+    private final NAR_CANSpark angleMotor;
+    private final NAR_CANSpark driveMotor;
     private final CANcoder angleEncoder;
     private final SwerveMotorConfig driveConfig;
     private final SwerveMotorConfig angleConfig;
@@ -53,7 +50,6 @@ public class SwerveModule {
         angleOffset = config.angleOffset;
 
         final PIDFFConfig drivePIDConfig = driveConfig.pidffConfig;
-        final PIDFFConfig anglePIDConfig = angleConfig.pidffConfig;
         feedforward = new SimpleMotorFeedforward(drivePIDConfig.kS, drivePIDConfig.kV, drivePIDConfig.kA);
         
         /* Angle Encoder Config */
@@ -61,8 +57,8 @@ public class SwerveModule {
         final SensorDirectionValue direction = config.CANCoderinvert ? SensorDirectionValue.Clockwise_Positive : SensorDirectionValue.CounterClockwise_Positive;
         angleEncoder.getConfigurator().apply(new MagnetSensorConfigs().withSensorDirection(direction));
 
-        angleMotor = new NAR_CANSparkMax(angleConfig.motorID, MotorType.kBrushless, EncoderType.Relative, anglePIDConfig.kP, anglePIDConfig.kI, anglePIDConfig.kD);
-        driveMotor = new NAR_CANSparkMax(driveConfig.motorID, MotorType.kBrushless, EncoderType.Relative, drivePIDConfig.kP, drivePIDConfig.kI, drivePIDConfig.kD);
+        angleMotor = config.driveConfig.motor;
+        driveMotor = config.angleConfig.motor;
 
         /* Angle Motor Config */
         configAngleMotor();
@@ -78,6 +74,7 @@ public class SwerveModule {
      */
     private void configAngleMotor(){
         angleMotor.configMotor(angleConfig.motorConfig);
+        angleMotor.setPID(angleConfig.pidffConfig);
         angleMotor.enableContinuousInput(-180, 180);
         angleMotor.setDefaultStatusFrames();
         resetToAbsolute();
@@ -88,6 +85,7 @@ public class SwerveModule {
      */
     private void configDriveMotor(){        
         driveMotor.configMotor(driveConfig.motorConfig);
+        driveMotor.setPID(driveConfig.pidffConfig);
         driveMotor.resetPosition(0);
         driveMotor.setDefaultStatusFrames();
     }

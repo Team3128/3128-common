@@ -342,30 +342,6 @@ public class NAR_Shuffleboard {
     }
 
     /**
-     * Get the network table reference of a widget.
-     * 
-     * @param tabName the title of the tab to select
-     * @param name the name of the widget.
-     * @return NetworkTableValue of the widget
-     */
-    public static NetworkTableValue getValue(String tabName, String name){
-        final NetworkTableValue entry = tabs.get(tabName).get(name).m_entry.get();
-        return entry;
-    }
-
-    /**
-     * Get the value reference of a widget storing objects.
-     * 
-     * @param tabName the title of the tab to select
-     * @param name the name of the widget
-     * @return ObjectSupplier referencing the widget
-     */
-    public static Supplier<Object> getObject(String tabName, String name){
-        final NetworkTableValue entry = tabs.get(tabName).get(name).m_entry.get();
-        return ()-> entry.getValue();
-    }
-
-    /**
      * Get the value reference of a widget storing longs.
      * 
      * @param tabName the title of the tab to select
@@ -373,8 +349,8 @@ public class NAR_Shuffleboard {
      * @return LongSupplier referencing the widget
      */
     public static LongSupplier getLong(String tabName, String name){
-        final NetworkTableValue entry = tabs.get(tabName).get(name).m_entry.get();
-        return ()-> entry.getInteger();
+        final GenericEntry entry = tabs.get(tabName).get(name).m_entry;
+        return ()-> entry.getInteger(0);
     }
 
     /**
@@ -385,8 +361,8 @@ public class NAR_Shuffleboard {
      * @return DoubleSupplier referencing the widget
      */
     public static DoubleSupplier getDouble(String tabName, String name){
-        final NetworkTableValue entry = tabs.get(tabName).get(name).m_entry.get();
-        return ()-> entry.getDouble();
+        final GenericEntry entry = tabs.get(tabName).get(name).m_entry;
+        return ()-> entry.getDouble(0);
     }
 
     /**
@@ -397,8 +373,8 @@ public class NAR_Shuffleboard {
      * @return BooleanSupplier referencing the widget
      */
     public static BooleanSupplier getBoolean(String tabName, String name){
-        final NetworkTableValue entry = tabs.get(tabName).get(name).m_entry.get();
-        return ()-> entry.getBoolean();
+        final GenericEntry entry = tabs.get(tabName).get(name).m_entry;
+        return ()-> entry.getBoolean(false);
     }
 
     /**
@@ -409,8 +385,8 @@ public class NAR_Shuffleboard {
      * @return StringSupplier referencing the widget
      */
     public static Supplier<String> getString(String tabName, String name){
-        final NetworkTableValue entry = tabs.get(tabName).get(name).m_entry.get();
-        return ()-> entry.getString();
+        final GenericEntry entry = tabs.get(tabName).get(name).m_entry;
+        return ()-> entry.getString("");
     }
 
     /**

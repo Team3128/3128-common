@@ -5,7 +5,6 @@ import java.util.function.DoubleSupplier;
 import common.utility.narwhaldashboard.NarwhalDashboard;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.util.sendable.SendableBuilder;
 
@@ -23,7 +22,6 @@ public class TrapController extends ControllerBase {
     private TrapezoidProfile.State setpoint = new TrapezoidProfile.State();
     private TrapezoidProfile.State tempSetpoint = new TrapezoidProfile.State();
     private TrapezoidProfile.State prevSetpoint = new TrapezoidProfile.State();
-    private SimpleMotorFeedforward feedforward;
     private TrapezoidProfile profile; 
     private double minimumInput;
     private double maximumInput;
@@ -38,7 +36,6 @@ public class TrapController extends ControllerBase {
     public TrapController(PIDFFConfig config, TrapezoidProfile.Constraints constraints, double period) {
         super(config, period);
         profile = new TrapezoidProfile(constraints);
-        feedforward = new SimpleMotorFeedforward(getkS(), getkV(), getkA());
         systemVelocity = ()-> 0;
     }
 
@@ -122,10 +119,12 @@ public class TrapController extends ControllerBase {
      */
     @Override
     public double calculateFF(double pidOutput) {
-        final double simpleGain = feedforward.calculate(prevSetpoint.velocity, tempSetpoint.velocity, getPeriod());
+        final double staticGain = !atSetpoint() ? Math.copySign(getkS(), pidOutput) : 0;
+        final double velocityGain = getkV() * prevSetpoint.velocity;
+        final double accelGain = getkA() * (tempSetpoint.velocity - prevSetpoint.velocity) / getPeriod();
         final double gravityGain = getkG() * kG_Function.getAsDouble();
-        if (shouldLog) NarwhalDashboard.getInstance().sendMessage("Simple Gain: " + simpleGain + "Gravity Gain: " + gravityGain);
-        return simpleGain + gravityGain;
+        if (shouldLog) NarwhalDashboard.getInstance().sendMessage("Static Gain: " + staticGain + " Velocity Gain: " + velocityGain + " Acceleration Gain: " + accelGain + " Gravity Gain: " + gravityGain);
+        return staticGain + velocityGain + accelGain + gravityGain;
     }
 
     /**
@@ -162,7 +161,6 @@ public class TrapController extends ControllerBase {
      */
     public void setSetpoint(TrapezoidProfile.State setpoint) {
         this.setpoint = setpoint;
-        feedforward = new SimpleMotorFeedforward(getkS(), getkV(), getkA());
         reset();
     }
 
