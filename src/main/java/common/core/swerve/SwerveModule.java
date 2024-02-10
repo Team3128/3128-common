@@ -218,6 +218,10 @@ public class SwerveModule {
         return angleMotor;
     }
     
+    /**
+     * Return the state of the swerve module.
+     * @return State of the swerve module.
+     */
     public State getRunningState() {
         if (driveMotor.getVelocity() != 0 && angleMotor.getVelocity() != 0) {
             return State.RUNNING; 
