@@ -57,8 +57,8 @@ public class SwerveModule {
         final SensorDirectionValue direction = config.CANCoderinvert ? SensorDirectionValue.Clockwise_Positive : SensorDirectionValue.CounterClockwise_Positive;
         angleEncoder.getConfigurator().apply(new MagnetSensorConfigs().withSensorDirection(direction));
 
-        angleMotor = config.driveConfig.motor;
-        driveMotor = config.angleConfig.motor;
+        angleMotor = angleConfig.motor;
+        driveMotor = driveConfig.motor;
 
         /* Angle Motor Config */
         configAngleMotor();
