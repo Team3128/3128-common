@@ -15,6 +15,7 @@ import common.hardware.motorcontroller.NAR_CANSpark;
 import common.hardware.motorcontroller.NAR_Motor;
 import common.hardware.motorcontroller.NAR_Motor.Control;
 import common.hardware.motorcontroller.NAR_Motor.Neutral;
+import common.utility.narwhaldashboard.NarwhalDashboard.State;
 
 
 /**
@@ -215,5 +216,15 @@ public class SwerveModule {
      */
     public NAR_Motor getAngleMotor() {
         return angleMotor;
+    }
+    
+    public State getRunningState() {
+        if (driveMotor.getVelocity() != 0 && angleMotor.getVelocity() != 0) {
+            return State.RUNNING; 
+        }
+        if (driveMotor.getVelocity() != 0 || angleMotor.getVelocity() != 0) {
+            return State.PARTIALLY_RUNNING; 
+        }
+        return State.DISCONNECTED;
     }
 }

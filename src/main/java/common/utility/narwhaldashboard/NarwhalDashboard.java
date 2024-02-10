@@ -40,6 +40,12 @@ public class NarwhalDashboard extends WebSocketServer implements AutoCloseable {
 
     private static int PORT = 5805;
 
+    public enum State {
+        RUNNING,
+        PARTIALLY_RUNNING,
+        DISCONNECTED
+    }
+
     public static synchronized NarwhalDashboard getInstance() {
         if (instance == null) {
             startServer();
@@ -263,6 +269,10 @@ public class NarwhalDashboard extends WebSocketServer implements AutoCloseable {
             return;
         }
         buttons.get(key).accept(down);
+    }
+
+    public void checkState(String name, Supplier<State> state) {
+        addUpdate(name, ()-> state.get());
     }
 
     @Override

@@ -3,6 +3,7 @@ package common.core.swerve;
 import org.littletonrobotics.junction.Logger;
 
 import common.hardware.motorcontroller.NAR_Motor.Control;
+import common.utility.narwhaldashboard.NarwhalDashboard;
 import common.utility.shuffleboard.NAR_Shuffleboard;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
@@ -61,8 +62,8 @@ public abstract class SwerveBase extends SubsystemBase {
             NAR_Shuffleboard.addData("Swerve", "Drive Motor" + module.moduleNumber, ()-> module.getState().speedMetersPerSecond, 2, module.moduleNumber);
         }
         NAR_Shuffleboard.addData("Swerve", "Pose", ()-> estimatedPose.toString(), 3, 0, 4, 1);
-        NAR_Shuffleboard.addData("Swerve", "Robot Velocity", getRobotVelocity().toString(), 3, 1, 4, 1);
-        NAR_Shuffleboard.addData("Swerve", "Velocity", getVelocity(), 3, 3, 1, 1);
+        NAR_Shuffleboard.addData("Swerve", "Robot Velocity", ()-> getRobotVelocity().toString(), 3, 1, 4, 1);
+        NAR_Shuffleboard.addData("Swerve", "Velocity", ()-> getVelocity(), 3, 3, 1, 1);
         NAR_Shuffleboard.addData("Swerve", "Field Velocity", ()-> getFieldVelocity().toString(), 3, 2, 4, 1);
         NAR_Shuffleboard.addData("Swerve", "Gyro", ()-> getYaw(), 7, 0, 2, 2).withWidget("Gyro");
     }
@@ -252,5 +253,11 @@ public abstract class SwerveBase extends SubsystemBase {
 
     public SwerveModule[] getModules() {
         return modules;
+    }
+
+    public void initStateCheck() {
+        for (final SwerveModule module : modules) {
+            NarwhalDashboard.getInstance().checkState("Module " + module.moduleNumber, ()-> module.getRunningState());
+        }
     }
 }
