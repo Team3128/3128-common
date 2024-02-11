@@ -272,7 +272,7 @@ public class NarwhalDashboard extends WebSocketServer implements AutoCloseable {
     }
 
     public void checkState(String name, Supplier<State> state) {
-        addUpdate(name, ()-> state.get());
+        addUpdate(name, ()-> state.get().toString());
     }
 
     @Override
