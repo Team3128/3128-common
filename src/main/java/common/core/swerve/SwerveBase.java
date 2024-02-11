@@ -257,7 +257,7 @@ public abstract class SwerveBase extends SubsystemBase {
 
     public void initStateCheck() {
         for (final SwerveModule module : modules) {
-            NarwhalDashboard.getInstance().checkState("Module " + module.moduleNumber, ()-> module.getRunningState());
+            NarwhalDashboard.getInstance().checkState("Module" + module.moduleNumber, ()-> module.getRunningState());
         }
     }
 }
