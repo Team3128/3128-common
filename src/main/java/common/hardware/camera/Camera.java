@@ -20,8 +20,6 @@ public class Camera {
 
     public final String name;
 
-    public final double cameraPitch;
-
     public final double xOffset;
 
     public final double yOffset;
@@ -36,10 +34,9 @@ public class Camera {
 
     public final PhotonPoseEstimator estimator;
 
-    public Camera(String name, double cameraPitch, double xOffset, double yOffset, double pitchOffset, double yawOffset,
+    public Camera(String name, double xOffset, double yOffset, double pitchOffset, double yawOffset,
             AprilTagFields aprilTags, PoseStrategy calc_strategy) {
         this.name = name;
-        this.cameraPitch = cameraPitch;
         this.xOffset = xOffset;
         this.yOffset = yOffset;
         this.pitchOffset = pitchOffset;
