@@ -1,5 +1,9 @@
 package common.hardware.camera;
 
+import java.util.Optional;
+import java.util.function.BiConsumer;
+
+import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
@@ -18,24 +22,27 @@ import edu.wpi.first.math.geometry.Transform3d;
  */
 public class Camera {
 
-    public final String name;
+    private final String name;
 
-    public final double xOffset;
+    private final double xOffset;
 
-    public final double yOffset;
+    private final double yOffset;
 
-    public final double pitchOffset;
+    private final double pitchOffset;
 
-    public final double yawOffset;
+    private final double yawOffset;
 
-    public final AprilTagFields aprilTags;
+    private final AprilTagFields aprilTags;
 
-    public final PoseStrategy calc_strategy;
+    private final PoseStrategy calc_strategy;
 
-    public final PhotonPoseEstimator estimator;
+    private final PhotonPoseEstimator estimator;
+    private EstimatedRobotPose lastEstimatedPose = null;
 
+    private final BiConsumer<Pose2d, Double> odometry;
+    
     public Camera(String name, double xOffset, double yOffset, double pitchOffset, double yawOffset,
-            AprilTagFields aprilTags, PoseStrategy calc_strategy) {
+            AprilTagFields aprilTags, PoseStrategy calc_strategy, BiConsumer<Pose2d, Double> odometry) {
         this.name = name;
         this.xOffset = xOffset;
         this.yOffset = yOffset;
@@ -43,17 +50,35 @@ public class Camera {
         this.yawOffset = yawOffset;
         this.aprilTags = aprilTags;
         this.calc_strategy = calc_strategy;
+        this.odometry = odometry;
 
         Transform3d offset = new Transform3d(xOffset, yOffset, 0, 
-        new Rotation3d(0.0, pitchOffset, 0.0).rotateBy(new Rotation3d(0.0,0.0,yawOffset))
+            new Rotation3d(0.0, pitchOffset, 0.0).rotateBy(new Rotation3d(0.0,0.0,yawOffset))
         );
 
-        estimator = new PhotonPoseEstimator(aprilTags.loadAprilTagLayoutField(), 
-        calc_strategy,
-        new PhotonCamera(name), offset
+        estimator = new PhotonPoseEstimator(
+            aprilTags.loadAprilTagLayoutField(), 
+            calc_strategy,
+            new PhotonCamera(name),
+            offset
         );
 
         estimator.setReferencePose(new Pose2d());
+    }
+
+    public void update(){
+        if (lastEstimatedPose != null)
+            estimator.setReferencePose(lastEstimatedPose.estimatedPose.toPose2d());
+        Optional<EstimatedRobotPose> estimatedPose = estimator.update();
+
+        if(!estimatedPose.isPresent()) return;
+        EstimatedRobotPose pose = estimatedPose.get();
+        odometry.accept(pose.estimatedPose.toPose2d(), pose.timestampSeconds);
+        lastEstimatedPose = pose;
+    }
+
+    public EstimatedRobotPose getLastEstimatedPose(){
+        return lastEstimatedPose;
     }
 
 }
