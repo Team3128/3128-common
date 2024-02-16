@@ -284,13 +284,15 @@ public class NarwhalDashboard extends WebSocketServer implements AutoCloseable {
     public void onStart() {}
 
     @Override
-    public void onClose(WebSocket conn, int code, String reason, boolean remote) {}
+    public void onClose(WebSocket conn, int code, String reason, boolean remote) {
+        this.conn = null;
+    }
 
     /**
      * Closes the dashboard.
      */
     @Override
     public void close() {
-        instance = null;
+        conn = null;
     }
 }

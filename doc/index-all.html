@@ -258,9 +258,9 @@ loadScripts(document, 'script');</script>
 </dd>
 <dt><a href="common/hardware/camera/Camera.html" class="type-name-link" title="class in common.hardware.camera">Camera</a> - Class in <a href="common/hardware/camera/package-summary.html">common.hardware.camera</a></dt>
 <dd>
-<div class="block">Represents and holds the specs of a camera.</div>
+<div class="block">Team 3128's class to control the robot's cameras and vision processing.</div>
 </dd>
-<dt><a href="common/hardware/camera/Camera.html#%3Cinit%3E(java.lang.String,double,double,double,double,edu.wpi.first.apriltag.AprilTagFields,org.photonvision.PhotonPoseEstimator.PoseStrategy,java.util.function.BiConsumer)" class="member-name-link">Camera(String, double, double, double, double, AprilTagFields, PhotonPoseEstimator.PoseStrategy, BiConsumer&lt;Pose2d, Double&gt;)</a> - Constructor for class common.hardware.camera.<a href="common/hardware/camera/Camera.html" title="class in common.hardware.camera">Camera</a></dt>
+<dt><a href="common/hardware/camera/Camera.html#%3Cinit%3E(java.lang.String,double,double,double,double,double)" class="member-name-link">Camera(String, double, double, double, double, double)</a> - Constructor for class common.hardware.camera.<a href="common/hardware/camera/Camera.html" title="class in common.hardware.camera">Camera</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="common/hardware/limelight/Limelight.html#cameraAngle" class="member-name-link">cameraAngle</a> - Variable in class common.hardware.limelight.<a href="common/hardware/limelight/Limelight.html" title="class in common.hardware.limelight">Limelight</a></dt>
 <dd>&nbsp;</dd>
@@ -356,6 +356,8 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Configures the motor settings</div>
 </dd>
+<dt><a href="common/hardware/camera/Camera.html#configCameras(edu.wpi.first.apriltag.AprilTagFields,org.photonvision.PhotonPoseEstimator.PoseStrategy,java.util.function.BiConsumer,java.util.function.Supplier)" class="member-name-link">configCameras(AprilTagFields, PhotonPoseEstimator.PoseStrategy, BiConsumer&lt;Pose2d, Double&gt;, Supplier&lt;Pose2d&gt;)</a> - Static method in class common.hardware.camera.<a href="common/hardware/camera/Camera.html" title="class in common.hardware.camera">Camera</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="common/hardware/motorcontroller/NAR_Motor.html#configMotor(common.hardware.motorcontroller.NAR_Motor.MotorConfig)" class="member-name-link">configMotor(NAR_Motor.MotorConfig)</a> - Method in class common.hardware.motorcontroller.<a href="common/hardware/motorcontroller/NAR_Motor.html" title="class in common.hardware.motorcontroller">NAR_Motor</a></dt>
 <dd>
 <div class="block">Configures all major motor settings.</div>
@@ -454,6 +456,8 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Disables the PID control.</div>
 </dd>
+<dt><a href="common/hardware/camera/Camera.html#disable()" class="member-name-link">disable()</a> - Method in class common.hardware.camera.<a href="common/hardware/camera/Camera.html" title="class in common.hardware.camera">Camera</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="common/utility/narwhaldashboard/NarwhalDashboard.State.html#DISCONNECTED" class="member-name-link">DISCONNECTED</a> - Enum constant in enum class common.utility.narwhaldashboard.<a href="common/utility/narwhaldashboard/NarwhalDashboard.State.html" title="enum class in common.utility.narwhaldashboard">NarwhalDashboard.State</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="common/hardware/motorcontroller/NAR_Motor.MotorConfig.html#distanceFactor" class="member-name-link">distanceFactor</a> - Variable in class common.hardware.motorcontroller.<a href="common/hardware/motorcontroller/NAR_Motor.MotorConfig.html" title="class in common.hardware.motorcontroller">NAR_Motor.MotorConfig</a></dt>
@@ -483,6 +487,8 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Enables the PID control.</div>
 </dd>
+<dt><a href="common/hardware/camera/Camera.html#enable()" class="member-name-link">enable()</a> - Method in class common.hardware.camera.<a href="common/hardware/camera/Camera.html" title="class in common.hardware.camera">Camera</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="common/core/controllers/ControllerBase.html#enableContinuousInput(double,double)" class="member-name-link">enableContinuousInput(double, double)</a> - Method in class common.core.controllers.<a href="common/core/controllers/ControllerBase.html" title="class in common.core.controllers">ControllerBase</a></dt>
 <dd>
 <div class="block">Enables continuous input.</div>
@@ -716,7 +722,7 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Returns the kV value calculated by the data.</div>
 </dd>
-<dt><a href="common/hardware/camera/Camera.html#getLastEstimatedPose()" class="member-name-link">getLastEstimatedPose()</a> - Method in class common.hardware.camera.<a href="common/hardware/camera/Camera.html" title="class in common.hardware.camera">Camera</a></dt>
+<dt><a href="common/hardware/camera/Camera.html#getLatestResult()" class="member-name-link">getLatestResult()</a> - Method in class common.hardware.camera.<a href="common/hardware/camera/Camera.html" title="class in common.hardware.camera">Camera</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="common/hardware/limelight/LEDMode.html#getLEDMode()" class="member-name-link">getLEDMode()</a> - Method in enum class common.hardware.limelight.<a href="common/hardware/limelight/LEDMode.html" title="enum class in common.hardware.limelight">LEDMode</a></dt>
 <dd>&nbsp;</dd>
@@ -763,6 +769,8 @@ loadScripts(document, 'script');</script>
 <div class="block">Returns the motor object controlling the motion</div>
 </dd>
 <dt><a href="common/hardware/motorcontroller/NAR_TalonSRX.html#getMotor()" class="member-name-link">getMotor()</a> - Method in class common.hardware.motorcontroller.<a href="common/hardware/motorcontroller/NAR_TalonSRX.html" title="class in common.hardware.motorcontroller">NAR_TalonSRX</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="common/hardware/camera/Camera.html#getOffset()" class="member-name-link">getOffset()</a> - Method in class common.hardware.camera.<a href="common/hardware/camera/Camera.html" title="class in common.hardware.camera">Camera</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="common/core/controllers/ControllerBase.html#getP()" class="member-name-link">getP()</a> - Method in class common.core.controllers.<a href="common/core/controllers/ControllerBase.html" title="class in common.core.controllers">ControllerBase</a></dt>
 <dd>
@@ -2004,6 +2012,8 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Updates every widget</div>
 </dd>
+<dt><a href="common/hardware/camera/Camera.html#updateAll()" class="member-name-link">updateAll()</a> - Static method in class common.hardware.camera.<a href="common/hardware/camera/Camera.html" title="class in common.hardware.camera">Camera</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="common/hardware/motorcontroller/NAR_Motor.html#updateIO(common.hardware.motorcontroller.NAR_MotorIOAutoLogged)" class="member-name-link">updateIO(NAR_MotorIOAutoLogged)</a> - Method in class common.hardware.motorcontroller.<a href="common/hardware/motorcontroller/NAR_Motor.html" title="class in common.hardware.motorcontroller">NAR_Motor</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="common/core/controllers/ControllerBase.html#useOutput()" class="member-name-link">useOutput()</a> - Method in class common.core.controllers.<a href="common/core/controllers/ControllerBase.html" title="class in common.core.controllers">ControllerBase</a></dt>

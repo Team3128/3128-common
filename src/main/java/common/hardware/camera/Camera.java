@@ -1,84 +1,118 @@
 package common.hardware.camera;
 
+import java.util.LinkedList;
 import java.util.Optional;
 import java.util.function.BiConsumer;
+import java.util.function.Supplier;
 
+import org.littletonrobotics.junction.Logger;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
+import org.photonvision.targeting.PhotonPipelineResult;
 
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
 
 /**
- * Represents and holds the specs of a camera.
+ * Team 3128's class to control the robot's cameras and vision processing.
  * 
  * @since 2022 Rapid React
  * @author Mason Lam, William Yuan
  */
 public class Camera {
 
-    private final String name;
-
-    private final double xOffset;
-
-    private final double yOffset;
-
-    private final double pitchOffset;
-
-    private final double yawOffset;
-
-    private final AprilTagFields aprilTags;
-
-    private final PoseStrategy calc_strategy;
-
+    private final PhotonCamera camera;
+    private final Transform3d offset;
     private final PhotonPoseEstimator estimator;
-    private EstimatedRobotPose lastEstimatedPose = null;
 
-    private final BiConsumer<Pose2d, Double> odometry;
+    private boolean isDisabled = false;
+    private PhotonPipelineResult lastResult;
+
+    private static AprilTagFieldLayout aprilTags;
+    private static PoseStrategy calc_strategy;
+    private static BiConsumer<Pose2d, Double> odometry;
+    private static Supplier<Pose2d> robotPose;
+
+    private static final LinkedList<Camera> cameras = new LinkedList<Camera>();
     
-    public Camera(String name, double xOffset, double yOffset, double pitchOffset, double yawOffset,
-            AprilTagFields aprilTags, PoseStrategy calc_strategy, BiConsumer<Pose2d, Double> odometry) {
-        this.name = name;
-        this.xOffset = xOffset;
-        this.yOffset = yOffset;
-        this.pitchOffset = pitchOffset;
-        this.yawOffset = yawOffset;
-        this.aprilTags = aprilTags;
-        this.calc_strategy = calc_strategy;
-        this.odometry = odometry;
+    public Camera(String name, double xOffset, double yOffset, double yawOffset, double pitchOffset, double rollOffset) {
+        camera = new PhotonCamera(name);
 
-        Transform3d offset = new Transform3d(xOffset, yOffset, 0, 
-            new Rotation3d(0.0, pitchOffset, 0.0).rotateBy(new Rotation3d(0.0,0.0,yawOffset))
+        this.offset = new Transform3d(xOffset, yOffset, 0, 
+            new Rotation3d(0.0, pitchOffset, 0.0)
+            .rotateBy(new Rotation3d(rollOffset, 0, 0))
+            .rotateBy(new Rotation3d(0.0,0.0,yawOffset))
         );
 
+        if (aprilTags == null || calc_strategy == null || odometry == null || robotPose == null) {
+            throw new IllegalStateException("Camera not configured");
+        }
+
         estimator = new PhotonPoseEstimator(
-            aprilTags.loadAprilTagLayoutField(), 
+            aprilTags, 
             calc_strategy,
-            new PhotonCamera(name),
+            camera,
             offset
         );
 
-        estimator.setReferencePose(new Pose2d());
+        cameras.add(this);
     }
+
+    public static void configCameras(AprilTagFields aprilTagLayout, PoseStrategy calc_strategy, BiConsumer<Pose2d, Double> odometry, Supplier<Pose2d> robotPose){
+        Camera.aprilTags = aprilTagLayout.loadAprilTagLayoutField();
+        Camera.calc_strategy = calc_strategy;
+        Camera.odometry = odometry;
+        Camera.robotPose = robotPose;
+    }
+
+    public static void updateAll(){
+        for (final Camera camera : cameras) {
+            camera.update();
+        }
+    }   
 
     public void update(){
-        if (lastEstimatedPose != null)
-            estimator.setReferencePose(lastEstimatedPose.estimatedPose.toPose2d());
-        Optional<EstimatedRobotPose> estimatedPose = estimator.update();
+        if (isDisabled) return;
+        lastResult = camera.getLatestResult();
+        if (!lastResult.hasTargets()) {
+            Logger.recordOutput("Vision/" + camera.getName(), robotPose.get());
+            return;
+        }
 
-        if(!estimatedPose.isPresent()) return;
-        EstimatedRobotPose pose = estimatedPose.get();
+        if (estimator.getPrimaryStrategy() == PoseStrategy.CLOSEST_TO_REFERENCE_POSE) {
+            estimator.setReferencePose(robotPose.get());
+        }
+
+        final Optional<EstimatedRobotPose> estimatedPose = estimator.update(lastResult);
+
+        if(!estimatedPose.isPresent()) {
+            Logger.recordOutput("Vision/" + camera.getName(), robotPose.get());
+        }
+
+        final EstimatedRobotPose pose = estimatedPose.get();
+        //To do add logging for this
         odometry.accept(pose.estimatedPose.toPose2d(), pose.timestampSeconds);
-        lastEstimatedPose = pose;
     }
 
-    public EstimatedRobotPose getLastEstimatedPose(){
-        return lastEstimatedPose;
+    public PhotonPipelineResult getLatestResult() {
+        return lastResult;
+    }
+
+    public Transform3d getOffset() {
+        return offset;
+    }
+
+    public void disable(){
+        isDisabled = true;
+    }
+
+    public void enable() {
+        isDisabled = false;
     }
 
 }

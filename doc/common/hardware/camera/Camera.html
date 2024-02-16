@@ -77,7 +77,7 @@ loadScripts(document, 'script');</script>
 <hr>
 <div class="type-signature"><span class="modifiers">public class </span><span class="element-name type-name-label">Camera</span>
 <span class="extends-implements">extends <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a></span></div>
-<div class="block">Represents and holds the specs of a camera.</div>
+<div class="block">Team 3128's class to control the robot's cameras and vision processing.</div>
 <dl class="notes">
 <dt>Since:</dt>
 <dd>2022 Rapid React</dd>
@@ -93,14 +93,12 @@ loadScripts(document, 'script');</script>
 <div class="summary-table two-column-summary">
 <div class="table-header col-first">Constructor</div>
 <div class="table-header col-last">Description</div>
-<div class="col-constructor-name even-row-color"><code><a href="#%3Cinit%3E(java.lang.String,double,double,double,double,edu.wpi.first.apriltag.AprilTagFields,org.photonvision.PhotonPoseEstimator.PoseStrategy,java.util.function.BiConsumer)" class="member-name-link">Camera</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;name,
+<div class="col-constructor-name even-row-color"><code><a href="#%3Cinit%3E(java.lang.String,double,double,double,double,double)" class="member-name-link">Camera</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;name,
  double&nbsp;xOffset,
  double&nbsp;yOffset,
- double&nbsp;pitchOffset,
  double&nbsp;yawOffset,
- edu.wpi.first.apriltag.AprilTagFields&nbsp;aprilTags,
- org.photonvision.PhotonPoseEstimator.PoseStrategy&nbsp;calc_strategy,
- <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/BiConsumer.html" title="class or interface in java.util.function" class="external-link">BiConsumer</a>&lt;edu.wpi.first.math.geometry.Pose2d,<wbr><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Double.html" title="class or interface in java.lang" class="external-link">Double</a>&gt;&nbsp;odometry)</code></div>
+ double&nbsp;pitchOffset,
+ double&nbsp;rollOffset)</code></div>
 <div class="col-last even-row-color">&nbsp;</div>
 </div>
 </section>
@@ -110,18 +108,36 @@ loadScripts(document, 'script');</script>
 <section class="method-summary" id="method-summary">
 <h2>Method Summary</h2>
 <div id="method-summary-table">
-<div class="table-tabs" role="tablist" aria-orientation="horizontal"><button id="method-summary-table-tab0" role="tab" aria-selected="true" aria-controls="method-summary-table.tabpanel" tabindex="0" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table', 3)" class="active-table-tab">All Methods</button><button id="method-summary-table-tab2" role="tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab2', 3)" class="table-tab">Instance Methods</button><button id="method-summary-table-tab4" role="tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab4', 3)" class="table-tab">Concrete Methods</button></div>
+<div class="table-tabs" role="tablist" aria-orientation="horizontal"><button id="method-summary-table-tab0" role="tab" aria-selected="true" aria-controls="method-summary-table.tabpanel" tabindex="0" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table', 3)" class="active-table-tab">All Methods</button><button id="method-summary-table-tab1" role="tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab1', 3)" class="table-tab">Static Methods</button><button id="method-summary-table-tab2" role="tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab2', 3)" class="table-tab">Instance Methods</button><button id="method-summary-table-tab4" role="tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab4', 3)" class="table-tab">Concrete Methods</button></div>
 <div id="method-summary-table.tabpanel" role="tabpanel">
 <div class="summary-table three-column-summary" aria-labelledby="method-summary-table-tab0">
 <div class="table-header col-first">Modifier and Type</div>
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>org.photonvision.EstimatedRobotPose</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getLastEstimatedPose()" class="member-name-link">getLastEstimatedPose</a>()</code></div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#configCameras(edu.wpi.first.apriltag.AprilTagFields,org.photonvision.PhotonPoseEstimator.PoseStrategy,java.util.function.BiConsumer,java.util.function.Supplier)" class="member-name-link">configCameras</a><wbr>(edu.wpi.first.apriltag.AprilTagFields&nbsp;aprilTagLayout,
+ org.photonvision.PhotonPoseEstimator.PoseStrategy&nbsp;calc_strategy,
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/BiConsumer.html" title="class or interface in java.util.function" class="external-link">BiConsumer</a>&lt;edu.wpi.first.math.geometry.Pose2d,<wbr><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Double.html" title="class or interface in java.lang" class="external-link">Double</a>&gt;&nbsp;odometry,
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Supplier.html" title="class or interface in java.util.function" class="external-link">Supplier</a>&lt;edu.wpi.first.math.geometry.Pose2d&gt;&nbsp;robotPose)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#disable()" class="member-name-link">disable</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#enable()" class="member-name-link">enable</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>org.photonvision.targeting.PhotonPipelineResult</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getLatestResult()" class="member-name-link">getLatestResult</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>edu.wpi.first.math.geometry.Transform3d</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getOffset()" class="member-name-link">getOffset</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#update()" class="member-name-link">update</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#updateAll()" class="member-name-link">updateAll</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
 </div>
 </div>
 </div>
@@ -140,16 +156,14 @@ loadScripts(document, 'script');</script>
 <h2>Constructor Details</h2>
 <ul class="member-list">
 <li>
-<section class="detail" id="&lt;init&gt;(java.lang.String,double,double,double,double,edu.wpi.first.apriltag.AprilTagFields,org.photonvision.PhotonPoseEstimator.PoseStrategy,java.util.function.BiConsumer)">
+<section class="detail" id="&lt;init&gt;(java.lang.String,double,double,double,double,double)">
 <h3>Camera</h3>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="element-name">Camera</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;name,
  double&nbsp;xOffset,
  double&nbsp;yOffset,
- double&nbsp;pitchOffset,
  double&nbsp;yawOffset,
- edu.wpi.first.apriltag.AprilTagFields&nbsp;aprilTags,
- org.photonvision.PhotonPoseEstimator.PoseStrategy&nbsp;calc_strategy,
- <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/BiConsumer.html" title="class or interface in java.util.function" class="external-link">BiConsumer</a>&lt;edu.wpi.first.math.geometry.Pose2d,<wbr><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Double.html" title="class or interface in java.lang" class="external-link">Double</a>&gt;&nbsp;odometry)</span></div>
+ double&nbsp;pitchOffset,
+ double&nbsp;rollOffset)</span></div>
 </section>
 </li>
 </ul>
@@ -161,15 +175,48 @@ loadScripts(document, 'script');</script>
 <h2>Method Details</h2>
 <ul class="member-list">
 <li>
+<section class="detail" id="configCameras(edu.wpi.first.apriltag.AprilTagFields,org.photonvision.PhotonPoseEstimator.PoseStrategy,java.util.function.BiConsumer,java.util.function.Supplier)">
+<h3>configCameras</h3>
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">configCameras</span><wbr><span class="parameters">(edu.wpi.first.apriltag.AprilTagFields&nbsp;aprilTagLayout,
+ org.photonvision.PhotonPoseEstimator.PoseStrategy&nbsp;calc_strategy,
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/BiConsumer.html" title="class or interface in java.util.function" class="external-link">BiConsumer</a>&lt;edu.wpi.first.math.geometry.Pose2d,<wbr><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Double.html" title="class or interface in java.lang" class="external-link">Double</a>&gt;&nbsp;odometry,
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Supplier.html" title="class or interface in java.util.function" class="external-link">Supplier</a>&lt;edu.wpi.first.math.geometry.Pose2d&gt;&nbsp;robotPose)</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="updateAll()">
+<h3>updateAll</h3>
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">updateAll</span>()</div>
+</section>
+</li>
+<li>
 <section class="detail" id="update()">
 <h3>update</h3>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">update</span>()</div>
 </section>
 </li>
 <li>
-<section class="detail" id="getLastEstimatedPose()">
-<h3>getLastEstimatedPose</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">org.photonvision.EstimatedRobotPose</span>&nbsp;<span class="element-name">getLastEstimatedPose</span>()</div>
+<section class="detail" id="getLatestResult()">
+<h3>getLatestResult</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">org.photonvision.targeting.PhotonPipelineResult</span>&nbsp;<span class="element-name">getLatestResult</span>()</div>
+</section>
+</li>
+<li>
+<section class="detail" id="getOffset()">
+<h3>getOffset</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">edu.wpi.first.math.geometry.Transform3d</span>&nbsp;<span class="element-name">getOffset</span>()</div>
+</section>
+</li>
+<li>
+<section class="detail" id="disable()">
+<h3>disable</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">disable</span>()</div>
+</section>
+</li>
+<li>
+<section class="detail" id="enable()">
+<h3>enable</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">enable</span>()</div>
 </section>
 </li>
 </ul>
