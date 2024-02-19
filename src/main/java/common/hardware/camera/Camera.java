@@ -11,7 +11,9 @@ import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.photonvision.targeting.PhotonPipelineResult;
+import org.photonvision.targeting.PhotonTrackedTarget;
 
+import common.utility.shuffleboard.NAR_Shuffleboard;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -32,13 +34,15 @@ public class Camera {
 
     private boolean isDisabled = false;
     private PhotonPipelineResult lastResult;
+    private EstimatedRobotPose lastPose;
 
     private static AprilTagFieldLayout aprilTags;
     private static PoseStrategy calc_strategy;
     private static BiConsumer<Pose2d, Double> odometry;
     private static Supplier<Pose2d> robotPose;
+    private static double ambiguityThreshold = 0.3;
 
-    private static final LinkedList<Camera> cameras = new LinkedList<Camera>();
+    public static final LinkedList<Camera> cameras = new LinkedList<Camera>();
     
     public Camera(String name, double xOffset, double yOffset, double yawOffset, double pitchOffset, double rollOffset) {
         camera = new PhotonCamera(name);
@@ -74,7 +78,23 @@ public class Camera {
         for (final Camera camera : cameras) {
             camera.update();
         }
-    }   
+    }
+
+    public static void enableAll() {
+        for (final Camera camera : cameras) {
+            camera.enable();
+        }
+    }
+
+    public static void disableAll() {
+        for (final Camera camera : cameras) {
+            camera.disable();
+        }
+    }
+
+    public static void setAmbiguityThreshold(double ambiguityThreshold) {
+        Camera.ambiguityThreshold = ambiguityThreshold;
+    }
 
     public void update(){
         if (isDisabled) return;
@@ -94,9 +114,26 @@ public class Camera {
             Logger.recordOutput("Vision/" + camera.getName(), robotPose.get());
         }
 
-        final EstimatedRobotPose pose = estimatedPose.get();
-        //To do add logging for this
-        odometry.accept(pose.estimatedPose.toPose2d(), pose.timestampSeconds);
+        lastPose = estimatedPose.get();
+
+        boolean validResult = false;
+        for (final PhotonTrackedTarget target : lastPose.targetsUsed) {
+            if (target.getPoseAmbiguity() < ambiguityThreshold) {
+                validResult = true;
+                break;
+            }
+        }
+
+        if (!validResult) {
+            Logger.recordOutput("Vision/" + camera.getName(), robotPose.get());
+            return;
+        }
+        
+        odometry.accept(lastPose.estimatedPose.toPose2d(), lastPose.timestampSeconds);
+    }
+
+    public void initShuffleboard() {
+        NAR_Shuffleboard.addData(camera.getName(), "Estimated Pose", ()-> lastPose.estimatedPose.toPose2d().toString(), 0, 0, 3, 1);
     }
 
     public PhotonPipelineResult getLatestResult() {

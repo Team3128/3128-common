@@ -266,6 +266,8 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="common/hardware/limelight/Limelight.html#cameraHeight" class="member-name-link">cameraHeight</a> - Variable in class common.hardware.limelight.<a href="common/hardware/limelight/Limelight.html" title="class in common.hardware.limelight">Limelight</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="common/hardware/camera/Camera.html#cameras" class="member-name-link">cameras</a> - Static variable in class common.hardware.camera.<a href="common/hardware/camera/Camera.html" title="class in common.hardware.camera">Camera</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="common/hardware/motorcontroller/NAR_CANSpark.ControllerType.html#CAN_SPARK_FLEX" class="member-name-link">CAN_SPARK_FLEX</a> - Enum constant in enum class common.hardware.motorcontroller.<a href="common/hardware/motorcontroller/NAR_CANSpark.ControllerType.html" title="enum class in common.hardware.motorcontroller">NAR_CANSpark.ControllerType</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="common/hardware/motorcontroller/NAR_CANSpark.ControllerType.html#CAN_SPARK_MAX" class="member-name-link">CAN_SPARK_MAX</a> - Enum constant in enum class common.hardware.motorcontroller.<a href="common/hardware/motorcontroller/NAR_CANSpark.ControllerType.html" title="enum class in common.hardware.motorcontroller">NAR_CANSpark.ControllerType</a></dt>
@@ -378,6 +380,10 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Configures motor settings.</div>
 </dd>
+<dt><a href="common/hardware/motorcontroller/NAR_CANSpark.html#configPID(common.core.controllers.PIDFFConfig)" class="member-name-link">configPID(PIDFFConfig)</a> - Method in class common.hardware.motorcontroller.<a href="common/hardware/motorcontroller/NAR_CANSpark.html" title="class in common.hardware.motorcontroller">NAR_CANSpark</a></dt>
+<dd>
+<div class="block">Set the PID values for the controller.</div>
+</dd>
 <dt><a href="common/core/commands/NAR_PIDCommand.html#controller" class="member-name-link">controller</a> - Variable in class common.core.commands.<a href="common/core/commands/NAR_PIDCommand.html" title="class in common.core.commands">NAR_PIDCommand</a></dt>
 <dd>
 <div class="block">Controller.</div>
@@ -458,6 +464,8 @@ loadScripts(document, 'script');</script>
 </dd>
 <dt><a href="common/hardware/camera/Camera.html#disable()" class="member-name-link">disable()</a> - Method in class common.hardware.camera.<a href="common/hardware/camera/Camera.html" title="class in common.hardware.camera">Camera</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="common/hardware/camera/Camera.html#disableAll()" class="member-name-link">disableAll()</a> - Static method in class common.hardware.camera.<a href="common/hardware/camera/Camera.html" title="class in common.hardware.camera">Camera</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="common/utility/narwhaldashboard/NarwhalDashboard.State.html#DISCONNECTED" class="member-name-link">DISCONNECTED</a> - Enum constant in enum class common.utility.narwhaldashboard.<a href="common/utility/narwhaldashboard/NarwhalDashboard.State.html" title="enum class in common.utility.narwhaldashboard">NarwhalDashboard.State</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="common/hardware/motorcontroller/NAR_Motor.MotorConfig.html#distanceFactor" class="member-name-link">distanceFactor</a> - Variable in class common.hardware.motorcontroller.<a href="common/hardware/motorcontroller/NAR_Motor.MotorConfig.html" title="class in common.hardware.motorcontroller">NAR_Motor.MotorConfig</a></dt>
@@ -489,6 +497,8 @@ loadScripts(document, 'script');</script>
 </dd>
 <dt><a href="common/hardware/camera/Camera.html#enable()" class="member-name-link">enable()</a> - Method in class common.hardware.camera.<a href="common/hardware/camera/Camera.html" title="class in common.hardware.camera">Camera</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="common/hardware/camera/Camera.html#enableAll()" class="member-name-link">enableAll()</a> - Static method in class common.hardware.camera.<a href="common/hardware/camera/Camera.html" title="class in common.hardware.camera">Camera</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="common/core/controllers/ControllerBase.html#enableContinuousInput(double,double)" class="member-name-link">enableContinuousInput(double, double)</a> - Method in class common.core.controllers.<a href="common/core/controllers/ControllerBase.html" title="class in common.core.controllers">ControllerBase</a></dt>
 <dd>
 <div class="block">Enables continuous input.</div>
@@ -498,10 +508,6 @@ loadScripts(document, 'script');</script>
 <div class="block">Enables continuous input.</div>
 </dd>
 <dt><a href="common/core/subsystems/NAR_PIDSubsystem.html#enableContinuousInput(double,double)" class="member-name-link">enableContinuousInput(double, double)</a> - Method in class common.core.subsystems.<a href="common/core/subsystems/NAR_PIDSubsystem.html" title="class in common.core.subsystems">NAR_PIDSubsystem</a></dt>
-<dd>
-<div class="block">Enables continuous input.</div>
-</dd>
-<dt><a href="common/hardware/motorcontroller/NAR_CANSpark.html#enableContinuousInput(double,double)" class="member-name-link">enableContinuousInput(double, double)</a> - Method in class common.hardware.motorcontroller.<a href="common/hardware/motorcontroller/NAR_CANSpark.html" title="class in common.hardware.motorcontroller">NAR_CANSpark</a></dt>
 <dd>
 <div class="block">Enables continuous input.</div>
 </dd>
@@ -888,6 +894,14 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Get the value reference of a widget storing Strings.</div>
 </dd>
+<dt><a href="common/hardware/motorcontroller/NAR_CANSpark.html#getTemperature()" class="member-name-link">getTemperature()</a> - Method in class common.hardware.motorcontroller.<a href="common/hardware/motorcontroller/NAR_CANSpark.html" title="class in common.hardware.motorcontroller">NAR_CANSpark</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="common/hardware/motorcontroller/NAR_Motor.html#getTemperature()" class="member-name-link">getTemperature()</a> - Method in class common.hardware.motorcontroller.<a href="common/hardware/motorcontroller/NAR_Motor.html" title="class in common.hardware.motorcontroller">NAR_Motor</a></dt>
+<dd>
+<div class="block">Returns the Motor's temperature in celsius.</div>
+</dd>
+<dt><a href="common/hardware/motorcontroller/NAR_TalonSRX.html#getTemperature()" class="member-name-link">getTemperature()</a> - Method in class common.hardware.motorcontroller.<a href="common/hardware/motorcontroller/NAR_TalonSRX.html" title="class in common.hardware.motorcontroller">NAR_TalonSRX</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="common/utility/tester/Tester.html#getTest(java.lang.String)" class="member-name-link">getTest(String)</a> - Method in class common.utility.tester.<a href="common/utility/tester/Tester.html" title="class in common.utility.tester">Tester</a></dt>
 <dd>
 <div class="block">Returns a Test for the robot.</div>
@@ -992,6 +1006,8 @@ loadScripts(document, 'script');</script>
 </dd>
 <dt><a href="common/core/swerve/SwerveBase.html#initShuffleboard()" class="member-name-link">initShuffleboard()</a> - Method in class common.core.swerve.<a href="common/core/swerve/SwerveBase.html" title="class in common.core.swerve">SwerveBase</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="common/hardware/camera/Camera.html#initShuffleboard()" class="member-name-link">initShuffleboard()</a> - Method in class common.hardware.camera.<a href="common/hardware/camera/Camera.html" title="class in common.hardware.camera">Camera</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="common/hardware/motorcontroller/NAR_CANSpark.html#initShuffleboard(java.lang.String,java.lang.String,int)" class="member-name-link">initShuffleboard(String, String, int)</a> - Method in class common.hardware.motorcontroller.<a href="common/hardware/motorcontroller/NAR_CANSpark.html" title="class in common.hardware.motorcontroller">NAR_CANSpark</a></dt>
 <dd>
 <div class="block">Adds a PID tuning setup to a specific shuffleboard tab.</div>
@@ -999,6 +1015,8 @@ loadScripts(document, 'script');</script>
 <dt><a href="common/core/swerve/SwerveBase.html#initStateCheck()" class="member-name-link">initStateCheck()</a> - Method in class common.core.swerve.<a href="common/core/swerve/SwerveBase.html" title="class in common.core.swerve">SwerveBase</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="common/hardware/motorcontroller/NAR_Motor.NAR_MotorIO.html#inputPower" class="member-name-link">inputPower</a> - Variable in class common.hardware.motorcontroller.<a href="common/hardware/motorcontroller/NAR_Motor.NAR_MotorIO.html" title="class in common.hardware.motorcontroller">NAR_Motor.NAR_MotorIO</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="common/hardware/motorcontroller/NAR_CANSpark.html#instances" class="member-name-link">instances</a> - Static variable in class common.hardware.motorcontroller.<a href="common/hardware/motorcontroller/NAR_CANSpark.html" title="class in common.hardware.motorcontroller">NAR_CANSpark</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="common/core/subsystems/ManipulatorTemplate.html#intake()" class="member-name-link">intake()</a> - Method in class common.core.subsystems.<a href="common/core/subsystems/ManipulatorTemplate.html" title="class in common.core.subsystems">ManipulatorTemplate</a></dt>
 <dd>
@@ -1131,6 +1149,8 @@ loadScripts(document, 'script');</script>
 </dd>
 <dt><a href="common/hardware/motorcontroller/MotorControllerConstants.html#MAX_PRIORITY" class="member-name-link">MAX_PRIORITY</a> - Static variable in class common.hardware.motorcontroller.<a href="common/hardware/motorcontroller/MotorControllerConstants.html" title="class in common.hardware.motorcontroller">MotorControllerConstants</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="common/hardware/motorcontroller/NAR_CANSpark.html#maximumRetries" class="member-name-link">maximumRetries</a> - Static variable in class common.hardware.motorcontroller.<a href="common/hardware/motorcontroller/NAR_CANSpark.html" title="class in common.hardware.motorcontroller">NAR_CANSpark</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="common/core/swerve/SwerveBase.html#maxSpeed" class="member-name-link">maxSpeed</a> - Variable in class common.core.swerve.<a href="common/core/swerve/SwerveBase.html" title="class in common.core.swerve">SwerveBase</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="common/core/swerve/SwerveModuleConfig.html#maxSpeed" class="member-name-link">maxSpeed</a> - Variable in class common.core.swerve.<a href="common/core/swerve/SwerveModuleConfig.html" title="class in common.core.swerve">SwerveModuleConfig</a></dt>
@@ -1212,7 +1232,7 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Create a new object to control a SPARK motor</div>
 </dd>
-<dt><a href="common/hardware/motorcontroller/NAR_CANSpark.html#%3Cinit%3E(int,common.hardware.motorcontroller.NAR_CANSpark.ControllerType,com.revrobotics.CANSparkLowLevel.MotorType,common.hardware.motorcontroller.NAR_CANSpark.EncoderType,double,double,double)" class="member-name-link">NAR_CANSpark(int, NAR_CANSpark.ControllerType, CANSparkLowLevel.MotorType, NAR_CANSpark.EncoderType, double, double, double)</a> - Constructor for class common.hardware.motorcontroller.<a href="common/hardware/motorcontroller/NAR_CANSpark.html" title="class in common.hardware.motorcontroller">NAR_CANSpark</a></dt>
+<dt><a href="common/hardware/motorcontroller/NAR_CANSpark.html#%3Cinit%3E(int,common.hardware.motorcontroller.NAR_CANSpark.ControllerType,com.revrobotics.CANSparkLowLevel.MotorType,common.hardware.motorcontroller.NAR_CANSpark.EncoderType,common.core.controllers.PIDFFConfig)" class="member-name-link">NAR_CANSpark(int, NAR_CANSpark.ControllerType, CANSparkLowLevel.MotorType, NAR_CANSpark.EncoderType, PIDFFConfig)</a> - Constructor for class common.hardware.motorcontroller.<a href="common/hardware/motorcontroller/NAR_CANSpark.html" title="class in common.hardware.motorcontroller">NAR_CANSpark</a></dt>
 <dd>
 <div class="block">Create a new object to control a SPARK motor</div>
 </dd>
@@ -1378,6 +1398,10 @@ loadScripts(document, 'script');</script>
 <dt><a href="common/core/controllers/PIDFFConfig.html" class="type-name-link" title="class in common.core.controllers">PIDFFConfig</a> - Class in <a href="common/core/controllers/package-summary.html">common.core.controllers</a></dt>
 <dd>
 <div class="block">Stores PID and feedforward constants.</div>
+</dd>
+<dt><a href="common/core/controllers/PIDFFConfig.html#%3Cinit%3E()" class="member-name-link">PIDFFConfig()</a> - Constructor for class common.core.controllers.<a href="common/core/controllers/PIDFFConfig.html" title="class in common.core.controllers">PIDFFConfig</a></dt>
+<dd>
+<div class="block">Creates an empty PID config.</div>
 </dd>
 <dt><a href="common/core/controllers/PIDFFConfig.html#%3Cinit%3E(double,double,double)" class="member-name-link">PIDFFConfig(double, double, double)</a> - Constructor for class common.core.controllers.<a href="common/core/controllers/PIDFFConfig.html" title="class in common.core.controllers">PIDFFConfig</a></dt>
 <dd>
@@ -1559,6 +1583,8 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Sets the motor state with feedforward</div>
 </dd>
+<dt><a href="common/hardware/camera/Camera.html#setAmbiguityThreshold(double)" class="member-name-link">setAmbiguityThreshold(double)</a> - Static method in class common.hardware.camera.<a href="common/hardware/camera/Camera.html" title="class in common.hardware.camera">Camera</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="common/hardware/motorcontroller/NAR_CANSpark.html#setBrakeMode()" class="member-name-link">setBrakeMode()</a> - Method in class common.hardware.motorcontroller.<a href="common/hardware/motorcontroller/NAR_CANSpark.html" title="class in common.hardware.motorcontroller">NAR_CANSpark</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="common/hardware/motorcontroller/NAR_Motor.html#setBrakeMode()" class="member-name-link">setBrakeMode()</a> - Method in class common.hardware.motorcontroller.<a href="common/hardware/motorcontroller/NAR_Motor.html" title="class in common.hardware.motorcontroller">NAR_Motor</a></dt>
@@ -1704,10 +1730,6 @@ loadScripts(document, 'script');</script>
 <dt><a href="common/core/controllers/ControllerBase.html#setPID(double,double,double)" class="member-name-link">setPID(double, double, double)</a> - Method in class common.core.controllers.<a href="common/core/controllers/ControllerBase.html" title="class in common.core.controllers">ControllerBase</a></dt>
 <dd>
 <div class="block">Sets the PID Controller gain parameters.</div>
-</dd>
-<dt><a href="common/hardware/motorcontroller/NAR_CANSpark.html#setPID(common.core.controllers.PIDFFConfig)" class="member-name-link">setPID(PIDFFConfig)</a> - Method in class common.hardware.motorcontroller.<a href="common/hardware/motorcontroller/NAR_CANSpark.html" title="class in common.hardware.motorcontroller">NAR_CANSpark</a></dt>
-<dd>
-<div class="block">Set the PID values for the controller.</div>
 </dd>
 <dt><a href="common/hardware/limelight/Limelight.html#setPipeline(common.hardware.limelight.Pipeline)" class="member-name-link">setPipeline(Pipeline)</a> - Method in class common.hardware.limelight.<a href="common/hardware/limelight/Limelight.html" title="class in common.hardware.limelight">Limelight</a></dt>
 <dd>&nbsp;</dd>

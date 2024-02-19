@@ -55,4 +55,11 @@ public class PIDFFConfig {
     public PIDFFConfig(double kP, double kI, double kD) {
         this(kP, kI, kD, 0, 0, 0, 0);
     }
+
+    /**
+     * Creates an empty PID config.
+     */
+    public PIDFFConfig() {
+        this(0, 0, 0);
+    }
 }

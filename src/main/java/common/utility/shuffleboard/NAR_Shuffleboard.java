@@ -39,19 +39,19 @@ public class NAR_Shuffleboard {
     /**
      * Storage class for NAR_Shuffleboard
      */
-    private static class widgetInfo {
+    private static class WidgetInfo {
         
         private SimpleWidget m_widget;
         private Supplier<Object> m_supply;
         private GenericEntry m_entry;
         
         /**
-         * Creates a new widgetInfo
+         * Creates a new WidgetInfo
          *
          * @param widget widget containing the entry 
          * @param supply supplier updating the entry
          */
-        public widgetInfo(SimpleWidget widget, Supplier<Object> supply){
+        public WidgetInfo(SimpleWidget widget, Supplier<Object> supply){
             m_widget = widget;
             m_supply = supply;
             m_entry = widget.getEntry();
@@ -66,13 +66,15 @@ public class NAR_Shuffleboard {
     public static int WINDOW_WIDTH = 9;
     public static int WINDOW_HEIGHT = 4;
 
-    private static final HashMap<String, HashMap<String, widgetInfo>> tabs = new HashMap<String, HashMap<String,widgetInfo>>();
+    private static final HashMap<String, HashMap<String, WidgetInfo>> tabs = new HashMap<String, HashMap<String,WidgetInfo>>();
     private static final HashMap<String, boolean[][]> widgetPositions = new HashMap<String, boolean[][]>();
 
     private static SimpleWidget[] autoWidgets;
     private static String[] autoNames;
     private static String selectedAutoName;
     private static int prevAutoIndex;
+
+    private static boolean shouldUpdate = true;
     
     /**
      * Creates a new tab
@@ -80,7 +82,7 @@ public class NAR_Shuffleboard {
      * @param tabName the title of the new tab
      */
     private static void create_tab(String tabName) {
-        tabs.put(tabName, new HashMap<String,widgetInfo>());
+        tabs.put(tabName, new HashMap<String,WidgetInfo>());
         widgetPositions.put(tabName, new boolean[WINDOW_WIDTH][WINDOW_HEIGHT]);
     }
 
@@ -170,7 +172,7 @@ public class NAR_Shuffleboard {
             return tabs.get(tabName).get(name).m_widget;
         }
         SimpleWidget widget = Shuffleboard.getTab(tabName).add(name,supply.get()).withPosition(x, y).withSize(width, height);
-        tabs.get(tabName).put(name, new widgetInfo(widget,supply));
+        tabs.get(tabName).put(name, new WidgetInfo(widget,supply));
         return widget;
     }
 
@@ -196,7 +198,7 @@ public class NAR_Shuffleboard {
             return tabs.get(tabName).get(name).m_widget;
         }
         SimpleWidget widget = Shuffleboard.getTab(tabName).add(name,data).withPosition(x, y).withSize(width,height);
-        tabs.get(tabName).put(name, new widgetInfo(widget,null));
+        tabs.get(tabName).put(name, new WidgetInfo(widget,null));
         return widget;
     }
 
@@ -404,9 +406,11 @@ public class NAR_Shuffleboard {
      * Updates every widget
      */
     public static void update() {
-        for(String i : tabs.keySet()){
-            for(String j : tabs.get(i).keySet()){
-                tabs.get(i).get(j).update();
+        if (!shouldUpdate) return;
+        for(final String tab : tabs.keySet()){
+            final HashMap<String, WidgetInfo> entries = tabs.get(tab);
+            for(final WidgetInfo entry : entries.values()){
+                entry.update();
             }
         }
     }

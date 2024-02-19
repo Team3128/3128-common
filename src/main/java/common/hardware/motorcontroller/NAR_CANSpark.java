@@ -18,9 +18,12 @@ import com.revrobotics.CANSparkBase.IdleMode;
 
 import common.core.controllers.PIDFFConfig;
 import common.core.misc.NAR_Robot;
+import common.utility.Log;
 import common.utility.shuffleboard.NAR_Shuffleboard;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
+
+import java.util.function.Supplier;
 
 import static common.hardware.motorcontroller.MotorControllerConstants.*;
 
@@ -31,7 +34,9 @@ import static common.hardware.motorcontroller.MotorControllerConstants.*;
  */
 public class NAR_CANSpark extends NAR_Motor {
 
-	private static final LinkedList<NAR_CANSpark> instances = new LinkedList<NAR_CANSpark>();
+	public static final int maximumRetries = 5;
+
+	public static final LinkedList<NAR_CANSpark> instances = new LinkedList<NAR_CANSpark>();
 
 	/**
 	 * Flashes all spark max's
@@ -97,11 +102,9 @@ public class NAR_CANSpark extends NAR_Motor {
 	 * @param motorType The motor type connected to the controller. Brushless motor wires must be connected
 	 *     	to their matching colors and the hall sensor must be plugged in. Brushed motors must be
 	 *     	connected to the Red and Black terminals only.
-	 * @param kP The proportional coefficient of the on board PIDController.
-	 * @param kI The integral coefficient of the on board PIDController.
-   	 * @param kD The derivative coefficient of the on board PIDController.
+	 * @param PIDconfig PIDFFConfig containing kP, kI, and kD values.
 	 */
-    public NAR_CANSpark(int deviceNumber, ControllerType controllerType, MotorType motorType, EncoderType encoderType, double kP, double kI, double kD) {
+    public NAR_CANSpark(int deviceNumber, ControllerType controllerType, MotorType motorType, EncoderType encoderType, PIDFFConfig PIDconfig) {
 		super(deviceNumber);
         motor = controllerType == ControllerType.CAN_SPARK_MAX ? new CANSparkMax(deviceNumber, motorType) : new CANSparkFlex(deviceNumber, motorType);
 		motor.restoreFactoryDefaults(); // Reset config parameters, unfollow other motor controllers
@@ -114,26 +117,21 @@ public class NAR_CANSpark extends NAR_Motor {
 		if (encoderType == EncoderType.Relative) {
 			relativeEncoder = (SparkRelativeEncoder) motor.getEncoder();
 			//No clue what this does, but Mechanical Advantage does this so it must be good
-			relativeEncoder.setAverageDepth(2);
-			relativeEncoder.setMeasurementPeriod(10);
+			configSpark(()-> relativeEncoder.setAverageDepth(2));
+			configSpark(()-> relativeEncoder.setMeasurementPeriod(10));
 		}
 		
 		else {
 			absoluteEncoder = motor.getAbsoluteEncoder(Type.kDutyCycle);
-			absoluteEncoder.setVelocityConversionFactor(60);
-			absoluteEncoder.setAverageDepth(2);
+			configSpark(()-> absoluteEncoder.setVelocityConversionFactor(60));
+			configSpark(()-> absoluteEncoder.setAverageDepth(2));
 		}
 
 		controller = motor.getPIDController();
-		controller.setOutputRange(-1, 1);
-		controller.setP(kP);
-		controller.setI(kI);
-		controller.setD(kD);
-		this.kP = kP;
-		this.kI = kI;
-		this.kD = kD;
+		configSpark(()-> controller.setOutputRange(-1, 1));
+		configPID(PIDconfig);
 		
-		controller.setFeedbackDevice(encoderType == EncoderType.Relative ? relativeEncoder : absoluteEncoder);
+		configSpark(()-> controller.setFeedbackDevice(encoderType == EncoderType.Relative ? relativeEncoder : absoluteEncoder));
 		instances.add(this);
     }
 
@@ -149,7 +147,7 @@ public class NAR_CANSpark extends NAR_Motor {
 	 * 		connected by an adapter.
 	 */
 	public NAR_CANSpark(int deviceNumber, ControllerType controllerType, MotorType motorType, EncoderType encoderType) {
-		this(deviceNumber, controllerType, motorType, encoderType, 0, 0, 0);
+		this(deviceNumber, controllerType, motorType, encoderType, new PIDFFConfig());
 	}
 
     /**
@@ -182,6 +180,23 @@ public class NAR_CANSpark extends NAR_Motor {
 	 */
 	public NAR_CANSpark(int deviceNumber) {
 		this(deviceNumber, ControllerType.CAN_SPARK_MAX, MotorType.kBrushless);
+	}
+
+	/**
+	 * Run the configuration until it succeeds or times out.
+	 *
+	 * @param config Lambda supplier returning the error state.
+	 */
+	private void configSpark(Supplier<REVLibError> config)
+	{
+		for (int i = 0; i < maximumRetries; i++)
+		{
+			if (config.get() == REVLibError.kOk)
+			{
+				return;
+			}
+		}
+		Log.fatal("Motors", "Failed to configure Spark Max " + motor.getDeviceId());
 	}
 
 	/**
@@ -219,10 +234,13 @@ public class NAR_CANSpark extends NAR_Motor {
 	 * Set the PID values for the controller.
 	 * @param config PIDFFConfig containing kP, kI, and kD values.
 	 */
-	public void setPID(PIDFFConfig config) {
-		controller.setP(config.kP);
-		controller.setI(config.kI);
-		controller.setD(config.kD);
+	public void configPID(PIDFFConfig config) {
+		configSpark(()-> controller.setP(config.kP));
+		configSpark(()-> controller.setI(config.kI));
+		configSpark(()-> controller.setD(config.kD));
+		this.kP = config.kP;
+		this.kI = config.kI;
+		this.kD = config.kD;
 	}
 
 	/**
@@ -241,7 +259,7 @@ public class NAR_CANSpark extends NAR_Motor {
 	 */
 	@Override
 	public void setCurrentLimit(int limit) {
-		motor.setSmartCurrentLimit(limit);
+		configSpark(()-> motor.setSmartCurrentLimit(limit));
 	}
 
     /**
@@ -260,10 +278,9 @@ public class NAR_CANSpark extends NAR_Motor {
 	 * 
 	 * @param frame Which type of {@link PeriodicFrame} to change the period of
 	 * @param periodMs Period in ms for the given frame.
-	 * @return {@link REVLibError#kOk} if successful
 	 */
-	public REVLibError setPeriodicFramePeriod(PeriodicFrame frame, int periodMs) {
-		return motor.setPeriodicFramePeriod(frame, periodMs);
+	public void setPeriodicFramePeriod(PeriodicFrame frame, int periodMs) {
+		configSpark(()-> motor.setPeriodicFramePeriod(frame, periodMs));
 	}
 
 	/**
@@ -287,22 +304,6 @@ public class NAR_CANSpark extends NAR_Motor {
 		setStatusFrames(SparkMaxConfig.DEFAULT);
 	}
 
-    /** Enables continuous input.
-    *
-    * <p>Rather then using the max and min input range as constraints, the motor considers them to be the
-    * same point and automatically calculates the shortest route to the setpoint.
-    *
-    * @param minInput The minimum value expected from the input.
-    * @param maxInput The maximum value expected from the input.
-    */
-	@Override
-    public void enableContinuousInput(double minInput, double maxInput) {
-        super.enableContinuousInput(minInput, maxInput);
-		controller.setPositionPIDWrappingEnabled(true);
-		controller.setPositionPIDWrappingMinInput(minInput / unitConversionFactor);
-		controller.setPositionPIDWrappingMaxInput(maxInput / unitConversionFactor);
-    }
-
 	/**
 	 * Burns all settings to flash; stores settings between power cycles
 	 */
@@ -322,7 +323,7 @@ public class NAR_CANSpark extends NAR_Motor {
 	 * @param invert Whether or not to invert motor output
      */
 	public void follow(NAR_CANSpark leader, boolean invert) {
-		motor.follow(leader.getMotor(), invert);
+		configSpark(()-> motor.follow(leader.getMotor(), invert));
 	}
 
 	@Override
@@ -380,18 +381,23 @@ public class NAR_CANSpark extends NAR_Motor {
     }
 
 	@Override
+	public double getTemperature() {
+		return motor.getMotorTemperature();
+	}
+
+	@Override
 	public void enableVoltageCompensation(double volts) {
-		motor.enableVoltageCompensation(volts);
+		configSpark(()-> motor.enableVoltageCompensation(volts));
 	}
 
 	@Override
 	protected void setBrakeMode() {
-		motor.setIdleMode(IdleMode.kBrake);
+		configSpark(()-> motor.setIdleMode(IdleMode.kBrake));
 	}
 
 	@Override
 	protected void setCoastMode() {
-		motor.setIdleMode(IdleMode.kCoast);
+		configSpark(()-> motor.setIdleMode(IdleMode.kCoast));
 	}
 
 	@Override

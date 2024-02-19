@@ -14,7 +14,7 @@ import edu.wpi.first.wpilibj.motorcontrol.MotorController;
  * @since 2023 Charged Up
  * @author Mason Lam
  */
-public abstract class NAR_Motor implements AutoCloseable{
+public abstract class NAR_Motor implements AutoCloseable {
     /**
      * Store conversion factors for motor
      */
@@ -192,7 +192,6 @@ public abstract class NAR_Motor implements AutoCloseable{
     *
     * <p>Rather then using the max and min input range as constraints, the motor considers them to be the
     * same point and automatically calculates the shortest route to the setpoint.
-    * <p> WARNING: Do not use with onBoard PID control with CTRE devices, works with SparkMax.
     *
     * @param minInput The minimum value expected from the input.
     * @param maxInput The maximum value expected from the input.
@@ -299,6 +298,12 @@ public abstract class NAR_Motor implements AutoCloseable{
      * @return Double measuring motor velocity
      */
     protected abstract double getRawVelocity();
+
+    /**
+     * Returns the Motor's temperature in celsius.
+     * @return The temperature in celsius.
+     */
+    public abstract double getTemperature();
 
     /**
      * Sets a motor's output based on the leader's

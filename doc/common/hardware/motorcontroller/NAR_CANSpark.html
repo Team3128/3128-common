@@ -130,6 +130,12 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-first">Modifier and Type</div>
 <div class="table-header col-second">Field</div>
 <div class="table-header col-last">Description</div>
+<div class="col-first even-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/LinkedList.html" title="class or interface in java.util" class="external-link">LinkedList</a>&lt;<a href="NAR_CANSpark.html" title="class in common.hardware.motorcontroller">NAR_CANSpark</a>&gt;</code></div>
+<div class="col-second even-row-color"><code><a href="#instances" class="member-name-link">instances</a></code></div>
+<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-first odd-row-color"><code>static final int</code></div>
+<div class="col-second odd-row-color"><code><a href="#maximumRetries" class="member-name-link">maximumRetries</a></code></div>
+<div class="col-last odd-row-color">&nbsp;</div>
 <div class="col-first even-row-color"><code>protected final com.revrobotics.CANSparkBase</code></div>
 <div class="col-second even-row-color"><code><a href="#motor" class="member-name-link">motor</a></code></div>
 <div class="col-last even-row-color">&nbsp;</div>
@@ -169,13 +175,11 @@ loadScripts(document, 'script');</script>
 <div class="col-last odd-row-color">
 <div class="block">Create a new object to control a SPARK motor</div>
 </div>
-<div class="col-constructor-name even-row-color"><code><a href="#%3Cinit%3E(int,common.hardware.motorcontroller.NAR_CANSpark.ControllerType,com.revrobotics.CANSparkLowLevel.MotorType,common.hardware.motorcontroller.NAR_CANSpark.EncoderType,double,double,double)" class="member-name-link">NAR_CANSpark</a><wbr>(int&nbsp;deviceNumber,
+<div class="col-constructor-name even-row-color"><code><a href="#%3Cinit%3E(int,common.hardware.motorcontroller.NAR_CANSpark.ControllerType,com.revrobotics.CANSparkLowLevel.MotorType,common.hardware.motorcontroller.NAR_CANSpark.EncoderType,common.core.controllers.PIDFFConfig)" class="member-name-link">NAR_CANSpark</a><wbr>(int&nbsp;deviceNumber,
  <a href="NAR_CANSpark.ControllerType.html" title="enum class in common.hardware.motorcontroller">NAR_CANSpark.ControllerType</a>&nbsp;controllerType,
  com.revrobotics.CANSparkLowLevel.MotorType&nbsp;motorType,
  <a href="NAR_CANSpark.EncoderType.html" title="enum class in common.hardware.motorcontroller">NAR_CANSpark.EncoderType</a>&nbsp;encoderType,
- double&nbsp;kP,
- double&nbsp;kI,
- double&nbsp;kD)</code></div>
+ <a href="../../core/controllers/PIDFFConfig.html" title="class in common.core.controllers">PIDFFConfig</a>&nbsp;PIDconfig)</code></div>
 <div class="col-last even-row-color">
 <div class="block">Create a new object to control a SPARK motor</div>
 </div>
@@ -209,10 +213,9 @@ loadScripts(document, 'script');</script>
 <div class="block">Closes the spark.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#enableContinuousInput(double,double)" class="member-name-link">enableContinuousInput</a><wbr>(double&nbsp;minInput,
- double&nbsp;maxInput)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#configPID(common.core.controllers.PIDFFConfig)" class="member-name-link">configPID</a><wbr>(<a href="../../core/controllers/PIDFFConfig.html" title="class in common.core.controllers">PIDFFConfig</a>&nbsp;config)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Enables continuous input.</div>
+<div class="block">Set the PID values for the controller.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#enableVoltageCompensation(double)" class="member-name-link">enableVoltageCompensation</a><wbr>(double&nbsp;volts)</code></div>
@@ -255,58 +258,58 @@ loadScripts(document, 'script');</script>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns the current going to the motor, increasing values means the motor is stalling</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#initShuffleboard(java.lang.String,java.lang.String,int)" class="member-name-link">initShuffleboard</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;tabName,
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>double</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getTemperature()" class="member-name-link">getTemperature</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Returns the Motor's temperature in celsius.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#initShuffleboard(java.lang.String,java.lang.String,int)" class="member-name-link">initShuffleboard</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;tabName,
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;prefix,
  int&nbsp;column)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Adds a PID tuning setup to a specific shuffleboard tab.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>protected void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#resetRawPosition(double)" class="member-name-link">resetRawPosition</a><wbr>(double&nbsp;rotations)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>protected void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#resetRawPosition(double)" class="member-name-link">resetRawPosition</a><wbr>(double&nbsp;rotations)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Resets the motor position</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>protected void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setBrakeMode()" class="member-name-link">setBrakeMode</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>protected void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setBrakeMode()" class="member-name-link">setBrakeMode</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Sets the motor in brake mode</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>protected void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setCoastMode()" class="member-name-link">setCoastMode</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>protected void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setCoastMode()" class="member-name-link">setCoastMode</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Sets the motor in coast mode</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setCurrentLimit(int)" class="member-name-link">setCurrentLimit</a><wbr>(int&nbsp;limit)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setCurrentLimit(int)" class="member-name-link">setCurrentLimit</a><wbr>(int&nbsp;limit)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Sets the current limit in Amps.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setDefaultStatusFrames()" class="member-name-link">setDefaultStatusFrames</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setDefaultStatusFrames()" class="member-name-link">setDefaultStatusFrames</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Set the status frame rate to Team 3128's defaults</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setInverted(boolean)" class="member-name-link">setInverted</a><wbr>(boolean&nbsp;inverted)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setInverted(boolean)" class="member-name-link">setInverted</a><wbr>(boolean&nbsp;inverted)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Sets the motor inverted</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>protected void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setPercentOutput(double)" class="member-name-link">setPercentOutput</a><wbr>(double&nbsp;speed)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>protected void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setPercentOutput(double)" class="member-name-link">setPercentOutput</a><wbr>(double&nbsp;speed)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Sets motor output power</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>com.revrobotics.REVLibError</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setPeriodicFramePeriod(com.revrobotics.CANSparkLowLevel.PeriodicFrame,int)" class="member-name-link">setPeriodicFramePeriod</a><wbr>(com.revrobotics.CANSparkLowLevel.PeriodicFrame&nbsp;frame,
- int&nbsp;periodMs)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Set the rate of transmission for periodic frames from the SPARK MAX</div>
-</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setPID(common.core.controllers.PIDFFConfig)" class="member-name-link">setPID</a><wbr>(<a href="../../core/controllers/PIDFFConfig.html" title="class in common.core.controllers">PIDFFConfig</a>&nbsp;config)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setPeriodicFramePeriod(com.revrobotics.CANSparkLowLevel.PeriodicFrame,int)" class="member-name-link">setPeriodicFramePeriod</a><wbr>(com.revrobotics.CANSparkLowLevel.PeriodicFrame&nbsp;frame,
+ int&nbsp;periodMs)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Set the PID values for the controller.</div>
+<div class="block">Set the rate of transmission for periodic frames from the SPARK MAX</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>protected void</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setPosition(double,double)" class="member-name-link">setPosition</a><wbr>(double&nbsp;rotations,
@@ -330,7 +333,7 @@ loadScripts(document, 'script');</script>
 </div>
 <div class="inherited-list">
 <h3 id="methods-inherited-from-class-common.hardware.motorcontroller.NAR_Motor">Methods inherited from class&nbsp;common.hardware.motorcontroller.<a href="NAR_Motor.html" title="class in common.hardware.motorcontroller">NAR_Motor</a></h3>
-<code><a href="NAR_Motor.html#configMotor(common.hardware.motorcontroller.NAR_Motor.MotorConfig)">configMotor</a>, <a href="NAR_Motor.html#getPosition()">getPosition</a>, <a href="NAR_Motor.html#getVelocity()">getVelocity</a>, <a href="NAR_Motor.html#resetPosition(double)">resetPosition</a>, <a href="NAR_Motor.html#set(double)">set</a>, <a href="NAR_Motor.html#set(double,common.hardware.motorcontroller.NAR_Motor.Control)">set</a>, <a href="NAR_Motor.html#set(double,common.hardware.motorcontroller.NAR_Motor.Control,double)">set</a>, <a href="NAR_Motor.html#setNeutralMode(common.hardware.motorcontroller.NAR_Motor.Neutral)">setNeutralMode</a>, <a href="NAR_Motor.html#setTimeConversionFactor(double)">setTimeConversionFactor</a>, <a href="NAR_Motor.html#setUnitConversionFactor(double)">setUnitConversionFactor</a>, <a href="NAR_Motor.html#setVolts(double)">setVolts</a>, <a href="NAR_Motor.html#updateIO(common.hardware.motorcontroller.NAR_MotorIOAutoLogged)">updateIO</a></code></div>
+<code><a href="NAR_Motor.html#configMotor(common.hardware.motorcontroller.NAR_Motor.MotorConfig)">configMotor</a>, <a href="NAR_Motor.html#enableContinuousInput(double,double)">enableContinuousInput</a>, <a href="NAR_Motor.html#getPosition()">getPosition</a>, <a href="NAR_Motor.html#getVelocity()">getVelocity</a>, <a href="NAR_Motor.html#resetPosition(double)">resetPosition</a>, <a href="NAR_Motor.html#set(double)">set</a>, <a href="NAR_Motor.html#set(double,common.hardware.motorcontroller.NAR_Motor.Control)">set</a>, <a href="NAR_Motor.html#set(double,common.hardware.motorcontroller.NAR_Motor.Control,double)">set</a>, <a href="NAR_Motor.html#setNeutralMode(common.hardware.motorcontroller.NAR_Motor.Neutral)">setNeutralMode</a>, <a href="NAR_Motor.html#setTimeConversionFactor(double)">setTimeConversionFactor</a>, <a href="NAR_Motor.html#setUnitConversionFactor(double)">setUnitConversionFactor</a>, <a href="NAR_Motor.html#setVolts(double)">setVolts</a>, <a href="NAR_Motor.html#updateIO(common.hardware.motorcontroller.NAR_MotorIOAutoLogged)">updateIO</a></code></div>
 <div class="inherited-list">
 <h3 id="methods-inherited-from-class-java.lang.Object">Methods inherited from class&nbsp;java.lang.<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a></h3>
 <code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#clone()" title="class or interface in java.lang" class="external-link">clone</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#equals(java.lang.Object)" title="class or interface in java.lang" class="external-link">equals</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#finalize()" title="class or interface in java.lang" class="external-link">finalize</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#getClass()" title="class or interface in java.lang" class="external-link">getClass</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#hashCode()" title="class or interface in java.lang" class="external-link">hashCode</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#notify()" title="class or interface in java.lang" class="external-link">notify</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#notifyAll()" title="class or interface in java.lang" class="external-link">notifyAll</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#toString()" title="class or interface in java.lang" class="external-link">toString</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#wait()" title="class or interface in java.lang" class="external-link">wait</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#wait(long)" title="class or interface in java.lang" class="external-link">wait</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#wait(long,int)" title="class or interface in java.lang" class="external-link">wait</a></code></div>
@@ -346,6 +349,26 @@ loadScripts(document, 'script');</script>
 <h2>Field Details</h2>
 <ul class="member-list">
 <li>
+<section class="detail" id="maximumRetries">
+<h3>maximumRetries</h3>
+<div class="member-signature"><span class="modifiers">public static final</span>&nbsp;<span class="return-type">int</span>&nbsp;<span class="element-name">maximumRetries</span></div>
+<dl class="notes">
+<dt>See Also:</dt>
+<dd>
+<ul class="see-list">
+<li><a href="../../../constant-values.html#common.hardware.motorcontroller.NAR_CANSpark.maximumRetries">Constant Field Values</a></li>
+</ul>
+</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="instances">
+<h3>instances</h3>
+<div class="member-signature"><span class="modifiers">public static final</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/LinkedList.html" title="class or interface in java.util" class="external-link">LinkedList</a>&lt;<a href="NAR_CANSpark.html" title="class in common.hardware.motorcontroller">NAR_CANSpark</a>&gt;</span>&nbsp;<span class="element-name">instances</span></div>
+</section>
+</li>
+<li>
 <section class="detail" id="motor">
 <h3>motor</h3>
 <div class="member-signature"><span class="modifiers">protected final</span>&nbsp;<span class="return-type">com.revrobotics.CANSparkBase</span>&nbsp;<span class="element-name">motor</span></div>
@@ -360,15 +383,13 @@ loadScripts(document, 'script');</script>
 <h2>Constructor Details</h2>
 <ul class="member-list">
 <li>
-<section class="detail" id="&lt;init&gt;(int,common.hardware.motorcontroller.NAR_CANSpark.ControllerType,com.revrobotics.CANSparkLowLevel.MotorType,common.hardware.motorcontroller.NAR_CANSpark.EncoderType,double,double,double)">
+<section class="detail" id="&lt;init&gt;(int,common.hardware.motorcontroller.NAR_CANSpark.ControllerType,com.revrobotics.CANSparkLowLevel.MotorType,common.hardware.motorcontroller.NAR_CANSpark.EncoderType,common.core.controllers.PIDFFConfig)">
 <h3>NAR_CANSpark</h3>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="element-name">NAR_CANSpark</span><wbr><span class="parameters">(int&nbsp;deviceNumber,
  <a href="NAR_CANSpark.ControllerType.html" title="enum class in common.hardware.motorcontroller">NAR_CANSpark.ControllerType</a>&nbsp;controllerType,
  com.revrobotics.CANSparkLowLevel.MotorType&nbsp;motorType,
  <a href="NAR_CANSpark.EncoderType.html" title="enum class in common.hardware.motorcontroller">NAR_CANSpark.EncoderType</a>&nbsp;encoderType,
- double&nbsp;kP,
- double&nbsp;kI,
- double&nbsp;kD)</span></div>
+ <a href="../../core/controllers/PIDFFConfig.html" title="class in common.core.controllers">PIDFFConfig</a>&nbsp;PIDconfig)</span></div>
 <div class="block">Create a new object to control a SPARK motor</div>
 <dl class="notes">
 <dt>Parameters:</dt>
@@ -379,9 +400,7 @@ loadScripts(document, 'script');</script>
 <dd><code>motorType</code> - The motor type connected to the controller. Brushless motor wires must be connected
         to their matching colors and the hall sensor must be plugged in. Brushed motors must be
         connected to the Red and Black terminals only.</dd>
-<dd><code>kP</code> - The proportional coefficient of the on board PIDController.</dd>
-<dd><code>kI</code> - The integral coefficient of the on board PIDController.</dd>
-<dd><code>kD</code> - The derivative coefficient of the on board PIDController.</dd>
+<dd><code>PIDconfig</code> - PIDFFConfig containing kP, kI, and kD values.</dd>
 </dl>
 </section>
 </li>
@@ -478,9 +497,9 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
-<section class="detail" id="setPID(common.core.controllers.PIDFFConfig)">
-<h3>setPID</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">setPID</span><wbr><span class="parameters">(<a href="../../core/controllers/PIDFFConfig.html" title="class in common.core.controllers">PIDFFConfig</a>&nbsp;config)</span></div>
+<section class="detail" id="configPID(common.core.controllers.PIDFFConfig)">
+<h3>configPID</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">configPID</span><wbr><span class="parameters">(<a href="../../core/controllers/PIDFFConfig.html" title="class in common.core.controllers">PIDFFConfig</a>&nbsp;config)</span></div>
 <div class="block">Set the PID values for the controller.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
@@ -513,7 +532,7 @@ loadScripts(document, 'script');</script>
 <li>
 <section class="detail" id="setPeriodicFramePeriod(com.revrobotics.CANSparkLowLevel.PeriodicFrame,int)">
 <h3>setPeriodicFramePeriod</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">com.revrobotics.REVLibError</span>&nbsp;<span class="element-name">setPeriodicFramePeriod</span><wbr><span class="parameters">(com.revrobotics.CANSparkLowLevel.PeriodicFrame&nbsp;frame,
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">setPeriodicFramePeriod</span><wbr><span class="parameters">(com.revrobotics.CANSparkLowLevel.PeriodicFrame&nbsp;frame,
  int&nbsp;periodMs)</span></div>
 <div class="block">Set the rate of transmission for periodic frames from the SPARK MAX
 
@@ -531,8 +550,6 @@ loadScripts(document, 'script');</script>
 <dt>Parameters:</dt>
 <dd><code>frame</code> - Which type of <code>CANSparkLowLevel.PeriodicFrame</code> to change the period of</dd>
 <dd><code>periodMs</code> - Period in ms for the given frame.</dd>
-<dt>Returns:</dt>
-<dd><code>REVLibError.kOk</code> if successful</dd>
 </dl>
 </section>
 </li>
@@ -555,24 +572,6 @@ loadScripts(document, 'script');</script>
 <dl class="notes">
 <dt>Specified by:</dt>
 <dd><code><a href="NAR_Motor.html#setDefaultStatusFrames()">setDefaultStatusFrames</a></code>&nbsp;in class&nbsp;<code><a href="NAR_Motor.html" title="class in common.hardware.motorcontroller">NAR_Motor</a></code></dd>
-</dl>
-</section>
-</li>
-<li>
-<section class="detail" id="enableContinuousInput(double,double)">
-<h3>enableContinuousInput</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">enableContinuousInput</span><wbr><span class="parameters">(double&nbsp;minInput,
- double&nbsp;maxInput)</span></div>
-<div class="block">Enables continuous input.
-
- <p>Rather then using the max and min input range as constraints, the motor considers them to be the
- same point and automatically calculates the shortest route to the setpoint.</div>
-<dl class="notes">
-<dt>Overrides:</dt>
-<dd><code><a href="NAR_Motor.html#enableContinuousInput(double,double)">enableContinuousInput</a></code>&nbsp;in class&nbsp;<code><a href="NAR_Motor.html" title="class in common.hardware.motorcontroller">NAR_Motor</a></code></dd>
-<dt>Parameters:</dt>
-<dd><code>minInput</code> - The minimum value expected from the input.</dd>
-<dd><code>maxInput</code> - The maximum value expected from the input.</dd>
 </dl>
 </section>
 </li>
@@ -737,6 +736,20 @@ loadScripts(document, 'script');</script>
 <dd><code><a href="NAR_Motor.html#getRawVelocity()">getRawVelocity</a></code>&nbsp;in class&nbsp;<code><a href="NAR_Motor.html" title="class in common.hardware.motorcontroller">NAR_Motor</a></code></dd>
 <dt>Returns:</dt>
 <dd>Double measuring motor velocity</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="getTemperature()">
+<h3>getTemperature</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">double</span>&nbsp;<span class="element-name">getTemperature</span>()</div>
+<div class="block"><span class="descfrm-type-label">Description copied from class:&nbsp;<code><a href="NAR_Motor.html#getTemperature()">NAR_Motor</a></code></span></div>
+<div class="block">Returns the Motor's temperature in celsius.</div>
+<dl class="notes">
+<dt>Specified by:</dt>
+<dd><code><a href="NAR_Motor.html#getTemperature()">getTemperature</a></code>&nbsp;in class&nbsp;<code><a href="NAR_Motor.html" title="class in common.hardware.motorcontroller">NAR_Motor</a></code></dd>
+<dt>Returns:</dt>
+<dd>The temperature in celsius.</dd>
 </dl>
 </section>
 </li>

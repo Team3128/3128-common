@@ -155,18 +155,23 @@ public class NAR_TalonSRX extends NAR_Motor {
 	}
 
 	@Override
-	public void resetRawPosition(double rotations) {
+	protected void resetRawPosition(double rotations) {
 		motor.setSelectedSensorPosition(rotations * TALONSRX_ENCODER_RESOLUTION);
 	}
 
 	@Override
-	public double getRawPosition() {
+	protected double getRawPosition() {
 		return motor.getSelectedSensorPosition() / TALONSRX_ENCODER_RESOLUTION;
 	}
 
 	@Override
-	public double getRawVelocity() {
+	protected double getRawVelocity() {
 		return motor.getSelectedSensorVelocity() / RPM_TO_TALONSRX;
+	}
+
+	@Override
+	public double getTemperature() {
+		return motor.getTemperature();
 	}
 
 	@Override

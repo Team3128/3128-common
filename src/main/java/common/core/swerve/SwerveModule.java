@@ -75,7 +75,7 @@ public class SwerveModule {
      */
     private void configAngleMotor(){
         angleMotor.configMotor(angleConfig.motorConfig);
-        angleMotor.setPID(angleConfig.pidffConfig);
+        angleMotor.configPID(angleConfig.pidffConfig);
         angleMotor.enableContinuousInput(-180, 180);
         angleMotor.setDefaultStatusFrames();
         resetToAbsolute();
@@ -86,7 +86,7 @@ public class SwerveModule {
      */
     private void configDriveMotor(){        
         driveMotor.configMotor(driveConfig.motorConfig);
-        driveMotor.setPID(driveConfig.pidffConfig);
+        driveMotor.configPID(driveConfig.pidffConfig);
         driveMotor.resetPosition(0);
         driveMotor.setDefaultStatusFrames();
     }
@@ -223,10 +223,10 @@ public class SwerveModule {
      * @return State of the swerve module.
      */
     public State getRunningState() {
-        if (driveMotor.getVelocity() != 0 && angleMotor.getVelocity() != 0) {
+        if (driveMotor.getTemperature() != 0 && angleMotor.getTemperature() != 0) {
             return State.RUNNING; 
         }
-        if (driveMotor.getVelocity() != 0 || angleMotor.getVelocity() != 0) {
+        if (driveMotor.getTemperature() != 0 || angleMotor.getTemperature() != 0) {
             return State.PARTIALLY_RUNNING; 
         }
         return State.DISCONNECTED;

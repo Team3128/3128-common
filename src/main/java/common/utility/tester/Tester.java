@@ -141,9 +141,10 @@ public class Tester {
                     curIndex ++;
                     state = TestState.PASSED;
                     if (curIndex < unitTests.size()) {
-                        unitTests.get(curIndex).schedule();
+                        passTimer.restart();
+                        testToSchedule = unitTests.get(curIndex);
                     }
-                    break;
+                    return;
                 default:
             }
         }
