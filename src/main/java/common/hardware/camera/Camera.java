@@ -8,7 +8,6 @@ import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
-import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
@@ -17,9 +16,11 @@ import common.utility.shuffleboard.NAR_Shuffleboard;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
-
+import edu.wpi.first.wpilibj.DriverStation;
+import java.util.HashSet;
 /**
  * Team 3128's class to control the robot's cameras and vision processing.
  * 
@@ -30,7 +31,6 @@ public class Camera {
 
     private final PhotonCamera camera;
     private final Transform3d offset;
-    private final PhotonPoseEstimator estimator;
 
     private boolean isDisabled = false;
     private PhotonPipelineResult lastResult;
@@ -43,10 +43,14 @@ public class Camera {
     private static double ambiguityThreshold = 0.3;
 
     public static final LinkedList<Camera> cameras = new LinkedList<Camera>();
+
+    private static final HashSet<Integer> reportedErrors = new HashSet<Integer>();
+
+    private static double distanceThreshold = 100;
     
     public Camera(String name, double xOffset, double yOffset, double yawOffset, double pitchOffset, double rollOffset) {
         camera = new PhotonCamera(name);
-
+    
         this.offset = new Transform3d(xOffset, yOffset, 0, 
             new Rotation3d(0.0, pitchOffset, 0.0)
             .rotateBy(new Rotation3d(rollOffset, 0, 0))
@@ -56,13 +60,6 @@ public class Camera {
         if (aprilTags == null || calc_strategy == null || odometry == null || robotPose == null) {
             throw new IllegalStateException("Camera not configured");
         }
-
-        estimator = new PhotonPoseEstimator(
-            aprilTags, 
-            calc_strategy,
-            camera,
-            offset
-        );
 
         cameras.add(this);
     }
@@ -96,6 +93,58 @@ public class Camera {
         Camera.ambiguityThreshold = ambiguityThreshold;
     }
 
+    public static void setDistanceThreshold(double distanceThreshold) {
+        Camera.distanceThreshold = distanceThreshold;
+    }
+
+    private Optional<EstimatedRobotPose> getEstimatedPose(PhotonPipelineResult result) {
+        PhotonTrackedTarget lowestAmbiguityTarget = null;
+
+        double lowestAmbiguityScore = 10;
+
+        for (PhotonTrackedTarget target : result.targets) {
+            double targetPoseAmbiguity = target.getPoseAmbiguity();
+            double dist = target.getBestCameraToTarget().getTranslation().toTranslation2d().getNorm();
+            if (dist > distanceThreshold || targetPoseAmbiguity > ambiguityThreshold) continue;
+            // Make sure the target is a Fiducial target.
+            if (targetPoseAmbiguity != -1 && targetPoseAmbiguity < lowestAmbiguityScore) {
+                lowestAmbiguityScore = targetPoseAmbiguity;
+                lowestAmbiguityTarget = target;
+            }
+        }
+
+        // Although there are confirmed to be targets, none of them may be fiducial
+        // targets.
+        if (lowestAmbiguityTarget == null) return Optional.empty();
+
+        int targetFiducialId = lowestAmbiguityTarget.getFiducialId();
+
+        Optional<Pose3d> targetPosition = aprilTags.getTagPose(targetFiducialId);
+
+        if (targetPosition.isEmpty()) {
+            reportFiducialPoseError(targetFiducialId);
+            return Optional.empty();
+        }
+
+        return Optional.of(
+                new EstimatedRobotPose(
+                        targetPosition
+                                .get()
+                                .transformBy(lowestAmbiguityTarget.getBestCameraToTarget().inverse())
+                                .transformBy(offset.inverse()),
+                        result.getTimestampSeconds(),
+                        result.getTargets(),
+                        PoseStrategy.LOWEST_AMBIGUITY));
+    }
+
+    private void reportFiducialPoseError(int fiducialId) {
+        if (!reportedErrors.contains(fiducialId)) {
+            DriverStation.reportError(
+                    "[PhotonPoseEstimator] Tried to get pose of unknown AprilTag: " + fiducialId, false);
+            reportedErrors.add(fiducialId);
+        }
+    }
+
     public void update(){
         if (isDisabled) return;
         lastResult = camera.getLatestResult();
@@ -104,30 +153,13 @@ public class Camera {
             return;
         }
 
-        if (estimator.getPrimaryStrategy() == PoseStrategy.CLOSEST_TO_REFERENCE_POSE) {
-            estimator.setReferencePose(robotPose.get());
-        }
-
-        final Optional<EstimatedRobotPose> estimatedPose = estimator.update(lastResult);
+        final Optional<EstimatedRobotPose> estimatedPose = getEstimatedPose(lastResult);
 
         if(!estimatedPose.isPresent()) {
             Logger.recordOutput("Vision/" + camera.getName(), robotPose.get());
         }
 
         lastPose = estimatedPose.get();
-
-        boolean validResult = false;
-        for (final PhotonTrackedTarget target : lastPose.targetsUsed) {
-            if (target.getPoseAmbiguity() < ambiguityThreshold) {
-                validResult = true;
-                break;
-            }
-        }
-
-        if (!validResult) {
-            Logger.recordOutput("Vision/" + camera.getName(), robotPose.get());
-            return;
-        }
         
         odometry.accept(lastPose.estimatedPose.toPose2d(), lastPose.timestampSeconds);
     }
