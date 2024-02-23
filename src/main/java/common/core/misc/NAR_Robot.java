@@ -19,55 +19,58 @@ import edu.wpi.first.wpilibj.Timer;
 
 /**
  * Team 3128's Robot class that includes advantageScope and addPeriodic
+ * 
  * @since 2023 Charged Up
  * @author Mason Lam
  */
 public class NAR_Robot extends IterativeRobotBase {
 
+    public static boolean logWithAdvantageKit = false;
+
     @SuppressWarnings("MemberName")
     static class Callback implements Comparable<Callback> {
-      public Runnable func;
-      public double period;
-      public double expirationTime;
+        public Runnable func;
+        public double period;
+        public double expirationTime;
 
-      /**
-       * Construct a callback container.
-       *
-       * @param func The callback to run.
-       * @param startTimeSeconds The common starting point for all callback scheduling in seconds.
-       * @param periodSeconds The period at which to run the callback in seconds.
-       * @param offsetSeconds The offset from the common starting time in seconds.
-       */
-      Callback(Runnable func, double startTimeSeconds, double periodSeconds, double offsetSeconds) {
-        this.func = func;
-        this.period = periodSeconds;
-        this.expirationTime =
-            startTimeSeconds
-                + offsetSeconds
-                + Math.floor((Timer.getFPGATimestamp() - startTimeSeconds) / this.period)
-                    * this.period
-                + this.period;
-      }
-
-      @Override
-      public boolean equals(Object rhs) {
-        if (rhs instanceof Callback) {
-          return Double.compare(expirationTime, ((Callback) rhs).expirationTime) == 0;
+        /**
+         * Construct a callback container.
+         *
+         * @param func             The callback to run.
+         * @param startTimeSeconds The common starting point for all callback scheduling
+         *                         in seconds.
+         * @param periodSeconds    The period at which to run the callback in seconds.
+         * @param offsetSeconds    The offset from the common starting time in seconds.
+         */
+        Callback(Runnable func, double startTimeSeconds, double periodSeconds, double offsetSeconds) {
+            this.func = func;
+            this.period = periodSeconds;
+            this.expirationTime = startTimeSeconds
+                    + offsetSeconds
+                    + Math.floor((Timer.getFPGATimestamp() - startTimeSeconds) / this.period)
+                            * this.period
+                    + this.period;
         }
-        return false;
-      }
 
-      @Override
-      public int hashCode() {
-        return Double.hashCode(expirationTime);
-      }
+        @Override
+        public boolean equals(Object rhs) {
+            if (rhs instanceof Callback) {
+                return Double.compare(expirationTime, ((Callback) rhs).expirationTime) == 0;
+            }
+            return false;
+        }
 
-      @Override
-      public int compareTo(Callback rhs) {
-        // Elements with sooner expiration times are sorted as lesser. The head of
-        // Java's PriorityQueue is the least element.
-        return Double.compare(expirationTime, rhs.expirationTime);
-      }
+        @Override
+        public int hashCode() {
+            return Double.hashCode(expirationTime);
+        }
+
+        @Override
+        public int compareTo(Callback rhs) {
+            // Elements with sooner expiration times are sorted as lesser. The head of
+            // Java's PriorityQueue is the least element.
+            return Double.compare(expirationTime, rhs.expirationTime);
+        }
     }
 
     public static final double kDefaultPeriod = 0.02;
@@ -84,7 +87,7 @@ public class NAR_Robot extends IterativeRobotBase {
 
     /** Constructor for TimedRobot. */
     protected NAR_Robot() {
-      this(kDefaultPeriod);
+        this(kDefaultPeriod);
     }
 
     /**
@@ -93,182 +96,190 @@ public class NAR_Robot extends IterativeRobotBase {
      * @param period Period in seconds.
      */
     protected NAR_Robot(double period) {
-      super(period);
-      m_startTime = Timer.getFPGATimestamp();
+        super(period);
+        m_startTime = Timer.getFPGATimestamp();
 
-      Method periodicBeforeUser = null;   //Method to get the periodicBeforeUser method from Logger
-      Method periodicAfterUser = null;   //Method to get the periodicAfterUser method from Logger
-      try {
-          periodicBeforeUser = Logger.class.getDeclaredMethod("periodicBeforeUser");
-          periodicAfterUser = Logger.class.getDeclaredMethod("periodicAfterUser", long.class, long.class);
-      } catch (NoSuchMethodException | SecurityException e) {
-        e.printStackTrace();
-      }
-
-      periodicBeforeUser.setAccessible(true);     //set the method to be accessible
-      periodicAfterUser.setAccessible(true);     //set the method to be accessible
-
-      final Method periodicBeforeUser0 = periodicBeforeUser;
-      periodicAfterUser0 = periodicAfterUser;
-
-      addPeriodic(()-> {
+        Method periodicBeforeUser = null; // Method to get the periodicBeforeUser method from Logger
+        Method periodicAfterUser = null; // Method to get the periodicAfterUser method from Logger
         try {
-          long loopCycleStart = Logger.getRealTimestamp();
-          periodicBeforeUser0.invoke(null);
-          long userCodeStart = Logger.getRealTimestamp();
-          loopFunc();
-          long loopCycleEnd = Logger.getRealTimestamp();
-          periodicAfterUser0.invoke(null, loopCycleEnd - userCodeStart, userCodeStart - loopCycleStart);
-        } catch (Exception e) {}
-      }, period);
-      NotifierJNI.setNotifierName(m_notifier, "TimedRobot");
+            periodicBeforeUser = Logger.class.getDeclaredMethod("periodicBeforeUser");
+            periodicAfterUser = Logger.class.getDeclaredMethod("periodicAfterUser", long.class, long.class);
+        } catch (NoSuchMethodException | SecurityException e) {
+            e.printStackTrace();
+        }
 
-      HAL.report(tResourceType.kResourceType_Framework, tInstances.kFramework_Timed);
+        periodicBeforeUser.setAccessible(true); // set the method to be accessible
+        periodicAfterUser.setAccessible(true); // set the method to be accessible
+
+        final Method periodicBeforeUser0 = periodicBeforeUser;
+        periodicAfterUser0 = periodicAfterUser;
+
+        addPeriodic(() -> {
+            try {
+                long loopCycleStart = Logger.getRealTimestamp();
+                periodicBeforeUser0.invoke(null);
+                long userCodeStart = Logger.getRealTimestamp();
+                loopFunc();
+                long loopCycleEnd = Logger.getRealTimestamp();
+                periodicAfterUser0.invoke(null, loopCycleEnd - userCodeStart, userCodeStart - loopCycleStart);
+            } catch (Exception e) {
+            }
+        }, period);
+        NotifierJNI.setNotifierName(m_notifier, "TimedRobot");
+
+        HAL.report(tResourceType.kResourceType_Framework, tInstances.kFramework_Timed);
     }
 
     @Override
     public void close() {
-      NotifierJNI.stopNotifier(m_notifier);
-      NotifierJNI.cleanNotifier(m_notifier);
+        NotifierJNI.stopNotifier(m_notifier);
+        NotifierJNI.cleanNotifier(m_notifier);
     }
 
     /** Provide an alternate "main loop" via startCompetition(). */
     @Override
     public void startCompetition() {
-      long initStart = Logger.getRealTimestamp();
-      robotInit();
+        long initStart = Logger.getRealTimestamp();
+        robotInit();
 
-      if (isSimulation()) {
-        simulationInit();
-      }
-
-      long initEnd = Logger.getRealTimestamp();
-
-      try {
-        Method registerFields = AutoLogOutputManager.class.getDeclaredMethod("registerFields", Object.class);
-        registerFields.setAccessible(true);
-        registerFields.invoke(null, this);
-        periodicAfterUser0.invoke(null, initEnd - initStart, 0);
-      }
-      catch (Exception e) {
-        e.printStackTrace();
-      }
-
-      // Tell the DS that the robot is ready to be enabled
-      System.out.println("********** Robot program startup complete **********");
-      DriverStationJNI.observeUserProgramStarting();
-
-      // Loop forever, calling the appropriate mode-dependent function
-      while (true) {
-        // We don't have to check there's an element in the queue first because
-        // there's always at least one (the constructor adds one). It's reenqueued
-        // at the end of the loop.
-        var callback = m_callbacks.poll();
-
-        NotifierJNI.updateNotifierAlarm(m_notifier, (long) (callback.expirationTime * 1e6));
-
-        long curTime = NotifierJNI.waitForNotifierAlarm(m_notifier);
-        if (curTime == 0) {
-          break;
+        if (isSimulation()) {
+            simulationInit();
         }
 
-        callback.func.run();
+        long initEnd = Logger.getRealTimestamp();
 
-        callback.expirationTime += callback.period;
-        m_callbacks.add(callback);
-
-        // Process all other callbacks that are ready to run
-        while ((long) (m_callbacks.peek().expirationTime * 1e6) <= curTime) {
-          callback = m_callbacks.poll();
-
-          callback.func.run();
-
-          callback.expirationTime += callback.period;
-          m_callbacks.add(callback);
+        try {
+            Method registerFields = AutoLogOutputManager.class.getDeclaredMethod("registerFields", Object.class);
+            registerFields.setAccessible(true);
+            registerFields.invoke(null, this);
+            periodicAfterUser0.invoke(null, initEnd - initStart, 0);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-      }
+
+        // Tell the DS that the robot is ready to be enabled
+        System.out.println("********** Robot program startup complete **********");
+        DriverStationJNI.observeUserProgramStarting();
+
+        // Loop forever, calling the appropriate mode-dependent function
+        while (true) {
+            // We don't have to check there's an element in the queue first because
+            // there's always at least one (the constructor adds one). It's reenqueued
+            // at the end of the loop.
+            var callback = m_callbacks.poll();
+
+            NotifierJNI.updateNotifierAlarm(m_notifier, (long) (callback.expirationTime * 1e6));
+
+            long curTime = NotifierJNI.waitForNotifierAlarm(m_notifier);
+            if (curTime == 0) {
+                break;
+            }
+
+            callback.func.run();
+
+            callback.expirationTime += callback.period;
+            m_callbacks.add(callback);
+
+            // Process all other callbacks that are ready to run
+            while ((long) (m_callbacks.peek().expirationTime * 1e6) <= curTime) {
+                callback = m_callbacks.poll();
+
+                callback.func.run();
+
+                callback.expirationTime += callback.period;
+                m_callbacks.add(callback);
+            }
+        }
     }
 
     public static enum LoggingState {
-      FULLMATCH,
-      SESSION,
-      NONE
+        FULLMATCH,
+        SESSION,
+        NONE
     }
 
     /**
      * Add a data receiver for Adv Kit logging to a USB drive.
-     * @param port true if USB drive is plugged into the top port, false if it is plugged into the bottom port.
+     * 
+     * @param port  true if USB drive is plugged into the top port, false if it is
+     *              plugged into the bottom port.
      * @param state session logging or full match logging.
      */
-    public static void addReceiver(boolean port, LoggingState state){
-      if(state == LoggingState.NONE){
-        return;
-      }
-      
-      String info = "";
-      if(state == LoggingState.FULLMATCH){
-        info += DriverStation.getMatchNumber() + "_" + 
-                DriverStation.getMatchType() + "_" + 
-                DriverStation.getEventName() + "_";
-      }
-        info += LocalDateTime.now().getMonthValue() + "_" + 
-                  LocalDateTime.now().getDayOfMonth() + "_" + 
-                  LocalDateTime.now().getYear() + "_T_" + 
-                  LocalDateTime.now().getHour() + "_" + 
-                  LocalDateTime.now().getMinute();
-      String folder = "";
-      if(state == LoggingState.SESSION){
-        folder = "sessions";
-      }else{
-        folder = "matches";
-      }
+    public static void addReceiver(boolean port, LoggingState state) {
+        if (state == LoggingState.NONE) {
+            return;
+        }
 
-      if(port){
-        try{
-          Logger.addDataReceiver(new WPILOGWriter("/media/sda1/" + folder + "/" + info + ".wpilog"));
-        }catch(Exception e){
-            e.printStackTrace();
+        String info = "";
+        if (state == LoggingState.FULLMATCH) {
+            info += DriverStation.getMatchNumber() + "_" +
+                    DriverStation.getMatchType() + "_" +
+                    DriverStation.getEventName() + "_";
         }
-      }else{
-        try{
-          Logger.addDataReceiver(new WPILOGWriter("/media/sda2/" + folder + "/" + info + ".wpilog"));
-        }catch(Exception e){
-            e.printStackTrace();
+        info += LocalDateTime.now().getMonthValue() + "_" +
+                LocalDateTime.now().getDayOfMonth() + "_" +
+                LocalDateTime.now().getYear() + "_T_" +
+                LocalDateTime.now().getHour() + "_" +
+                LocalDateTime.now().getMinute();
+        String folder = "";
+        if (state == LoggingState.SESSION) {
+            folder = "sessions";
+        } else {
+            folder = "matches";
         }
-      }            
+
+        if (port) {
+            try {
+                Logger.addDataReceiver(new WPILOGWriter("/media/sda1/" + folder + "/" + info + ".wpilog"));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else {
+            try {
+                Logger.addDataReceiver(new WPILOGWriter("/media/sda2/" + folder + "/" + info + ".wpilog"));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     /** Ends the main loop in startCompetition(). */
     @Override
     public void endCompetition() {
-      NotifierJNI.stopNotifier(m_notifier);
+        NotifierJNI.stopNotifier(m_notifier);
     }
 
     /**
      * Add a callback to run at a specific period.
      *
-     * <p>This is scheduled on TimedRobot's Notifier, so TimedRobot and the callback run
+     * <p>
+     * This is scheduled on TimedRobot's Notifier, so TimedRobot and the callback
+     * run
      * synchronously. Interactions between them are thread-safe.
      *
-     * @param callback The callback to run.
+     * @param callback      The callback to run.
      * @param periodSeconds The period at which to run the callback in seconds.
      */
     public static void addPeriodic(Runnable callback, double periodSeconds) {
-      m_callbacks.add(new Callback(callback, m_startTime, periodSeconds, 0.0));
+        m_callbacks.add(new Callback(callback, m_startTime, periodSeconds, 0.0));
     }
 
     /**
      * Add a callback to run at a specific period with a starting time offset.
      *
-     * <p>This is scheduled on TimedRobot's Notifier, so TimedRobot and the callback run
+     * <p>
+     * This is scheduled on TimedRobot's Notifier, so TimedRobot and the callback
+     * run
      * synchronously. Interactions between them are thread-safe.
      *
-     * @param callback The callback to run.
+     * @param callback      The callback to run.
      * @param periodSeconds The period at which to run the callback in seconds.
-     * @param offsetSeconds The offset from the common starting time in seconds. This is useful for
-     *     scheduling a callback in a different timeslot relative to TimedRobot.
+     * @param offsetSeconds The offset from the common starting time in seconds.
+     *                      This is useful for
+     *                      scheduling a callback in a different timeslot relative
+     *                      to TimedRobot.
      */
     public static void addPeriodic(Runnable callback, double periodSeconds, double offsetSeconds) {
-      m_callbacks.add(new Callback(callback, m_startTime, periodSeconds, offsetSeconds));
+        m_callbacks.add(new Callback(callback, m_startTime, periodSeconds, offsetSeconds));
     }
 }

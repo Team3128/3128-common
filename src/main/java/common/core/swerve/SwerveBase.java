@@ -2,6 +2,7 @@ package common.core.swerve;
 
 import org.littletonrobotics.junction.Logger;
 
+import common.core.misc.NAR_Robot;
 import common.hardware.motorcontroller.NAR_Motor.Control;
 import common.utility.narwhaldashboard.NarwhalDashboard;
 import common.utility.shuffleboard.NAR_Shuffleboard;
@@ -184,8 +185,10 @@ public abstract class SwerveBase extends SubsystemBase {
     public void periodic() {
         odometry.update(getGyroRotation2d(), getPositions());
         estimatedPose = odometry.getEstimatedPosition();
-        Logger.recordOutput("Swerve/ActualModuleStates", getStates());
-        Logger.recordOutput("Swerve/RobotRotation", getGyroRotation2d());
+        if (NAR_Robot.logWithAdvantageKit) {
+            Logger.recordOutput("Swerve/ActualModuleStates", getStates());
+            Logger.recordOutput("Swerve/RobotRotation", getGyroRotation2d());
+        }
     }
 
     public void resetAll() {

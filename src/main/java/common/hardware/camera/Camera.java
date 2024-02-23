@@ -12,6 +12,7 @@ import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
+import common.core.misc.NAR_Robot;
 import common.utility.shuffleboard.NAR_Shuffleboard;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
@@ -148,18 +149,19 @@ public class Camera {
     public void update(){
         if (isDisabled) return;
         lastResult = camera.getLatestResult();
-        if (!lastResult.hasTargets()) {
+        if (!lastResult.hasTargets() && NAR_Robot.logWithAdvantageKit) {
             Logger.recordOutput("Vision/" + camera.getName(), robotPose.get());
             return;
         }
 
         final Optional<EstimatedRobotPose> estimatedPose = getEstimatedPose(lastResult);
 
-        if(!estimatedPose.isPresent()) {
+        if(!estimatedPose.isPresent() && NAR_Robot.logWithAdvantageKit) {
             Logger.recordOutput("Vision/" + camera.getName(), robotPose.get());
         }
 
         lastPose = estimatedPose.get();
+        if (NAR_Robot.logWithAdvantageKit) Logger.recordOutput("Vision/" + camera.getName(), lastPose.estimatedPose.toPose2d());
         
         odometry.accept(lastPose.estimatedPose.toPose2d(), lastPose.timestampSeconds);
     }

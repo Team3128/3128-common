@@ -90,6 +90,7 @@ public abstract class NAR_Motor implements AutoCloseable {
         public double inputPower = 0;
         public double appliedOutput = 0;
         public double stallCurrent = 0;
+        public double position;
         public double velocity = 0;
 	}
 
@@ -99,15 +100,18 @@ public abstract class NAR_Motor implements AutoCloseable {
         io.inputPower = prevValue;
         io.appliedOutput = getAppliedOutput();
         io.stallCurrent = getStallCurrent();
+        io.position = getPosition();
         io.velocity = getVelocity();
     }
 
     public NAR_Motor(int id){
-        io = new NAR_MotorIOAutoLogged();
-        NAR_Robot.addPeriodic(()-> {
-            updateIO(io);
-            Logger.processInputs("Motors/" + id, io);
-        }, 0.02);
+        if (NAR_Robot.logWithAdvantageKit) {
+            io = new NAR_MotorIOAutoLogged();
+            NAR_Robot.addPeriodic(()-> {
+                updateIO(io);
+                Logger.processInputs("Motors/" + id, io);
+            }, 0.02);
+        }
     }
 
     /**

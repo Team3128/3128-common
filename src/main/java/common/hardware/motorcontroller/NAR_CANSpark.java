@@ -19,6 +19,7 @@ import com.revrobotics.CANSparkBase.IdleMode;
 import common.core.controllers.PIDFFConfig;
 import common.core.misc.NAR_Robot;
 import common.utility.Log;
+import common.utility.narwhaldashboard.NarwhalDashboard.State;
 import common.utility.shuffleboard.NAR_Shuffleboard;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
@@ -34,7 +35,9 @@ import static common.hardware.motorcontroller.MotorControllerConstants.*;
  */
 public class NAR_CANSpark extends NAR_Motor {
 
-	public static final int maximumRetries = 5;
+	private static int numFailedConfigs = 0;
+
+	public static int maximumRetries = 5;
 
 	public static final LinkedList<NAR_CANSpark> instances = new LinkedList<NAR_CANSpark>();
 
@@ -46,6 +49,14 @@ public class NAR_CANSpark extends NAR_Motor {
 			spark.burnFlash();
 		}
 	}
+
+	/**
+	 * @return The number of failed configurations of the motor.
+	 */
+	public static int getNumFailedConfigs() {
+		return numFailedConfigs;
+	}
+
 	/**
 	 * Team 3128's status frames
 	 */
@@ -107,8 +118,10 @@ public class NAR_CANSpark extends NAR_Motor {
     public NAR_CANSpark(int deviceNumber, ControllerType controllerType, MotorType motorType, EncoderType encoderType, PIDFFConfig PIDconfig) {
 		super(deviceNumber);
         motor = controllerType == ControllerType.CAN_SPARK_MAX ? new CANSparkMax(deviceNumber, motorType) : new CANSparkFlex(deviceNumber, motorType);
-		motor.restoreFactoryDefaults(); // Reset config parameters, unfollow other motor controllers
-		motor.setCANTimeout(canSparkMaxTimeout);
+
+		configSpark(()-> motor.clearFaults());
+		configSpark(()-> motor.restoreFactoryDefaults()); // Reset config parameters, unfollow other motor controllers
+		configSpark(()-> motor.setCANTimeout(canSparkMaxTimeout));		//I have this here and I don't know why - Mason
 		enableVoltageCompensation(12.0);
 		setCurrentLimit(motorType == MotorType.kBrushless ? NEO_CurrentLimit : NEO_550CurrentLimit);
 
@@ -196,6 +209,7 @@ public class NAR_CANSpark extends NAR_Motor {
 				return;
 			}
 		}
+		numFailedConfigs ++;
 		Log.fatal("Motors", "Failed to configure Spark Max " + motor.getDeviceId());
 	}
 
@@ -313,6 +327,11 @@ public class NAR_CANSpark extends NAR_Motor {
 		Timer.delay(0.5);
 		REVLibError status = motor.burnFlash();
 		Timer.delay(0.5);
+		if (status == REVLibError.kOk) {
+			Log.info("Motors", "Burned flash for Spark Max " + motor.getDeviceId());
+		} else {
+			Log.unusual("Motors", "Failed to burn flash for Spark Max " + motor.getDeviceId());
+		}
 
 		return status;
 	}
@@ -404,6 +423,18 @@ public class NAR_CANSpark extends NAR_Motor {
     public CANSparkBase getMotor() {
         return motor;
     }
+
+	/**
+	 * Returns motor and motor controller functionality.
+	 * @return State of the motor controller and motor.
+	 */
+	public State getState() {
+		//To do add check for motors
+		if (motor.getLastError() == REVLibError.kOk) {
+			return State.RUNNING;
+		}
+		return State.DISCONNECTED;
+	}
 
 	/**
      * Closes the spark.
