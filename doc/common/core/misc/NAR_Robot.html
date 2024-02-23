@@ -120,6 +120,9 @@ loadScripts(document, 'script');</script>
 <div class="col-first even-row-color"><code>static final double</code></div>
 <div class="col-second even-row-color"><code><a href="#kDefaultPeriod" class="member-name-link">kDefaultPeriod</a></code></div>
 <div class="col-last even-row-color">&nbsp;</div>
+<div class="col-first odd-row-color"><code>static boolean</code></div>
+<div class="col-second odd-row-color"><code><a href="#logWithAdvantageKit" class="member-name-link">logWithAdvantageKit</a></code></div>
+<div class="col-last odd-row-color">&nbsp;</div>
 </div>
 </section>
 </li>
@@ -212,6 +215,12 @@ loadScripts(document, 'script');</script>
 <h2>Field Details</h2>
 <ul class="member-list">
 <li>
+<section class="detail" id="logWithAdvantageKit">
+<h3>logWithAdvantageKit</h3>
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">logWithAdvantageKit</span></div>
+</section>
+</li>
+<li>
 <section class="detail" id="kDefaultPeriod">
 <h3>kDefaultPeriod</h3>
 <div class="member-signature"><span class="modifiers">public static final</span>&nbsp;<span class="return-type">double</span>&nbsp;<span class="element-name">kDefaultPeriod</span></div>
@@ -290,7 +299,8 @@ loadScripts(document, 'script');</script>
 <div class="block">Add a data receiver for Adv Kit logging to a USB drive.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
-<dd><code>port</code> - true if USB drive is plugged into the top port, false if it is plugged into the bottom port.</dd>
+<dd><code>port</code> - true if USB drive is plugged into the top port, false if it is
+              plugged into the bottom port.</dd>
 <dd><code>state</code> - session logging or full match logging.</dd>
 </dl>
 </section>
@@ -313,7 +323,9 @@ loadScripts(document, 'script');</script>
  double&nbsp;periodSeconds)</span></div>
 <div class="block">Add a callback to run at a specific period.
 
- <p>This is scheduled on TimedRobot's Notifier, so TimedRobot and the callback run
+ <p>
+ This is scheduled on TimedRobot's Notifier, so TimedRobot and the callback
+ run
  synchronously. Interactions between them are thread-safe.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
@@ -330,14 +342,18 @@ loadScripts(document, 'script');</script>
  double&nbsp;offsetSeconds)</span></div>
 <div class="block">Add a callback to run at a specific period with a starting time offset.
 
- <p>This is scheduled on TimedRobot's Notifier, so TimedRobot and the callback run
+ <p>
+ This is scheduled on TimedRobot's Notifier, so TimedRobot and the callback
+ run
  synchronously. Interactions between them are thread-safe.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>callback</code> - The callback to run.</dd>
 <dd><code>periodSeconds</code> - The period at which to run the callback in seconds.</dd>
-<dd><code>offsetSeconds</code> - The offset from the common starting time in seconds. This is useful for
-     scheduling a callback in a different timeslot relative to TimedRobot.</dd>
+<dd><code>offsetSeconds</code> - The offset from the common starting time in seconds.
+                      This is useful for
+                      scheduling a callback in a different timeslot relative
+                      to TimedRobot.</dd>
 </dl>
 </section>
 </li>
