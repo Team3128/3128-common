@@ -430,7 +430,7 @@ public class NAR_CANSpark extends NAR_Motor {
 	}
 
 	public boolean getFault(FaultID fault) {
-		return getFault(fault);
+		return motor.getFault(fault);
 	}
 
 	/**
