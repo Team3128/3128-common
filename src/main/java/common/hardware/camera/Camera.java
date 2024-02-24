@@ -123,9 +123,13 @@ public class Camera {
         Optional<Pose3d> targetPosition = aprilTags.getTagPose(targetFiducialId);
 
         if (targetPosition.isEmpty()) {
+            if (NAR_Robot.logWithAdvantageKit) Logger.recordOutput("Vision/" + camera.getName() + "/Target",  robotPose.get());
             reportFiducialPoseError(targetFiducialId);
             return Optional.empty();
         }
+
+        if (NAR_Robot.logWithAdvantageKit) Logger.recordOutput("Vision/" + camera.getName() + "/Target",  targetPosition.get().toPose2d());
+
 
         return Optional.of(
                 new EstimatedRobotPose(
@@ -150,18 +154,18 @@ public class Camera {
         if (isDisabled) return;
         lastResult = camera.getLatestResult();
         if (!lastResult.hasTargets() && NAR_Robot.logWithAdvantageKit) {
-            Logger.recordOutput("Vision/" + camera.getName(), robotPose.get());
+            Logger.recordOutput("Vision/" + camera.getName() + "/Position", robotPose.get());
             return;
         }
 
         final Optional<EstimatedRobotPose> estimatedPose = getEstimatedPose(lastResult);
 
         if(!estimatedPose.isPresent() && NAR_Robot.logWithAdvantageKit) {
-            Logger.recordOutput("Vision/" + camera.getName(), robotPose.get());
+            Logger.recordOutput("Vision/" + camera.getName() + "/Position", robotPose.get());
         }
 
         lastPose = estimatedPose.get();
-        if (NAR_Robot.logWithAdvantageKit) Logger.recordOutput("Vision/" + camera.getName(), lastPose.estimatedPose.toPose2d());
+        if (NAR_Robot.logWithAdvantageKit) Logger.recordOutput("Vision/" + camera.getName() + "/Position", lastPose.estimatedPose.toPose2d());
         
         odometry.accept(lastPose.estimatedPose.toPose2d(), lastPose.timestampSeconds);
     }
