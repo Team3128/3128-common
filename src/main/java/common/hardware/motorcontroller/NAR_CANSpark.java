@@ -211,7 +211,7 @@ public class NAR_CANSpark extends NAR_Motor {
 			}
 		}
 		numFailedConfigs ++;
-		Log.fatal("Motors", "Failed to configure Spark Max " + motor.getDeviceId());
+		Log.info("Motors", "Failed to configure Spark Max " + motor.getDeviceId());
 	}
 
 	/**
