@@ -6,6 +6,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 
+import com.revrobotics.CANSparkBase.FaultID;
 import com.ctre.phoenix6.configs.MagnetSensorConfigs;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
@@ -223,10 +224,10 @@ public class SwerveModule {
      * @return State of the swerve module.
      */
     public State getRunningState() {
-        if (driveMotor.getTemperature() != 0 && angleMotor.getTemperature() != 0) {
+        if (driveMotor.getState() == State.RUNNING && angleMotor.getState() == State.RUNNING) {
             return State.RUNNING; 
         }
-        if (driveMotor.getTemperature() != 0 || angleMotor.getTemperature() != 0) {
+        if (driveMotor.getState() == State.DISCONNECTED || angleMotor.getState() == State.DISCONNECTED) {
             return State.PARTIALLY_RUNNING; 
         }
         return State.DISCONNECTED;

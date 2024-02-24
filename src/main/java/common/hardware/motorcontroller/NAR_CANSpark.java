@@ -15,6 +15,7 @@ import com.revrobotics.SparkPIDController;
 import com.revrobotics.SparkRelativeEncoder;
 import com.revrobotics.CANSparkBase.ControlType;
 import com.revrobotics.CANSparkBase.IdleMode;
+import com.revrobotics.CANSparkBase.FaultID;
 
 import common.core.controllers.PIDFFConfig;
 import common.core.misc.NAR_Robot;
@@ -424,13 +425,21 @@ public class NAR_CANSpark extends NAR_Motor {
         return motor;
     }
 
+	public short getAllFaults() {
+		return motor.getFaults();
+	}
+
+	public boolean getFault(FaultID fault) {
+		return getFault(fault);
+	}
+
 	/**
 	 * Returns motor and motor controller functionality.
 	 * @return State of the motor controller and motor.
 	 */
 	public State getState() {
 		//To do add check for motors
-		if (motor.getLastError() == REVLibError.kOk) {
+		if (motor.getFault(FaultID.kMotorFault) == false) {
 			return State.RUNNING;
 		}
 		return State.DISCONNECTED;
