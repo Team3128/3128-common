@@ -112,8 +112,9 @@ public class Camera {
         for (PhotonTrackedTarget target : result.targets) {
             double targetPoseAmbiguity = target.getPoseAmbiguity();
             double dist = target.getBestCameraToTarget().getTranslation().toTranslation2d().getNorm();
-            if (dist > distanceThreshold || targetPoseAmbiguity > ambiguityThreshold) continue;
+            if (dist > distanceThreshold || targetPoseAmbiguity > ambiguityThreshold || ignoredTags.contains(Double.valueOf(target.getFiducialId()))) continue;
             // Make sure the target is a Fiducial target.
+
             if (targetPoseAmbiguity != -1 && targetPoseAmbiguity < lowestAmbiguityScore) {
                 lowestAmbiguityScore = targetPoseAmbiguity;
                 lowestAmbiguityTarget = target;
@@ -128,7 +129,7 @@ public class Camera {
 
         Optional<Pose3d> targetPosition = aprilTags.getTagPose(targetFiducialId);
 
-        if (targetPosition.isEmpty() || ignoredTags.contains(Double.valueOf(targetFiducialId))) {
+        if (targetPosition.isEmpty()) {
             if (NAR_Robot.logWithAdvantageKit) Logger.recordOutput("Vision/" + camera.getName() + "/Target",  robotPose.get());
             reportFiducialPoseError(targetFiducialId);
             return Optional.empty();
