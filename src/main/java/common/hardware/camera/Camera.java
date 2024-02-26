@@ -43,6 +43,8 @@ public class Camera {
     private static Supplier<Pose2d> robotPose;
     private static double ambiguityThreshold = 0.3;
 
+    private static LinkedList<Double> ignoredTags = new LinkedList<Double>();
+
     public static final LinkedList<Camera> cameras = new LinkedList<Camera>();
 
     private static final HashSet<Integer> reportedErrors = new HashSet<Integer>();
@@ -70,6 +72,10 @@ public class Camera {
         Camera.calc_strategy = calc_strategy;
         Camera.odometry = odometry;
         Camera.robotPose = robotPose;
+    }
+
+    public static void setIgnoredTags(LinkedList<Double> ignoredTags) {
+        Camera.ignoredTags = ignoredTags;
     }
 
     public static void updateAll(){
@@ -122,14 +128,13 @@ public class Camera {
 
         Optional<Pose3d> targetPosition = aprilTags.getTagPose(targetFiducialId);
 
-        if (targetPosition.isEmpty()) {
+        if (targetPosition.isEmpty() || ignoredTags.contains(Double.valueOf(targetFiducialId))) {
             if (NAR_Robot.logWithAdvantageKit) Logger.recordOutput("Vision/" + camera.getName() + "/Target",  robotPose.get());
             reportFiducialPoseError(targetFiducialId);
             return Optional.empty();
         }
 
         if (NAR_Robot.logWithAdvantageKit) Logger.recordOutput("Vision/" + camera.getName() + "/Target",  targetPosition.get().toPose2d());
-
 
         return Optional.of(
                 new EstimatedRobotPose(
