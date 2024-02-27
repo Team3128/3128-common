@@ -219,6 +219,18 @@ public class Tester {
     }
 
     /**
+     * Adds a unit test to be run for a system.
+     * @param name Name of the test or system.
+     * @param test Unit test to be added.
+     */
+    public void addTest(String name, Test test) {
+        if (!systemTests.containsKey(name)) {
+            systemTests.put(name, new Test(name));
+        }
+        systemTests.get(name).addTest(test);
+    }
+
+    /**
      * Returns a Test for the robot.
      * @param name Name of the test or system.
      * @return A Test.
