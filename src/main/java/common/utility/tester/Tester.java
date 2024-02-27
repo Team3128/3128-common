@@ -102,6 +102,14 @@ public class Tester {
         }
 
         /**
+         * Adds a larger system test to be run.
+         * @param test Test for the robot.
+         */
+        public void addTest(Test test) {
+            unitTests.add(new UnitTest(test.getName(), test, ()-> test.state == TestState.PASSED));
+        }
+
+        /**
          * Adds a unit test to be run.
          * @param test A unit test for the system.
          */

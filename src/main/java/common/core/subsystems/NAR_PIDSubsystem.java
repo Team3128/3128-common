@@ -42,7 +42,7 @@ public abstract class NAR_PIDSubsystem extends SubsystemBase {
         public SetpointTest(String testName, double setpoint, double plateau, double timeOut) {
             super(testName, runOnce(()-> startPID(setpoint)).andThen(waitSeconds(timeOut)));
             this.plateau = plateau;
-            this.timeOut = 0;
+            this.timeOut = timeOut;
             timer = new Timer();
             prevTime = 0;
         }
