@@ -134,7 +134,7 @@ dependencies {
     implementation wpi.java.vendor.java()
 	implementation group: 'gov.nist.math', name: 'jama', version: '1.0.3'
 
-	implementation 'org.java-websocket:Java-WebSocket:1.4.0'
+	implementation 'org.java-websocket:Java-WebSocket:1.4.1'
     implementation group: 'com.googlecode.json-simple', name: 'json-simple', version: '1.1.1'
 
 	
