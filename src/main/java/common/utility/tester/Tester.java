@@ -125,6 +125,11 @@ public class Tester {
             passTimer.stop();
             passTimer.reset();
             Log.info(name, "TEST RUNNING");
+
+            for(UnitTest test : unitTests) {
+                test.testState = TestState.FAILED;
+            }
+
             if (unitTests.size() == 0) state = TestState.FAILED;
             else unitTests.get(0).schedule();
         }
