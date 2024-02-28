@@ -97,7 +97,7 @@ public class Tester {
             state = TestState.FAILED;
             curIndex = 0;
             passTimer = new Timer();
-            NarwhalDashboard.getInstance().addUpdate(name, ()-> state);
+            NarwhalDashboard.getInstance().addUpdate(name, ()-> state.toString());
             NarwhalDashboard.getInstance().addButton(name, (boolean pressed) -> {
                 if (pressed) this.schedule();
             });
