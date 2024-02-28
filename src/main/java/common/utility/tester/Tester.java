@@ -41,7 +41,7 @@ public class Tester {
          */
         public UnitTest(String testName, Command command, BooleanSupplier passCondition) {
             this.testName = testName;
-            this.command = command.handleInterrupt(()-> interrupted = true);
+            this.command = command;
             this.passCondition = passCondition;
             testState = TestState.FAILED;
             for (final Subsystem subsystem : command.getRequirements()) {
