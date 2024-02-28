@@ -72,7 +72,7 @@ public class Tester {
 
         @Override
         public boolean isFinished() {
-            return command.isFinished() || !command.isScheduled();
+            return command.isFinished();
         }
     }
 
