@@ -2,6 +2,7 @@ package common.utility.tester;
 
 import static edu.wpi.first.wpilibj2.command.Commands.*;
 import common.hardware.motorcontroller.NAR_Motor;
+import common.utility.Log;
 import common.utility.tester.Tester.UnitTest;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Subsystem;
@@ -104,12 +105,14 @@ public class CurrentTest extends UnitTest {
 
     @Override
     public void initialize() {
+        super.initialize();
         timer.restart();
         hasDelayed = false;
     }
 
     @Override
     public void execute() {
+        super.execute();
         if (!hasDelayed) {
             if (timer.hasElapsed(1)) {
                 hasDelayed = true;
