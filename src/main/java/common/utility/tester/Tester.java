@@ -22,7 +22,6 @@ public class Tester {
         protected Command command;
         protected BooleanSupplier passCondition;
         protected TestState testState;
-        private boolean interrupted = false;
 
         /**
          * Creates a new Unit Test.
@@ -53,7 +52,6 @@ public class Tester {
         public void initialize() {
             Log.info(testName, "Test Running");
             command.initialize();
-            interrupted = false;
             testState = TestState.RUNNING;
         }
 
@@ -65,7 +63,7 @@ public class Tester {
         @Override
         public void end(boolean interrupted) {
             Log.info(testName, "Test Ended");
-            testState = (this.interrupted || interrupted || !passCondition.getAsBoolean()) ? TestState.FAILED : TestState.PASSED;
+            testState = (interrupted || !passCondition.getAsBoolean()) ? TestState.FAILED : TestState.PASSED;
             Log.info(testName, "Test " + testState);
             command.end(interrupted);
         }

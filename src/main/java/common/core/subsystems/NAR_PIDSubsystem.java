@@ -9,7 +9,6 @@ import common.core.controllers.ControllerBase;
 import common.utility.Log;
 import common.utility.shuffleboard.NAR_Shuffleboard;
 import common.utility.tester.Tester;
-import common.utility.tester.Tester.TestState;
 import common.utility.tester.Tester.UnitTest;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.Timer;
@@ -28,8 +27,7 @@ public abstract class NAR_PIDSubsystem extends SubsystemBase {
      */
     public class SetpointTest extends UnitTest {
         private final double timeOut;
-        private final double plateau;
-        private final Timer timer;
+        private final Timer timer = new Timer();
         private double prevTime;
 
         /**
@@ -41,9 +39,8 @@ public abstract class NAR_PIDSubsystem extends SubsystemBase {
          */
         public SetpointTest(String testName, double setpoint, double plateau, double timeOut) {
             super(testName, runOnce(()-> startPID(setpoint)).andThen(waitSeconds(timeOut)));
-            this.plateau = plateau;
             this.timeOut = timeOut;
-            timer = new Timer();
+            passCondition = ()-> timer.hasElapsed(plateau);
             prevTime = 0;
         }
 
@@ -62,15 +59,14 @@ public abstract class NAR_PIDSubsystem extends SubsystemBase {
 
         @Override
         public void end(boolean interrupted) {
+            super.end(interrupted);
             Log.info(testName, "Expected Time: " + timeOut);
             Log.info(testName, "Actual Time: " + (Timer.getFPGATimestamp() - prevTime));
-            if (timer.hasElapsed(plateau)) testState = TestState.PASSED;
-            else testState = TestState.FAILED;
         }
 
         @Override
         public boolean isFinished() {
-            return super.isFinished() || timer.hasElapsed(plateau);
+            return super.isFinished() || passCondition.getAsBoolean();
         }
 
         /**

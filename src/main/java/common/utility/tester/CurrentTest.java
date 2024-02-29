@@ -13,6 +13,7 @@ import java.util.function.BooleanSupplier;
  */
 public class CurrentTest extends UnitTest {
 
+    private NAR_Motor motor;
     private double plateau;
     private boolean hasDelayed;
     private Timer timer;
@@ -95,9 +96,10 @@ public class CurrentTest extends UnitTest {
             Subsystem... subsystems) {
         super(
             testName, 
-            runOnce(()-> motor.set(power), subsystems).andThen(waitSeconds(timeout)).finallyDo(()-> motor.set(0)),
+            runOnce(()-> motor.set(power), subsystems).andThen(waitSeconds(timeout)),
             passCondition
         );
+        this.motor = motor;
         this.plateau = plateau;
         timer = new Timer();
         hasDelayed = false;
@@ -121,6 +123,12 @@ public class CurrentTest extends UnitTest {
             return;
         }
         if (!passCondition.getAsBoolean()) timer.reset();
+    }
+
+    @Override
+    public void end(boolean interrupted) {
+        super.end(interrupted);
+        motor.set(0);
     }
 
     @Override

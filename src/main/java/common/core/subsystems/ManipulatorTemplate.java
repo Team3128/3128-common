@@ -111,8 +111,8 @@ public abstract class ManipulatorTemplate extends SubsystemBase {
      * Initializes shuffleboard with debug elements.
      */
     public void initShuffleboard() {
-        NAR_Shuffleboard.addData("Manipulator", "Object Present", ()-> hasObjectPresent(), 0, 0);
-        NAR_Shuffleboard.addData("Manipulator", "Manip current", () -> getCurrent(), 0, 1);
+        NAR_Shuffleboard.addData(getName(), "Object Present", ()-> hasObjectPresent(), 0, 0);
+        NAR_Shuffleboard.addData(getName(), "Manip current", () -> getCurrent(), 0, 1);
         NAR_Shuffleboard.addData(getName(), "TOGGLE", false, 1, 0).withWidget("Toggle Button").getEntry();
         debug = NAR_Shuffleboard.getBoolean(getName(), "TOGGLE");
         NAR_Shuffleboard.addData(getName(), "DEBUG", ()-> debug.getAsBoolean(), 1, 1);
