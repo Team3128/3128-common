@@ -65,7 +65,7 @@ public abstract class NAR_PIDSubsystem extends SubsystemBase {
             Log.info(testName, "Expected Time: " + timeOut);
             Log.info(testName, "Actual Time: " + (Timer.getFPGATimestamp() - prevTime));
             if (timer.hasElapsed(plateau)) testState = TestState.PASSED;
-            testState = TestState.FAILED;
+            else testState = TestState.FAILED;
         }
 
         @Override
