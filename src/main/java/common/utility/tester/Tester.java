@@ -145,7 +145,6 @@ public class Tester {
                 passTimer.stop();
                 passTimer.reset();
                 state = TestState.RUNNING;
-                testToSchedule.testState = TestState.RUNNING;
                 testToSchedule.schedule();
                 testToSchedule = null;
             }
@@ -161,6 +160,7 @@ public class Tester {
                     if (curIndex < unitTests.size()) {
                         passTimer.restart();
                         testToSchedule = unitTests.get(curIndex);
+                        testToSchedule.testState = TestState.RUNNING;
                     }
                     return;
                 default:
