@@ -131,7 +131,11 @@ public class Tester {
             }
 
             if (unitTests.size() == 0) state = TestState.FAILED;
-            else unitTests.get(0).schedule();
+            else {
+                final UnitTest initialTest = unitTests.get(0);
+                initialTest.testState = TestState.RUNNING;
+                initialTest.schedule();
+            }
         }
 
         @Override
@@ -141,6 +145,7 @@ public class Tester {
                 passTimer.stop();
                 passTimer.reset();
                 state = TestState.RUNNING;
+                testToSchedule.testState = TestState.RUNNING;
                 testToSchedule.schedule();
                 testToSchedule = null;
             }
