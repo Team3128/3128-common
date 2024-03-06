@@ -439,7 +439,11 @@ public class NAR_CANSpark extends NAR_Motor {
 	 */
 	public State getState() {
 		//To do add check for motors
-		if (motor.getFault(FaultID.kSensorFault) == false && motor.getLastError() == REVLibError.kOk) {
+		if (!motor.getFault(FaultID.kSensorFault)
+			&& !motor.getFault(FaultID.kMotorFault)
+			&& !motor.getFault(FaultID.kEEPROMCRC)
+			&& motor.getLastError() == REVLibError.kOk 
+			) {
 			return State.RUNNING;
 		}
 		return State.DISCONNECTED;
