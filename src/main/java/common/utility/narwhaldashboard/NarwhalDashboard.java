@@ -18,6 +18,7 @@ import org.json.simple.JSONObject;
 
 import common.core.misc.NAR_Robot;
 import common.utility.Log;
+import common.utility.narwhaldashboard.DashAnnotations.NARUpdateable;
 import edu.wpi.first.util.function.BooleanConsumer;
 
 /**
@@ -204,7 +205,7 @@ public class NarwhalDashboard extends WebSocketServer implements AutoCloseable {
             conn.send(obj.toJSONString());
         }
     }
-    
+
     /**
      * Adds all the methods with the NARUpdateable annotation to the dashboard
      * 

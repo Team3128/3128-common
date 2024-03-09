@@ -9,6 +9,7 @@ common.hardware.limelight
 common.hardware.motorcontroller
 common.utility
 common.utility.narwhaldashboard
+common.utility.narwhaldashboard.DashAnnotations
 common.utility.shuffleboard
 common.utility.sysid
 common.utility.tester
