@@ -140,6 +140,15 @@ dependencies {
 	
 	def akitJson = new groovy.json.JsonSlurper().parseText(new File(projectDir.getAbsolutePath() + "/vendordeps/AdvantageKit.json").text)
     annotationProcessor "org.littletonrobotics.akit.junction:junction-autolog:$akitJson.version"
+
+	annotationProcessor 'com.google.auto.service:auto-service:1.0-rc5'
+    compileOnly 'com.google.auto.service:auto-service:1.0-rc5'
+
+
+	// annotationProcessor project("3128-common.processor.src.main.java.common.AnnotationProcessor")
+
+	// implementation project("3128-common.processor.src.main.java.common.AnnotationProcessor")
+	
         
     // For reference, here are a few more of the easy to add libraries not currently used:
    	//implementation pathfinder() (Jaci's)
@@ -172,6 +181,12 @@ def hash = { ->
     }
     
     return grgit.head().abbreviatedId
+}
+
+jar{
+	manifest {
+		attributes("NARAnnotationProc" : "common.utility.narwhaldashboard.DashAnnotations.AnnotationProcessor")
+	}
 }
 
 // Setting up 3128-common Jar File. In this case, adding version information to jar manifest.

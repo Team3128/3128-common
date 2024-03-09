@@ -1,4 +1,4 @@
-package common.utility.narwhaldashboard;
+package common;
 
 import java.lang.reflect.Method;
 import java.util.List;
@@ -12,12 +12,13 @@ import javax.lang.model.SourceVersion;
 import javax.lang.model.element.TypeElement;
 
 import common.core.subsystems.NAR_PIDSubsystem;
+import common.utility.narwhaldashboard.NarwhalDashboard;
 
 import javax.lang.model.element.Element; // Import the missing Element class
 import javax.lang.model.element.ElementKind; // Import the missing ElementKind class
 import java.util.stream.Collectors; // Import the missing Collectors class
 
-
+@AutoService(Processor.class)
 @SupportedAnnotationTypes("common.utility.narwhaldashboard.NARUpdateable")
 @SupportedSourceVersion(SourceVersion.RELEASE_11)
 public class AnnotationProcessor extends AbstractProcessor{
@@ -33,23 +34,21 @@ public class AnnotationProcessor extends AbstractProcessor{
 
     public void processAnnotation(Element element) {
         String methodName = element.getSimpleName().toString();
-        String packageName = element.getEnclosingElement().toString();
-        String annotationName = methodName + "AnnotationUpdateable"; // fix later
-        String annotationFullName = packageName + "." + annotationName;
+        
+        // String packageName = element.getEnclosingElement().toString();
+        // String annotationName = methodName + "AnnotationUpdateable"; // fix later
+        // String annotationFullName = packageName + "." + annotationName;
 
         element.getEnclosedElements()
             .stream().filter(e -> ElementKind.METHOD.equals(e.getKind())).forEach(
                 method -> {
                     NARUpdateable annotation = method.getAnnotation(NARUpdateable.class);
-                    String name = annotation.name();
-                    method.accept(null, null);
-                    method.
-                    NarwhalDashboard.addUpdate(name, ()->{
+                    NarwhalDashboard.getInstance().addUpdate(annotation.name(), ()->{
                         try {
-                            Method meth = method.getClass().getDeclaredMethod("getInstance");
-                            Object o = meth.invoke(null);
+                            Method meth = method.getClass().getDeclaredMethod(methodName);
+                            Object o = method.getClass().getDeclaredMethod("getInstance").invoke(null);
 
-                            return method.invoke(o);
+                            return meth.invoke(o);
                         } catch (Exception e) {
                             e.printStackTrace();
                             return null;
