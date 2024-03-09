@@ -1,5 +1,6 @@
 package common.utility.narwhaldashboard;
 
+import java.lang.reflect.Method;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -201,6 +202,34 @@ public class NarwhalDashboard extends WebSocketServer implements AutoCloseable {
                 obj.put(key, updateMap.get(key).get());
             }
             conn.send(obj.toJSONString());
+        }
+    }
+    
+    /**
+     * Adds all the methods with the NARUpdateable annotation to the dashboard
+     * 
+     * @param obj The object from a class that has methods with the NARUpdateable annotation
+     * 
+     * <p>
+     * EXAMPLE: SWERVEBASE CLASS 
+     */
+    public void addClassAnnotations(Object obj){
+        for(Method method: obj.getClass().getMethods()){
+            if(method.isAnnotationPresent(NARUpdateable.class)){
+                NARUpdateable annotation = method.getAnnotation(NARUpdateable.class);
+                String name = annotation.name();
+                if(name.equals("none")){
+                    name = method.getName();
+                }
+                addUpdate(name, ()->{
+                    try {
+                        return method.invoke(obj);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        return null;
+                    }
+                });
+            }
         }
     }
 
