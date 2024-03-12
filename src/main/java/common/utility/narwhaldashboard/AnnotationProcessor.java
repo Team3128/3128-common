@@ -18,6 +18,7 @@ import common.core.subsystems.NAR_PIDSubsystem;
 import javax.lang.model.element.Element; // Import the missing Element class
 import javax.lang.model.element.ElementKind; // Import the missing ElementKind class
 import javax.annotation.processing.Processor; // Import the missing Processor class
+import javax.tools.Diagnostic; // Import the missing Diagnostic class
 
 @AutoService(Processor.class)
 @SupportedAnnotationTypes("common.utility.narwhaldashboard.NARUpdateable")
@@ -26,6 +27,7 @@ public class AnnotationProcessor extends AbstractProcessor{
 
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
+        processingEnv.getMessager().printMessage(Diagnostic.Kind.WARNING, "Annotation Processor Running...");
         annotations.forEach(annotation ->
             roundEnv.getElementsAnnotatedWith(annotation).forEach(
                 element -> processAnnotation((Element) element)));
@@ -39,6 +41,7 @@ public class AnnotationProcessor extends AbstractProcessor{
         // String packageName = element.getEnclosingElement().toString();
         // String annotationName = methodName + "AnnotationUpdateable"; // fix later
         // String annotationFullName = packageName + "." + annotationName;
+        processingEnv.getMessager().printMessage(Diagnostic.Kind.WARNING, "Annotation Processor Running For" + methodName);
 
         element.getEnclosedElements()
             .stream().filter(e -> ElementKind.METHOD.equals(e.getKind())).forEach(
