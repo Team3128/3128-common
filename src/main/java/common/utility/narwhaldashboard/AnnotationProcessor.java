@@ -1,4 +1,4 @@
-package common;
+package common.utility.narwhaldashboard;
 
 import java.lang.reflect.Method;
 import java.util.List;
@@ -11,12 +11,13 @@ import javax.annotation.processing.SupportedSourceVersion;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.TypeElement;
 
+import com.google.auto.service.AutoService;
+
 import common.core.subsystems.NAR_PIDSubsystem;
-import common.utility.narwhaldashboard.NarwhalDashboard;
 
 import javax.lang.model.element.Element; // Import the missing Element class
 import javax.lang.model.element.ElementKind; // Import the missing ElementKind class
-import java.util.stream.Collectors; // Import the missing Collectors class
+import javax.annotation.processing.Processor; // Import the missing Processor class
 
 @AutoService(Processor.class)
 @SupportedAnnotationTypes("common.utility.narwhaldashboard.NARUpdateable")
