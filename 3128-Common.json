@@ -12,7 +12,7 @@
     {
       "groupId": "com.github.Team3128",
       "artifactId": "3128-common",
-      "version": "1.56"
+      "version": "1.5.6"
     }
   ],
   "jniDependencies": [],
