@@ -1,4 +1,4 @@
-package common.utility.narwhaldashboard.DashAnnotations;
+package common.utility.narwhaldashboard;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

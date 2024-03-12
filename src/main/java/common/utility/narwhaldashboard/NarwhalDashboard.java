@@ -18,7 +18,6 @@ import org.json.simple.JSONObject;
 
 import common.core.misc.NAR_Robot;
 import common.utility.Log;
-import common.utility.narwhaldashboard.DashAnnotations.NARUpdateable;
 import edu.wpi.first.util.function.BooleanConsumer;
 
 /**
