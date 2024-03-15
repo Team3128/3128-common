@@ -60,10 +60,10 @@ public class NAR_TalonSRX extends NAR_Motor {
 	 */
 	@Override
 	public void setDefaultStatusFrames() {
-		setStatusFramePeriod(StatusFrameEnhanced.Status_1_General, MotorControllerConstants.MAX_PRIORITY);
+		setStatusFramePeriod(StatusFrameEnhanced.Status_1_General, MotorControllerConstants.HIGH_PRIORITY);
 		setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, MotorControllerConstants.LOW_PRIORITY);
 		setStatusFramePeriod(StatusFrameEnhanced.Status_3_Quadrature, MotorControllerConstants.LOW_PRIORITY);
-		setStatusFramePeriod(StatusFrameEnhanced.Status_4_AinTempVbat, MotorControllerConstants.MEDIUM_PRIORITY);
+		setStatusFramePeriod(StatusFrameEnhanced.Status_4_AinTempVbat, MotorControllerConstants.LOW_PRIORITY);
 		setStatusFramePeriod(StatusFrameEnhanced.Status_8_PulseWidth, MotorControllerConstants.LOW_PRIORITY);
 		setStatusFramePeriod(StatusFrameEnhanced.Status_10_MotionMagic, MotorControllerConstants.LOW_PRIORITY);
 		setStatusFramePeriod(StatusFrameEnhanced.Status_12_Feedback1, MotorControllerConstants.LOW_PRIORITY);

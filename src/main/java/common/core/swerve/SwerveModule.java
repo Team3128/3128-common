@@ -13,6 +13,7 @@ import common.core.controllers.PIDFFConfig;
 import common.core.swerve.SwerveModuleConfig.SwerveMotorConfig;
 import common.hardware.motorcontroller.NAR_CANSpark;
 import common.hardware.motorcontroller.NAR_Motor;
+import common.hardware.motorcontroller.NAR_CANSpark.SparkMaxConfig;
 import common.hardware.motorcontroller.NAR_Motor.Control;
 import common.hardware.motorcontroller.NAR_Motor.Neutral;
 import common.utility.narwhaldashboard.NarwhalDashboard.State;
@@ -55,6 +56,7 @@ public class SwerveModule {
         
         /* Angle Encoder Config */
         angleEncoder = new CANcoder(config.cancoderID);
+        
         final SensorDirectionValue direction = config.CANCoderinvert ? SensorDirectionValue.Clockwise_Positive : SensorDirectionValue.CounterClockwise_Positive;
         angleEncoder.getConfigurator().apply(new MagnetSensorConfigs().withSensorDirection(direction));
 
@@ -77,7 +79,7 @@ public class SwerveModule {
         angleMotor.configMotor(angleConfig.motorConfig);
         angleMotor.configPID(angleConfig.pidffConfig);
         angleMotor.enableContinuousInput(-180, 180);
-        angleMotor.setDefaultStatusFrames();
+        angleMotor.setStatusFrames(SparkMaxConfig.POSITION);
         resetToAbsolute();
     }
 
