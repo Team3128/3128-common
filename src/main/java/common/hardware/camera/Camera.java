@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
+import java.util.ArrayList;
 
 import org.littletonrobotics.junction.Logger;
 import org.photonvision.EstimatedRobotPose;
@@ -30,6 +31,11 @@ import java.util.HashSet;
  */
 public class Camera {
 
+    public static int updateCounter = 0;
+
+    private static double validDist = 0.5;
+    private static double overrideThreshold = 30;
+
     private final PhotonCamera camera;
     private final Transform3d offset;
 
@@ -41,15 +47,15 @@ public class Camera {
     private static PoseStrategy calc_strategy;
     private static BiConsumer<Pose2d, Double> odometry;
     private static Supplier<Pose2d> robotPose;
-    private static double ambiguityThreshold = 0.3;
+    private static double ambiguityThreshold = 0.2;
 
-    private static LinkedList<Double> ignoredTags = new LinkedList<Double>();
+    private static ArrayList<Double> ignoredTags = new ArrayList<Double>();
 
     public static final LinkedList<Camera> cameras = new LinkedList<Camera>();
 
     private static final HashSet<Integer> reportedErrors = new HashSet<Integer>();
 
-    private static double distanceThreshold = 100;
+    private static double distanceThreshold = 3.5;
     
     public Camera(String name, double xOffset, double yOffset, double yawOffset, double pitchOffset, double rollOffset) {
         camera = new PhotonCamera(name);
@@ -74,8 +80,10 @@ public class Camera {
         Camera.robotPose = robotPose;
     }
 
-    public static void setIgnoredTags(LinkedList<Double> ignoredTags) {
-        Camera.ignoredTags = ignoredTags;
+    public static void addIgnoredTags(double ...ignoredTags) {
+        for(final double tag : ignoredTags) {
+            Camera.ignoredTags.add(tag);
+        }
     }
 
     public static void updateAll(){
@@ -171,9 +179,23 @@ public class Camera {
         }
 
         lastPose = estimatedPose.get();
-        if (NAR_Robot.logWithAdvantageKit) Logger.recordOutput("Vision/" + camera.getName() + "/Position", lastPose.estimatedPose.toPose2d());
+        Pose2d estPose = lastPose.estimatedPose.toPose2d();
+
+        if(!isGoodEstimate(estPose)) {
+            updateCounter++;
+            if (updateCounter <= overrideThreshold) return;
+        }
+        else {
+            updateCounter = 0;
+        }
+
+        if (NAR_Robot.logWithAdvantageKit) Logger.recordOutput("Vision/" + camera.getName() + "/Position", estPose);
         
-        odometry.accept(lastPose.estimatedPose.toPose2d(), lastPose.timestampSeconds);
+        odometry.accept(estPose, lastPose.timestampSeconds);
+    }
+
+    public boolean isGoodEstimate(Pose2d pose){
+        return pose.getTranslation().getDistance(robotPose.get().getTranslation()) < validDist;
     }
 
     public void initShuffleboard() {
