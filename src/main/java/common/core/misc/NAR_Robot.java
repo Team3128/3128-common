@@ -1,10 +1,14 @@
 package common.core.misc;
 
+import java.lang.management.GarbageCollectorMXBean;
+import java.lang.management.ManagementFactory;
 import java.lang.reflect.Method;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.PriorityQueue;
 
 import org.littletonrobotics.junction.AutoLogOutputManager;
+import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
@@ -25,7 +29,7 @@ import edu.wpi.first.wpilibj.Timer;
  */
 public class NAR_Robot extends IterativeRobotBase {
 
-    public static boolean logWithAdvantageKit = false;
+    public static boolean logWithAdvantageKit = true;
 
     @SuppressWarnings("MemberName")
     static class Callback implements Comparable<Callback> {
@@ -85,6 +89,8 @@ public class NAR_Robot extends IterativeRobotBase {
 
     private final Method periodicAfterUser0;
 
+    private final GcStatsCollector gcStatsCollector = new GcStatsCollector();
+
     /** Constructor for TimedRobot. */
     protected NAR_Robot() {
         this(kDefaultPeriod);
@@ -117,11 +123,12 @@ public class NAR_Robot extends IterativeRobotBase {
         addPeriodic(() -> {
             try {
                 long loopCycleStart = Logger.getRealTimestamp();
-                periodicBeforeUser0.invoke(null);
+                if (logWithAdvantageKit) periodicBeforeUser0.invoke(null);
                 long userCodeStart = Logger.getRealTimestamp();
                 loopFunc();
                 long loopCycleEnd = Logger.getRealTimestamp();
-                periodicAfterUser0.invoke(null, loopCycleEnd - userCodeStart, userCodeStart - loopCycleStart);
+                if (logWithAdvantageKit) gcStatsCollector.update();
+                if (logWithAdvantageKit) periodicAfterUser0.invoke(null, loopCycleEnd - userCodeStart, userCodeStart - loopCycleStart);
             } catch (Exception e) {
             }
         }, period);
@@ -282,4 +289,27 @@ public class NAR_Robot extends IterativeRobotBase {
     public static void addPeriodic(Runnable callback, double periodSeconds, double offsetSeconds) {
         m_callbacks.add(new Callback(callback, m_startTime, periodSeconds, offsetSeconds));
     }
+
+    private static final class GcStatsCollector {
+    private List<GarbageCollectorMXBean> gcBeans = ManagementFactory.getGarbageCollectorMXBeans();
+    private final long[] lastTimes = new long[gcBeans.size()];
+    private final long[] lastCounts = new long[gcBeans.size()];
+  
+    public void update() {
+      long accumTime = 0;
+      long accumCounts = 0;
+      for (int i = 0; i < gcBeans.size(); i++) {
+        long gcTime = gcBeans.get(i).getCollectionTime();
+        long gcCount = gcBeans.get(i).getCollectionCount();
+        accumTime += gcTime - lastTimes[i];
+        accumCounts += gcCount - lastCounts[i];
+  
+        lastTimes[i] = gcTime;
+        lastCounts[i] = gcCount;
+      }
+  
+      Logger.recordOutput("LoggedRobot/GCTimeMS", (double) accumTime);
+      Logger.recordOutput("LoggedRobot/GCCounts", (double) accumCounts);
+    }
+  }
 }
