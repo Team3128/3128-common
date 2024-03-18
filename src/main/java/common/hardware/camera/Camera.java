@@ -33,8 +33,8 @@ public class Camera {
 
     public static int updateCounter = 0;
 
-    private static double validDist = 0.5;
-    private static double overrideThreshold = 30;
+    public static double validDist = 0.5;
+    public static double overrideThreshold = 30;
 
     private final PhotonCamera camera;
     private final Transform3d offset;
