@@ -25,6 +25,7 @@ import edu.wpi.first.util.function.BooleanConsumer;
  * @since Deep Space 2019
  * @author Mason Lam
  */
+@NARUpdateable
 public class NarwhalDashboard extends WebSocketServer implements AutoCloseable {
     private final HashMap<String, List<Object>> initMap = new HashMap<String, List<Object>>();
     private final HashMap<String, Supplier<Object>> updateMap = new HashMap<String, Supplier<Object>>();

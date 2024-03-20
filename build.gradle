@@ -121,6 +121,13 @@ eclipse {
     }
 }
 
+compileJava {
+    options.annotationProcessorGeneratedSourcesDirectory = file("${projectDir}/generated")
+    options.compilerArgs += [
+        '-AoutputDirectory=${projectDir}/generated'
+    ]
+}
+
 // task(checkAkitInstall, dependsOn: "classes", type: JavaExec) {
 //     mainClass = "org.littletonrobotics.junction.CheckInstall"
 //     classpath = sourceSets.main.runtimeClasspath
@@ -141,7 +148,14 @@ dependencies {
 	
 	def akitJson = new groovy.json.JsonSlurper().parseText(new File(projectDir.getAbsolutePath() + "/vendordeps/AdvantageKit.json").text)
     annotationProcessor "org.littletonrobotics.akit.junction:junction-autolog:$akitJson.version"
-        
+	implementation "org.littletonrobotics.akit.junction:junction-autolog:$akitJson.version"
+
+	// annotationProcessor project(':processorModule')
+
+	//annotationProcessor project(':processorModule.src.main.java.CommonProcessor')
+	//annotationProcessor project(':processorModule.src.main.java.CommonProcessor')
+
+	// annotationProcessor project(':processorModule.src.main.java.CommonProcessor')        
     // For reference, here are a few more of the easy to add libraries not currently used:
    	//implementation pathfinder() (Jaci's)
    	//implementation openrioMatchData()
