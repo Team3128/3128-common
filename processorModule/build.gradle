@@ -1,0 +1,20 @@
+plugins {
+    id 'java'
+}
+
+group 'com.common'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    annotationProcessor 'com.google.auto.service:auto-service:1.0-rc5'
+    implementation 'com.google.auto.service:auto-service:1.0-rc5'
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
