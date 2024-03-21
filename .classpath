@@ -60,11 +60,6 @@
 			<attribute name="gradle.buildServer" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="/Users/teja.yaramada/.gradle/caches/modules-2/files-2.1/org.littletonrobotics.akit.junction/wpilib-shim/3.1.1/51d29fc042b1b8ea29f2d68a8d5a8071208858f6/wpilib-shim-3.1.1.jar" sourcepath="/Users/teja.yaramada/.gradle/caches/modules-2/files-2.1/org.littletonrobotics.akit.junction/wpilib-shim/3.1.1/ad277a5b6f08dc7d91c9f6124e0e015b7e63b574/wpilib-shim-3.1.1-sources.jar">
-		<attributes>
-			<attribute name="gradle.buildServer" value="true"/>
-		</attributes>
-	</classpathentry>
 	<classpathentry kind="lib" path="/Users/teja.yaramada/.gradle/caches/modules-2/files-2.1/org.hamcrest/hamcrest-core/1.1/860340562250678d1a344907ac75754e259cdb14/hamcrest-core-1.1.jar" sourcepath="/Users/teja.yaramada/.gradle/caches/modules-2/files-2.1/org.hamcrest/hamcrest-core/1.1/2ccf1154d1a8936042a8a742dc3e611d02ac7213/hamcrest-core-1.1-sources.jar">
 		<attributes>
 			<attribute name="gradle.buildServer" value="true"/>
@@ -125,7 +120,22 @@
 			<attribute name="gradle.buildServer" value="true"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="/Users/teja.yaramada/.gradle/caches/modules-2/files-2.1/org.littletonrobotics.akit.junction/junction-autolog/3.2.0/abaf89ad1ac7acc95dbc0d3f0785a39acf98dd0e/junction-autolog-3.2.0.jar" sourcepath="/Users/teja.yaramada/.gradle/caches/modules-2/files-2.1/org.littletonrobotics.akit.junction/junction-autolog/3.2.0/613c73ef2d87adbab97eb5b0e9cda6f73db8958c/junction-autolog-3.2.0-sources.jar">
+		<attributes>
+			<attribute name="gradle.buildServer" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/Users/teja.yaramada/.gradle/caches/modules-2/files-2.1/org.photonvision/photontargeting-java/v2024.3.1/51462257fdfb77cad3ceb94d703659a223e1fc3/photontargeting-java-v2024.3.1.jar" sourcepath="/Users/teja.yaramada/.gradle/caches/modules-2/files-2.1/org.photonvision/photontargeting-java/v2024.3.1/fe2e068cb74ec3166368ba42d65e80e03cbf87b3/photontargeting-java-v2024.3.1-sources.jar">
+		<attributes>
+			<attribute name="gradle.buildServer" value="true"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="lib" path="/Users/teja.yaramada/.gradle/caches/modules-2/files-2.1/com.google.guava/guava/27.0.1-jre/bd41a290787b5301e63929676d792c507bbc00ae/guava-27.0.1-jre.jar" sourcepath="/Users/teja.yaramada/.gradle/caches/modules-2/files-2.1/com.google.guava/guava/27.0.1-jre/cb5c1119df8d41a428013289b193eba3ccaf5f60/guava-27.0.1-jre-sources.jar">
+		<attributes>
+			<attribute name="gradle.buildServer" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/Users/teja.yaramada/.gradle/caches/modules-2/files-2.1/com.squareup/javapoet/1.13.0/d6562d385049f35eb50403fa86bb11cce76b866a/javapoet-1.13.0.jar" sourcepath="/Users/teja.yaramada/.gradle/caches/modules-2/files-2.1/com.squareup/javapoet/1.13.0/dfb1b91cb583dba87ec8cc64b18e2f9f852ba1cc/javapoet-1.13.0-sources.jar">
 		<attributes>
 			<attribute name="gradle.buildServer" value="true"/>
 		</attributes>
@@ -141,6 +151,11 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="lib" path="/Users/teja.yaramada/wpilib/2024/maven/edu/wpi/first/cameraserver/cameraserver-java/2024.3.1/cameraserver-java-2024.3.1.jar" sourcepath="/Users/teja.yaramada/wpilib/2024/maven/edu/wpi/first/cameraserver/cameraserver-java/2024.3.1/cameraserver-java-2024.3.1-sources.jar">
+		<attributes>
+			<attribute name="gradle.buildServer" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/Users/teja.yaramada/.gradle/caches/modules-2/files-2.1/org.photonvision/photonlib-java/v2024.3.1/c1a3e0cb397ca7588d0b88fe17a860db4a4ce340/photonlib-java-v2024.3.1.jar" sourcepath="/Users/teja.yaramada/.gradle/caches/modules-2/files-2.1/org.photonvision/photonlib-java/v2024.3.1/26293447a536e7fcef6eb34263a8e611aaee3e20/photonlib-java-v2024.3.1-sources.jar">
 		<attributes>
 			<attribute name="gradle.buildServer" value="true"/>
 		</attributes>
@@ -180,6 +195,11 @@
 			<attribute name="gradle.buildServer" value="true"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="/Users/teja.yaramada/.gradle/caches/modules-2/files-2.1/org.littletonrobotics.akit.junction/wpilib-shim/3.2.0/fb416330713c18255e0e0e97a8788b006bfbdc1d/wpilib-shim-3.2.0.jar" sourcepath="/Users/teja.yaramada/.gradle/caches/modules-2/files-2.1/org.littletonrobotics.akit.junction/wpilib-shim/3.2.0/b6ad9b8c54ea7d21165734be024c32fcd8af841f/wpilib-shim-3.2.0-sources.jar">
+		<attributes>
+			<attribute name="gradle.buildServer" value="true"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="lib" path="/Users/teja.yaramada/wpilib/2024/maven/edu/wpi/first/cscore/cscore-java/2024.3.1/cscore-java-2024.3.1.jar" sourcepath="/Users/teja.yaramada/wpilib/2024/maven/edu/wpi/first/cscore/cscore-java/2024.3.1/cscore-java-2024.3.1-sources.jar">
 		<attributes>
 			<attribute name="gradle.buildServer" value="true"/>
@@ -195,12 +215,12 @@
 			<attribute name="gradle.buildServer" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="/Users/teja.yaramada/.gradle/caches/modules-2/files-2.1/com.fasterxml.jackson.core/jackson-databind/2.15.2/9353b021f10c307c00328f52090de2bdb4b6ff9c/jackson-databind-2.15.2.jar" sourcepath="/Users/teja.yaramada/.gradle/caches/modules-2/files-2.1/com.fasterxml.jackson.core/jackson-databind/2.15.2/32d4d520f3e46e7b2c2d4d863d8f2f381af4fa6/jackson-databind-2.15.2-sources.jar">
+	<classpathentry kind="lib" path="/Users/teja.yaramada/.gradle/caches/modules-2/files-2.1/org.littletonrobotics.akit.junction/junction-core/3.2.0/531a38290fb542465f1e26900973da858a4eb507/junction-core-3.2.0.jar" sourcepath="/Users/teja.yaramada/.gradle/caches/modules-2/files-2.1/org.littletonrobotics.akit.junction/junction-core/3.2.0/ca66b2a609dc98d803e0ab096cf288fd8ab607a4/junction-core-3.2.0-sources.jar">
 		<attributes>
 			<attribute name="gradle.buildServer" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="/Users/teja.yaramada/.gradle/caches/modules-2/files-2.1/org.photonvision/photonlib-java/v2024.2.9/b8285287f084dc9c7aef5da3a0391665c466a315/photonlib-java-v2024.2.9.jar" sourcepath="/Users/teja.yaramada/.gradle/caches/modules-2/files-2.1/org.photonvision/photonlib-java/v2024.2.9/f55a7a216231fa544a3993755cd028918a043d29/photonlib-java-v2024.2.9-sources.jar">
+	<classpathentry kind="lib" path="/Users/teja.yaramada/.gradle/caches/modules-2/files-2.1/com.fasterxml.jackson.core/jackson-databind/2.15.2/9353b021f10c307c00328f52090de2bdb4b6ff9c/jackson-databind-2.15.2.jar" sourcepath="/Users/teja.yaramada/.gradle/caches/modules-2/files-2.1/com.fasterxml.jackson.core/jackson-databind/2.15.2/32d4d520f3e46e7b2c2d4d863d8f2f381af4fa6/jackson-databind-2.15.2-sources.jar">
 		<attributes>
 			<attribute name="gradle.buildServer" value="true"/>
 		</attributes>
@@ -210,17 +230,12 @@
 			<attribute name="gradle.buildServer" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="/Users/teja.yaramada/.gradle/caches/modules-2/files-2.1/org.littletonrobotics.akit.conduit/conduit-api/3.1.1/c287925b35fa1855041ffbfb039776a846e35a15/conduit-api-3.1.1.jar" sourcepath="/Users/teja.yaramada/.gradle/caches/modules-2/files-2.1/org.littletonrobotics.akit.conduit/conduit-api/3.1.1/a7145a257d9e17ab70d49bb8645d9e12877b42e5/conduit-api-3.1.1-sources.jar">
-		<attributes>
-			<attribute name="gradle.buildServer" value="true"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="/Users/teja.yaramada/.gradle/caches/modules-2/files-2.1/org.littletonrobotics.akit.junction/junction-core/3.1.1/910924ce9b4430d581c800161a6c5918b12e3b30/junction-core-3.1.1.jar" sourcepath="/Users/teja.yaramada/.gradle/caches/modules-2/files-2.1/org.littletonrobotics.akit.junction/junction-core/3.1.1/1516081eee3d6b1339d7536a8589063222e1a6e4/junction-core-3.1.1-sources.jar">
-		<attributes>
-			<attribute name="gradle.buildServer" value="true"/>
-		</attributes>
-	</classpathentry>
 	<classpathentry kind="lib" path="/Users/teja.yaramada/.gradle/caches/modules-2/files-2.1/com.google.code.findbugs/jsr305/3.0.2/25ea2e8b0c338a877313bd4672d3fe056ea78f0d/jsr305-3.0.2.jar" sourcepath="/Users/teja.yaramada/.gradle/caches/modules-2/files-2.1/com.google.code.findbugs/jsr305/3.0.2/b19b5927c2c25b6c70f093767041e641ae0b1b35/jsr305-3.0.2-sources.jar">
+		<attributes>
+			<attribute name="gradle.buildServer" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/Users/teja.yaramada/.gradle/caches/modules-2/files-2.1/org.littletonrobotics.akit.conduit/conduit-api/3.2.0/c287925b35fa1855041ffbfb039776a846e35a15/conduit-api-3.2.0.jar" sourcepath="/Users/teja.yaramada/.gradle/caches/modules-2/files-2.1/org.littletonrobotics.akit.conduit/conduit-api/3.2.0/a7145a257d9e17ab70d49bb8645d9e12877b42e5/conduit-api-3.2.0-sources.jar">
 		<attributes>
 			<attribute name="gradle.buildServer" value="true"/>
 		</attributes>
@@ -251,11 +266,6 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="lib" path="/Users/teja.yaramada/wpilib/2024/maven/edu/wpi/first/wpiunits/wpiunits-java/2024.3.1/wpiunits-java-2024.3.1.jar" sourcepath="/Users/teja.yaramada/wpilib/2024/maven/edu/wpi/first/wpiunits/wpiunits-java/2024.3.1/wpiunits-java-2024.3.1-sources.jar">
-		<attributes>
-			<attribute name="gradle.buildServer" value="true"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="/Users/teja.yaramada/.gradle/caches/modules-2/files-2.1/org.photonvision/photontargeting-java/v2024.2.9/4e2433f97cda4b9624a05f949728d844b4dc5c3/photontargeting-java-v2024.2.9.jar" sourcepath="/Users/teja.yaramada/.gradle/caches/modules-2/files-2.1/org.photonvision/photontargeting-java/v2024.2.9/c6ff478d28a24ae35b73a031052983819aa95d3a/photontargeting-java-v2024.2.9-sources.jar">
 		<attributes>
 			<attribute name="gradle.buildServer" value="true"/>
 		</attributes>
