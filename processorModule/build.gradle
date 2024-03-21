@@ -12,9 +12,10 @@ repositories {
 dependencies {
     annotationProcessor 'com.google.auto.service:auto-service:1.0-rc5'
     implementation 'com.google.auto.service:auto-service:1.0-rc5'
-}
 
+    compileOnly project(':')
+}
 java {
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
 }

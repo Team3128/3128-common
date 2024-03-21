@@ -148,10 +148,9 @@ dependencies {
 	
 	def akitJson = new groovy.json.JsonSlurper().parseText(new File(projectDir.getAbsolutePath() + "/vendordeps/AdvantageKit.json").text)
     annotationProcessor "org.littletonrobotics.akit.junction:junction-autolog:$akitJson.version"
-	implementation "org.littletonrobotics.akit.junction:junction-autolog:$akitJson.version"
 
-	// annotationProcessor project(':processorModule')
-
+	annotationProcessor project(':processorModule')
+	
 	//annotationProcessor project(':processorModule.src.main.java.CommonProcessor')
 	//annotationProcessor project(':processorModule.src.main.java.CommonProcessor')
 
