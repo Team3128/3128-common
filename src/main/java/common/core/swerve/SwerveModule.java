@@ -13,9 +13,12 @@ import common.core.controllers.PIDFFConfig;
 import common.core.swerve.SwerveModuleConfig.SwerveMotorConfig;
 import common.hardware.motorcontroller.NAR_CANSpark;
 import common.hardware.motorcontroller.NAR_Motor;
+import common.hardware.motorcontroller.NAR_CANSpark.SparkMaxConfig;
 import common.hardware.motorcontroller.NAR_Motor.Control;
 import common.hardware.motorcontroller.NAR_Motor.Neutral;
 import common.utility.narwhaldashboard.NarwhalDashboard.State;
+
+import java.util.function.Supplier;
 
 
 /**
@@ -24,6 +27,8 @@ import common.utility.narwhaldashboard.NarwhalDashboard.State;
  * @author Mika Okamato, Mason Lam
  */
 public class SwerveModule {
+
+    public static boolean shouldOptimizeCAN = true;
 
     public final int moduleNumber;
     private final double angleOffset;
@@ -38,6 +43,8 @@ public class SwerveModule {
     private final double maxSpeed;
 
     private Rotation2d lastAngle;
+
+    private final Supplier<Double> absoluteAngle;
 
     /**
      * Creates a new Swerve Module object
@@ -55,6 +62,14 @@ public class SwerveModule {
         
         /* Angle Encoder Config */
         angleEncoder = new CANcoder(config.cancoderID);
+        var absoluteAngleSupplier = angleEncoder.getAbsolutePosition();
+        if (shouldOptimizeCAN) {
+            absoluteAngleSupplier.setUpdateFrequency(100);
+            angleEncoder.optimizeBusUtilization();
+        }
+        absoluteAngle = absoluteAngleSupplier.asSupplier();
+        
+        
         final SensorDirectionValue direction = config.CANCoderinvert ? SensorDirectionValue.Clockwise_Positive : SensorDirectionValue.CounterClockwise_Positive;
         angleEncoder.getConfigurator().apply(new MagnetSensorConfigs().withSensorDirection(direction));
 
@@ -77,7 +92,7 @@ public class SwerveModule {
         angleMotor.configMotor(angleConfig.motorConfig);
         angleMotor.configPID(angleConfig.pidffConfig);
         angleMotor.enableContinuousInput(-180, 180);
-        angleMotor.setDefaultStatusFrames();
+        angleMotor.setStatusFrames(SparkMaxConfig.POSITION);
         resetToAbsolute();
     }
 
@@ -150,7 +165,7 @@ public class SwerveModule {
      * Returns the current angle of the CANCoder
      */
     public Rotation2d getCanCoder(){
-        return Rotation2d.fromDegrees(MathUtil.inputModulus(angleEncoder.getAbsolutePosition().getValueAsDouble() * 360 - angleOffset, -180, 180));
+        return Rotation2d.fromDegrees(MathUtil.inputModulus(absoluteAngle.get() * 360 - angleOffset, -180, 180));
     }
 
     /**
