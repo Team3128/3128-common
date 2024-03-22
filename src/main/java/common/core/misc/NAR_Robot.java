@@ -4,6 +4,8 @@ import java.lang.management.GarbageCollectorMXBean;
 import java.lang.management.ManagementFactory;
 import java.lang.reflect.Method;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.PriorityQueue;
 
@@ -11,6 +13,7 @@ import org.littletonrobotics.junction.AutoLogOutputManager;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
+import org.reflections.Reflections;
 
 import edu.wpi.first.hal.DriverStationJNI;
 import edu.wpi.first.hal.HAL;
@@ -92,6 +95,8 @@ public class NAR_Robot extends IterativeRobotBase {
 
     private final GcStatsCollector gcStatsCollector = new GcStatsCollector();
 
+    private static List<Method> processorGeneratedContainers = new LinkedList<Method>();
+
     /** Constructor for TimedRobot. */
     protected NAR_Robot() {
         this(kDefaultPeriod);
@@ -144,11 +149,33 @@ public class NAR_Robot extends IterativeRobotBase {
         NotifierJNI.cleanNotifier(m_notifier);
     }
 
+    public void addProcessorGeneratedContainer(String classPath) {
+        try {
+            Class<?> container = Class.forName(classPath);
+            Method updateMethod = container.getDeclaredMethod("update");
+            processorGeneratedContainers.add(updateMethod);
+        } catch (ClassNotFoundException | NoSuchMethodException | SecurityException e) {
+            System.out.println("Failed to add processor generated container: " + classPath);
+            e.printStackTrace();
+        }
+    }
+
+    private void containersInit() {
+        for(Method updateMethod : processorGeneratedContainers) {
+            try {
+                updateMethod.invoke(null);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     /** Provide an alternate "main loop" via startCompetition(). */
     @Override
     public void startCompetition() {
         long initStart = Logger.getRealTimestamp();
         robotInit();
+        containersInit();
 
         if (isSimulation()) {
             simulationInit();
