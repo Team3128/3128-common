@@ -149,7 +149,7 @@ public class NAR_Robot extends IterativeRobotBase {
         NotifierJNI.cleanNotifier(m_notifier);
     }
 
-    public void addProcessorGeneratedContainer(String classPath) {
+    public static void addProcessorGeneratedContainer(String classPath) {
         try {
             Class<?> container = Class.forName(classPath);
             Method updateMethod = container.getDeclaredMethod("update");
