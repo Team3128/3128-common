@@ -79,8 +79,8 @@ public abstract class NAR_PIDSubsystem extends SubsystemBase {
 
     protected final ControllerBase controller;
     protected boolean enabled;
-    private BooleanSupplier debug;
-    private DoubleSupplier setpoint;
+    protected BooleanSupplier debug;
+    protected DoubleSupplier setpoint;
     private double min, max;
     private double safetyThresh;
     private Timer safetyTimer = new Timer();

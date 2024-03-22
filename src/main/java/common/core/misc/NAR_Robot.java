@@ -19,6 +19,7 @@ import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.IterativeRobotBase;
+import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 
 /**
@@ -155,13 +156,15 @@ public class NAR_Robot extends IterativeRobotBase {
 
         long initEnd = Logger.getRealTimestamp();
 
-        try {
-            Method registerFields = AutoLogOutputManager.class.getDeclaredMethod("registerFields", Object.class);
-            registerFields.setAccessible(true);
-            registerFields.invoke(null, this);
-            periodicAfterUser0.invoke(null, initEnd - initStart, 0);
-        } catch (Exception e) {
-            e.printStackTrace();
+        if (logWithAdvantageKit) {
+            try {
+                Method registerFields = AutoLogOutputManager.class.getDeclaredMethod("registerFields", Object.class);
+                registerFields.setAccessible(true);
+                registerFields.invoke(null, this);
+                periodicAfterUser0.invoke(null, initEnd - initStart, 0);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
         // Tell the DS that the robot is ready to be enabled

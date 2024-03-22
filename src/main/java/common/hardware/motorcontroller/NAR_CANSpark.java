@@ -119,7 +119,7 @@ public class NAR_CANSpark extends NAR_Motor {
     public NAR_CANSpark(int deviceNumber, ControllerType controllerType, MotorType motorType, EncoderType encoderType, PIDFFConfig PIDconfig) {
 		super(deviceNumber);
         motor = controllerType == ControllerType.CAN_SPARK_MAX ? new CANSparkMax(deviceNumber, motorType) : new CANSparkFlex(deviceNumber, motorType);
-		
+		motor.setCANMaxRetries(0);
 		configSpark(()-> motor.clearFaults());
 		configSpark(()-> motor.restoreFactoryDefaults()); // Reset config parameters, unfollow other motor controllers
 		configSpark(()-> motor.setCANTimeout(canSparkMaxTimeout));		//I have this here and I don't know why - Mason
