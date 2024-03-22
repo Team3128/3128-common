@@ -13,7 +13,6 @@ import org.littletonrobotics.junction.AutoLogOutputManager;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
-import org.reflections.Reflections;
 
 import edu.wpi.first.hal.DriverStationJNI;
 import edu.wpi.first.hal.HAL;
@@ -94,7 +93,7 @@ public class NAR_Robot extends IterativeRobotBase {
 
     private final GcStatsCollector gcStatsCollector = new GcStatsCollector();
 
-    private static List<Method> processorGeneratedContainers = new LinkedList<Method>();
+    private static List<String> generatedContainerPackages = new LinkedList<String>();
 
     /** Constructor for TimedRobot. */
     protected NAR_Robot() {
@@ -148,20 +147,15 @@ public class NAR_Robot extends IterativeRobotBase {
         NotifierJNI.cleanNotifier(m_notifier);
     }
 
-    public static void addProcessorGeneratedContainer(String classPath) {
-        try {
-            Class<?> container = Class.forName(classPath);
-            Method updateMethod = container.getDeclaredMethod("update");
-            processorGeneratedContainers.add(updateMethod);
-        } catch (ClassNotFoundException | NoSuchMethodException | SecurityException e) {
-            System.out.println("Failed to add processor generated container: " + classPath);
-            e.printStackTrace();
-        }
+    public static void addProcessorGeneratedContainer(String classPackage) {
+        generatedContainerPackages.add(classPackage);
     }
 
     private void containersInit() {
-        for(Method updateMethod : processorGeneratedContainers) {
+        for(String classPackage : generatedContainerPackages) {
             try {
+                Class<?> container = Class.forName(classPackage);
+                Method updateMethod = container.getDeclaredMethod("update");
                 updateMethod.invoke(null);
             } catch (Exception e) {
                 e.printStackTrace();
