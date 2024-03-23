@@ -4,21 +4,18 @@ import java.lang.management.GarbageCollectorMXBean;
 import java.lang.management.ManagementFactory;
 import java.lang.reflect.Method;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.PriorityQueue;
 
 import org.littletonrobotics.junction.AutoLogOutputManager;
-import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
 import edu.wpi.first.hal.DriverStationJNI;
-import edu.wpi.first.hal.HAL;
-import edu.wpi.first.hal.NotifierJNI;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.NotifierJNI;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.IterativeRobotBase;
 import edu.wpi.first.wpilibj.Timer;
@@ -93,8 +90,6 @@ public class NAR_Robot extends IterativeRobotBase {
 
     private final GcStatsCollector gcStatsCollector = new GcStatsCollector();
 
-    public static List<String> generatedContainerPackages = new LinkedList<String>();
-
     /** Constructor for TimedRobot. */
     protected NAR_Robot() {
         this(kDefaultPeriod);
@@ -147,28 +142,11 @@ public class NAR_Robot extends IterativeRobotBase {
         NotifierJNI.cleanNotifier(m_notifier);
     }
 
-    public static void addProcessorGeneratedContainer(String classPackage) {
-        generatedContainerPackages.add(classPackage);
-    }
-
-    private void containersInit() {
-        for(String classPackage : generatedContainerPackages) {
-            try {
-                Class<?> container = Class.forName(classPackage);
-                Method updateMethod = container.getDeclaredMethod("update");
-                updateMethod.invoke(null);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
     /** Provide an alternate "main loop" via startCompetition(). */
     @Override
     public void startCompetition() {
         long initStart = Logger.getRealTimestamp();
         robotInit();
-        containersInit();
 
         if (isSimulation()) {
             simulationInit();
