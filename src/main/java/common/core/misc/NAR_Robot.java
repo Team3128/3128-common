@@ -93,7 +93,7 @@ public class NAR_Robot extends IterativeRobotBase {
 
     private final GcStatsCollector gcStatsCollector = new GcStatsCollector();
 
-    private static List<String> generatedContainerPackages = new LinkedList<String>();
+    public static List<String> generatedContainerPackages = new LinkedList<String>();
 
     /** Constructor for TimedRobot. */
     protected NAR_Robot() {
