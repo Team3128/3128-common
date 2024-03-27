@@ -8,6 +8,7 @@ common.hardware.input
 common.hardware.limelight
 common.hardware.motorcontroller
 common.utility
+common.utility.annotations
 common.utility.narwhaldashboard
 common.utility.shuffleboard
 common.utility.sysid
