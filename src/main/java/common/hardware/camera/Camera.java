@@ -5,6 +5,7 @@ import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import org.littletonrobotics.junction.Logger;
 import org.photonvision.EstimatedRobotPose;
@@ -31,6 +32,12 @@ import java.util.HashSet;
  */
 public class Camera {
 
+    public static boolean areShootTagsSeen = false;
+
+    private static ArrayList<Integer> shootTags = new ArrayList<Integer>();
+
+    private static HashMap<Camera, Boolean> shootTagsSeen = new HashMap<Camera, Boolean>();
+
     public static int updateCounter = 0;
 
     public static double validDist = 0.5;
@@ -49,7 +56,7 @@ public class Camera {
     private static Supplier<Pose2d> robotPose;
     private static double ambiguityThreshold = 0.2;
 
-    private static ArrayList<Double> ignoredTags = new ArrayList<Double>();
+    private static ArrayList<Integer> ignoredTags = new ArrayList<Integer>();
 
     public static final LinkedList<Camera> cameras = new LinkedList<Camera>();
 
@@ -71,6 +78,7 @@ public class Camera {
         }
 
         cameras.add(this);
+        shootTagsSeen.put(this, false);
     }
 
     public static void configCameras(AprilTagFields aprilTagLayout, PoseStrategy calc_strategy, BiConsumer<Pose2d, Double> odometry, Supplier<Pose2d> robotPose){
@@ -80,10 +88,26 @@ public class Camera {
         Camera.robotPose = robotPose;
     }
 
-    public static void addIgnoredTags(double ...ignoredTags) {
-        for(final double tag : ignoredTags) {
+    public static void addIgnoredTags(int ...ignoredTags) {
+        for(final int tag : ignoredTags) {
             Camera.ignoredTags.add(tag);
         }
+    }
+
+    public static void addShootTags(int ...shootTags) {
+        for(final int tag : shootTags) {
+            Camera.shootTags.add(tag);
+        }
+    }
+
+    public static void checkShootTagsAll(){
+        for (final Camera camera : cameras) {
+            if(shootTagsSeen.get(camera)) {
+                areShootTagsSeen = true;
+                return;
+            }
+        }
+        areShootTagsSeen = false;
     }
 
     public static void updateAll(){
@@ -120,8 +144,12 @@ public class Camera {
         for (PhotonTrackedTarget target : result.targets) {
             double targetPoseAmbiguity = target.getPoseAmbiguity();
             double dist = target.getBestCameraToTarget().getTranslation().toTranslation2d().getNorm();
-            if (dist > distanceThreshold || targetPoseAmbiguity > ambiguityThreshold || ignoredTags.contains(Double.valueOf(target.getFiducialId()))) continue;
+            if (dist > distanceThreshold || targetPoseAmbiguity > ambiguityThreshold || ignoredTags.contains(Integer.valueOf(target.getFiducialId()))) continue;
             // Make sure the target is a Fiducial target.
+
+            if(shootTags.contains(Integer.valueOf(target.getFiducialId()))) {
+                shootTagsSeen.put(this, true);
+            }
 
             if (targetPoseAmbiguity != -1 && targetPoseAmbiguity < lowestAmbiguityScore) {
                 lowestAmbiguityScore = targetPoseAmbiguity;
