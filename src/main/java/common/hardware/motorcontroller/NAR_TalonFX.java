@@ -92,10 +92,10 @@ public class NAR_TalonFX extends NAR_Motor {
         PID0.kP = config.kP;
         PID0.kI = config.kI;
         PID0.kD = config.kD;
-        PID0.kS = config.kS;
-        PID0.kV = config.kV;
-        PID0.kA = config.kA;
-        PID0.kG = config.kG;
+        // PID0.kS = config.kS;
+        // PID0.kV = config.kV;
+        // PID0.kA = config.kA;
+        // PID0.kG = config.kG;
         configTalonFX(()-> motor.getConfigurator().apply(PID0));
     }
 
