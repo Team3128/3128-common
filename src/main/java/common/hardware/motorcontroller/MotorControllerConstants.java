@@ -17,10 +17,15 @@ public class MotorControllerConstants {
     public static final double SPARKMAX_RPM_TO_NUpS = SPARKMAX_ENCODER_RESOLUTION / 60; // rotations/min -> counts/sec
 
     public static final int NO_PRIORITY = 32000;
-    public static final int LOW_PRIORITY = 255;
+    public static final int LOW_PRIORITY = 250;
     public static final int MEDIUM_PRIORITY = 100;
     public static final int HIGH_PRIORITY = 20;
     public static final int MAX_PRIORITY = 10;
+
+    public static final double MAX_PRIORITY_FREQ = 1.0 / (MAX_PRIORITY / 1000.0);
+    public static final double HIGH_PRIORITY_FREQ = 1.0 / (HIGH_PRIORITY / 1000.0);
+    public static final double MEDIUM_PRIORITY_FREQ = 1.0 / (MEDIUM_PRIORITY / 1000.0);
+    public static final double LOW_PRIORITY_FREQ = 1.0 / (LOW_PRIORITY / 1000.0);
 
     public static final int canSparkMaxTimeout = 500; //ms
 

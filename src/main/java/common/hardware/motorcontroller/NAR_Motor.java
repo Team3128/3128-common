@@ -5,7 +5,10 @@ import java.util.LinkedList;
 
 import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.Logger;
+
+import common.core.controllers.PIDFFConfig;
 import common.core.misc.NAR_Robot;
+import common.utility.narwhaldashboard.NarwhalDashboard;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 
@@ -15,6 +18,7 @@ import edu.wpi.first.wpilibj.motorcontrol.MotorController;
  * @author Mason Lam
  */
 public abstract class NAR_Motor implements AutoCloseable {
+
     /**
      * Store conversion factors for motor
      */
@@ -184,6 +188,12 @@ public abstract class NAR_Motor implements AutoCloseable {
     }
 
     /**
+	 * Set the PID values for the controller.
+	 * @param config PIDFFConfig containing kP, kI, and kD values.
+	 */
+	public abstract void configPID(PIDFFConfig config);
+
+    /**
      * Wraps a measurement value to the min and max input
      * @param value A measurement value
      * @return The measurement value wrapped by the min and max input
@@ -349,12 +359,37 @@ public abstract class NAR_Motor implements AutoCloseable {
      */
     public abstract void enableVoltageCompensation(double volts);
 
+    /**
+	 * Sets the current limit in Amps.
+	 * @param limit The current limit in Amps.
+	 */
     public abstract void setCurrentLimit(int limit);
+
+    /**
+	 * Returns motor and motor controller functionality.
+	 * @return State of the motor controller and motor.
+	 */
+    public abstract NarwhalDashboard.State getState();
 
     /**
      * Set the status frame rate to Team 3128's defaults
      */
     public abstract void setDefaultStatusFrames();
+
+    /**
+     * Set the status frame rate to Team 3128's for a position motor
+     */
+    public abstract void setPositionStatusFrames();
+
+    /**
+     * Set the status frame rate to Team 3128's for a velocity motor
+     */
+    public abstract void setVelocityStatusFrames();
+
+    /**
+     * Set the status frame rate to Team 3128's for a follower motor
+     */
+    public abstract void setFollowerStatusFrames();
 
     /**
      * Returns the motor object controlling the motion

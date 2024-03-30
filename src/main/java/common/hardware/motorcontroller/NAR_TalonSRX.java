@@ -9,6 +9,9 @@ import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
 import com.ctre.phoenix.motorcontrol.can.TalonSRXConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
+import common.core.controllers.PIDFFConfig;
+import common.utility.narwhaldashboard.NarwhalDashboard;
+
 /**
  * Team 3128's streamlined {@link WPI_TalonSRX} class.
  * @since 2023 Charged Up
@@ -72,6 +75,21 @@ public class NAR_TalonSRX extends NAR_Motor {
 		setStatusFramePeriod(StatusFrameEnhanced.Status_21_FeedbackIntegrated, MotorControllerConstants.LOW_PRIORITY);
 	}
 
+	@Override
+	public void setPositionStatusFrames() {
+        setDefaultStatusFrames();
+	}
+
+	@Override
+	public void setVelocityStatusFrames() {
+        setDefaultStatusFrames();
+	}
+
+	@Override
+	public void setFollowerStatusFrames() {
+		setDefaultStatusFrames();
+	}
+
 	/**
 	 * Configures the motor settings
 	 * @param config See the {@link TalonSRXConfiguration} class
@@ -79,6 +97,11 @@ public class NAR_TalonSRX extends NAR_Motor {
 	public void configAllSettings(TalonSRXConfiguration config) {
 		motor.configAllSettings(config);
 	}
+
+	@Override
+    public void configPID(PIDFFConfig config) {
+        throw new UnsupportedOperationException("Don't use PID on a 775pro");
+    }
 
 	/**
      * Sets a motor's output based on the leader's
@@ -167,6 +190,11 @@ public class NAR_TalonSRX extends NAR_Motor {
 	@Override
 	protected double getRawVelocity() {
 		return motor.getSelectedSensorVelocity() / RPM_TO_TALONSRX;
+	}
+
+	@Override
+	public NarwhalDashboard.State getState() {
+		return NarwhalDashboard.State.RUNNING;
 	}
 
 	@Override

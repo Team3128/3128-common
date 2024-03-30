@@ -245,10 +245,7 @@ public class NAR_CANSpark extends NAR_Motor {
 		}, 0.5, 0.05);
 	}
 
-	/**
-	 * Set the PID values for the controller.
-	 * @param config PIDFFConfig containing kP, kI, and kD values.
-	 */
+	@Override
 	public void configPID(PIDFFConfig config) {
 		configSpark(()-> controller.setP(config.kP));
 		configSpark(()-> controller.setI(config.kI));
@@ -317,6 +314,21 @@ public class NAR_CANSpark extends NAR_Motor {
 	@Override
 	public void setDefaultStatusFrames() {
 		setStatusFrames(SparkMaxConfig.DEFAULT);
+	}
+
+	@Override
+	public void setPositionStatusFrames() {
+		setStatusFrames(SparkMaxConfig.POSITION);
+	}
+
+	@Override
+	public void setVelocityStatusFrames() {
+		setStatusFrames(SparkMaxConfig.VELOCITY);
+	}
+
+	@Override
+	public void setFollowerStatusFrames() {
+		setStatusFrames(SparkMaxConfig.FOLLOWER);
 	}
 
 	/**

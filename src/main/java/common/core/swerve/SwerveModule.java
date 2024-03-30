@@ -11,9 +11,7 @@ import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 import common.core.controllers.PIDFFConfig;
 import common.core.swerve.SwerveModuleConfig.SwerveMotorConfig;
-import common.hardware.motorcontroller.NAR_CANSpark;
 import common.hardware.motorcontroller.NAR_Motor;
-import common.hardware.motorcontroller.NAR_CANSpark.SparkMaxConfig;
 import common.hardware.motorcontroller.NAR_Motor.Control;
 import common.hardware.motorcontroller.NAR_Motor.Neutral;
 import common.utility.narwhaldashboard.NarwhalDashboard.State;
@@ -32,8 +30,8 @@ public class SwerveModule {
 
     public final int moduleNumber;
     private final double angleOffset;
-    private final NAR_CANSpark angleMotor;
-    private final NAR_CANSpark driveMotor;
+    private final NAR_Motor angleMotor;
+    private final NAR_Motor driveMotor;
     private final CANcoder angleEncoder;
     private final SwerveMotorConfig driveConfig;
     private final SwerveMotorConfig angleConfig;
@@ -92,7 +90,7 @@ public class SwerveModule {
         angleMotor.configMotor(angleConfig.motorConfig);
         angleMotor.configPID(angleConfig.pidffConfig);
         angleMotor.enableContinuousInput(-180, 180);
-        angleMotor.setStatusFrames(SparkMaxConfig.POSITION);
+        angleMotor.setPositionStatusFrames();;
         resetToAbsolute();
     }
 
