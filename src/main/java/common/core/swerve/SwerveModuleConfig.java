@@ -1,7 +1,7 @@
 package common.core.swerve;
 
 import common.core.controllers.PIDFFConfig;
-import common.hardware.motorcontroller.NAR_CANSpark;
+import common.hardware.motorcontroller.NAR_Motor;
 import common.hardware.motorcontroller.NAR_Motor.MotorConfig;
 
 /**
@@ -10,11 +10,11 @@ import common.hardware.motorcontroller.NAR_Motor.MotorConfig;
 public class SwerveModuleConfig {
 
     public static class SwerveMotorConfig {
-        public final NAR_CANSpark motor;
+        public final NAR_Motor motor;
         public final MotorConfig motorConfig;
         public final PIDFFConfig pidffConfig;
 
-        public SwerveMotorConfig(NAR_CANSpark motor, MotorConfig motorConfig, PIDFFConfig pidffConfig) {
+        public SwerveMotorConfig(NAR_Motor motor, MotorConfig motorConfig, PIDFFConfig pidffConfig) {
             this.motor = motor;
             this.motorConfig = motorConfig;
             this.pidffConfig = pidffConfig;
