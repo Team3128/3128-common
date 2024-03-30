@@ -1,6 +1,7 @@
 package common.hardware.motorcontroller;
 
 import static common.hardware.motorcontroller.MotorControllerConstants.HIGH_PRIORITY_FREQ;
+import static common.hardware.motorcontroller.MotorControllerConstants.NEO_CurrentLimit;
 
 import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.StatusSignal;
@@ -55,6 +56,7 @@ public class NAR_TalonFX extends NAR_Motor {
         temperature = motor.getDeviceTemp();
 
         enableVoltageCompensation(12);
+        setCurrentLimit(NEO_CurrentLimit);
         configPID(pidConfig);
     }
 
