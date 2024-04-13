@@ -62,7 +62,7 @@ public class Camera {
 
     private static final HashSet<Integer> reportedErrors = new HashSet<Integer>();
 
-    private static double distanceThreshold = 3.5;
+    private double distanceThreshold = 3.5;
     
     public Camera(String name, double xOffset, double yOffset, double yawOffset, double pitchOffset, double rollOffset) {
         camera = new PhotonCamera(name);
@@ -132,8 +132,14 @@ public class Camera {
         Camera.ambiguityThreshold = ambiguityThreshold;
     }
 
-    public static void setDistanceThreshold(double distanceThreshold) {
-        Camera.distanceThreshold = distanceThreshold;
+    public void setCamDistanceThreshold(double distThreshold) {
+        distanceThreshold = distThreshold;
+    }
+
+    public static void setAllDistanceThreshold(double distThreshold) {
+        for (final Camera camera : cameras) {
+            camera.setCamDistanceThreshold(distThreshold);
+        }
     }
 
     private Optional<EstimatedRobotPose> getEstimatedPose(PhotonPipelineResult result) {
