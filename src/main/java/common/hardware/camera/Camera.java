@@ -5,8 +5,6 @@ import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 import java.util.ArrayList;
-import java.util.HashMap;
-
 import org.littletonrobotics.junction.Logger;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
@@ -32,16 +30,14 @@ import java.util.HashSet;
  */
 public class Camera {
 
-    public static boolean areShootTagsSeen = false;
+    private static ArrayList<Integer> tags = new ArrayList<Integer>();
 
-    private static ArrayList<Integer> shootTags = new ArrayList<Integer>();
-
-    private static HashMap<Camera, Boolean> shootTagsSeen = new HashMap<Camera, Boolean>();
+    private boolean hasSeenTag;
 
     public static int updateCounter = 0;
 
     public static double validDist = 0.5;
-    public static double overrideThreshold = 30;
+    public static double overrideThreshold = 5;
 
     private final PhotonCamera camera;
     private final Transform3d offset;
@@ -54,7 +50,7 @@ public class Camera {
     private static PoseStrategy calc_strategy;
     private static BiConsumer<Pose2d, Double> odometry;
     private static Supplier<Pose2d> robotPose;
-    private static double ambiguityThreshold = 0.2;
+    private static double ambiguityThreshold = 0.3;
 
     private static ArrayList<Integer> ignoredTags = new ArrayList<Integer>();
 
@@ -78,7 +74,7 @@ public class Camera {
         }
 
         cameras.add(this);
-        shootTagsSeen.put(this, false);
+        hasSeenTag = false;
     }
 
     public static void configCameras(AprilTagFields aprilTagLayout, PoseStrategy calc_strategy, BiConsumer<Pose2d, Double> odometry, Supplier<Pose2d> robotPose){
@@ -94,20 +90,17 @@ public class Camera {
         }
     }
 
-    public static void addShootTags(int ...shootTags) {
-        for(final int tag : shootTags) {
-            Camera.shootTags.add(tag);
+    public static void addTags(int ...tags) {
+        for(final int tag : tags) {
+            Camera.tags.add(tag);
         }
     }
 
-    public static void checkShootTagsAll(){
+    public static boolean seesTag(){
         for (final Camera camera : cameras) {
-            if(shootTagsSeen.get(camera)) {
-                areShootTagsSeen = true;
-                return;
-            }
+            if(camera.hasSeenTag) return true;
         }
-        areShootTagsSeen = false;
+        return false;
     }
 
     public static void updateAll(){
@@ -153,13 +146,10 @@ public class Camera {
             if (dist > distanceThreshold || targetPoseAmbiguity > ambiguityThreshold || ignoredTags.contains(Integer.valueOf(target.getFiducialId()))) continue;
             // Make sure the target is a Fiducial target.
 
-            if(shootTags.contains(Integer.valueOf(target.getFiducialId()))) {
-                shootTagsSeen.put(this, true);
-            }
-
             if (targetPoseAmbiguity != -1 && targetPoseAmbiguity < lowestAmbiguityScore) {
                 lowestAmbiguityScore = targetPoseAmbiguity;
                 lowestAmbiguityTarget = target;
+                hasSeenTag = tags.contains(target.getFiducialId());
             }
         }
 
@@ -200,6 +190,7 @@ public class Camera {
 
     public void update(){
         if (isDisabled) return;
+        hasSeenTag = false;
         lastResult = camera.getLatestResult();
         if (!lastResult.hasTargets() && NAR_Robot.logWithAdvantageKit) {
             Logger.recordOutput("Vision/" + camera.getName() + "/Position", robotPose.get());
@@ -217,7 +208,10 @@ public class Camera {
 
         if(!isGoodEstimate(estPose)) {
             updateCounter++;
-            if (updateCounter <= overrideThreshold) return;
+            if (updateCounter <= overrideThreshold) {
+                hasSeenTag = false;
+                return;
+            }
         }
         else {
             updateCounter = 0;

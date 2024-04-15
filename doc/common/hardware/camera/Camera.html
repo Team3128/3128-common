@@ -94,21 +94,18 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-first">Modifier and Type</div>
 <div class="table-header col-second">Field</div>
 <div class="table-header col-last">Description</div>
-<div class="col-first even-row-color"><code>static boolean</code></div>
-<div class="col-second even-row-color"><code><a href="#areShootTagsSeen" class="member-name-link">areShootTagsSeen</a></code></div>
+<div class="col-first even-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/LinkedList.html" title="class or interface in java.util" class="external-link">LinkedList</a>&lt;<a href="Camera.html" title="class in common.hardware.camera">Camera</a>&gt;</code></div>
+<div class="col-second even-row-color"><code><a href="#cameras" class="member-name-link">cameras</a></code></div>
 <div class="col-last even-row-color">&nbsp;</div>
-<div class="col-first odd-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/LinkedList.html" title="class or interface in java.util" class="external-link">LinkedList</a>&lt;<a href="Camera.html" title="class in common.hardware.camera">Camera</a>&gt;</code></div>
-<div class="col-second odd-row-color"><code><a href="#cameras" class="member-name-link">cameras</a></code></div>
+<div class="col-first odd-row-color"><code>static double</code></div>
+<div class="col-second odd-row-color"><code><a href="#overrideThreshold" class="member-name-link">overrideThreshold</a></code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
-<div class="col-first even-row-color"><code>static double</code></div>
-<div class="col-second even-row-color"><code><a href="#overrideThreshold" class="member-name-link">overrideThreshold</a></code></div>
+<div class="col-first even-row-color"><code>static int</code></div>
+<div class="col-second even-row-color"><code><a href="#updateCounter" class="member-name-link">updateCounter</a></code></div>
 <div class="col-last even-row-color">&nbsp;</div>
-<div class="col-first odd-row-color"><code>static int</code></div>
-<div class="col-second odd-row-color"><code><a href="#updateCounter" class="member-name-link">updateCounter</a></code></div>
+<div class="col-first odd-row-color"><code>static double</code></div>
+<div class="col-second odd-row-color"><code><a href="#validDist" class="member-name-link">validDist</a></code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
-<div class="col-first even-row-color"><code>static double</code></div>
-<div class="col-second even-row-color"><code><a href="#validDist" class="member-name-link">validDist</a></code></div>
-<div class="col-last even-row-color">&nbsp;</div>
 </div>
 </section>
 </li>
@@ -145,41 +142,41 @@ loadScripts(document, 'script');</script>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#addIgnoredTags(int...)" class="member-name-link">addIgnoredTags</a><wbr>(int...&nbsp;ignoredTags)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#addShootTags(int...)" class="member-name-link">addShootTags</a><wbr>(int...&nbsp;shootTags)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#addTags(int...)" class="member-name-link">addTags</a><wbr>(int...&nbsp;tags)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#checkShootTagsAll()" class="member-name-link">checkShootTagsAll</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#configCameras(edu.wpi.first.apriltag.AprilTagFields,org.photonvision.PhotonPoseEstimator.PoseStrategy,java.util.function.BiConsumer,java.util.function.Supplier)" class="member-name-link">configCameras</a><wbr>(edu.wpi.first.apriltag.AprilTagFields&nbsp;aprilTagLayout,
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#configCameras(edu.wpi.first.apriltag.AprilTagFields,org.photonvision.PhotonPoseEstimator.PoseStrategy,java.util.function.BiConsumer,java.util.function.Supplier)" class="member-name-link">configCameras</a><wbr>(edu.wpi.first.apriltag.AprilTagFields&nbsp;aprilTagLayout,
  org.photonvision.PhotonPoseEstimator.PoseStrategy&nbsp;calc_strategy,
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/BiConsumer.html" title="class or interface in java.util.function" class="external-link">BiConsumer</a>&lt;edu.wpi.first.math.geometry.Pose2d,<wbr><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Double.html" title="class or interface in java.lang" class="external-link">Double</a>&gt;&nbsp;odometry,
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Supplier.html" title="class or interface in java.util.function" class="external-link">Supplier</a>&lt;edu.wpi.first.math.geometry.Pose2d&gt;&nbsp;robotPose)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#disable()" class="member-name-link">disable</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#disableAll()" class="member-name-link">disableAll</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#enable()" class="member-name-link">enable</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#enableAll()" class="member-name-link">enableAll</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>org.photonvision.targeting.PhotonPipelineResult</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getLatestResult()" class="member-name-link">getLatestResult</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>edu.wpi.first.math.geometry.Transform3d</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getOffset()" class="member-name-link">getOffset</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#disable()" class="member-name-link">disable</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#initShuffleboard()" class="member-name-link">initShuffleboard</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#isGoodEstimate(edu.wpi.first.math.geometry.Pose2d)" class="member-name-link">isGoodEstimate</a><wbr>(edu.wpi.first.math.geometry.Pose2d&nbsp;pose)</code></div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#disableAll()" class="member-name-link">disableAll</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#enable()" class="member-name-link">enable</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#enableAll()" class="member-name-link">enableAll</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>org.photonvision.targeting.PhotonPipelineResult</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getLatestResult()" class="member-name-link">getLatestResult</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>edu.wpi.first.math.geometry.Transform3d</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getOffset()" class="member-name-link">getOffset</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#initShuffleboard()" class="member-name-link">initShuffleboard</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#isGoodEstimate(edu.wpi.first.math.geometry.Pose2d)" class="member-name-link">isGoodEstimate</a><wbr>(edu.wpi.first.math.geometry.Pose2d&nbsp;pose)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static boolean</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#seesTag()" class="member-name-link">seesTag</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static void</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#setAllDistanceThreshold(double)" class="member-name-link">setAllDistanceThreshold</a><wbr>(double&nbsp;distThreshold)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
@@ -212,12 +209,6 @@ loadScripts(document, 'script');</script>
 <section class="field-details" id="field-detail">
 <h2>Field Details</h2>
 <ul class="member-list">
-<li>
-<section class="detail" id="areShootTagsSeen">
-<h3>areShootTagsSeen</h3>
-<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">areShootTagsSeen</span></div>
-</section>
-</li>
 <li>
 <section class="detail" id="updateCounter">
 <h3>updateCounter</h3>
@@ -285,15 +276,15 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
-<section class="detail" id="addShootTags(int...)">
-<h3>addShootTags</h3>
-<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">addShootTags</span><wbr><span class="parameters">(int...&nbsp;shootTags)</span></div>
+<section class="detail" id="addTags(int...)">
+<h3>addTags</h3>
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">addTags</span><wbr><span class="parameters">(int...&nbsp;tags)</span></div>
 </section>
 </li>
 <li>
-<section class="detail" id="checkShootTagsAll()">
-<h3>checkShootTagsAll</h3>
-<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">checkShootTagsAll</span>()</div>
+<section class="detail" id="seesTag()">
+<h3>seesTag</h3>
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">seesTag</span>()</div>
 </section>
 </li>
 <li>
