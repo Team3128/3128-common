@@ -25,6 +25,15 @@ import java.util.Map;
 import org.json.simple.parser.*; 
   
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.util.Units;
+import common.hardware.camera.OffseasonAprilTags;
+
+import java.util.HashMap;
+import java.util.Map;
+
 /** Loadable AprilTag field layouts. */
 public enum AprilTagFields {
   /** 2022 Rapid React. */
@@ -35,6 +44,7 @@ public enum AprilTagFields {
   k2024Crescendo("2024-crescendo.json"),
   /** 2024 Offseason Crescendo */
   k2024OffseasonCrescendo("OffseasonAprilTags.json");
+  // k2024OffseasonCrescendo(OffseasonAprilTags.offSeasonTagMap);
 
   /** Base resource directory. */
   public static final String kBaseResourceDir = "//common//hardware//camera//";
@@ -63,7 +73,6 @@ public enum AprilTagFields {
           "Could not load AprilTagFieldLayout from " + this.m_resourceFile, e);
     }
   }
-  
 
   public static AprilTagFieldLayout loadFromResource(String resourcePath) throws IOException {
     InputStream stream = AprilTagFieldLayout.class.getResourceAsStream(resourcePath);

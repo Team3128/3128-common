@@ -5,6 +5,8 @@ import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 import java.util.ArrayList;
+import java.util.HashMap;
+
 import org.littletonrobotics.junction.Logger;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
@@ -26,7 +28,7 @@ import edu.wpi.first.apriltag.AprilTagFields;
  * Team 3128's class to control the robot's cameras and vision processing.
  * 
  * @since 2022 Rapid React
- * @author Mason Lam, William Yuan
+ * @author Mason Lam, William Yuan 
  */
 public class Camera {
 
@@ -46,7 +48,8 @@ public class Camera {
     private PhotonPipelineResult lastResult;
     private EstimatedRobotPose lastPose;
 
-    private static AprilTagFieldLayout aprilTags;
+    // private static AprilTagFieldLayout aprilTags;
+    private static HashMap<Integer, Pose3d> aprilTags;
     private static PoseStrategy calc_strategy;
     private static BiConsumer<Pose2d, Double> odometry;
     private static Supplier<Pose2d> robotPose;
@@ -77,8 +80,8 @@ public class Camera {
         hasSeenTag = false;
     }
 
-    public static void configCameras(AprilTagFields aprilTagLayout, PoseStrategy calc_strategy, BiConsumer<Pose2d, Double> odometry, Supplier<Pose2d> robotPose){
-        Camera.aprilTags = aprilTagLayout.loadAprilTagLayoutField();
+    public static void configCameras(HashMap<Integer,Pose3d> aprilTagLayout, PoseStrategy calc_strategy, BiConsumer<Pose2d, Double> odometry, Supplier<Pose2d> robotPose){
+        Camera.aprilTags = aprilTagLayout;
         Camera.calc_strategy = calc_strategy;
         Camera.odometry = odometry;
         Camera.robotPose = robotPose;
@@ -159,7 +162,8 @@ public class Camera {
 
         int targetFiducialId = lowestAmbiguityTarget.getFiducialId();
 
-        Optional<Pose3d> targetPosition = aprilTags.getTagPose(targetFiducialId);
+        // Optional<Pose3d> targetPosition = aprilTags.getTagPose(targetFiducialId);
+        Optional<Pose3d> targetPosition = Optional.of(aprilTags.get(targetFiducialId));
 
         if (targetPosition.isEmpty()) {
             if (NAR_Robot.logWithAdvantageKit) Logger.recordOutput("Vision/" + camera.getName() + "/Target",  robotPose.get());
