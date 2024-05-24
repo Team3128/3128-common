@@ -21,6 +21,7 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj.DriverStation;
 import java.util.HashSet;
+import edu.wpi.first.apriltag.AprilTagFields;
 /**
  * Team 3128's class to control the robot's cameras and vision processing.
  * 

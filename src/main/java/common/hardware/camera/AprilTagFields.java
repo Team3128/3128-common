@@ -12,6 +12,18 @@ import java.io.UncheckedIOException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.math.geometry.Pose3d;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.util.HashMap;
+import java.util.Iterator; 
+import java.util.Map; 
+  
+import org.json.simple.parser.*; 
+  
 
 /** Loadable AprilTag field layouts. */
 public enum AprilTagFields {
@@ -25,7 +37,7 @@ public enum AprilTagFields {
   k2024OffseasonCrescendo("OffseasonAprilTags.json");
 
   /** Base resource directory. */
-  public static final String kBaseResourceDir = "/common/hardware/camera/";
+  public static final String kBaseResourceDir = "//common//hardware//camera//";
 
   /** Alias to the current game. */
   public static final AprilTagFields kDefaultField = k2024OffseasonCrescendo;
@@ -66,4 +78,6 @@ public enum AprilTagFields {
       throw new IOException("Failed to load AprilTagFieldLayout: " + resourcePath);
     }
   }
+
+
 }
