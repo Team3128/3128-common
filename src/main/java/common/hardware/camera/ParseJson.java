@@ -17,7 +17,7 @@ import edu.wpi.first.math.geometry.Translation3d;
 
 public class ParseJson {
 
-    HashMap<Integer, Pose3d> offseasonTags = new HashMap<Integer, Pose3d>();
+    HashMap<Integer, Pose3d> aprilTags = new HashMap<Integer, Pose3d>();
     public ParseJson(String filepath){
 
       Object obj = new Object();
@@ -37,31 +37,31 @@ public class ParseJson {
       // typecasting obj to JSONObject 
       JSONObject jo = (JSONObject) obj; 
         
-      JSONArray poses = ((JSONArray) jo.get("tags")); 
+      JSONArray tags = ((JSONArray) jo.get("tags")); 
          
 
-      for (int i = 0; i < poses.size(); i++) {
-        JSONObject tag = (JSONObject) poses.get(i);
+      for (int i = 0; i < tags.size(); i++) {
+        JSONObject tag = (JSONObject) tags.get(i);
         JSONObject pose = (JSONObject) tag.get("pose");
         JSONObject translation = (JSONObject) pose.get("translation");
         JSONObject rotation = (JSONObject) pose.get("rotation");
-        double rotationW = Double.parseDouble(rotation.get("W").toString());
-        double rotationX = Double.parseDouble(rotation.get("X").toString());
-        double rotationY = Double.parseDouble(rotation.get("Y").toString());
-        double rotationZ = Double.parseDouble(rotation.get("Z").toString());
-        Quaternion quaternion = new Quaternion(rotationW, rotationX, rotationY,rotationZ);
+        JSONObject quaternion = (JSONObject) rotation.get("quaternion");
+        double rotationW = Double.parseDouble(quaternion.get("W").toString());
+        double rotationX = Double.parseDouble(quaternion.get("X").toString());
+        double rotationY = Double.parseDouble(quaternion.get("Y").toString());
+        double rotationZ = Double.parseDouble(quaternion.get("Z").toString());
+        Quaternion quaternion3d = new Quaternion(rotationW, rotationX, rotationY,rotationZ);
         double translationx = Double.parseDouble(translation.get("x").toString());
         double translationy = Double.parseDouble(translation.get("y").toString());
         double translationz = Double.parseDouble(translation.get("z").toString());
         Translation3d translation3d = new Translation3d(translationx, translationy, translationz);
-        Pose3d apriltag = new Pose3d(translation3d, new Rotation3d(quaternion));
+        Pose3d aprilTag = new Pose3d(translation3d, new Rotation3d(quaternion3d));
         // System.out.print(i + " " + translation.get("x"));
-        offseasonTags.put(i, apriltag);
+        aprilTags.put(i, aprilTag);
       }
-
     }
 
     public HashMap<Integer, Pose3d> returnHashMap(){
-        return offseasonTags;
+        return aprilTags;
     }
 }
