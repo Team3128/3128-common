@@ -196,8 +196,6 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Loadable AprilTag field layouts.</div>
 </dd>
-<dt><a href="common/hardware/camera/AprilTagFields.html#apriltags" class="member-name-link">apriltags</a> - Static variable in enum class common.hardware.camera.<a href="common/hardware/camera/AprilTagFields.html" title="enum class in common.hardware.camera">AprilTagFields</a></dt>
-<dd>&nbsp;</dd>
 <dt><a href="common/hardware/limelight/LimelightKey.html#AREA" class="member-name-link">AREA</a> - Enum constant in enum class common.hardware.limelight.<a href="common/hardware/limelight/LimelightKey.html" title="enum class in common.hardware.limelight">LimelightKey</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="common/core/controllers/ControllerBase.html#atSetpoint()" class="member-name-link">atSetpoint()</a> - Method in class common.core.controllers.<a href="common/core/controllers/ControllerBase.html" title="class in common.core.controllers">ControllerBase</a></dt>
@@ -392,7 +390,7 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Configures the motor settings</div>
 </dd>
-<dt><a href="common/hardware/camera/Camera.html#configCameras(edu.wpi.first.apriltag.AprilTagFields,org.photonvision.PhotonPoseEstimator.PoseStrategy,java.util.function.BiConsumer,java.util.function.Supplier)" class="member-name-link">configCameras(AprilTagFields, PhotonPoseEstimator.PoseStrategy, BiConsumer&lt;Pose2d, Double&gt;, Supplier&lt;Pose2d&gt;)</a> - Static method in class common.hardware.camera.<a href="common/hardware/camera/Camera.html" title="class in common.hardware.camera">Camera</a></dt>
+<dt><a href="common/hardware/camera/Camera.html#configCameras(java.util.HashMap,org.photonvision.PhotonPoseEstimator.PoseStrategy,java.util.function.BiConsumer,java.util.function.Supplier)" class="member-name-link">configCameras(HashMap&lt;Integer, Pose3d&gt;, PhotonPoseEstimator.PoseStrategy, BiConsumer&lt;Pose2d, Double&gt;, Supplier&lt;Pose2d&gt;)</a> - Static method in class common.hardware.camera.<a href="common/hardware/camera/Camera.html" title="class in common.hardware.camera">Camera</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="common/hardware/motorcontroller/NAR_Motor.html#configMotor(common.hardware.motorcontroller.NAR_Motor.MotorConfig)" class="member-name-link">configMotor(NAR_Motor.MotorConfig)</a> - Method in class common.hardware.motorcontroller.<a href="common/hardware/motorcontroller/NAR_Motor.html" title="class in common.hardware.motorcontroller">NAR_Motor</a></dt>
 <dd>
@@ -1515,6 +1513,12 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="common/hardware/limelight/LEDMode.html#OFF" class="member-name-link">OFF</a> - Enum constant in enum class common.hardware.limelight.<a href="common/hardware/limelight/LEDMode.html" title="enum class in common.hardware.limelight">LEDMode</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="common/hardware/camera/OffseasonAprilTags.html" class="type-name-link" title="class in common.hardware.camera">OffseasonAprilTags</a> - Class in <a href="common/hardware/camera/package-summary.html">common.hardware.camera</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="common/hardware/camera/OffseasonAprilTags.html#%3Cinit%3E()" class="member-name-link">OffseasonAprilTags()</a> - Constructor for class common.hardware.camera.<a href="common/hardware/camera/OffseasonAprilTags.html" title="class in common.hardware.camera">OffseasonAprilTags</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="common/hardware/camera/OffseasonAprilTags.html#offSeasonTagMap" class="member-name-link">offSeasonTagMap</a> - Static variable in class common.hardware.camera.<a href="common/hardware/camera/OffseasonAprilTags.html" title="class in common.hardware.camera">OffseasonAprilTags</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="common/hardware/limelight/LEDMode.html#ON" class="member-name-link">ON</a> - Enum constant in enum class common.hardware.limelight.<a href="common/hardware/limelight/LEDMode.html" title="enum class in common.hardware.limelight">LEDMode</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="common/utility/narwhaldashboard/NarwhalDashboard.html#onClose(org.java_websocket.WebSocket,int,java.lang.String,boolean)" class="member-name-link">onClose(WebSocket, int, String, boolean)</a> - Method in class common.utility.narwhaldashboard.<a href="common/utility/narwhaldashboard/NarwhalDashboard.html" title="class in common.utility.narwhaldashboard">NarwhalDashboard</a></dt>
@@ -1545,11 +1549,9 @@ loadScripts(document, 'script');</script>
 </dl>
 <h2 class="title" id="I:P">P</h2>
 <dl class="index">
-<dt><a href="common/hardware/camera/AprilTagFields.html#parseJson()" class="member-name-link">parseJson()</a> - Method in enum class common.hardware.camera.<a href="common/hardware/camera/AprilTagFields.html" title="enum class in common.hardware.camera">AprilTagFields</a></dt>
-<dd>&nbsp;</dd>
 <dt><a href="common/hardware/camera/ParseJson.html" class="type-name-link" title="class in common.hardware.camera">ParseJson</a> - Class in <a href="common/hardware/camera/package-summary.html">common.hardware.camera</a></dt>
 <dd>&nbsp;</dd>
-<dt><a href="common/hardware/camera/ParseJson.html#%3Cinit%3E()" class="member-name-link">ParseJson()</a> - Constructor for class common.hardware.camera.<a href="common/hardware/camera/ParseJson.html" title="class in common.hardware.camera">ParseJson</a></dt>
+<dt><a href="common/hardware/camera/ParseJson.html#%3Cinit%3E(java.lang.String)" class="member-name-link">ParseJson(String)</a> - Constructor for class common.hardware.camera.<a href="common/hardware/camera/ParseJson.html" title="class in common.hardware.camera">ParseJson</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="common/utility/narwhaldashboard/NarwhalDashboard.State.html#PARTIALLY_RUNNING" class="member-name-link">PARTIALLY_RUNNING</a> - Enum constant in enum class common.utility.narwhaldashboard.<a href="common/utility/narwhaldashboard/NarwhalDashboard.State.html" title="enum class in common.utility.narwhaldashboard">NarwhalDashboard.State</a></dt>
 <dd>&nbsp;</dd>
@@ -1698,6 +1700,8 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Resets the angle motor to the CANCoder position</div>
 </dd>
+<dt><a href="common/hardware/camera/ParseJson.html#returnHashMap()" class="member-name-link">returnHashMap()</a> - Method in class common.hardware.camera.<a href="common/hardware/camera/ParseJson.html" title="class in common.hardware.camera">ParseJson</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="common/core/swerve/SwerveConversions.html#rotationsToDegrees(double,double)" class="member-name-link">rotationsToDegrees(double, double)</a> - Static method in class common.core.swerve.<a href="common/core/swerve/SwerveConversions.html" title="class in common.core.swerve">SwerveConversions</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="common/core/swerve/SwerveConversions.html#rotationsToMeters(double,double,double)" class="member-name-link">rotationsToMeters(double, double, double)</a> - Static method in class common.core.swerve.<a href="common/core/swerve/SwerveConversions.html" title="class in common.core.swerve">SwerveConversions</a></dt>
