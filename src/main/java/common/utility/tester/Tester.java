@@ -22,7 +22,6 @@ public class Tester {
         protected Command command;
         protected BooleanSupplier passCondition;
         protected TestState testState;
-
         /**
          * Creates a new Unit Test.
          * @param testName Name of the test.
