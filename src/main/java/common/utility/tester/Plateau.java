@@ -7,15 +7,12 @@ import java.util.function.DoubleSupplier;
 
 import common.utility.tester.Tester.UnitTest;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj2.command.Command;
 
 public class Plateau extends UnitTest {
-    private String testName;
     private double plateau;
-    private double tolerance;
     private Timer timer;
     private boolean hasDelayed;
-    private static double timeout = 30;
+    public static double timeout = 30;
 
     /**
      * 
@@ -46,6 +43,7 @@ public class Plateau extends UnitTest {
      * @param plateau How long the pass condition must be true for.
      * @param error Difference from expected value.
      * @param tolerance Maximum error.
+     * @param passCondition Condition for the test to pass.
      */
     public Plateau(String testName, double plateau, DoubleSupplier error, double tolerance, BooleanSupplier passCondition) {
         super(
