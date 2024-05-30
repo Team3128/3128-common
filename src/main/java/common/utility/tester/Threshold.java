@@ -27,7 +27,7 @@ public class Threshold extends UnitTest {
      * @param threshold Threshold that should be reached.
      */
     public Threshold(String testName, DoubleSupplier measurement, double threshold) {
-        this(testName, measurement, ()-> measurement.getAsDouble() > threshold);
+        this(testName, measurement, threshold, ()-> measurement.getAsDouble() > threshold);
     }
 
 
@@ -41,6 +41,7 @@ public class Threshold extends UnitTest {
     public Threshold(
             String testName, 
             DoubleSupplier measurement,
+            double threshold,
             BooleanSupplier passCondition) {
         super(
             testName, 
