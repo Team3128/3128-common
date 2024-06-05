@@ -1,7 +1,5 @@
 package common.utility.tester;
 
-import static edu.wpi.first.wpilibj2.command.Commands.*;
-
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
@@ -11,12 +9,33 @@ import edu.wpi.first.wpilibj2.command.Command;
 
 public class ThresholdTest extends UnitTest {
     public String testName;
-    private boolean hasDelayed; //sometimes, i assume, the system will delay for one second; so we have to take that into account just in case it happens?
+    private boolean hasDelayed;
+    private double delayPeriod;
     private Timer timer;
-    private static double timeout = 30;
 
-        /**
+    /**
      * Creates a threshold test.
+     * @param testName Name of the test.
+     * @param command Command to run.
+     * @param measurement Source of measurement.
+     * @param threshold Threshold that should be reached.
+     */
+    public ThresholdTest(
+            String testName, 
+            Command command, 
+            DoubleSupplier measurement, 
+            double threshold) {
+        this(
+            testName, 
+            command, 
+            measurement,
+            threshold,
+            30
+        );
+    }
+
+    /**
+     * Creates a threshold test. (specify timeout)
      * @param testName Name of the test.
      * @param command Command to run.
      * @param measurement Source of measurement.
@@ -33,12 +52,32 @@ public class ThresholdTest extends UnitTest {
             testName, 
             command, 
             timeOut, 
-            ()-> measurement.getAsDouble() > threshold);
+            ()-> Math.abs(measurement.getAsDouble()) > threshold);
     }
 
 
     /**
-     * Creates a threshold test.
+     * Creates a threshold test. (specify passCondition)
+     * @param testName Name of the test.
+     * @param command Command to run.
+     * @param passCondition Condition for the test to pass.
+     */
+    public ThresholdTest(
+            String testName, 
+            Command command,
+            BooleanSupplier passCondition) {
+        this(
+            testName, 
+            command,
+            30,
+            passCondition
+        );
+        timer = new Timer();
+        hasDelayed = false;
+    }
+
+    /**
+     * Creates a threshold test. (specify timeout and passCondition)
      * @param testName Name of the test.
      * @param command Command to run.
      * @param timeOut Time for test to run.
@@ -49,46 +88,35 @@ public class ThresholdTest extends UnitTest {
             Command command,
             double timeOut,
             BooleanSupplier passCondition) {
-        super(
+        this(
             testName, 
-            command.andThen(waitSeconds(timeOut)),
+            command,
+            timeOut,
+            1,
             passCondition
         );
-        timer = new Timer();
-        hasDelayed = false;
     }
 
     /**
-     * Creates a threshold test.
+     * Creates a threshold test. (specify timeout, passCondition, and delayPeriod)
      * @param testName Name of the test.
      * @param command Command to run.
-     * @param measurement Source of measurement.
-     * @param threshold Threshold that should be reached.
-     */
-    public ThresholdTest(
-            String testName, 
-            Command command, 
-            DoubleSupplier measurement, 
-            double threshold) {
-        this(testName, command, ()-> measurement.getAsDouble() > threshold);
-    }
-
-
-    /**
-     * Creates a threshold test.
-     * @param testName Name of the test.
-     * @param command Command to run.
+     * @param timeOut Time for test to run.
+     * @param delayPeriod Time of delay in seconds.
      * @param passCondition Condition for the test to pass.
      */
     public ThresholdTest(
             String testName, 
             Command command,
+            double timeOut,
+            double delayPeriod,
             BooleanSupplier passCondition) {
         super(
             testName, 
-            command.andThen(waitSeconds(timeout)),
+            command.withTimeout(timeOut),
             passCondition
         );
+        this.delayPeriod = delayPeriod;
         timer = new Timer();
         hasDelayed = false;
     }
@@ -104,7 +132,7 @@ public class ThresholdTest extends UnitTest {
     public void execute() {
         super.execute();
         if (!hasDelayed) {
-            if (timer.hasElapsed(1)) {
+            if (timer.hasElapsed(delayPeriod)) {
                 hasDelayed = true;
                 timer.reset();
             }
@@ -120,7 +148,7 @@ public class ThresholdTest extends UnitTest {
 
     @Override
     public boolean isFinished() {
-        return super.isFinished() || (hasDelayed);
+        return super.isFinished() || (passCondition.getAsBoolean() && hasDelayed);
     }
     
 }

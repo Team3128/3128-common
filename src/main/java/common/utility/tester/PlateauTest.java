@@ -1,7 +1,5 @@
 package common.utility.tester;
 
-import static edu.wpi.first.wpilibj2.command.Commands.*;
-
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
@@ -12,11 +10,32 @@ import edu.wpi.first.wpilibj2.command.Command;
 public class PlateauTest extends UnitTest {
     private double plateau;
     private Timer timer;
-    private boolean hasDelayed;
-    public static double timeout = 30;
 
     /**
      * Creates a plateau test.
+     * @param testName Name of test.
+     * @param command Command to run.
+     * @param plateau How long the pass condition must be true for.
+     * @param error Difference from expected value.
+     * @param tolerance Maximum error.
+     */
+    public PlateauTest(
+            String testName,  
+            Command command, 
+            double plateau, 
+            DoubleSupplier error, 
+            double tolerance) {
+        this(
+            testName, 
+            command,
+            plateau,
+            error,
+            tolerance,
+            30);
+    }
+
+    /**
+     * Creates a plateau test. (specify timeout)
      * @param testName Name of test.
      * @param command Command to run.
      * @param plateau How long the pass condition must be true for.
@@ -35,12 +54,34 @@ public class PlateauTest extends UnitTest {
             testName, 
             command, 
             plateau, 
-            timeout,
+            timeOut,
             () -> Math.abs(error.getAsDouble()) < tolerance);
     }
 
     /**
-     * Creates a plateau test.
+     * Creates a plateau test. (specify passCondition)
+     * @param testName Name of test.
+     * @param command Command to run.
+     * @param plateau How long the pass condition must be true for.
+     * @param passCondition Condition for the test to pass.
+     */
+    public PlateauTest(
+            String testName,  
+            Command command, 
+            double plateau, 
+            BooleanSupplier passCondition) {
+        this(
+            testName,
+            command, 
+            plateau, 
+            30,
+            passCondition);
+        this.plateau = plateau;
+        timer = new Timer();
+    }
+
+    /**
+     * Creates a plateau test. (specify passCondition and timeout)
      * @param testName Name of test.
      * @param command Command to run.
      * @param plateau How long the pass condition must be true for.
@@ -55,55 +96,11 @@ public class PlateauTest extends UnitTest {
             BooleanSupplier passCondition) {
         super(
             testName,
-            command.andThen(waitSeconds(timeOut)),
+            command.withTimeout(timeOut),
             passCondition
         );
         this.plateau = plateau;
         timer = new Timer();
-        hasDelayed = false;
-    }
-
-    /**
-     * Creates a plateau test.
-     * @param testName Name of test.
-     * @param command Command to run.
-     * @param plateau How long the pass condition must be true for.
-     * @param error Difference from expected value.
-     * @param tolerance Maximum error.
-     */
-    public PlateauTest(
-            String testName,  
-            Command command, 
-            double plateau, 
-            DoubleSupplier error, 
-            double tolerance) {
-        this(
-            testName, 
-            command, 
-            plateau, 
-            () -> Math.abs(error.getAsDouble()) < tolerance);
-    }
-
-    /**
-     * Creates a plateau test.
-     * @param testName Name of test.
-     * @param command Command to run.
-     * @param plateau How long the pass condition must be true for.
-     * @param passCondition Condition for the test to pass.
-     */
-    public PlateauTest(
-            String testName,  
-            Command command, 
-            double plateau, 
-            BooleanSupplier passCondition) {
-        super(
-            testName,
-            command.andThen(waitSeconds(timeout)),
-            passCondition
-        );
-        this.plateau = plateau;
-        timer = new Timer();
-        hasDelayed = false;
     }
 
 
@@ -111,19 +108,11 @@ public class PlateauTest extends UnitTest {
     public void initialize() {
         super.initialize();
         timer.restart();
-        hasDelayed = false;
     }
 
     @Override
     public void execute() {
         super.execute();
-        if (!hasDelayed) {
-            if (timer.hasElapsed(1)) {
-                hasDelayed = true;
-                timer.reset();
-            }
-            return;
-        }
         if (!passCondition.getAsBoolean()) timer.reset();
     }
 
@@ -134,7 +123,7 @@ public class PlateauTest extends UnitTest {
 
     @Override
     public boolean isFinished() {
-        return super.isFinished() || (timer.hasElapsed(plateau) && hasDelayed);
+        return super.isFinished() || (timer.hasElapsed(plateau));
     }
     
     
