@@ -3,11 +3,11 @@ package common.utility.tester;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
-import common.utility.tester.Tester.UnitTest;
+import common.utility.tester.Tester.SystemsTest;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 
-public class PlateauTest extends UnitTest {
+public class PlateauTest extends SystemsTest {
     private double plateau;
     private Timer timer;
 
@@ -123,7 +123,7 @@ public class PlateauTest extends UnitTest {
 
     @Override
     public boolean isFinished() {
-        return super.isFinished() || (timer.hasElapsed(plateau));
+        return super.isFinished() || (timer.hasElapsed(plateau) && passCondition.getAsBoolean());
     }
     
     

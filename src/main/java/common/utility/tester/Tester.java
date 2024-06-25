@@ -16,28 +16,28 @@ import edu.wpi.first.wpilibj2.command.Subsystem;
 public class Tester {
     
     /**System test */
-    public static class UnitTest extends Command {
+    public static class SystemsTest extends Command {
 
         protected String testName;
         protected Command command;
         protected BooleanSupplier passCondition;
         protected TestState testState;
         /**
-         * Creates a new Unit Test.
+         * Creates a new System Test.
          * @param testName Name of the test.
          * @param command Command to be run for the test.
          */
-        public UnitTest(String testName, Command command) {
+        public SystemsTest(String testName, Command command) {
             this(testName, command, ()-> true);
         }
 
         /**
-         * Creates a new Unit Test.
+         * Creates a new System Test.
          * @param testName Name of the test.
          * @param command Command to be run for the test.
          * @param passCondition Condition for the test to pass.
          */
-        public UnitTest(String testName, Command command, BooleanSupplier passCondition) {
+        public SystemsTest(String testName, Command command, BooleanSupplier passCondition) {
             this.testName = testName;
             this.command = command;
             this.passCondition = passCondition;
@@ -75,11 +75,11 @@ public class Tester {
 
     /**Collection of tests to be run for a system */
     public static class Test extends Command {
-        private final ArrayList<UnitTest> unitTests;
+        private final ArrayList<SystemsTest> systemsTests;
         private final String name;
         private final Timer passTimer;
         private double timeBetweenTests;
-        private UnitTest testToSchedule;
+        private SystemsTest testToSchedule;
         private TestState state;
         private int curIndex;
 
@@ -88,7 +88,7 @@ public class Tester {
          * @param name Name of the test or system.
          */
         private Test(String name) {
-            unitTests = new ArrayList<UnitTest>();
+            systemsTests = new ArrayList<SystemsTest>();
             this.name = name;
             this.timeBetweenTests = 0;
             state = TestState.FAILED;
@@ -105,15 +105,15 @@ public class Tester {
          * @param test Test for the robot.
          */
         public void addTest(Test test) {
-            unitTests.add(new UnitTest(test.getName(), test, ()-> test.state == TestState.PASSED));
+            systemsTests.add(new SystemsTest(test.getName(), test, ()-> test.state == TestState.PASSED));
         }
 
         /**
-         * Adds a unit test to be run.
-         * @param test A unit test for the system.
+         * Adds a System test to be run.
+         * @param test A System test for the system.
          */
-        public void addTest(UnitTest test) {
-            unitTests.add(test);
+        public void addTest(SystemsTest test) {
+            systemsTests.add(test);
         }
 
         @Override
@@ -125,13 +125,13 @@ public class Tester {
             passTimer.reset();
             Log.info(name, "Test Running");
 
-            for(UnitTest test : unitTests) {
+            for(SystemsTest test : systemsTests) {
                 test.testState = TestState.FAILED;
             }
 
-            if (unitTests.size() == 0) state = TestState.FAILED;
+            if (systemsTests.size() == 0) state = TestState.FAILED;
             else {
-                final UnitTest initialTest = unitTests.get(0);
+                final SystemsTest initialTest = systemsTests.get(0);
                 initialTest.testState = TestState.RUNNING;
                 initialTest.schedule();
             }
@@ -139,7 +139,7 @@ public class Tester {
 
         @Override
         public void execute() {
-            if (unitTests.size() == 0) return;
+            if (systemsTests.size() == 0) return;
             if (passTimer.hasElapsed(timeBetweenTests) && testToSchedule != null) {
                 passTimer.stop();
                 passTimer.reset();
@@ -148,7 +148,7 @@ public class Tester {
                 testToSchedule = null;
             }
 
-            final UnitTest test = unitTests.get(curIndex);
+            final SystemsTest test = systemsTests.get(curIndex);
             switch(test.testState) {
                 case FAILED:
                     state = TestState.FAILED;
@@ -156,9 +156,9 @@ public class Tester {
                 case PASSED:
                     curIndex ++;
                     state = TestState.PASSED;
-                    if (curIndex < unitTests.size()) {
+                    if (curIndex < systemsTests.size()) {
                         passTimer.restart();
-                        testToSchedule = unitTests.get(curIndex);
+                        testToSchedule = systemsTests.get(curIndex);
                         testToSchedule.testState = TestState.RUNNING;
                     }
                     return;
@@ -174,7 +174,7 @@ public class Tester {
 
         @Override
         public boolean isFinished() {
-            return state == TestState.FAILED || curIndex == unitTests.size();
+            return state == TestState.FAILED || curIndex == systemsTests.size();
         }
 
         /**
@@ -217,11 +217,11 @@ public class Tester {
     }
 
     /**
-     * Adds a unit test to be run for a system.
+     * Adds a Systems test to be run for a system.
      * @param name Name of the test or system.
-     * @param test Unit test to be added.
+     * @param test Systems test to be added.
      */
-    public void addTest(String name, UnitTest test) {
+    public void addTest(String name, SystemsTest test) {
         if (!systemTests.containsKey(name)) {
             systemTests.put(name, new Test(name));
         }
@@ -229,9 +229,9 @@ public class Tester {
     }
 
     /**
-     * Adds a unit test to be run for a system.
+     * Adds a Systems test to be run for a system.
      * @param name Name of the test or system.
-     * @param test Unit test to be added.
+     * @param test Systems test to be added.
      */
     public void addTest(String name, Test test) {
         if (!systemTests.containsKey(name)) {
@@ -251,7 +251,7 @@ public class Tester {
     }
 
     /**
-     * Runs the unit tests for a system.
+     * Runs the Systems tests for a system.
      * @param name Name of the test or system.
      */
     public void runTest(String name) {

@@ -3,11 +3,11 @@ package common.utility.tester;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
-import common.utility.tester.Tester.UnitTest;
+import common.utility.tester.Tester.SystemsTest;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 
-public class ThresholdTest extends UnitTest {
+public class ThresholdTest extends SystemsTest {
     public String testName;
     private boolean hasDelayed;
     private double delayPeriod;

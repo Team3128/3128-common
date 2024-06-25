@@ -9,9 +9,10 @@ import common.core.controllers.ControllerBase;
 import common.utility.Log;
 import common.utility.shuffleboard.NAR_Shuffleboard;
 import common.utility.tester.Tester;
-import common.utility.tester.Tester.UnitTest;
+import common.utility.tester.Tester.SystemsTest;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.simulation.LinearSystemSim;
 import edu.wpi.first.wpilibj2.command.PIDSubsystem;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -23,9 +24,9 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public abstract class NAR_PIDSubsystem extends SubsystemBase {
 
     /**
-     * UnitTest specifically for PIDSubsystems.
+     * SystemsTest specifically for PIDSubsystems.
      */
-    public class SetpointTest extends UnitTest {
+    public class SetpointTest extends SystemsTest {
         private final double timeOut;
         private final Timer timer = new Timer();
         private double prevTime;
@@ -131,7 +132,6 @@ public abstract class NAR_PIDSubsystem extends SubsystemBase {
             updateTimer.restart();
         }
     }
-
     /**
      * Initializes shuffleboard with debug elements for PID + FF values.
      */

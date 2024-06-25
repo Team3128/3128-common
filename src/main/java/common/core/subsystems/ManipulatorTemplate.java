@@ -28,13 +28,13 @@ public abstract class ManipulatorTemplate extends SubsystemBase {
     private DoubleSupplier powerSetpoint;
 
     /**
-     * Creates an Elevator object.
+     * Creates an Manipulator object.
      * @param currentThreshold Current when object is intook.
      * @param intakePower Intake power.
      * @param outtakePower Outtake power.
      * @param stallPower Stall Power, run when Manipulator has a game piece.
      * @param lagSeconds Time before current check is run.
-     * @param motors Elevator motors.
+     * @param motors Manipulator motors.
      */
     public ManipulatorTemplate(double currentThreshold, double intakePower, double outtakePower, double stallPower, double lagSeconds, NAR_Motor... motors){
         this.currentThreshold = currentThreshold;
