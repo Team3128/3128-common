@@ -24,6 +24,7 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj.DriverStation;
 import java.util.HashSet;
 import edu.wpi.first.apriltag.AprilTagFields;
+
 /**
  * Team 3128's class to control the robot's cameras and vision processing.
  * 
@@ -78,6 +79,16 @@ public class Camera {
 
         cameras.add(this);
         hasSeenTag = false;
+    }
+    public double getDistanceGround(){
+        // double yOffset =this.offset.getY();
+        // double pitchOffset = this.offset.getRotation().getY();
+        // double pitchObject = Math.toRadians(target.getPitch());
+        PhotonTrackedTarget target = lastResult.getBestTarget();
+        double objectDistance = target.getBestCameraToTarget().getTranslation().toTranslation2d().getNorm();
+        return objectDistance;
+
+
     }
 
     public static void configCameras(AprilTagFields aprilTagLayout, PoseStrategy calc_strategy, BiConsumer<Pose2d, Double> odometry, Supplier<Pose2d> robotPose){
