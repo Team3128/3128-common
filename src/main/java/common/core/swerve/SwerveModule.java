@@ -10,6 +10,7 @@ import com.ctre.phoenix6.configs.MagnetSensorConfigs;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 import common.core.controllers.PIDFFConfig;
+import common.core.swerve.SwerveModuleConfig.SwerveEncoderConfig;
 import common.core.swerve.SwerveModuleConfig.SwerveMotorConfig;
 import common.hardware.motorcontroller.NAR_Motor;
 import common.hardware.motorcontroller.NAR_Motor.Control;
@@ -29,12 +30,13 @@ public class SwerveModule {
     public static boolean shouldOptimizeCAN = true;
 
     public final int moduleNumber;
-    private final double angleOffset;
     private final NAR_Motor angleMotor;
     private final NAR_Motor driveMotor;
     private final CANcoder angleEncoder;
     private final SwerveMotorConfig driveConfig;
     private final SwerveMotorConfig angleConfig;
+    private final SwerveEncoderConfig encoderConfig;
+
 
     private final SimpleMotorFeedforward feedforward;
 
@@ -52,14 +54,14 @@ public class SwerveModule {
         this.moduleNumber = config.moduleNumber;
         this.driveConfig = config.driveConfig;
         this.angleConfig = config.angleConfig;
+        this.encoderConfig = config.encoderConfig;
         this.maxSpeed = config.maxSpeed;
-        angleOffset = config.angleOffset;
 
         final PIDFFConfig drivePIDConfig = driveConfig.pidffConfig;
         feedforward = new SimpleMotorFeedforward(drivePIDConfig.kS, drivePIDConfig.kV, drivePIDConfig.kA);
         
         /* Angle Encoder Config */
-        angleEncoder = new CANcoder(config.cancoderID, config.canbusString);
+        angleEncoder = encoderConfig.encoder;
         var absoluteAngleSupplier = angleEncoder.getAbsolutePosition();
         if (shouldOptimizeCAN) {
             absoluteAngleSupplier.setUpdateFrequency(100);
@@ -68,7 +70,7 @@ public class SwerveModule {
         absoluteAngle = absoluteAngleSupplier.asSupplier();
         
         
-        final SensorDirectionValue direction = config.CANCoderinvert ? SensorDirectionValue.Clockwise_Positive : SensorDirectionValue.CounterClockwise_Positive;
+        final SensorDirectionValue direction = encoderConfig.invert ? SensorDirectionValue.Clockwise_Positive : SensorDirectionValue.CounterClockwise_Positive;
         angleEncoder.getConfigurator().apply(new MagnetSensorConfigs().withSensorDirection(direction));
 
         angleMotor = angleConfig.motor;
@@ -138,9 +140,7 @@ public class SwerveModule {
      * @param angle The desired angle of the module
      */
     public void xLock(Rotation2d angle) {
-        final double desiredAngle = CTREModuleState.optimize(new SwerveModuleState(0, angle), getAngle()).angle.getDegrees();
-        driveMotor.set(0, Control.Velocity);
-        angleMotor.set(desiredAngle, Control.Position); 
+        setDesiredState(new SwerveModuleState(0, angle));
     }
 
     /**
@@ -155,15 +155,14 @@ public class SwerveModule {
      * Resets the angle motor to the CANCoder position
      */
     public void resetToAbsolute(){
-        final double absolutePosition = getCanCoder().getDegrees();
-        angleMotor.resetPosition(absolutePosition);
+        angleMotor.resetPosition(getAbsoluteAngle().getDegrees());
     }
 
     /**
      * Returns the current angle of the CANCoder
      */
-    public Rotation2d getCanCoder(){
-        return Rotation2d.fromDegrees(MathUtil.inputModulus(absoluteAngle.get() * 360 - angleOffset, -180, 180));
+    public Rotation2d getAbsoluteAngle(){
+        return Rotation2d.fromDegrees(MathUtil.inputModulus(absoluteAngle.get() * 360 - encoderConfig.encoderOffset, -180, 180));
     }
 
     /**

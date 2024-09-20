@@ -1,5 +1,7 @@
 package common.core.swerve;
 
+import com.ctre.phoenix6.hardware.CANcoder;
+
 import common.core.controllers.PIDFFConfig;
 import common.hardware.motorcontroller.NAR_Motor;
 import common.hardware.motorcontroller.NAR_Motor.MotorConfig;
@@ -21,29 +23,29 @@ public class SwerveModuleConfig {
         }
     }
 
+    public static class SwerveEncoderConfig {
+        public final CANcoder encoder;
+        public final double encoderOffset;
+        public final boolean invert;
+
+        public SwerveEncoderConfig(CANcoder encoder, double encoderOffset, boolean invert) {
+            this.encoder = encoder;
+            this.encoderOffset = encoderOffset;
+            this.invert = invert;
+        }
+    }
+
     public final int moduleNumber;
     public final SwerveMotorConfig driveConfig;
     public final SwerveMotorConfig angleConfig;
-    public final int cancoderID;
-    public final String canbusString;
-    public final double angleOffset;
-    public final boolean CANCoderinvert;
+    public final SwerveEncoderConfig encoderConfig;
     public final double maxSpeed;
 
-    public SwerveModuleConfig(int moduleNumber, SwerveMotorConfig driveConfig, SwerveMotorConfig angleConfig, int canCoderID, String canbusString, double angleOffset, boolean CANCoderinvert, double maxSpeed){
+    public SwerveModuleConfig(int moduleNumber, SwerveMotorConfig driveConfig, SwerveMotorConfig angleConfig, SwerveEncoderConfig encoderConfig, double maxSpeed){
         this.moduleNumber = moduleNumber;
         this.driveConfig = driveConfig;
         this.angleConfig = angleConfig;
-        this.cancoderID = canCoderID;
-        this.canbusString = canbusString;
-        this.angleOffset = angleOffset;
-        this.CANCoderinvert = CANCoderinvert;
+        this.encoderConfig = encoderConfig;
         this.maxSpeed = maxSpeed;
     }
-
-    public SwerveModuleConfig(int moduleNumber, SwerveMotorConfig driveConfig, SwerveMotorConfig angleConfig, int canCoderID, double angleOffset, boolean CANCoderinvert, double maxSpeed) {
-        this(moduleNumber, driveConfig, angleConfig, canCoderID, "", angleOffset, CANCoderinvert, maxSpeed);
-    }
-
-
 }
