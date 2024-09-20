@@ -59,7 +59,7 @@ public class SwerveModule {
         feedforward = new SimpleMotorFeedforward(drivePIDConfig.kS, drivePIDConfig.kV, drivePIDConfig.kA);
         
         /* Angle Encoder Config */
-        angleEncoder = new CANcoder(config.cancoderID);
+        angleEncoder = new CANcoder(config.cancoderID, config.canbusString);
         var absoluteAngleSupplier = angleEncoder.getAbsolutePosition();
         if (shouldOptimizeCAN) {
             absoluteAngleSupplier.setUpdateFrequency(100);

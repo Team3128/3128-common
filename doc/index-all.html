@@ -184,11 +184,7 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="common/core/swerve/SwerveModuleConfig.html#angleConfig" class="member-name-link">angleConfig</a> - Variable in class common.core.swerve.<a href="common/core/swerve/SwerveModuleConfig.html" title="class in common.core.swerve">SwerveModuleConfig</a></dt>
 <dd>&nbsp;</dd>
-<dt><a href="common/core/swerve/SwerveModuleConstants.html#angleMotorID" class="member-name-link">angleMotorID</a> - Variable in class common.core.swerve.<a href="common/core/swerve/SwerveModuleConstants.html" title="class in common.core.swerve">SwerveModuleConstants</a></dt>
-<dd>&nbsp;</dd>
 <dt><a href="common/core/swerve/SwerveModuleConfig.html#angleOffset" class="member-name-link">angleOffset</a> - Variable in class common.core.swerve.<a href="common/core/swerve/SwerveModuleConfig.html" title="class in common.core.swerve">SwerveModuleConfig</a></dt>
-<dd>&nbsp;</dd>
-<dt><a href="common/core/swerve/SwerveModuleConstants.html#angleOffset" class="member-name-link">angleOffset</a> - Variable in class common.core.swerve.<a href="common/core/swerve/SwerveModuleConstants.html" title="class in common.core.swerve">SwerveModuleConstants</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="common/hardware/motorcontroller/NAR_Motor.NAR_MotorIO.html#appliedOutput" class="member-name-link">appliedOutput</a> - Variable in class common.hardware.motorcontroller.<a href="common/hardware/motorcontroller/NAR_Motor.NAR_MotorIO.html" title="class in common.hardware.motorcontroller">NAR_Motor.NAR_MotorIO</a></dt>
 <dd>&nbsp;</dd>
@@ -294,9 +290,9 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="common/hardware/motorcontroller/NAR_CANSpark.ControllerType.html#CAN_SPARK_MAX" class="member-name-link">CAN_SPARK_MAX</a> - Enum constant in enum class common.hardware.motorcontroller.<a href="common/hardware/motorcontroller/NAR_CANSpark.ControllerType.html" title="enum class in common.hardware.motorcontroller">NAR_CANSpark.ControllerType</a></dt>
 <dd>&nbsp;</dd>
-<dt><a href="common/core/swerve/SwerveModuleConfig.html#cancoderID" class="member-name-link">cancoderID</a> - Variable in class common.core.swerve.<a href="common/core/swerve/SwerveModuleConfig.html" title="class in common.core.swerve">SwerveModuleConfig</a></dt>
+<dt><a href="common/core/swerve/SwerveModuleConfig.html#canbusString" class="member-name-link">canbusString</a> - Variable in class common.core.swerve.<a href="common/core/swerve/SwerveModuleConfig.html" title="class in common.core.swerve">SwerveModuleConfig</a></dt>
 <dd>&nbsp;</dd>
-<dt><a href="common/core/swerve/SwerveModuleConstants.html#cancoderID" class="member-name-link">cancoderID</a> - Variable in class common.core.swerve.<a href="common/core/swerve/SwerveModuleConstants.html" title="class in common.core.swerve">SwerveModuleConstants</a></dt>
+<dt><a href="common/core/swerve/SwerveModuleConfig.html#cancoderID" class="member-name-link">cancoderID</a> - Variable in class common.core.swerve.<a href="common/core/swerve/SwerveModuleConfig.html" title="class in common.core.swerve">SwerveModuleConfig</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="common/core/swerve/SwerveModuleConfig.html#CANCoderinvert" class="member-name-link">CANCoderinvert</a> - Variable in class common.core.swerve.<a href="common/core/swerve/SwerveModuleConfig.html" title="class in common.core.swerve">SwerveModuleConfig</a></dt>
 <dd>&nbsp;</dd>
@@ -512,8 +508,6 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="common/core/swerve/SwerveModuleConfig.html#driveConfig" class="member-name-link">driveConfig</a> - Variable in class common.core.swerve.<a href="common/core/swerve/SwerveModuleConfig.html" title="class in common.core.swerve">SwerveModuleConfig</a></dt>
 <dd>&nbsp;</dd>
-<dt><a href="common/core/swerve/SwerveModuleConstants.html#driveMotorID" class="member-name-link">driveMotorID</a> - Variable in class common.core.swerve.<a href="common/core/swerve/SwerveModuleConstants.html" title="class in common.core.swerve">SwerveModuleConstants</a></dt>
-<dd>&nbsp;</dd>
 <dt><a href="common/hardware/limelight/StreamMode.html#DRIVER_CAMERA" class="member-name-link">DRIVER_CAMERA</a> - Enum constant in enum class common.hardware.limelight.<a href="common/hardware/limelight/StreamMode.html" title="enum class in common.hardware.limelight">StreamMode</a></dt>
 <dd>&nbsp;</dd>
 </dl>
@@ -718,6 +712,8 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Get the Differential coefficient.</div>
 </dd>
+<dt><a href="common/hardware/camera/Camera.html#getDistanceGround()" class="member-name-link">getDistanceGround()</a> - Method in class common.hardware.camera.<a href="common/hardware/camera/Camera.html" title="class in common.hardware.camera">Camera</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="common/utility/shuffleboard/NAR_Shuffleboard.html#getDouble(java.lang.String,java.lang.String)" class="member-name-link">getDouble(String, String)</a> - Static method in class common.utility.shuffleboard.<a href="common/utility/shuffleboard/NAR_Shuffleboard.html" title="class in common.utility.shuffleboard">NAR_Shuffleboard</a></dt>
 <dd>
 <div class="block">Get the value reference of a widget storing doubles.</div>
@@ -2179,14 +2175,10 @@ loadScripts(document, 'script');</script>
 </dd>
 <dt><a href="common/core/swerve/SwerveModuleConfig.html#%3Cinit%3E(int,common.core.swerve.SwerveModuleConfig.SwerveMotorConfig,common.core.swerve.SwerveModuleConfig.SwerveMotorConfig,int,double,boolean,double)" class="member-name-link">SwerveModuleConfig(int, SwerveModuleConfig.SwerveMotorConfig, SwerveModuleConfig.SwerveMotorConfig, int, double, boolean, double)</a> - Constructor for class common.core.swerve.<a href="common/core/swerve/SwerveModuleConfig.html" title="class in common.core.swerve">SwerveModuleConfig</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="common/core/swerve/SwerveModuleConfig.html#%3Cinit%3E(int,common.core.swerve.SwerveModuleConfig.SwerveMotorConfig,common.core.swerve.SwerveModuleConfig.SwerveMotorConfig,int,java.lang.String,double,boolean,double)" class="member-name-link">SwerveModuleConfig(int, SwerveModuleConfig.SwerveMotorConfig, SwerveModuleConfig.SwerveMotorConfig, int, String, double, boolean, double)</a> - Constructor for class common.core.swerve.<a href="common/core/swerve/SwerveModuleConfig.html" title="class in common.core.swerve">SwerveModuleConfig</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="common/core/swerve/SwerveModuleConfig.SwerveMotorConfig.html" class="type-name-link" title="class in common.core.swerve">SwerveModuleConfig.SwerveMotorConfig</a> - Class in <a href="common/core/swerve/package-summary.html">common.core.swerve</a></dt>
 <dd>&nbsp;</dd>
-<dt><a href="common/core/swerve/SwerveModuleConstants.html" class="type-name-link" title="class in common.core.swerve">SwerveModuleConstants</a> - Class in <a href="common/core/swerve/package-summary.html">common.core.swerve</a></dt>
-<dd>&nbsp;</dd>
-<dt><a href="common/core/swerve/SwerveModuleConstants.html#%3Cinit%3E(int,int,int,double)" class="member-name-link">SwerveModuleConstants(int, int, int, double)</a> - Constructor for class common.core.swerve.<a href="common/core/swerve/SwerveModuleConstants.html" title="class in common.core.swerve">SwerveModuleConstants</a></dt>
-<dd>
-<div class="block">Swerve Module Constants to be used when creating swerve modules.</div>
-</dd>
 <dt><a href="common/core/swerve/SwerveModuleConfig.SwerveMotorConfig.html#%3Cinit%3E(common.hardware.motorcontroller.NAR_Motor,common.hardware.motorcontroller.NAR_Motor.MotorConfig,common.core.controllers.PIDFFConfig)" class="member-name-link">SwerveMotorConfig(NAR_Motor, NAR_Motor.MotorConfig, PIDFFConfig)</a> - Constructor for class common.core.swerve.<a href="common/core/swerve/SwerveModuleConfig.SwerveMotorConfig.html" title="class in common.core.swerve">SwerveModuleConfig.SwerveMotorConfig</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="common/utility/tester/Tester.SystemsTest.html#%3Cinit%3E(java.lang.String,edu.wpi.first.wpilibj2.command.Command)" class="member-name-link">SystemsTest(String, Command)</a> - Constructor for class common.utility.tester.<a href="common/utility/tester/Tester.SystemsTest.html" title="class in common.utility.tester">Tester.SystemsTest</a></dt>

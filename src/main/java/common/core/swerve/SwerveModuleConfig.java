@@ -25,17 +25,25 @@ public class SwerveModuleConfig {
     public final SwerveMotorConfig driveConfig;
     public final SwerveMotorConfig angleConfig;
     public final int cancoderID;
+    public final String canbusString;
     public final double angleOffset;
     public final boolean CANCoderinvert;
     public final double maxSpeed;
 
-    public SwerveModuleConfig(int moduleNumber, SwerveMotorConfig driveConfig, SwerveMotorConfig angleConfig, int canCoderID, double angleOffset, boolean CANCoderinvert, double maxSpeed) {
+    public SwerveModuleConfig(int moduleNumber, SwerveMotorConfig driveConfig, SwerveMotorConfig angleConfig, int canCoderID, String canbusString, double angleOffset, boolean CANCoderinvert, double maxSpeed){
         this.moduleNumber = moduleNumber;
         this.driveConfig = driveConfig;
         this.angleConfig = angleConfig;
         this.cancoderID = canCoderID;
+        this.canbusString = canbusString;
         this.angleOffset = angleOffset;
         this.CANCoderinvert = CANCoderinvert;
         this.maxSpeed = maxSpeed;
     }
+
+    public SwerveModuleConfig(int moduleNumber, SwerveMotorConfig driveConfig, SwerveMotorConfig angleConfig, int canCoderID, double angleOffset, boolean CANCoderinvert, double maxSpeed) {
+        this(moduleNumber, driveConfig, angleConfig, canCoderID, "", angleOffset, CANCoderinvert, maxSpeed);
+    }
+
+
 }
