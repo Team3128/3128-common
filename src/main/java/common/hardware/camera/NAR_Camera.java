@@ -1,23 +1,31 @@
 // package common.hardware.camera;
 
 // import java.util.LinkedList;
+// import java.util.ArrayList;
 // import java.util.HashMap;
 // import java.util.List;
+// import java.util.Optional;
 // import java.util.function.BiConsumer;
 // import java.util.function.DoubleSupplier;
 // import java.util.function.Supplier;
 
+// import org.photonvision.EstimatedRobotPose;
 // import org.photonvision.PhotonCamera;
+// import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 // import org.photonvision.targeting.PhotonPipelineResult;
 // import org.photonvision.targeting.PhotonTrackedTarget;
 
+// import common.core.misc.NAR_Robot;
+// import edu.wpi.first.apriltag.AprilTagFieldLayout;
 // import edu.wpi.first.math.MathUtil;
 // import edu.wpi.first.math.geometry.Pose2d;
+// import edu.wpi.first.math.geometry.Pose3d;
 // import edu.wpi.first.math.geometry.Rotation2d;
 // import edu.wpi.first.math.geometry.Transform2d;
 // import edu.wpi.first.math.geometry.Transform3d;
 // import edu.wpi.first.math.geometry.Translation2d;
 // import edu.wpi.first.math.util.Units;
+// import edu.wpi.first.wpilibj.DriverStation;
 
 // import org.littletonrobotics.junction.Logger;
 
@@ -33,14 +41,21 @@
 
 //     public final Camera camera;
 
+//     private static ArrayList<Integer> ignoredTags = new ArrayList<Integer>();
+
 //     private PhotonPipelineResult result;
 
 //     private List<PhotonTrackedTarget> targets;
 //     private PhotonTrackedTarget bestTarget;
 
+//     private boolean hasSeenTag;
+
 //     private static DoubleSupplier gyro;
 //     private static BiConsumer<Pose2d, Double> odometry;
-//     private static HashMap<Integer, Pose2d> aprilTags;
+//     // private static HashMap<Integer, Pose2d> aprilTags;
+//     private static AprilTagFieldLayout aprilTags;
+
+//     private static Supplier<Pose2d> robotPose;
 
 //     private static double angleThreshold = 30;
 //     private static double distanceThreshold = 5;
@@ -71,7 +86,7 @@
 //      * @param aprilTags Sets the AprilTag positions on the field.
 //      * @param poseSupplier Supplies the robot's current pose.
 //      */
-//     public static void setResources(DoubleSupplier gyro, BiConsumer<Pose2d, Double> odometry, HashMap<Integer, Pose2d> aprilTags, Supplier<Pose2d> poseSupplier) {
+//     public static void setResources(DoubleSupplier gyro, BiConsumer<Pose2d, Double> odometry, AprilTagFieldLayout aprilTags, Supplier<Pose2d> poseSupplier) {
 //         NAR_Camera.gyro = gyro;
 //         NAR_Camera.odometry = odometry;
 //         NAR_Camera.aprilTags = aprilTags;
@@ -94,25 +109,11 @@
 //     }
 
 //     /**
-//      * Allows the camera to update robot odometry.
-//      */
-//     public void enable() {
-//         camera.enabled = true;
-//     }
-
-//     /**
-//      * Stops the camera from updating robot odometry.
-//      */
-//     public void disable() {
-//         camera.enabled = false;
-//     }
-
-//     /**
 //      * Gets the latest targets.
 //      */
 //     public void update() {
 //         //Don't update if camera is disabled
-//         if (!camera.enabled) return;
+//         if (camera.isDisabled) return;
 
 //         //returns the most recent camera frame
 //         result = this.getLatestResult();
@@ -331,7 +332,7 @@
 //             relTargetAngle = Rotation2d.fromDegrees(robotAngle);
 //         }
 
-//         // vector relative to camera coordinate system
+//         // vector relative to camera coordinate system.
 //         final Translation2d vector = getRelTarget(target).getTranslation().rotateBy(relTargetAngle);
 
 //         return new Transform2d(vector, relTargetAngle);
