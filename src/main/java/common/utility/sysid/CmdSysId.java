@@ -16,9 +16,11 @@ public class CmdSysId extends Command {
     private final FFCharacterization data;
     private final Consumer<Double> voltageConsumer;
     private final Supplier<Double> velocitySupplier;
+    private final Supplier<Double> positionSupplier;
 
     private final double startDelaySecs;
     private final double rampRateVoltsPerSec;
+    private final double targetPosition;
 
     private final Timer timer = new Timer();
 
@@ -35,15 +37,19 @@ public class CmdSysId extends Command {
         String name,
         Consumer<Double> voltageConsumer,
         Supplier<Double> velocitySupplier,
+        Supplier<Double> positionSupplier,
         double startDelaySecs,
         double rampRateVoltsPerSec,
+        double targetPosition,
         Subsystem... subsystems
         ) {
         this.data = new FFCharacterization(name);
         this.voltageConsumer = voltageConsumer;
         this.velocitySupplier = velocitySupplier;
+        this.positionSupplier = positionSupplier;
         this.startDelaySecs = startDelaySecs;
         this.rampRateVoltsPerSec = rampRateVoltsPerSec;
+        this.targetPosition = targetPosition;
         
         addRequirements(subsystems);
     }
@@ -59,9 +65,11 @@ public class CmdSysId extends Command {
         String name,
         Consumer<Double> voltageConsumer,
         Supplier<Double> velocitySupplier,
+        Supplier<Double> positionSupplier,
+        double targetPosition,
         Subsystem... subsystems
         ) {
-        this(name, voltageConsumer, velocitySupplier, 2.0, 1.0, subsystems);
+        this(name, voltageConsumer, velocitySupplier, positionSupplier, 2.0, 1.0, targetPosition, subsystems);
     }
 
     @Override
@@ -86,6 +94,11 @@ public class CmdSysId extends Command {
         setVoltage(0.0);
         timer.stop();
         data.print();
+    }
+
+    @Override
+    public boolean isFinished() {
+        return Math.abs(positionSupplier.get()) >= targetPosition;
     }
 
     /**
