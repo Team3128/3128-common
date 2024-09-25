@@ -20,7 +20,9 @@ public class CmdSysId extends Command {
 
     private final double startDelaySecs;
     private final double rampRateVoltsPerSec;
+
     private final double targetPosition;
+    private final boolean goingForward;
 
     private final Timer timer = new Timer();
 
@@ -29,8 +31,11 @@ public class CmdSysId extends Command {
      * @param name Name of the test.
      * @param voltageConsumer Motors of the subsystem.
      * @param velocitySupplier Velocity of the subsystem.
+     * @param positionSupplier Position of the subsystem.
      * @param startDelaySecs Delay before the command starts.
      * @param rampRateVoltsPerSec Rate at which voltage increases.
+     * @param targetPosition Target position to reach.
+     * @param goingForward Direction to move in.
      * @param subsystems Subsystems used.
      */
     public CmdSysId(
@@ -41,15 +46,19 @@ public class CmdSysId extends Command {
         double startDelaySecs,
         double rampRateVoltsPerSec,
         double targetPosition,
+        boolean goingForward,
         Subsystem... subsystems
         ) {
         this.data = new FFCharacterization(name);
         this.voltageConsumer = voltageConsumer;
         this.velocitySupplier = velocitySupplier;
         this.positionSupplier = positionSupplier;
+
         this.startDelaySecs = startDelaySecs;
         this.rampRateVoltsPerSec = rampRateVoltsPerSec;
+
         this.targetPosition = targetPosition;
+        this.goingForward = goingForward;
         
         addRequirements(subsystems);
     }
@@ -59,6 +68,9 @@ public class CmdSysId extends Command {
      * @param name Name of the test.
      * @param voltageConsumer Motors of the subsystem.
      * @param velocitySupplier Velocity of the subsystem.
+     * @param positionSupplier Position of the subsystem.
+     * @param targetPosition Target position to reach.
+     * @param goingForward Direction to move in.
      * @param subsystems Subsystems used.
      */
     public CmdSysId(
@@ -67,9 +79,10 @@ public class CmdSysId extends Command {
         Supplier<Double> velocitySupplier,
         Supplier<Double> positionSupplier,
         double targetPosition,
+        boolean goingForward,
         Subsystem... subsystems
         ) {
-        this(name, voltageConsumer, velocitySupplier, positionSupplier, 2.0, 1.0, targetPosition, subsystems);
+        this(name, voltageConsumer, velocitySupplier, positionSupplier, 2.0, 1.0, targetPosition, goingForward, subsystems);
     }
 
     @Override
@@ -83,7 +96,7 @@ public class CmdSysId extends Command {
     public void execute() {
         if (timer.get() < startDelaySecs) return;
 
-        final double voltage = (timer.get() - startDelaySecs) * rampRateVoltsPerSec;
+        double voltage = (timer.get() - startDelaySecs) * rampRateVoltsPerSec * (goingForward ? 1 : -1);
 
         setVoltage(voltage);
         updateData(voltage);
@@ -98,7 +111,8 @@ public class CmdSysId extends Command {
 
     @Override
     public boolean isFinished() {
-        return Math.abs(positionSupplier.get()) >= targetPosition;
+        return goingForward ? Math.abs(positionSupplier.get()) >= targetPosition : 
+                                Math.abs(positionSupplier.get()) <= targetPosition;
     }
 
     /**
