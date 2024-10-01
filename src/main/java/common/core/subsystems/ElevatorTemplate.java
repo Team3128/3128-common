@@ -78,6 +78,11 @@ public abstract class ElevatorTemplate extends NAR_PIDSubsystem {
      * @return Command that resets the elevator position.
      */
     public Command reset(double position) {
-        return runOnce(()-> motors[0].resetPosition(position));
+        return runOnce(()-> {
+            
+        for(NAR_Motor motor : motors){
+            motor.resetPosition(position);
+        }
+    });
     }
 }

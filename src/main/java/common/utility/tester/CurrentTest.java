@@ -2,7 +2,6 @@ package common.utility.tester;
 
 import static edu.wpi.first.wpilibj2.command.Commands.*;
 import common.hardware.motorcontroller.NAR_Motor;
-import common.utility.Log;
 import common.utility.tester.Tester.SystemsTest;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Subsystem;

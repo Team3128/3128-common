@@ -4,7 +4,6 @@ import java.lang.management.GarbageCollectorMXBean;
 import java.lang.management.ManagementFactory;
 import java.lang.reflect.Method;
 import java.time.LocalDateTime;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.PriorityQueue;
 
@@ -22,14 +21,26 @@ import edu.wpi.first.wpilibj.IterativeRobotBase;
 import edu.wpi.first.wpilibj.Timer;
 
 /**
- * Team 3128's Robot class that includes advantageScope and addPeriodic
+ * Team 3128's Custom Robot class
  * 
+ * <p> Includes AdvantageKit and addPeriodic()
+ * 
+ * <p>NOTES:
+ * <ul>
+ * <li> TimedRobot implements the IterativeRobotBase robot program framework.
+ * <li> The TimedRobot class is intended to be subclassed by a user creating a robot program.
+ * <li> Periodic() functions from the base class are called on an interval by a Notifier instance.
+ * <li> AdvantageKit logging is disabled by default. 
+ * </ul>
+ * 
+ * <p> ----------------------------------------------
+ *  
  * @since 2023 Charged Up
- * @author Mason Lam
+ * @author Mason Lam, Wallim
  */
 public class NAR_Robot extends IterativeRobotBase {
 
-    public static boolean logWithAdvantageKit = true;
+    public static boolean logWithAdvantageKit = false;
 
     @SuppressWarnings("MemberName")
     static class Callback implements Comparable<Callback> {
@@ -87,9 +98,9 @@ public class NAR_Robot extends IterativeRobotBase {
 
     private static final PriorityQueue<Callback> m_callbacks = new PriorityQueue<>();
 
-    private final Method periodicAfterUser0;
+    private Method periodicAfterUser0 = null;
 
-    private final GcStatsCollector gcStatsCollector = new GcStatsCollector();
+    private GcStatsCollector gcStatsCollector = new GcStatsCollector();
 
     /** Constructor for TimedRobot. */
     protected NAR_Robot() {
@@ -105,33 +116,40 @@ public class NAR_Robot extends IterativeRobotBase {
         super(period);
         m_startTime = Timer.getFPGATimestamp();
 
-        Method periodicBeforeUser = null; // Method to get the periodicBeforeUser method from Logger
-        Method periodicAfterUser = null; // Method to get the periodicAfterUser method from Logger
-        try {
-            periodicBeforeUser = Logger.class.getDeclaredMethod("periodicBeforeUser");
-            periodicAfterUser = Logger.class.getDeclaredMethod("periodicAfterUser", long.class, long.class);
-        } catch (NoSuchMethodException | SecurityException e) {
-            e.printStackTrace();
+        if(logWithAdvantageKit) {
+            Method periodicBeforeUser = null; // Method to get the periodicBeforeUser method from Logger
+            Method periodicAfterUser = null; // Method to get the periodicAfterUser method from Logger
+            try {
+                periodicBeforeUser = Logger.class.getDeclaredMethod("periodicBeforeUser");
+                periodicAfterUser = Logger.class.getDeclaredMethod("periodicAfterUser", long.class, long.class);
+            } catch (NoSuchMethodException | SecurityException e) {
+                e.printStackTrace();
+            }
+
+            periodicBeforeUser.setAccessible(true); // set the method to be accessible
+            periodicAfterUser.setAccessible(true); // set the method to be accessible
+
+            Method periodicBeforeUser0 = periodicBeforeUser;
+            periodicAfterUser0 = periodicAfterUser;
+
+            addPeriodic(() -> {
+                try {
+                    long loopCycleStart = Logger.getRealTimestamp();
+                    if (logWithAdvantageKit) periodicBeforeUser0.invoke(null);
+                    long userCodeStart = Logger.getRealTimestamp();
+                    loopFunc();
+                    long loopCycleEnd = Logger.getRealTimestamp();
+                    if (logWithAdvantageKit) gcStatsCollector.update();
+                    if (logWithAdvantageKit) periodicAfterUser0.invoke(null, loopCycleEnd - userCodeStart, userCodeStart - loopCycleStart);
+                } catch (Exception e) {
+                }
+            }, period);
+
+        } else {
+            addPeriodic(this::loopFunc, period);
         }
 
-        periodicBeforeUser.setAccessible(true); // set the method to be accessible
-        periodicAfterUser.setAccessible(true); // set the method to be accessible
-
-        final Method periodicBeforeUser0 = periodicBeforeUser;
-        periodicAfterUser0 = periodicAfterUser;
-
-        addPeriodic(() -> {
-            try {
-                long loopCycleStart = Logger.getRealTimestamp();
-                if (logWithAdvantageKit) periodicBeforeUser0.invoke(null);
-                long userCodeStart = Logger.getRealTimestamp();
-                loopFunc();
-                long loopCycleEnd = Logger.getRealTimestamp();
-                if (logWithAdvantageKit) gcStatsCollector.update();
-                if (logWithAdvantageKit) periodicAfterUser0.invoke(null, loopCycleEnd - userCodeStart, userCodeStart - loopCycleStart);
-            } catch (Exception e) {
-            }
-        }, period);
+        
         NotifierJNI.setNotifierName(m_notifier, "TimedRobot");
 
         HAL.report(tResourceType.kResourceType_Framework, tInstances.kFramework_Timed);
@@ -146,14 +164,17 @@ public class NAR_Robot extends IterativeRobotBase {
     /** Provide an alternate "main loop" via startCompetition(). */
     @Override
     public void startCompetition() {
-        long initStart = Logger.getRealTimestamp();
+        long initStart = 0;
+        if(logWithAdvantageKit) initStart = Logger.getRealTimestamp();
+        
         robotInit();
 
         if (isSimulation()) {
             simulationInit();
         }
 
-        long initEnd = Logger.getRealTimestamp();
+        long initEnd = 0;
+        if(logWithAdvantageKit) initEnd = Logger.getRealTimestamp();
 
         if (logWithAdvantageKit) {
             try {
