@@ -6,7 +6,6 @@ import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
-import java.util.ArrayList;
 
 import org.littletonrobotics.junction.Logger;
 import org.photonvision.PhotonCamera;

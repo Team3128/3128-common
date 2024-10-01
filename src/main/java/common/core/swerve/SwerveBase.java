@@ -86,7 +86,7 @@ public abstract class SwerveBase extends SubsystemBase {
     }
 
     public void executeRequests() {
-        double overideRotation;
+        double overideRotation = 0;
         var aggregateVelocity = new ChassisSpeeds();
         for (ChassisSpeeds velocity : velocityRequests.keySet()) {
             aggregateVelocity.plus(velocity);
