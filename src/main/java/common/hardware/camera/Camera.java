@@ -1,111 +1,251 @@
 package common.hardware.camera;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Optional;
 import java.util.function.BiConsumer;
+import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 import java.util.ArrayList;
 
 import org.littletonrobotics.junction.Logger;
-import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
-import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
 import common.core.misc.NAR_Robot;
+import common.utility.Log;
 import common.utility.shuffleboard.NAR_Shuffleboard;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.wpilibj.DriverStation;
-import java.util.HashSet;
-import edu.wpi.first.apriltag.AprilTagFields;
 
 /**
  * Team 3128's class to control the robot's cameras and vision processing.
  * 
- * @since 2022 Rapid React
- * @author Mason Lam, William Yuan 
+ * @since 2024 Crescendo
+ * @author Audrey Zheng
  */
 public class Camera {
 
-    private static ArrayList<Integer> tags = new ArrayList<Integer>();
-
-    private boolean hasSeenTag;
-
-    public static int updateCounter = 0;
-
-    public static double validDist = 0.5;
-    public static double overrideThreshold = 5;
-
-    private final PhotonCamera camera;
-    private final Transform3d offset;
-
-    private boolean isDisabled = false;
-    private PhotonPipelineResult lastResult;
-    private EstimatedRobotPose lastPose;
-
+    public PhotonCamera camera;
+    private static ArrayList<Integer> targets = new ArrayList<Integer>();
+    public static final LinkedList<Camera> cameras = new LinkedList<Camera>();
+    private PhotonPipelineResult result = new PhotonPipelineResult();  
+    
+    private static DoubleSupplier gyro;
     private static AprilTagFieldLayout aprilTags;
-    // private static HashMap<Integer, Pose3d> aprilTags;
-    private static PoseStrategy calc_strategy;
     private static BiConsumer<Pose2d, Double> odometry;
     private static Supplier<Pose2d> robotPose;
-    private static double ambiguityThreshold = 0.3;
-
+    
+    private static double distanceThreshold = 5;
+    private static double ambiguityThreshold = 0.5;
+    public static double validDist = 0.5;
+    public static double overrideThreshold = 5;
+    public static int updateCounter = 0;
+    
+    private boolean hasSeenTag;
+    public Pose2d estimatedPose = new Pose2d();
+    private static ArrayList<Integer> tags = new ArrayList<Integer>();
     private static ArrayList<Integer> ignoredTags = new ArrayList<Integer>();
+    public boolean isDisabled = false;
+    public Transform3d offset;
+    public double distance;
 
-    public static final LinkedList<Camera> cameras = new LinkedList<Camera>();
-
-    private static final HashSet<Integer> reportedErrors = new HashSet<Integer>();
-
-    private double distanceThreshold = 3.5;
-    
+    /**
+     * Creates a Camera object
+     */
     public Camera(String name, double xOffset, double yOffset, double yawOffset, double pitchOffset, double rollOffset) {
-        camera = new PhotonCamera(name);
-    
+        Log.info("Camera", "camera constructer");
+
         this.offset = new Transform3d(xOffset, yOffset, 0, 
             new Rotation3d(0.0, pitchOffset, 0.0)
             .rotateBy(new Rotation3d(rollOffset, 0, 0))
             .rotateBy(new Rotation3d(0.0,0.0,yawOffset))
         );
 
-        if (aprilTags == null || calc_strategy == null || odometry == null || robotPose == null) {
-            throw new IllegalStateException("Camera not configured");
-        }
+        camera = new PhotonCamera(name);
 
         cameras.add(this);
+
+        initShuffleboard();
         hasSeenTag = false;
     }
-    public double getDistanceGround(){
-        // double yOffset =this.offset.getY();
-        // double pitchOffset = this.offset.getRotation().getY();
-        // double pitchObject = Math.toRadians(target.getPitch());
-        PhotonTrackedTarget target = lastResult.getBestTarget();
-        double objectDistance = target.getBestCameraToTarget().getTranslation().toTranslation2d().getNorm();
-        return objectDistance;
 
-
-    }
-
-    public static void configCameras(AprilTagFields aprilTagLayout, PoseStrategy calc_strategy, BiConsumer<Pose2d, Double> odometry, Supplier<Pose2d> robotPose){
-        Camera.aprilTags = aprilTagLayout.loadAprilTagLayoutField();
-        Camera.calc_strategy = calc_strategy;
+    /**
+     * Sets the necessary resources for cameras to function.
+     * 
+     * @param gyro Feeds the angle of the robot.
+     * @param odometry Feeds the robot odometry object for vision estimates to update.
+     * @param aprilTags Sets the AprilTag positions on the field.
+     * @param robotPose Supplies the robot's current pose.
+    */
+    public static void setResources(DoubleSupplier gyro, BiConsumer<Pose2d, Double> odometry, AprilTagFieldLayout aprilTags, Supplier<Pose2d> robotPose) {
+        Camera.gyro = gyro;
         Camera.odometry = odometry;
+        Camera.aprilTags = aprilTags;
         Camera.robotPose = robotPose;
     }
 
+    /**
+     * Sets the necessary thresholds for the cameras to use
+     * @param distanceThreshold Maximum distance from tag to accept
+     * @param ambiguityThreshold Maximum tag ambiguity to accept
+     */
+    public static void setThresholds(double distanceThreshold, double ambiguityThreshold) {
+        Camera.distanceThreshold = distanceThreshold;
+        Camera.ambiguityThreshold = ambiguityThreshold;
+    }
+
+    /**
+     * Gets the latest camera updates
+     */
+    public void update() {
+        if (isDisabled) return;
+        hasSeenTag = false;
+        result = camera.getLatestResult();
+
+        if (!result.hasTargets()) {
+            targets = null;
+            if (NAR_Robot.logWithAdvantageKit) Logger.recordOutput("Vision/" + camera.getName(), robotPose.get());
+            return;
+        }
+
+        final Pose2d estPos = getPose(result).get();
+
+        /*
+         * Checks if the the robot has a good estimate
+         */
+
+        if(!isGoodEstimate(estPos)) {
+            updateCounter++;
+            if (updateCounter <= overrideThreshold) {
+                hasSeenTag = false; 
+                return;
+            }
+        }
+        else {
+            updateCounter = 0;
+        } 
+        
+        odometry.accept(estPos, result.getTimestampSeconds());
+    }
+
+
+    /**
+     * Gets the latest camera updates
+     * @param result Latest result from the camera
+     * @return The estimated robot pose
+     */
+    public Optional<Pose2d> getPose(PhotonPipelineResult result) {
+        double lowestAmbiguityScore = 10;
+        PhotonTrackedTarget lowestAmbiguityTarget = null;
+
+        if (!result.hasTargets()) return Optional.empty();
+
+        /*
+         * Find the target with the lowest ambiguity score 
+         */
+        for (PhotonTrackedTarget target : result.targets) {
+            if (isValidTarget(target) && getPoseAmbiguity(target) < lowestAmbiguityScore && getPoseAmbiguity(target) != -1) {
+                lowestAmbiguityScore = getPoseAmbiguity(target);
+                lowestAmbiguityTarget = target;
+                hasSeenTag = tags.contains(target.getFiducialId()); 
+            }
+        }
+
+        if (lowestAmbiguityTarget == null) return Optional.empty();
+
+        distance = getDistance(lowestAmbiguityTarget);
+
+        /*
+         * Finds the pose of the lowest ambiguity target and uses the gyro to determine the estimated pose
+         */
+        Optional<Pose3d> targetPosition = aprilTags.getTagPose(lowestAmbiguityTarget.getFiducialId());
+        estimatedPose = getGyroStablilization(targetPosition, lowestAmbiguityTarget);
+
+        return Optional.of(estimatedPose);
+    }
+
+    /**
+     * Uses the gyro angle and target position to determine robot pose
+     * @param targetPosition The Pose3d of the target
+     * @param bestTarget Lowest ambiguity target
+     * @return The estimated Pose2d of the robot
+     */
+    public Pose2d getGyroStablilization(Optional<Pose3d> targetPosition, PhotonTrackedTarget bestTarget) {
+        double gyroAngle = getGyroAngle() * Math.PI / 180;
+        
+        Transform3d targetToCamera = bestTarget.getBestCameraToTarget().inverse();
+        Rotation3d gyroRotation3d = new Rotation3d(0, 0, gyroAngle);
+        Pose3d target = targetPosition.get();
+        
+        /*
+         * Determines the position of the camera using the position of the target and the gyro rotation
+         */
+        Pose3d cameraPose = new Pose3d(target.getTranslation().plus(
+            targetToCamera.getTranslation().rotateBy(target.getRotation())),
+            gyroRotation3d.plus(target.getRotation())
+        );
+
+        /*
+         * Determines the position of the robot using the position of the camera and its offset
+         */
+        Pose3d robotPose = new Pose3d(cameraPose.getTranslation().plus(
+            offset.inverse().getTranslation().rotateBy(cameraPose.getRotation())),
+            offset.inverse().getRotation().plus(cameraPose.getRotation())
+        );
+        
+        return robotPose.toPose2d();
+    }
+
+    /**
+     * Returns if an estimate is within a valid distance from the robot pose
+     * @param pose Estimated pose
+     * @return If the estimated pose is valid
+     */
+    public boolean isGoodEstimate(Pose2d pose){
+        return pose.getTranslation().getDistance(robotPose.get().getTranslation()) < validDist;
+    }
+
+    /**
+     * Blacklists tags from use
+     * @param ignoredTags IDs of ignored tags
+     */
     public static void addIgnoredTags(int ...ignoredTags) {
         for(final int tag : ignoredTags) {
             Camera.ignoredTags.add(tag);
         }
     }
 
-    public static void addTags(int ...tags) {
-        for(final int tag : tags) {
-            Camera.tags.add(tag);
+    /**
+     * Returns true if the target is within the distance and ambiguity thresholds and is not blacklisted
+     * @param target 
+     * @return If the target is valid
+     */
+    public boolean isValidTarget(PhotonTrackedTarget target) {       
+        return !(getDistance(target) > distanceThreshold) && 
+            getPoseAmbiguity(target) < ambiguityThreshold &&
+            !ignoredTags.contains(Integer.valueOf(target.getFiducialId()));
+    }
+
+    public double getDistance(PhotonTrackedTarget target) {
+        return target.getBestCameraToTarget().getTranslation().toTranslation2d().getNorm();
+    }
+
+    public double getPoseAmbiguity(PhotonTrackedTarget target) {
+        return target.getPoseAmbiguity();
+    } 
+
+    public double getGyroAngle() {
+        return gyro.getAsDouble();
+    }
+
+    public static void updateAll() {
+        for (final Camera camera : cameras) {
+            camera.update();
         }
     }
 
@@ -115,11 +255,13 @@ public class Camera {
         }
         return false;
     }
+    
+    public void enable() {
+        isDisabled = false;
+    }
 
-    public static void updateAll(){
-        for (final Camera camera : cameras) {
-            camera.update();
-        }
+    public void disable(){
+        isDisabled = true;
     }
 
     public static void enableAll() {
@@ -134,130 +276,10 @@ public class Camera {
         }
     }
 
-    public static void setAmbiguityThreshold(double ambiguityThreshold) {
-        Camera.ambiguityThreshold = ambiguityThreshold;
-    }
-
-    public void setCamDistanceThreshold(double distThreshold) {
-        distanceThreshold = distThreshold;
-    }
-
-    public static void setAllDistanceThreshold(double distThreshold) {
-        for (final Camera camera : cameras) {
-            camera.setCamDistanceThreshold(distThreshold);
-        }
-    }
-
-    private Optional<EstimatedRobotPose> getEstimatedPose(PhotonPipelineResult result) {
-        PhotonTrackedTarget lowestAmbiguityTarget = null;
-
-        double lowestAmbiguityScore = 10;
-
-        for (PhotonTrackedTarget target : result.targets) {
-            double targetPoseAmbiguity = target.getPoseAmbiguity();
-            double dist = target.getBestCameraToTarget().getTranslation().toTranslation2d().getNorm();
-            if (dist > distanceThreshold || targetPoseAmbiguity > ambiguityThreshold || ignoredTags.contains(Integer.valueOf(target.getFiducialId()))) continue;
-            // Make sure the target is a Fiducial target.
-
-            if (targetPoseAmbiguity != -1 && targetPoseAmbiguity < lowestAmbiguityScore) {
-                lowestAmbiguityScore = targetPoseAmbiguity;
-                lowestAmbiguityTarget = target;
-                hasSeenTag = tags.contains(target.getFiducialId());
-            }
-        }
-
-        // Although there are confirmed to be targets, none of them may be fiducial
-        // targets.
-        if (lowestAmbiguityTarget == null) return Optional.empty();
-
-        int targetFiducialId = lowestAmbiguityTarget.getFiducialId();
-
-        Optional<Pose3d> targetPosition = aprilTags.getTagPose(targetFiducialId);
-        // Optional<Pose3d> targetPosition = Optional.of(aprilTags.get(targetFiducialId));
-
-        if (targetPosition.isEmpty()) {
-            if (NAR_Robot.logWithAdvantageKit) Logger.recordOutput("Vision/" + camera.getName() + "/Target",  robotPose.get());
-            reportFiducialPoseError(targetFiducialId);
-            return Optional.empty();
-        }
-
-        if (NAR_Robot.logWithAdvantageKit) Logger.recordOutput("Vision/" + camera.getName() + "/Target",  targetPosition.get().toPose2d());
-
-        return Optional.of(
-                new EstimatedRobotPose(
-                        targetPosition
-                                .get()
-                                .transformBy(lowestAmbiguityTarget.getBestCameraToTarget().inverse())
-                                .transformBy(offset.inverse()),
-                        result.getTimestampSeconds(),
-                        result.getTargets(),
-                        PoseStrategy.LOWEST_AMBIGUITY));
-    }
-
-    private void reportFiducialPoseError(int fiducialId) {
-        if (!reportedErrors.contains(fiducialId)) {
-            DriverStation.reportError(
-                    "[PhotonPoseEstimator] Tried to get pose of unknown AprilTag: " + fiducialId, false);
-            reportedErrors.add(fiducialId);
-        }
-    }
-
-    public void update(){
-        if (isDisabled) return;
-        hasSeenTag = false;
-        lastResult = camera.getLatestResult();
-        if (!lastResult.hasTargets() && NAR_Robot.logWithAdvantageKit) {
-            Logger.recordOutput("Vision/" + camera.getName() + "/Position", robotPose.get());
-            return;
-        }
-
-        final Optional<EstimatedRobotPose> estimatedPose = getEstimatedPose(lastResult);
-
-        if(!estimatedPose.isPresent() && NAR_Robot.logWithAdvantageKit) {
-            Logger.recordOutput("Vision/" + camera.getName() + "/Position", robotPose.get());
-        }
-
-        lastPose = estimatedPose.get();
-        Pose2d estPose = lastPose.estimatedPose.toPose2d();
-
-        if(!isGoodEstimate(estPose)) {
-            updateCounter++;
-            if (updateCounter <= overrideThreshold) {
-                hasSeenTag = false;
-                return;
-            }
-        }
-        else {
-            updateCounter = 0;
-        }
-
-        if (NAR_Robot.logWithAdvantageKit) Logger.recordOutput("Vision/" + camera.getName() + "/Position", estPose);
-        
-        odometry.accept(estPose, lastPose.timestampSeconds);
-    }
-
-    public boolean isGoodEstimate(Pose2d pose){
-        return pose.getTranslation().getDistance(robotPose.get().getTranslation()) < validDist;
-    }
-
     public void initShuffleboard() {
-        NAR_Shuffleboard.addData(camera.getName(), "Estimated Pose", ()-> lastPose.estimatedPose.toPose2d().toString(), 0, 0, 3, 1);
+        NAR_Shuffleboard.addData(camera.getName(), "Estimated Pose", () -> estimatedPose.toString(), 0, 0, 4, 1);
+        NAR_Shuffleboard.addData(camera.getName(), "Distance", () -> distance, 0, 1, 2, 1);
+        NAR_Shuffleboard.addData(camera.getName(), "Is Disabled", () -> isDisabled, 2, 1, 1, 1);
+        NAR_Shuffleboard.addData(camera.getName(), "Has target", () -> result.hasTargets(), 3, 2, 1, 1);
     }
-
-    public PhotonPipelineResult getLatestResult() {
-        return lastResult;
-    }
-
-    public Transform3d getOffset() {
-        return offset;
-    }
-
-    public void disable(){
-        isDisabled = true;
-    }
-
-    public void enable() {
-        isDisabled = false;
-    }
-
 }
