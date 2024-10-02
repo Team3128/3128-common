@@ -1,7 +1,5 @@
 package common.core.swerve;
 
-import java.util.HashMap;
-
 import org.littletonrobotics.junction.Logger;
 
 import common.core.misc.NAR_Robot;
@@ -32,11 +30,8 @@ public abstract class SwerveBase extends SubsystemBase {
     protected final SwerveModule[] modules;
     private Pose2d estimatedPose;
 
-    protected HashMap<ChassisSpeeds, Boolean> velocityRequests = new HashMap<>();
-    
     public boolean fieldRelative;
     public double maxSpeed;
-    protected double poseCorrectionDt = 0.009;
 
     public SwerveBase(SwerveDriveKinematics kinematics, Matrix<N3, N1> stateStdDevs, Matrix<N3, N1> visionMeasurementDevs, SwerveModuleConfig... configs) {
         this.kinematics = kinematics;
@@ -62,45 +57,59 @@ public abstract class SwerveBase extends SubsystemBase {
         for (final SwerveModule module : modules) {
             NAR_Shuffleboard.addData("Swerve", "CANcoder " + module.moduleNumber, ()-> module.getAbsoluteAngle().getDegrees(), 0, module.moduleNumber);
             NAR_Shuffleboard.addData("Swerve", "Angle Motor " + module.moduleNumber, ()-> module.getState().angle.getDegrees(), 1, module.moduleNumber);
-            NAR_Shuffleboard.addData("Swerve", "Drive Motor " + module.moduleNumber, ()-> module.getState().speedMetersPerSecond, 2, module.moduleNumber);
-            NAR_Shuffleboard.addData("Swerve", "Drive Current " + module.moduleNumber, ()-> module.getDriveMotor().getStallCurrent(), 3, module.moduleNumber);
+            NAR_Shuffleboard.addData("Swerve", "Drive Motor" + module.moduleNumber, ()-> module.getState().speedMetersPerSecond, 2, module.moduleNumber);
         }
-        NAR_Shuffleboard.addData("Swerve", "Pose", ()-> estimatedPose.toString(), 4, 0, 4, 1);
-        NAR_Shuffleboard.addData("Swerve", "Robot Velocity", ()-> getRobotVelocity().toString(), 4, 1, 4, 1);
-        NAR_Shuffleboard.addData("Swerve", "Velocity", ()-> getVelocity(), 4, 3, 1, 1);
-        NAR_Shuffleboard.addData("Swerve", "Field Velocity", ()-> getFieldVelocity().toString(), 4, 2, 4, 1);
-        NAR_Shuffleboard.addData("Swerve", "Gyro", ()-> getYaw(), 8, 0, 2, 2).withWidget("Gyro");
+        NAR_Shuffleboard.addData("Swerve", "Pose", ()-> estimatedPose.toString(), 3, 0, 4, 1);
+        NAR_Shuffleboard.addData("Swerve", "Robot Velocity", ()-> getRobotVelocity().toString(), 3, 1, 4, 1);
+        NAR_Shuffleboard.addData("Swerve", "Velocity", ()-> getVelocity(), 3, 3, 1, 1);
+        NAR_Shuffleboard.addData("Swerve", "Field Velocity", ()-> getFieldVelocity().toString(), 3, 2, 4, 1);
+        NAR_Shuffleboard.addData("Swerve", "Gyro", ()-> getYaw(), 7, 0, 2, 2).withWidget("Gyro");
     }
 
-    public void requestAction(ChassisSpeeds velocity) {
-        requestAction(velocity, false, false);
+    public void drive(Translation2d translation, double rotation, boolean fieldRelative) {
+        drive(fieldRelative ? ChassisSpeeds.fromFieldRelativeSpeeds(
+                translation.getX(), translation.getY(), rotation, getGyroRotation2d())
+                : new ChassisSpeeds(translation.getX(), translation.getY(), rotation));
     }
 
-    public void requestAction(ChassisSpeeds velocity, boolean overrideRotation) {
-        requestAction(velocity, overrideRotation, false);
-    }
+    public void drive(ChassisSpeeds velocity) {
+        if (chassisVelocityCorrection) {
+            double dtConstant = 0.009;
+            Pose2d robotPoseVel = new Pose2d(velocity.vxMetersPerSecond * dtConstant,
+                                            velocity.vyMetersPerSecond * dtConstant,
+                                            Rotation2d.fromRadians(velocity.omegaRadiansPerSecond * dtConstant));
+            Twist2d twistVel = PoseLog(robotPoseVel);
 
-    public void requestAction(ChassisSpeeds velocity, boolean overrideRotation, boolean robotRelative) {
-        velocity = fieldRelative ? velocity : ChassisSpeeds.fromRobotRelativeSpeeds(velocity, getGyroRotation2d());
-        velocityRequests.put(velocity, overrideRotation);
-    }
-
-    public void executeRequests() {
-        double overideRotation = 0;
-        var aggregateVelocity = new ChassisSpeeds();
-        for (ChassisSpeeds velocity : velocityRequests.keySet()) {
-            aggregateVelocity.plus(velocity);
-            if (velocityRequests.get(velocity)) overideRotation = velocity.omegaRadiansPerSecond;
+            velocity = new ChassisSpeeds(twistVel.dx / dtConstant, twistVel.dy / dtConstant,
+                                        twistVel.dtheta / dtConstant);
         }
-        velocityRequests.clear();
+        setModuleStates(kinematics.toSwerveModuleStates(velocity));
+        Logger.recordOutput("Swerve/DesiredModuleStates", kinematics.toSwerveModuleStates(velocity));
+    }
 
-        if(overideRotation != 0) 
-            aggregateVelocity.omegaRadiansPerSecond = overideRotation;
-
-        if (chassisVelocityCorrection) 
-            aggregateVelocity = ChassisSpeeds.discretize(aggregateVelocity, poseCorrectionDt);
-        setModuleStates(kinematics.toSwerveModuleStates(aggregateVelocity));
-        Logger.recordOutput("Swerve/DesiredModuleStates", kinematics.toSwerveModuleStates(aggregateVelocity));
+    /**
+   * Logical inverse of the Pose exponential from 254. Taken from team 3181.
+   *
+   * @param transform Pose to perform the log on.
+   * @return {@link Twist2d} of the transformed pose.
+   */
+    public static Twist2d PoseLog(final Pose2d transform) {
+        final double kEps          = 1E-9;
+        final double dtheta        = transform.getRotation().getRadians();
+        final double half_dtheta   = 0.5 * dtheta;
+        final double cos_minus_one = transform.getRotation().getCos() - 1.0;
+        double       halftheta_by_tan_of_halfdtheta;
+        if (Math.abs(cos_minus_one) < kEps)
+        {
+        halftheta_by_tan_of_halfdtheta = 1.0 - 1.0 / 12.0 * dtheta * dtheta;
+        } else
+        {
+        halftheta_by_tan_of_halfdtheta = -(half_dtheta * transform.getRotation().getSin()) / cos_minus_one;
+        }
+        final Translation2d translation_part = transform.getTranslation()
+                                                        .rotateBy(new Rotation2d(halftheta_by_tan_of_halfdtheta,
+                                                                                -half_dtheta));
+        return new Twist2d(translation_part.getX(), translation_part.getY(), dtheta);
     }
 
     public void stop() {
