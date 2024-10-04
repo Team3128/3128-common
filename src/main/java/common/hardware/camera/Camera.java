@@ -16,8 +16,10 @@ import common.core.misc.NAR_Robot;
 import common.utility.Log;
 import common.utility.shuffleboard.NAR_Shuffleboard;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 
@@ -52,6 +54,7 @@ public class Camera {
     public boolean isDisabled = false;
     public Transform3d offset;
     public double distance;
+    public Pose2d updatedPose;
 
     /**
      * Creates a Camera object
@@ -230,6 +233,18 @@ public class Camera {
             !ignoredTags.contains(Integer.valueOf(target.getFiducialId()));
     }
 
+    /**
+     * Overrides the pose's rotation with the gyro angle
+     * @param result
+     * @return
+     */
+    public Pose2d getGyroPose(PhotonPipelineResult result) {
+        Pose2d pose = getPose(result).get();
+        Rotation2d gyroAngle = Rotation2d.fromDegrees(MathUtil.angleModulus(getGyroAngle()));
+        updatedPose = new Pose2d(pose.getX(), pose.getY(), gyroAngle); 
+        return updatedPose;
+    }
+
     public double getDistance(PhotonTrackedTarget target) {
         return target.getBestCameraToTarget().getTranslation().toTranslation2d().getNorm();
     }
@@ -276,7 +291,7 @@ public class Camera {
     }
 
     public void initShuffleboard() {
-        NAR_Shuffleboard.addData(camera.getName(), "Estimated Pose", () -> estimatedPose.toString(), 0, 0, 4, 1);
+        NAR_Shuffleboard.addData(camera.getName(), "Estimated Pose", () -> updatedPose.toString(), 0, 0, 4, 1);
         NAR_Shuffleboard.addData(camera.getName(), "Distance", () -> distance, 0, 1, 2, 1);
         NAR_Shuffleboard.addData(camera.getName(), "Is Disabled", () -> isDisabled, 2, 1, 1, 1);
         NAR_Shuffleboard.addData(camera.getName(), "Has target", () -> result.hasTargets(), 3, 2, 1, 1);
