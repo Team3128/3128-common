@@ -80,7 +80,7 @@ loadScripts(document, 'script');</script>
 <div class="block">Team 3128's class to control the robot's cameras and vision processing.</div>
 <dl class="notes">
 <dt>Since:</dt>
-<dd>2022 Rapid React</dd>
+<dd>2024 Crescendo</dd>
 </dl>
 </section>
 <section class="summary">
@@ -94,14 +94,32 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-first">Modifier and Type</div>
 <div class="table-header col-second">Field</div>
 <div class="table-header col-last">Description</div>
-<div class="col-first even-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/LinkedList.html" title="class or interface in java.util" class="external-link">LinkedList</a>&lt;<a href="Camera.html" title="class in common.hardware.camera">Camera</a>&gt;</code></div>
-<div class="col-second even-row-color"><code><a href="#cameras" class="member-name-link">cameras</a></code></div>
+<div class="col-first even-row-color"><code>org.photonvision.PhotonCamera</code></div>
+<div class="col-second even-row-color"><code><a href="#camera" class="member-name-link">camera</a></code></div>
 <div class="col-last even-row-color">&nbsp;</div>
-<div class="col-first odd-row-color"><code>static double</code></div>
-<div class="col-second odd-row-color"><code><a href="#overrideThreshold" class="member-name-link">overrideThreshold</a></code></div>
+<div class="col-first odd-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/LinkedList.html" title="class or interface in java.util" class="external-link">LinkedList</a>&lt;<a href="Camera.html" title="class in common.hardware.camera">Camera</a>&gt;</code></div>
+<div class="col-second odd-row-color"><code><a href="#cameras" class="member-name-link">cameras</a></code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
-<div class="col-first even-row-color"><code>static int</code></div>
-<div class="col-second even-row-color"><code><a href="#updateCounter" class="member-name-link">updateCounter</a></code></div>
+<div class="col-first even-row-color"><code>double</code></div>
+<div class="col-second even-row-color"><code><a href="#distance" class="member-name-link">distance</a></code></div>
+<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-first odd-row-color"><code>edu.wpi.first.math.geometry.Pose2d</code></div>
+<div class="col-second odd-row-color"><code><a href="#estimatedPose" class="member-name-link">estimatedPose</a></code></div>
+<div class="col-last odd-row-color">&nbsp;</div>
+<div class="col-first even-row-color"><code>boolean</code></div>
+<div class="col-second even-row-color"><code><a href="#isDisabled" class="member-name-link">isDisabled</a></code></div>
+<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-first odd-row-color"><code>edu.wpi.first.math.geometry.Transform3d</code></div>
+<div class="col-second odd-row-color"><code><a href="#offset" class="member-name-link">offset</a></code></div>
+<div class="col-last odd-row-color">&nbsp;</div>
+<div class="col-first even-row-color"><code>static double</code></div>
+<div class="col-second even-row-color"><code><a href="#overrideThreshold" class="member-name-link">overrideThreshold</a></code></div>
+<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-first odd-row-color"><code>static int</code></div>
+<div class="col-second odd-row-color"><code><a href="#updateCounter" class="member-name-link">updateCounter</a></code></div>
+<div class="col-last odd-row-color">&nbsp;</div>
+<div class="col-first even-row-color"><code>edu.wpi.first.math.geometry.Pose2d</code></div>
+<div class="col-second even-row-color"><code><a href="#updatedPose" class="member-name-link">updatedPose</a></code></div>
 <div class="col-last even-row-color">&nbsp;</div>
 <div class="col-first odd-row-color"><code>static double</code></div>
 <div class="col-second odd-row-color"><code><a href="#validDist" class="member-name-link">validDist</a></code></div>
@@ -123,7 +141,9 @@ loadScripts(document, 'script');</script>
  double&nbsp;yawOffset,
  double&nbsp;pitchOffset,
  double&nbsp;rollOffset)</code></div>
-<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-last even-row-color">
+<div class="block">Creates a Camera object</div>
+</div>
 </div>
 </section>
 </li>
@@ -140,16 +160,9 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static void</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#addIgnoredTags(int...)" class="member-name-link">addIgnoredTags</a><wbr>(int...&nbsp;ignoredTags)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#addTags(int...)" class="member-name-link">addTags</a><wbr>(int...&nbsp;tags)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#configCameras(edu.wpi.first.apriltag.AprilTagFields,org.photonvision.PhotonPoseEstimator.PoseStrategy,java.util.function.BiConsumer,java.util.function.Supplier)" class="member-name-link">configCameras</a><wbr>(edu.wpi.first.apriltag.AprilTagFields&nbsp;aprilTagLayout,
- org.photonvision.PhotonPoseEstimator.PoseStrategy&nbsp;calc_strategy,
- <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/BiConsumer.html" title="class or interface in java.util.function" class="external-link">BiConsumer</a>&lt;edu.wpi.first.math.geometry.Pose2d,<wbr><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Double.html" title="class or interface in java.lang" class="external-link">Double</a>&gt;&nbsp;odometry,
- <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Supplier.html" title="class or interface in java.util.function" class="external-link">Supplier</a>&lt;edu.wpi.first.math.geometry.Pose2d&gt;&nbsp;robotPose)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="block">Blacklists tags from use</div>
+</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#disable()" class="member-name-link">disable</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
@@ -163,38 +176,68 @@ loadScripts(document, 'script');</script>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#enableAll()" class="member-name-link">enableAll</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>double</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getDistanceGround()" class="member-name-link">getDistanceGround</a>()</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getDistance(org.photonvision.targeting.PhotonTrackedTarget)" class="member-name-link">getDistance</a><wbr>(org.photonvision.targeting.PhotonTrackedTarget&nbsp;target)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>org.photonvision.targeting.PhotonPipelineResult</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getLatestResult()" class="member-name-link">getLatestResult</a>()</code></div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>double</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getGyroAngle()" class="member-name-link">getGyroAngle</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>edu.wpi.first.math.geometry.Transform3d</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getOffset()" class="member-name-link">getOffset</a>()</code></div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>edu.wpi.first.math.geometry.Pose2d</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getGyroPose(org.photonvision.targeting.PhotonPipelineResult)" class="member-name-link">getGyroPose</a><wbr>(org.photonvision.targeting.PhotonPipelineResult&nbsp;result)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Overrides the pose's rotation with the gyro angle</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>edu.wpi.first.math.geometry.Pose2d</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getGyroStablilization(java.util.Optional,org.photonvision.targeting.PhotonTrackedTarget)" class="member-name-link">getGyroStablilization</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Optional.html" title="class or interface in java.util" class="external-link">Optional</a>&lt;edu.wpi.first.math.geometry.Pose3d&gt;&nbsp;targetPosition,
+ org.photonvision.targeting.PhotonTrackedTarget&nbsp;bestTarget)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Uses the gyro angle and target position to determine robot pose</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Optional.html" title="class or interface in java.util" class="external-link">Optional</a>&lt;edu.wpi.first.math.geometry.Pose2d&gt;</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getPose(org.photonvision.targeting.PhotonPipelineResult)" class="member-name-link">getPose</a><wbr>(org.photonvision.targeting.PhotonPipelineResult&nbsp;result)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Gets the latest camera updates</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>double</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getPoseAmbiguity(org.photonvision.targeting.PhotonTrackedTarget)" class="member-name-link">getPoseAmbiguity</a><wbr>(org.photonvision.targeting.PhotonTrackedTarget&nbsp;target)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#initShuffleboard()" class="member-name-link">initShuffleboard</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#initShuffleboard()" class="member-name-link">initShuffleboard</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#isGoodEstimate(edu.wpi.first.math.geometry.Pose2d)" class="member-name-link">isGoodEstimate</a><wbr>(edu.wpi.first.math.geometry.Pose2d&nbsp;pose)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Returns if an estimate is within a valid distance from the robot pose</div>
+</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#isGoodEstimate(edu.wpi.first.math.geometry.Pose2d)" class="member-name-link">isGoodEstimate</a><wbr>(edu.wpi.first.math.geometry.Pose2d&nbsp;pose)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#isValidTarget(org.photonvision.targeting.PhotonTrackedTarget)" class="member-name-link">isValidTarget</a><wbr>(org.photonvision.targeting.PhotonTrackedTarget&nbsp;target)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Returns true if the target is within the distance and ambiguity thresholds and is not blacklisted</div>
+</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static boolean</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#seesTag()" class="member-name-link">seesTag</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#setAllDistanceThreshold(double)" class="member-name-link">setAllDistanceThreshold</a><wbr>(double&nbsp;distThreshold)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#setResources(java.util.function.DoubleSupplier,java.util.function.BiConsumer,edu.wpi.first.apriltag.AprilTagFieldLayout,java.util.function.Supplier)" class="member-name-link">setResources</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/DoubleSupplier.html" title="class or interface in java.util.function" class="external-link">DoubleSupplier</a>&nbsp;gyro,
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/BiConsumer.html" title="class or interface in java.util.function" class="external-link">BiConsumer</a>&lt;edu.wpi.first.math.geometry.Pose2d,<wbr><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Double.html" title="class or interface in java.lang" class="external-link">Double</a>&gt;&nbsp;odometry,
+ edu.wpi.first.apriltag.AprilTagFieldLayout&nbsp;aprilTags,
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Supplier.html" title="class or interface in java.util.function" class="external-link">Supplier</a>&lt;edu.wpi.first.math.geometry.Pose2d&gt;&nbsp;robotPose)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="block">Sets the necessary resources for cameras to function.</div>
+</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#setAmbiguityThreshold(double)" class="member-name-link">setAmbiguityThreshold</a><wbr>(double&nbsp;ambiguityThreshold)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#setThresholds(double,double)" class="member-name-link">setThresholds</a><wbr>(double&nbsp;distanceThreshold,
+ double&nbsp;ambiguityThreshold)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="block">Sets the necessary thresholds for the cameras to use</div>
+</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setCamDistanceThreshold(double)" class="member-name-link">setCamDistanceThreshold</a><wbr>(double&nbsp;distThreshold)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#update()" class="member-name-link">update</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#updateAll()" class="member-name-link">updateAll</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#update()" class="member-name-link">update</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Gets the latest camera updates</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#updateAll()" class="member-name-link">updateAll</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
 </div>
 </div>
 </div>
@@ -213,9 +256,15 @@ loadScripts(document, 'script');</script>
 <h2>Field Details</h2>
 <ul class="member-list">
 <li>
-<section class="detail" id="updateCounter">
-<h3>updateCounter</h3>
-<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">int</span>&nbsp;<span class="element-name">updateCounter</span></div>
+<section class="detail" id="camera">
+<h3>camera</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">org.photonvision.PhotonCamera</span>&nbsp;<span class="element-name">camera</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="cameras">
+<h3>cameras</h3>
+<div class="member-signature"><span class="modifiers">public static final</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/LinkedList.html" title="class or interface in java.util" class="external-link">LinkedList</a>&lt;<a href="Camera.html" title="class in common.hardware.camera">Camera</a>&gt;</span>&nbsp;<span class="element-name">cameras</span></div>
 </section>
 </li>
 <li>
@@ -231,9 +280,39 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
-<section class="detail" id="cameras">
-<h3>cameras</h3>
-<div class="member-signature"><span class="modifiers">public static final</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/LinkedList.html" title="class or interface in java.util" class="external-link">LinkedList</a>&lt;<a href="Camera.html" title="class in common.hardware.camera">Camera</a>&gt;</span>&nbsp;<span class="element-name">cameras</span></div>
+<section class="detail" id="updateCounter">
+<h3>updateCounter</h3>
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">int</span>&nbsp;<span class="element-name">updateCounter</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="estimatedPose">
+<h3>estimatedPose</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">edu.wpi.first.math.geometry.Pose2d</span>&nbsp;<span class="element-name">estimatedPose</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="isDisabled">
+<h3>isDisabled</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">isDisabled</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="offset">
+<h3>offset</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">edu.wpi.first.math.geometry.Transform3d</span>&nbsp;<span class="element-name">offset</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="distance">
+<h3>distance</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">double</span>&nbsp;<span class="element-name">distance</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="updatedPose">
+<h3>updatedPose</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">edu.wpi.first.math.geometry.Pose2d</span>&nbsp;<span class="element-name">updatedPose</span></div>
 </section>
 </li>
 </ul>
@@ -253,6 +332,7 @@ loadScripts(document, 'script');</script>
  double&nbsp;yawOffset,
  double&nbsp;pitchOffset,
  double&nbsp;rollOffset)</span></div>
+<div class="block">Creates a Camera object</div>
 </section>
 </li>
 </ul>
@@ -264,30 +344,141 @@ loadScripts(document, 'script');</script>
 <h2>Method Details</h2>
 <ul class="member-list">
 <li>
-<section class="detail" id="getDistanceGround()">
-<h3>getDistanceGround</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">double</span>&nbsp;<span class="element-name">getDistanceGround</span>()</div>
+<section class="detail" id="setResources(java.util.function.DoubleSupplier,java.util.function.BiConsumer,edu.wpi.first.apriltag.AprilTagFieldLayout,java.util.function.Supplier)">
+<h3>setResources</h3>
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">setResources</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/DoubleSupplier.html" title="class or interface in java.util.function" class="external-link">DoubleSupplier</a>&nbsp;gyro,
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/BiConsumer.html" title="class or interface in java.util.function" class="external-link">BiConsumer</a>&lt;edu.wpi.first.math.geometry.Pose2d,<wbr><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Double.html" title="class or interface in java.lang" class="external-link">Double</a>&gt;&nbsp;odometry,
+ edu.wpi.first.apriltag.AprilTagFieldLayout&nbsp;aprilTags,
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Supplier.html" title="class or interface in java.util.function" class="external-link">Supplier</a>&lt;edu.wpi.first.math.geometry.Pose2d&gt;&nbsp;robotPose)</span></div>
+<div class="block">Sets the necessary resources for cameras to function.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>gyro</code> - Feeds the angle of the robot.</dd>
+<dd><code>odometry</code> - Feeds the robot odometry object for vision estimates to update.</dd>
+<dd><code>aprilTags</code> - Sets the AprilTag positions on the field.</dd>
+<dd><code>robotPose</code> - Supplies the robot's current pose.</dd>
+</dl>
 </section>
 </li>
 <li>
-<section class="detail" id="configCameras(edu.wpi.first.apriltag.AprilTagFields,org.photonvision.PhotonPoseEstimator.PoseStrategy,java.util.function.BiConsumer,java.util.function.Supplier)">
-<h3>configCameras</h3>
-<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">configCameras</span><wbr><span class="parameters">(edu.wpi.first.apriltag.AprilTagFields&nbsp;aprilTagLayout,
- org.photonvision.PhotonPoseEstimator.PoseStrategy&nbsp;calc_strategy,
- <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/BiConsumer.html" title="class or interface in java.util.function" class="external-link">BiConsumer</a>&lt;edu.wpi.first.math.geometry.Pose2d,<wbr><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Double.html" title="class or interface in java.lang" class="external-link">Double</a>&gt;&nbsp;odometry,
- <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Supplier.html" title="class or interface in java.util.function" class="external-link">Supplier</a>&lt;edu.wpi.first.math.geometry.Pose2d&gt;&nbsp;robotPose)</span></div>
+<section class="detail" id="setThresholds(double,double)">
+<h3>setThresholds</h3>
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">setThresholds</span><wbr><span class="parameters">(double&nbsp;distanceThreshold,
+ double&nbsp;ambiguityThreshold)</span></div>
+<div class="block">Sets the necessary thresholds for the cameras to use</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>distanceThreshold</code> - Maximum distance from tag to accept</dd>
+<dd><code>ambiguityThreshold</code> - Maximum tag ambiguity to accept</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="update()">
+<h3>update</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">update</span>()</div>
+<div class="block">Gets the latest camera updates</div>
+</section>
+</li>
+<li>
+<section class="detail" id="getPose(org.photonvision.targeting.PhotonPipelineResult)">
+<h3>getPose</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Optional.html" title="class or interface in java.util" class="external-link">Optional</a>&lt;edu.wpi.first.math.geometry.Pose2d&gt;</span>&nbsp;<span class="element-name">getPose</span><wbr><span class="parameters">(org.photonvision.targeting.PhotonPipelineResult&nbsp;result)</span></div>
+<div class="block">Gets the latest camera updates</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>result</code> - Latest result from the camera</dd>
+<dt>Returns:</dt>
+<dd>The estimated robot pose</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="getGyroStablilization(java.util.Optional,org.photonvision.targeting.PhotonTrackedTarget)">
+<h3>getGyroStablilization</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">edu.wpi.first.math.geometry.Pose2d</span>&nbsp;<span class="element-name">getGyroStablilization</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Optional.html" title="class or interface in java.util" class="external-link">Optional</a>&lt;edu.wpi.first.math.geometry.Pose3d&gt;&nbsp;targetPosition,
+ org.photonvision.targeting.PhotonTrackedTarget&nbsp;bestTarget)</span></div>
+<div class="block">Uses the gyro angle and target position to determine robot pose</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>targetPosition</code> - The Pose3d of the target</dd>
+<dd><code>bestTarget</code> - Lowest ambiguity target</dd>
+<dt>Returns:</dt>
+<dd>The estimated Pose2d of the robot</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="isGoodEstimate(edu.wpi.first.math.geometry.Pose2d)">
+<h3>isGoodEstimate</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">isGoodEstimate</span><wbr><span class="parameters">(edu.wpi.first.math.geometry.Pose2d&nbsp;pose)</span></div>
+<div class="block">Returns if an estimate is within a valid distance from the robot pose</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>pose</code> - Estimated pose</dd>
+<dt>Returns:</dt>
+<dd>If the estimated pose is valid</dd>
+</dl>
 </section>
 </li>
 <li>
 <section class="detail" id="addIgnoredTags(int...)">
 <h3>addIgnoredTags</h3>
 <div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">addIgnoredTags</span><wbr><span class="parameters">(int...&nbsp;ignoredTags)</span></div>
+<div class="block">Blacklists tags from use</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>ignoredTags</code> - IDs of ignored tags</dd>
+</dl>
 </section>
 </li>
 <li>
-<section class="detail" id="addTags(int...)">
-<h3>addTags</h3>
-<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">addTags</span><wbr><span class="parameters">(int...&nbsp;tags)</span></div>
+<section class="detail" id="isValidTarget(org.photonvision.targeting.PhotonTrackedTarget)">
+<h3>isValidTarget</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">isValidTarget</span><wbr><span class="parameters">(org.photonvision.targeting.PhotonTrackedTarget&nbsp;target)</span></div>
+<div class="block">Returns true if the target is within the distance and ambiguity thresholds and is not blacklisted</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>target</code> - </dd>
+<dt>Returns:</dt>
+<dd>If the target is valid</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="getGyroPose(org.photonvision.targeting.PhotonPipelineResult)">
+<h3>getGyroPose</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">edu.wpi.first.math.geometry.Pose2d</span>&nbsp;<span class="element-name">getGyroPose</span><wbr><span class="parameters">(org.photonvision.targeting.PhotonPipelineResult&nbsp;result)</span></div>
+<div class="block">Overrides the pose's rotation with the gyro angle</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>result</code> - </dd>
+<dt>Returns:</dt>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="getDistance(org.photonvision.targeting.PhotonTrackedTarget)">
+<h3>getDistance</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">double</span>&nbsp;<span class="element-name">getDistance</span><wbr><span class="parameters">(org.photonvision.targeting.PhotonTrackedTarget&nbsp;target)</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="getPoseAmbiguity(org.photonvision.targeting.PhotonTrackedTarget)">
+<h3>getPoseAmbiguity</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">double</span>&nbsp;<span class="element-name">getPoseAmbiguity</span><wbr><span class="parameters">(org.photonvision.targeting.PhotonTrackedTarget&nbsp;target)</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="getGyroAngle()">
+<h3>getGyroAngle</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">double</span>&nbsp;<span class="element-name">getGyroAngle</span>()</div>
+</section>
+</li>
+<li>
+<section class="detail" id="updateAll()">
+<h3>updateAll</h3>
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">updateAll</span>()</div>
 </section>
 </li>
 <li>
@@ -297,9 +488,15 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
-<section class="detail" id="updateAll()">
-<h3>updateAll</h3>
-<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">updateAll</span>()</div>
+<section class="detail" id="enable()">
+<h3>enable</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">enable</span>()</div>
+</section>
+</li>
+<li>
+<section class="detail" id="disable()">
+<h3>disable</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">disable</span>()</div>
 </section>
 </li>
 <li>
@@ -315,63 +512,9 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
-<section class="detail" id="setAmbiguityThreshold(double)">
-<h3>setAmbiguityThreshold</h3>
-<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">setAmbiguityThreshold</span><wbr><span class="parameters">(double&nbsp;ambiguityThreshold)</span></div>
-</section>
-</li>
-<li>
-<section class="detail" id="setCamDistanceThreshold(double)">
-<h3>setCamDistanceThreshold</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">setCamDistanceThreshold</span><wbr><span class="parameters">(double&nbsp;distThreshold)</span></div>
-</section>
-</li>
-<li>
-<section class="detail" id="setAllDistanceThreshold(double)">
-<h3>setAllDistanceThreshold</h3>
-<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">setAllDistanceThreshold</span><wbr><span class="parameters">(double&nbsp;distThreshold)</span></div>
-</section>
-</li>
-<li>
-<section class="detail" id="update()">
-<h3>update</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">update</span>()</div>
-</section>
-</li>
-<li>
-<section class="detail" id="isGoodEstimate(edu.wpi.first.math.geometry.Pose2d)">
-<h3>isGoodEstimate</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">isGoodEstimate</span><wbr><span class="parameters">(edu.wpi.first.math.geometry.Pose2d&nbsp;pose)</span></div>
-</section>
-</li>
-<li>
 <section class="detail" id="initShuffleboard()">
 <h3>initShuffleboard</h3>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">initShuffleboard</span>()</div>
-</section>
-</li>
-<li>
-<section class="detail" id="getLatestResult()">
-<h3>getLatestResult</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">org.photonvision.targeting.PhotonPipelineResult</span>&nbsp;<span class="element-name">getLatestResult</span>()</div>
-</section>
-</li>
-<li>
-<section class="detail" id="getOffset()">
-<h3>getOffset</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">edu.wpi.first.math.geometry.Transform3d</span>&nbsp;<span class="element-name">getOffset</span>()</div>
-</section>
-</li>
-<li>
-<section class="detail" id="disable()">
-<h3>disable</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">disable</span>()</div>
-</section>
-</li>
-<li>
-<section class="detail" id="enable()">
-<h3>enable</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">enable</span>()</div>
 </section>
 </li>
 </ul>

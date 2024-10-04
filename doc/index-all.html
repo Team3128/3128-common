@@ -105,7 +105,9 @@ loadScripts(document, 'script');</script>
 <div class="block">Displays an updating value in Shuffleboard</div>
 </dd>
 <dt><a href="common/hardware/camera/Camera.html#addIgnoredTags(int...)" class="member-name-link">addIgnoredTags(int...)</a> - Static method in class common.hardware.camera.<a href="common/hardware/camera/Camera.html" title="class in common.hardware.camera">Camera</a></dt>
-<dd>&nbsp;</dd>
+<dd>
+<div class="block">Blacklists tags from use</div>
+</dd>
 <dt><a href="common/utility/narwhaldashboard/NarwhalDashboard.html#addInit(java.lang.String,java.lang.Object)" class="member-name-link">addInit(String, Object)</a> - Method in class common.utility.narwhaldashboard.<a href="common/utility/narwhaldashboard/NarwhalDashboard.html" title="class in common.utility.narwhaldashboard">NarwhalDashboard</a></dt>
 <dd>
 <div class="block">Sends an object to the web server on intialize</div>
@@ -130,15 +132,7 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Add a callback to run at a specific period.</div>
 </dd>
-<dt><a href="common/core/misc/NAR_Robot2.html#addPeriodic(java.lang.Runnable,double)" class="member-name-link">addPeriodic(Runnable, double)</a> - Method in class common.core.misc.<a href="common/core/misc/NAR_Robot2.html" title="class in common.core.misc">NAR_Robot2</a></dt>
-<dd>
-<div class="block">Add a callback to run at a specific period.</div>
-</dd>
 <dt><a href="common/core/misc/NAR_Robot.html#addPeriodic(java.lang.Runnable,double,double)" class="member-name-link">addPeriodic(Runnable, double, double)</a> - Static method in class common.core.misc.<a href="common/core/misc/NAR_Robot.html" title="class in common.core.misc">NAR_Robot</a></dt>
-<dd>
-<div class="block">Add a callback to run at a specific period with a starting time offset.</div>
-</dd>
-<dt><a href="common/core/misc/NAR_Robot2.html#addPeriodic(java.lang.Runnable,double,double)" class="member-name-link">addPeriodic(Runnable, double, double)</a> - Method in class common.core.misc.<a href="common/core/misc/NAR_Robot2.html" title="class in common.core.misc">NAR_Robot2</a></dt>
 <dd>
 <div class="block">Add a callback to run at a specific period with a starting time offset.</div>
 </dd>
@@ -154,8 +148,6 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Displays sendable values, like subsystems and command, works on all classes that extend sendable</div>
 </dd>
-<dt><a href="common/hardware/camera/Camera.html#addTags(int...)" class="member-name-link">addTags(int...)</a> - Static method in class common.hardware.camera.<a href="common/hardware/camera/Camera.html" title="class in common.hardware.camera">Camera</a></dt>
-<dd>&nbsp;</dd>
 <dt><a href="common/utility/tester/Tester.Test.html#addTest(common.utility.tester.Tester.SystemsTest)" class="member-name-link">addTest(Tester.SystemsTest)</a> - Method in class common.utility.tester.<a href="common/utility/tester/Tester.Test.html" title="class in common.utility.tester">Tester.Test</a></dt>
 <dd>
 <div class="block">Adds a System test to be run.</div>
@@ -272,12 +264,16 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Returns the PID output of the controller.</div>
 </dd>
+<dt><a href="common/hardware/camera/Camera.html#camera" class="member-name-link">camera</a> - Variable in class common.hardware.camera.<a href="common/hardware/camera/Camera.html" title="class in common.hardware.camera">Camera</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="common/hardware/camera/Camera.html" class="type-name-link" title="class in common.hardware.camera">Camera</a> - Class in <a href="common/hardware/camera/package-summary.html">common.hardware.camera</a></dt>
 <dd>
 <div class="block">Team 3128's class to control the robot's cameras and vision processing.</div>
 </dd>
 <dt><a href="common/hardware/camera/Camera.html#%3Cinit%3E(java.lang.String,double,double,double,double,double)" class="member-name-link">Camera(String, double, double, double, double, double)</a> - Constructor for class common.hardware.camera.<a href="common/hardware/camera/Camera.html" title="class in common.hardware.camera">Camera</a></dt>
-<dd>&nbsp;</dd>
+<dd>
+<div class="block">Creates a Camera object</div>
+</dd>
 <dt><a href="common/hardware/limelight/Limelight.html#cameraAngle" class="member-name-link">cameraAngle</a> - Variable in class common.hardware.limelight.<a href="common/hardware/limelight/Limelight.html" title="class in common.hardware.limelight">Limelight</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="common/hardware/limelight/Limelight.html#cameraHeight" class="member-name-link">cameraHeight</a> - Variable in class common.hardware.limelight.<a href="common/hardware/limelight/Limelight.html" title="class in common.hardware.limelight">Limelight</a></dt>
@@ -304,8 +300,6 @@ loadScripts(document, 'script');</script>
 </dd>
 <dt><a href="common/core/misc/NAR_Robot.html#close()" class="member-name-link">close()</a> - Method in class common.core.misc.<a href="common/core/misc/NAR_Robot.html" title="class in common.core.misc">NAR_Robot</a></dt>
 <dd>&nbsp;</dd>
-<dt><a href="common/core/misc/NAR_Robot2.html#close()" class="member-name-link">close()</a> - Method in class common.core.misc.<a href="common/core/misc/NAR_Robot2.html" title="class in common.core.misc">NAR_Robot2</a></dt>
-<dd>&nbsp;</dd>
 <dt><a href="common/hardware/motorcontroller/NAR_CANSpark.html#close()" class="member-name-link">close()</a> - Method in class common.hardware.motorcontroller.<a href="common/hardware/motorcontroller/NAR_CANSpark.html" title="class in common.hardware.motorcontroller">NAR_CANSpark</a></dt>
 <dd>
 <div class="block">Closes the spark.</div>
@@ -324,11 +318,11 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Team 3128's command to identify feed forward constants.</div>
 </dd>
-<dt><a href="common/utility/sysid/CmdSysId.html#%3Cinit%3E(java.lang.String,java.util.function.Consumer,java.util.function.Supplier,double,double,edu.wpi.first.wpilibj2.command.Subsystem...)" class="member-name-link">CmdSysId(String, Consumer&lt;Double&gt;, Supplier&lt;Double&gt;, double, double, Subsystem...)</a> - Constructor for class common.utility.sysid.<a href="common/utility/sysid/CmdSysId.html" title="class in common.utility.sysid">CmdSysId</a></dt>
+<dt><a href="common/utility/sysid/CmdSysId.html#%3Cinit%3E(java.lang.String,java.util.function.Consumer,java.util.function.Supplier,java.util.function.Supplier,double,boolean,edu.wpi.first.wpilibj2.command.Subsystem...)" class="member-name-link">CmdSysId(String, Consumer&lt;Double&gt;, Supplier&lt;Double&gt;, Supplier&lt;Double&gt;, double, boolean, Subsystem...)</a> - Constructor for class common.utility.sysid.<a href="common/utility/sysid/CmdSysId.html" title="class in common.utility.sysid">CmdSysId</a></dt>
 <dd>
 <div class="block">Creates a new command to identify feed forward constants of the subsystem.</div>
 </dd>
-<dt><a href="common/utility/sysid/CmdSysId.html#%3Cinit%3E(java.lang.String,java.util.function.Consumer,java.util.function.Supplier,edu.wpi.first.wpilibj2.command.Subsystem...)" class="member-name-link">CmdSysId(String, Consumer&lt;Double&gt;, Supplier&lt;Double&gt;, Subsystem...)</a> - Constructor for class common.utility.sysid.<a href="common/utility/sysid/CmdSysId.html" title="class in common.utility.sysid">CmdSysId</a></dt>
+<dt><a href="common/utility/sysid/CmdSysId.html#%3Cinit%3E(java.lang.String,java.util.function.Consumer,java.util.function.Supplier,java.util.function.Supplier,double,double,double,boolean,edu.wpi.first.wpilibj2.command.Subsystem...)" class="member-name-link">CmdSysId(String, Consumer&lt;Double&gt;, Supplier&lt;Double&gt;, Supplier&lt;Double&gt;, double, double, double, boolean, Subsystem...)</a> - Constructor for class common.utility.sysid.<a href="common/utility/sysid/CmdSysId.html" title="class in common.utility.sysid">CmdSysId</a></dt>
 <dd>
 <div class="block">Creates a new command to identify feed forward constants of the subsystem.</div>
 </dd>
@@ -374,8 +368,6 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Configures the motor settings</div>
 </dd>
-<dt><a href="common/hardware/camera/Camera.html#configCameras(edu.wpi.first.apriltag.AprilTagFields,org.photonvision.PhotonPoseEstimator.PoseStrategy,java.util.function.BiConsumer,java.util.function.Supplier)" class="member-name-link">configCameras(AprilTagFields, PhotonPoseEstimator.PoseStrategy, BiConsumer&lt;Pose2d, Double&gt;, Supplier&lt;Pose2d&gt;)</a> - Static method in class common.hardware.camera.<a href="common/hardware/camera/Camera.html" title="class in common.hardware.camera">Camera</a></dt>
-<dd>&nbsp;</dd>
 <dt><a href="common/hardware/motorcontroller/NAR_Motor.html#configMotor(common.hardware.motorcontroller.NAR_Motor.MotorConfig)" class="member-name-link">configMotor(NAR_Motor.MotorConfig)</a> - Method in class common.hardware.motorcontroller.<a href="common/hardware/motorcontroller/NAR_Motor.html" title="class in common.hardware.motorcontroller">NAR_Motor</a></dt>
 <dd>
 <div class="block">Configures all major motor settings.</div>
@@ -492,6 +484,8 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="common/utility/narwhaldashboard/NarwhalDashboard.State.html#DISCONNECTED" class="member-name-link">DISCONNECTED</a> - Enum constant in enum class common.utility.narwhaldashboard.<a href="common/utility/narwhaldashboard/NarwhalDashboard.State.html" title="enum class in common.utility.narwhaldashboard">NarwhalDashboard.State</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="common/hardware/camera/Camera.html#distance" class="member-name-link">distance</a> - Variable in class common.hardware.camera.<a href="common/hardware/camera/Camera.html" title="class in common.hardware.camera">Camera</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="common/hardware/motorcontroller/NAR_Motor.MotorConfig.html#distanceFactor" class="member-name-link">distanceFactor</a> - Variable in class common.hardware.motorcontroller.<a href="common/hardware/motorcontroller/NAR_Motor.MotorConfig.html" title="class in common.hardware.motorcontroller">NAR_Motor.MotorConfig</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="common/core/swerve/SwerveBase.html#drive(edu.wpi.first.math.geometry.Translation2d,double,boolean)" class="member-name-link">drive(Translation2d, double, boolean)</a> - Method in class common.core.swerve.<a href="common/core/swerve/SwerveBase.html" title="class in common.core.swerve">SwerveBase</a></dt>
@@ -575,10 +569,8 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Ends the main loop in startCompetition().</div>
 </dd>
-<dt><a href="common/core/misc/NAR_Robot2.html#endCompetition()" class="member-name-link">endCompetition()</a> - Method in class common.core.misc.<a href="common/core/misc/NAR_Robot2.html" title="class in common.core.misc">NAR_Robot2</a></dt>
-<dd>
-<div class="block">Ends the main loop in startCompetition().</div>
-</dd>
+<dt><a href="common/hardware/camera/Camera.html#estimatedPose" class="member-name-link">estimatedPose</a> - Variable in class common.hardware.camera.<a href="common/hardware/camera/Camera.html" title="class in common.hardware.camera">Camera</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="common/utility/sysid/PolynomialDerivative.html#evaluate(double)" class="member-name-link">evaluate(double)</a> - Method in class common.utility.sysid.<a href="common/utility/sysid/PolynomialDerivative.html" title="class in common.utility.sysid">PolynomialDerivative</a></dt>
 <dd>
 <div class="block">Returns a y-value by plugging in the x-value into the derivative function.</div>
@@ -710,7 +702,7 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Get the Differential coefficient.</div>
 </dd>
-<dt><a href="common/hardware/camera/Camera.html#getDistanceGround()" class="member-name-link">getDistanceGround()</a> - Method in class common.hardware.camera.<a href="common/hardware/camera/Camera.html" title="class in common.hardware.camera">Camera</a></dt>
+<dt><a href="common/hardware/camera/Camera.html#getDistance(org.photonvision.targeting.PhotonTrackedTarget)" class="member-name-link">getDistance(PhotonTrackedTarget)</a> - Method in class common.hardware.camera.<a href="common/hardware/camera/Camera.html" title="class in common.hardware.camera">Camera</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="common/utility/shuffleboard/NAR_Shuffleboard.html#getDouble(java.lang.String,java.lang.String)" class="member-name-link">getDouble(String, String)</a> - Static method in class common.utility.shuffleboard.<a href="common/utility/shuffleboard/NAR_Shuffleboard.html" title="class in common.utility.shuffleboard">NAR_Shuffleboard</a></dt>
 <dd>
@@ -738,8 +730,18 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Gets the current field-relative velocity (x, y and omega) of the robot</div>
 </dd>
+<dt><a href="common/hardware/camera/Camera.html#getGyroAngle()" class="member-name-link">getGyroAngle()</a> - Method in class common.hardware.camera.<a href="common/hardware/camera/Camera.html" title="class in common.hardware.camera">Camera</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="common/hardware/camera/Camera.html#getGyroPose(org.photonvision.targeting.PhotonPipelineResult)" class="member-name-link">getGyroPose(PhotonPipelineResult)</a> - Method in class common.hardware.camera.<a href="common/hardware/camera/Camera.html" title="class in common.hardware.camera">Camera</a></dt>
+<dd>
+<div class="block">Overrides the pose's rotation with the gyro angle</div>
+</dd>
 <dt><a href="common/core/swerve/SwerveBase.html#getGyroRotation2d()" class="member-name-link">getGyroRotation2d()</a> - Method in class common.core.swerve.<a href="common/core/swerve/SwerveBase.html" title="class in common.core.swerve">SwerveBase</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="common/hardware/camera/Camera.html#getGyroStablilization(java.util.Optional,org.photonvision.targeting.PhotonTrackedTarget)" class="member-name-link">getGyroStablilization(Optional&lt;Pose3d&gt;, PhotonTrackedTarget)</a> - Method in class common.hardware.camera.<a href="common/hardware/camera/Camera.html" title="class in common.hardware.camera">Camera</a></dt>
+<dd>
+<div class="block">Uses the gyro angle and target position to determine robot pose</div>
+</dd>
 <dt><a href="common/core/swerve/SwerveBase.html#getHeading()" class="member-name-link">getHeading()</a> - Method in class common.core.swerve.<a href="common/core/swerve/SwerveBase.html" title="class in common.core.swerve">SwerveBase</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="common/core/controllers/ControllerBase.html#getI()" class="member-name-link">getI()</a> - Method in class common.core.controllers.<a href="common/core/controllers/ControllerBase.html" title="class in common.core.controllers">ControllerBase</a></dt>
@@ -780,8 +782,6 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Returns the kV value calculated by the data.</div>
 </dd>
-<dt><a href="common/hardware/camera/Camera.html#getLatestResult()" class="member-name-link">getLatestResult()</a> - Method in class common.hardware.camera.<a href="common/hardware/camera/Camera.html" title="class in common.hardware.camera">Camera</a></dt>
-<dd>&nbsp;</dd>
 <dt><a href="common/hardware/limelight/LEDMode.html#getLEDMode()" class="member-name-link">getLEDMode()</a> - Method in enum class common.hardware.limelight.<a href="common/hardware/limelight/LEDMode.html" title="enum class in common.hardware.limelight">LEDMode</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="common/hardware/input/NAR_Joystick.html#getLeftPOVButton()" class="member-name-link">getLeftPOVButton()</a> - Method in class common.hardware.input.<a href="common/hardware/input/NAR_Joystick.html" title="class in common.hardware.input">NAR_Joystick</a></dt>
@@ -834,8 +834,6 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="common/hardware/motorcontroller/NAR_TalonFX.html#getNumFailedConfigs()" class="member-name-link">getNumFailedConfigs()</a> - Static method in class common.hardware.motorcontroller.<a href="common/hardware/motorcontroller/NAR_TalonFX.html" title="class in common.hardware.motorcontroller">NAR_TalonFX</a></dt>
 <dd>&nbsp;</dd>
-<dt><a href="common/hardware/camera/Camera.html#getOffset()" class="member-name-link">getOffset()</a> - Method in class common.hardware.camera.<a href="common/hardware/camera/Camera.html" title="class in common.hardware.camera">Camera</a></dt>
-<dd>&nbsp;</dd>
 <dt><a href="common/core/controllers/ControllerBase.html#getP()" class="member-name-link">getP()</a> - Method in class common.core.controllers.<a href="common/core/controllers/ControllerBase.html" title="class in common.core.controllers">ControllerBase</a></dt>
 <dd>
 <div class="block">Get the Proportional coefficient.</div>
@@ -849,6 +847,12 @@ loadScripts(document, 'script');</script>
 <dt><a href="common/core/swerve/SwerveBase.html#getPitch()" class="member-name-link">getPitch()</a> - Method in class common.core.swerve.<a href="common/core/swerve/SwerveBase.html" title="class in common.core.swerve">SwerveBase</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="common/core/swerve/SwerveBase.html#getPose()" class="member-name-link">getPose()</a> - Method in class common.core.swerve.<a href="common/core/swerve/SwerveBase.html" title="class in common.core.swerve">SwerveBase</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="common/hardware/camera/Camera.html#getPose(org.photonvision.targeting.PhotonPipelineResult)" class="member-name-link">getPose(PhotonPipelineResult)</a> - Method in class common.hardware.camera.<a href="common/hardware/camera/Camera.html" title="class in common.hardware.camera">Camera</a></dt>
+<dd>
+<div class="block">Gets the latest camera updates</div>
+</dd>
+<dt><a href="common/hardware/camera/Camera.html#getPoseAmbiguity(org.photonvision.targeting.PhotonTrackedTarget)" class="member-name-link">getPoseAmbiguity(PhotonTrackedTarget)</a> - Method in class common.hardware.camera.<a href="common/hardware/camera/Camera.html" title="class in common.hardware.camera">Camera</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="common/hardware/motorcontroller/NAR_Motor.html#getPosition()" class="member-name-link">getPosition()</a> - Method in class common.hardware.motorcontroller.<a href="common/hardware/motorcontroller/NAR_Motor.html" title="class in common.hardware.motorcontroller">NAR_Motor</a></dt>
 <dd>
@@ -1116,6 +1120,8 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Return whether the subsystem is in debug mode.</div>
 </dd>
+<dt><a href="common/hardware/camera/Camera.html#isDisabled" class="member-name-link">isDisabled</a> - Variable in class common.hardware.camera.<a href="common/hardware/camera/Camera.html" title="class in common.hardware.camera">Camera</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="common/core/subsystems/NAR_PIDSubsystem.html#isEnabled()" class="member-name-link">isEnabled()</a> - Method in class common.core.subsystems.<a href="common/core/subsystems/NAR_PIDSubsystem.html" title="class in common.core.subsystems">NAR_PIDSubsystem</a></dt>
 <dd>
 <div class="block">Returns whether the controller is enabled.</div>
@@ -1123,6 +1129,8 @@ loadScripts(document, 'script');</script>
 <dt><a href="common/core/commands/NAR_PIDCommand.html#isFinished()" class="member-name-link">isFinished()</a> - Method in class common.core.commands.<a href="common/core/commands/NAR_PIDCommand.html" title="class in common.core.commands">NAR_PIDCommand</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="common/core/subsystems/NAR_PIDSubsystem.SetpointTest.html#isFinished()" class="member-name-link">isFinished()</a> - Method in class common.core.subsystems.<a href="common/core/subsystems/NAR_PIDSubsystem.SetpointTest.html" title="class in common.core.subsystems">NAR_PIDSubsystem.SetpointTest</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="common/utility/sysid/CmdSysId.html#isFinished()" class="member-name-link">isFinished()</a> - Method in class common.utility.sysid.<a href="common/utility/sysid/CmdSysId.html" title="class in common.utility.sysid">CmdSysId</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="common/utility/tester/CurrentTest.html#isFinished()" class="member-name-link">isFinished()</a> - Method in class common.utility.tester.<a href="common/utility/tester/CurrentTest.html" title="class in common.utility.tester">CurrentTest</a></dt>
 <dd>&nbsp;</dd>
@@ -1135,7 +1143,13 @@ loadScripts(document, 'script');</script>
 <dt><a href="common/utility/tester/ThresholdTest.html#isFinished()" class="member-name-link">isFinished()</a> - Method in class common.utility.tester.<a href="common/utility/tester/ThresholdTest.html" title="class in common.utility.tester">ThresholdTest</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="common/hardware/camera/Camera.html#isGoodEstimate(edu.wpi.first.math.geometry.Pose2d)" class="member-name-link">isGoodEstimate(Pose2d)</a> - Method in class common.hardware.camera.<a href="common/hardware/camera/Camera.html" title="class in common.hardware.camera">Camera</a></dt>
-<dd>&nbsp;</dd>
+<dd>
+<div class="block">Returns if an estimate is within a valid distance from the robot pose</div>
+</dd>
+<dt><a href="common/hardware/camera/Camera.html#isValidTarget(org.photonvision.targeting.PhotonTrackedTarget)" class="member-name-link">isValidTarget(PhotonTrackedTarget)</a> - Method in class common.hardware.camera.<a href="common/hardware/camera/Camera.html" title="class in common.hardware.camera">Camera</a></dt>
+<dd>
+<div class="block">Returns true if the target is within the distance and ambiguity thresholds and is not blacklisted</div>
+</dd>
 </dl>
 <h2 class="title" id="I:K">K</h2>
 <dl class="index">
@@ -1153,10 +1167,6 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="common/core/misc/NAR_Robot.html#kDefaultPeriod" class="member-name-link">kDefaultPeriod</a> - Static variable in class common.core.misc.<a href="common/core/misc/NAR_Robot.html" title="class in common.core.misc">NAR_Robot</a></dt>
 <dd>&nbsp;</dd>
-<dt><a href="common/core/misc/NAR_Robot2.html#kDefaultPeriod" class="member-name-link">kDefaultPeriod</a> - Static variable in class common.core.misc.<a href="common/core/misc/NAR_Robot2.html" title="class in common.core.misc">NAR_Robot2</a></dt>
-<dd>
-<div class="block">Default loop period.</div>
-</dd>
 <dt><a href="common/core/controllers/ControllerBase.html#kG" class="member-name-link">kG</a> - Variable in class common.core.controllers.<a href="common/core/controllers/ControllerBase.html" title="class in common.core.controllers">ControllerBase</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="common/core/controllers/PIDFFConfig.html#kG" class="member-name-link">kG</a> - Variable in class common.core.controllers.<a href="common/core/controllers/PIDFFConfig.html" title="class in common.core.controllers">PIDFFConfig</a></dt>
@@ -1410,7 +1420,7 @@ loadScripts(document, 'script');</script>
 </dd>
 <dt><a href="common/core/misc/NAR_Robot.html" class="type-name-link" title="class in common.core.misc">NAR_Robot</a> - Class in <a href="common/core/misc/package-summary.html">common.core.misc</a></dt>
 <dd>
-<div class="block">Team 3128's Robot class that includes advantageScope and addPeriodic</div>
+<div class="block">Team 3128's Custom Robot class</div>
 </dd>
 <dt><a href="common/core/misc/NAR_Robot.html#%3Cinit%3E()" class="member-name-link">NAR_Robot()</a> - Constructor for class common.core.misc.<a href="common/core/misc/NAR_Robot.html" title="class in common.core.misc">NAR_Robot</a></dt>
 <dd>
@@ -1422,18 +1432,6 @@ loadScripts(document, 'script');</script>
 </dd>
 <dt><a href="common/core/misc/NAR_Robot.LoggingState.html" class="type-name-link" title="enum class in common.core.misc">NAR_Robot.LoggingState</a> - Enum Class in <a href="common/core/misc/package-summary.html">common.core.misc</a></dt>
 <dd>&nbsp;</dd>
-<dt><a href="common/core/misc/NAR_Robot2.html" class="type-name-link" title="class in common.core.misc">NAR_Robot2</a> - Class in <a href="common/core/misc/package-summary.html">common.core.misc</a></dt>
-<dd>
-<div class="block">TimedRobot implements the IterativeRobotBase robot program framework.</div>
-</dd>
-<dt><a href="common/core/misc/NAR_Robot2.html#%3Cinit%3E()" class="member-name-link">NAR_Robot2()</a> - Constructor for class common.core.misc.<a href="common/core/misc/NAR_Robot2.html" title="class in common.core.misc">NAR_Robot2</a></dt>
-<dd>
-<div class="block">Constructor for TimedRobot.</div>
-</dd>
-<dt><a href="common/core/misc/NAR_Robot2.html#%3Cinit%3E(double)" class="member-name-link">NAR_Robot2(double)</a> - Constructor for class common.core.misc.<a href="common/core/misc/NAR_Robot2.html" title="class in common.core.misc">NAR_Robot2</a></dt>
-<dd>
-<div class="block">Constructor for TimedRobot.</div>
-</dd>
 <dt><a href="common/utility/shuffleboard/NAR_Shuffleboard.html" class="type-name-link" title="class in common.utility.shuffleboard">NAR_Shuffleboard</a> - Class in <a href="common/utility/shuffleboard/package-summary.html">common.utility.shuffleboard</a></dt>
 <dd>
 <div class="block">Team 3128's Wrapper class for <code>Shuffleboard</code></div>
@@ -1486,6 +1484,8 @@ loadScripts(document, 'script');</script>
 <dt><a href="common/core/swerve/SwerveBase.html#odometry" class="member-name-link">odometry</a> - Variable in class common.core.swerve.<a href="common/core/swerve/SwerveBase.html" title="class in common.core.swerve">SwerveBase</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="common/hardware/limelight/LEDMode.html#OFF" class="member-name-link">OFF</a> - Enum constant in enum class common.hardware.limelight.<a href="common/hardware/limelight/LEDMode.html" title="enum class in common.hardware.limelight">LEDMode</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="common/hardware/camera/Camera.html#offset" class="member-name-link">offset</a> - Variable in class common.hardware.camera.<a href="common/hardware/camera/Camera.html" title="class in common.hardware.camera">Camera</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="common/hardware/limelight/LEDMode.html#ON" class="member-name-link">ON</a> - Enum constant in enum class common.hardware.limelight.<a href="common/hardware/limelight/LEDMode.html" title="enum class in common.hardware.limelight">LEDMode</a></dt>
 <dd>&nbsp;</dd>
@@ -1749,10 +1749,6 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Sets the motor state with feedforward</div>
 </dd>
-<dt><a href="common/hardware/camera/Camera.html#setAllDistanceThreshold(double)" class="member-name-link">setAllDistanceThreshold(double)</a> - Static method in class common.hardware.camera.<a href="common/hardware/camera/Camera.html" title="class in common.hardware.camera">Camera</a></dt>
-<dd>&nbsp;</dd>
-<dt><a href="common/hardware/camera/Camera.html#setAmbiguityThreshold(double)" class="member-name-link">setAmbiguityThreshold(double)</a> - Static method in class common.hardware.camera.<a href="common/hardware/camera/Camera.html" title="class in common.hardware.camera">Camera</a></dt>
-<dd>&nbsp;</dd>
 <dt><a href="common/hardware/motorcontroller/NAR_CANSpark.html#setBrakeMode()" class="member-name-link">setBrakeMode()</a> - Method in class common.hardware.motorcontroller.<a href="common/hardware/motorcontroller/NAR_CANSpark.html" title="class in common.hardware.motorcontroller">NAR_CANSpark</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="common/hardware/motorcontroller/NAR_Motor.html#setBrakeMode()" class="member-name-link">setBrakeMode()</a> - Method in class common.hardware.motorcontroller.<a href="common/hardware/motorcontroller/NAR_Motor.html" title="class in common.hardware.motorcontroller">NAR_Motor</a></dt>
@@ -1769,8 +1765,6 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Sets the module's neutral mode</div>
 </dd>
-<dt><a href="common/hardware/camera/Camera.html#setCamDistanceThreshold(double)" class="member-name-link">setCamDistanceThreshold(double)</a> - Method in class common.hardware.camera.<a href="common/hardware/camera/Camera.html" title="class in common.hardware.camera">Camera</a></dt>
-<dd>&nbsp;</dd>
 <dt><a href="common/hardware/motorcontroller/NAR_CANSpark.html#setCoastMode()" class="member-name-link">setCoastMode()</a> - Method in class common.hardware.motorcontroller.<a href="common/hardware/motorcontroller/NAR_CANSpark.html" title="class in common.hardware.motorcontroller">NAR_CANSpark</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="common/hardware/motorcontroller/NAR_Motor.html#setCoastMode()" class="member-name-link">setCoastMode()</a> - Method in class common.hardware.motorcontroller.<a href="common/hardware/motorcontroller/NAR_Motor.html" title="class in common.hardware.motorcontroller">NAR_Motor</a></dt>
@@ -1797,7 +1791,7 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="common/hardware/motorcontroller/NAR_TalonSRX.html#setCurrentLimit(int)" class="member-name-link">setCurrentLimit(int)</a> - Method in class common.hardware.motorcontroller.<a href="common/hardware/motorcontroller/NAR_TalonSRX.html" title="class in common.hardware.motorcontroller">NAR_TalonSRX</a></dt>
 <dd>
-<div class="block">We just burn out our 775's *shrug* and I can't be bothered to figure out a good way to do this with CTRE</div>
+<div class="block">Still burn our motors nevertheless</div>
 </dd>
 <dt><a href="common/core/controllers/ControllerBase.html#setD(double)" class="member-name-link">setD(double)</a> - Method in class common.core.controllers.<a href="common/core/controllers/ControllerBase.html" title="class in common.core.controllers">ControllerBase</a></dt>
 <dd>
@@ -1973,6 +1967,10 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Sets power to all motors.</div>
 </dd>
+<dt><a href="common/hardware/camera/Camera.html#setResources(java.util.function.DoubleSupplier,java.util.function.BiConsumer,edu.wpi.first.apriltag.AprilTagFieldLayout,java.util.function.Supplier)" class="member-name-link">setResources(DoubleSupplier, BiConsumer&lt;Pose2d, Double&gt;, AprilTagFieldLayout, Supplier&lt;Pose2d&gt;)</a> - Static method in class common.hardware.camera.<a href="common/hardware/camera/Camera.html" title="class in common.hardware.camera">Camera</a></dt>
+<dd>
+<div class="block">Sets the necessary resources for cameras to function.</div>
+</dd>
 <dt><a href="common/hardware/input/NAR_XboxController.html#setRightXDeadband(double)" class="member-name-link">setRightXDeadband(double)</a> - Method in class common.hardware.input.<a href="common/hardware/input/NAR_XboxController.html" title="class in common.hardware.input">NAR_XboxController</a></dt>
 <dd>
 <div class="block">Sets the horizontal deadband value for the right joystick.</div>
@@ -2007,6 +2005,10 @@ loadScripts(document, 'script');</script>
 </dd>
 <dt><a href="common/hardware/limelight/Limelight.html#setStreamMode(common.hardware.limelight.StreamMode)" class="member-name-link">setStreamMode(StreamMode)</a> - Method in class common.hardware.limelight.<a href="common/hardware/limelight/Limelight.html" title="class in common.hardware.limelight">Limelight</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="common/hardware/camera/Camera.html#setThresholds(double,double)" class="member-name-link">setThresholds(double, double)</a> - Static method in class common.hardware.camera.<a href="common/hardware/camera/Camera.html" title="class in common.hardware.camera">Camera</a></dt>
+<dd>
+<div class="block">Sets the necessary thresholds for the cameras to use</div>
+</dd>
 <dt><a href="common/hardware/input/NAR_Joystick.html#setThrottleBounds(double,double)" class="member-name-link">setThrottleBounds(double, double)</a> - Method in class common.hardware.input.<a href="common/hardware/input/NAR_Joystick.html" title="class in common.hardware.input">NAR_Joystick</a></dt>
 <dd>
 <div class="block">Sets the throttle bounds for the joystick.</div>
@@ -2111,10 +2113,6 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Provide an alternate "main loop" via startCompetition().</div>
 </dd>
-<dt><a href="common/core/misc/NAR_Robot2.html#startCompetition()" class="member-name-link">startCompetition()</a> - Method in class common.core.misc.<a href="common/core/misc/NAR_Robot2.html" title="class in common.core.misc">NAR_Robot2</a></dt>
-<dd>
-<div class="block">Provide an alternate "main loop" via startCompetition().</div>
-</dd>
 <dt><a href="common/core/subsystems/NAR_PIDSubsystem.html#startPID(double)" class="member-name-link">startPID(double)</a> - Method in class common.core.subsystems.<a href="common/core/subsystems/NAR_PIDSubsystem.html" title="class in common.core.subsystems">NAR_PIDSubsystem</a></dt>
 <dd>
 <div class="block">Sets the setpoint for the subsystem.</div>
@@ -2150,9 +2148,7 @@ loadScripts(document, 'script');</script>
 <dt><a href="common/hardware/limelight/StreamMode.html" class="type-name-link" title="enum class in common.hardware.limelight">StreamMode</a> - Enum Class in <a href="common/hardware/limelight/package-summary.html">common.hardware.limelight</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="common/core/swerve/SwerveBase.html" class="type-name-link" title="class in common.core.swerve">SwerveBase</a> - Class in <a href="common/core/swerve/package-summary.html">common.core.swerve</a></dt>
-<dd>
-<div class="block">To do fix this garbage</div>
-</dd>
+<dd>&nbsp;</dd>
 <dt><a href="common/core/swerve/SwerveBase.html#%3Cinit%3E(edu.wpi.first.math.kinematics.SwerveDriveKinematics,edu.wpi.first.math.Matrix,edu.wpi.first.math.Matrix,common.core.swerve.SwerveModuleConfig...)" class="member-name-link">SwerveBase(SwerveDriveKinematics, Matrix&lt;N3, N1&gt;, Matrix&lt;N3, N1&gt;, SwerveModuleConfig...)</a> - Constructor for class common.core.swerve.<a href="common/core/swerve/SwerveBase.html" title="class in common.core.swerve">SwerveBase</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="common/core/swerve/SwerveConversions.html" class="type-name-link" title="class in common.core.swerve">SwerveConversions</a> - Class in <a href="common/core/swerve/package-summary.html">common.core.swerve</a></dt>
@@ -2281,7 +2277,9 @@ loadScripts(document, 'script');</script>
  is a bug, but does not cause anything to crash.</div>
 </dd>
 <dt><a href="common/hardware/camera/Camera.html#update()" class="member-name-link">update()</a> - Method in class common.hardware.camera.<a href="common/hardware/camera/Camera.html" title="class in common.hardware.camera">Camera</a></dt>
-<dd>&nbsp;</dd>
+<dd>
+<div class="block">Gets the latest camera updates</div>
+</dd>
 <dt><a href="common/utility/shuffleboard/NAR_Shuffleboard.html#update()" class="member-name-link">update()</a> - Static method in class common.utility.shuffleboard.<a href="common/utility/shuffleboard/NAR_Shuffleboard.html" title="class in common.utility.shuffleboard">NAR_Shuffleboard</a></dt>
 <dd>
 <div class="block">Updates every widget</div>
@@ -2289,6 +2287,8 @@ loadScripts(document, 'script');</script>
 <dt><a href="common/hardware/camera/Camera.html#updateAll()" class="member-name-link">updateAll()</a> - Static method in class common.hardware.camera.<a href="common/hardware/camera/Camera.html" title="class in common.hardware.camera">Camera</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="common/hardware/camera/Camera.html#updateCounter" class="member-name-link">updateCounter</a> - Static variable in class common.hardware.camera.<a href="common/hardware/camera/Camera.html" title="class in common.hardware.camera">Camera</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="common/hardware/camera/Camera.html#updatedPose" class="member-name-link">updatedPose</a> - Variable in class common.hardware.camera.<a href="common/hardware/camera/Camera.html" title="class in common.hardware.camera">Camera</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="common/hardware/motorcontroller/NAR_Motor.html#updateIO(common.hardware.motorcontroller.NAR_MotorIOAutoLogged)" class="member-name-link">updateIO(NAR_MotorIOAutoLogged)</a> - Method in class common.hardware.motorcontroller.<a href="common/hardware/motorcontroller/NAR_Motor.html" title="class in common.hardware.motorcontroller">NAR_Motor</a></dt>
 <dd>&nbsp;</dd>
