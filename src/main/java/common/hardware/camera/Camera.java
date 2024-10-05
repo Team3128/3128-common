@@ -54,7 +54,7 @@ public class Camera {
     public boolean isDisabled = false;
     public Transform3d offset;
     public double distance;
-    public Pose2d updatedPose;
+    public Pose2d updatedPose = new Pose2d();
 
     /**
      * Creates a Camera object
