@@ -81,7 +81,6 @@ public abstract class NAR_PIDSubsystem extends SubsystemBase {
     protected boolean enabled;
     protected BooleanSupplier debug;
     protected DoubleSupplier setpoint;
-    private double min, max;
     private double safetyThresh;
     private Timer safetyTimer = new Timer();
 
@@ -101,8 +100,7 @@ public abstract class NAR_PIDSubsystem extends SubsystemBase {
         this.controller = controller;
         controller.setMeasurementSource(()-> getMeasurement());
         controller.addOutput(output -> useOutput(output, getSetpoint()));
-        min = Double.NEGATIVE_INFINITY;
-        max = Double.POSITIVE_INFINITY;
+
         safetyThresh = 5;
         prevMeasurement = 0;
         prevVelocity = 0;
@@ -180,22 +178,21 @@ public abstract class NAR_PIDSubsystem extends SubsystemBase {
     }
 
     /**
+     * Sets constraints for the setpoint of the PID subsystem.
+     * @param min The minimum setpoint for the subsystem
+     * @param max The maximum setpoint for the subsystem
+     */
+    public void setConstraints(double min, double max) {
+        controller.setConstraints(min, max);
+    }
+
+    /**
      * Sets the error which is considered tolerable for use with atSetpoint().
      *
      * @param positionTolerance Position error which is tolerable.
      */
     public void setTolerance(double positionTolerance) {
         controller.setTolerance(positionTolerance);
-    }
-
-    /**
-     * Sets constraints for the setpoint of the PID subsystem.
-     * @param min The minimum setpoint for the subsystem
-     * @param max The maximum setpoint for the subsystem
-     */
-    public void setConstraints(double min, double max) {
-        this.min = min;
-        this.max = max;
     }
 
     /**
@@ -213,7 +210,7 @@ public abstract class NAR_PIDSubsystem extends SubsystemBase {
      */
     public void startPID(double setpoint) {
         enable();
-        controller.setSetpoint(MathUtil.clamp((debug != null && debug.getAsBoolean()) ? this.setpoint.getAsDouble() : setpoint, min, max));
+        controller.setSetpoint((debug != null && debug.getAsBoolean()) ? this.setpoint.getAsDouble() : setpoint);
     }
 
     /**

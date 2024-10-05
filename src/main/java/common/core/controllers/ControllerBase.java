@@ -5,6 +5,7 @@ import java.util.function.DoubleConsumer;
 import java.util.function.DoubleSupplier;
 
 import common.hardware.motorcontroller.NAR_Motor;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
@@ -25,6 +26,8 @@ public abstract class ControllerBase implements Sendable, AutoCloseable {
     protected DoubleSupplier kS, kV, kA, kG;
     protected DoubleSupplier kG_Function = ()-> 1;
 
+    private double min, max;
+
     /**
      * Creates a base controller object to control motion.
      * <p>Sets kP, kI, kD, kS, kV, kA, kG, constraints, period values.
@@ -39,6 +42,9 @@ public abstract class ControllerBase implements Sendable, AutoCloseable {
         this.kG = ()-> config.kG;
 
         kG_Function = ()-> 1;
+
+        min = Double.NEGATIVE_INFINITY;
+        max = Double.POSITIVE_INFINITY;
     }
 
     /**
@@ -243,7 +249,7 @@ public abstract class ControllerBase implements Sendable, AutoCloseable {
      */
     public void setSetpoint(double setpoint) {
         reset();
-        controller.setSetpoint(setpoint);
+        controller.setSetpoint(MathUtil.clamp(setpoint, min, max));
     }
 
     /**
@@ -393,5 +399,15 @@ public abstract class ControllerBase implements Sendable, AutoCloseable {
     @Override
     public void close() {
         controller.close();
+    }
+
+    /**
+     * Sets constraints for the setpoint of the PID subsystem.
+     * @param min The minimum setpoint for the subsystem
+     * @param max The maximum setpoint for the subsystem
+     */
+    public void setConstraints(double min, double max) {
+        this.min = min;
+        this.max = max;
     }
 }
