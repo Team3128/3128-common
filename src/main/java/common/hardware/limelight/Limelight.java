@@ -1,5 +1,9 @@
 package common.hardware.limelight;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 
@@ -21,23 +25,25 @@ public class Limelight {
     public double targetWidth;
 
     public double frontDistance;
+    public double robotCenterDistance;
 
     public NetworkTable limelightTable;
 
     /**
      * 
-     * @param cameraAngle   - The vertical angle of the limelight
-     * @param cameraHeight  - The height off of the ground of the limelight
-     * @param frontDistance - The distance between the front of the robot and the
-     *                      Limelight
+     * @param cameraAngle   - The vertical angle of the limelight. Leaning backwards is positive degrees.
+     * @param cameraHeight  - The height off of the ground of the limelight lens
+     * @param frontDistance - The distance between the front of the robot and the Limelight Lens
+     * @param robotCenterDistance - The distance between the center of the robot and the Limelight Lens
      */
-    public Limelight(String hostname, double cameraAngle, double cameraHeight, double frontDistance) {
+    public Limelight(String hostname, double cameraAngle, double cameraHeight, double frontDistance, double robotCenterDistance) {
         this.hostname = hostname;
 
         this.cameraAngle = cameraAngle;
         this.cameraHeight = cameraHeight;
 
         this.frontDistance = frontDistance;
+        this.robotCenterDistance = robotCenterDistance;
 
         limelightTable = NetworkTableInstance.getDefault().getTable(hostname);
     }
@@ -84,6 +90,15 @@ public class Limelight {
             return -1;
         double ty = getValue(LimelightKey.VERTICAL_OFFSET) * Math.PI / 180;
         return (-targetHeight + cameraHeight) * Math.tan(ty + cameraAngle) - frontDistance;
+    }
+
+    public Translation2d getTargetFieldPosition(double targetHeight, Pose2d robotPose) {
+        if(!hasValidTarget()) return null;
+        double ty = getValue(LimelightKey.VERTICAL_OFFSET);
+        double tx = getValue(LimelightKey.HORIZONTAL_OFFSET);
+        double calcDistance = (targetHeight - cameraHeight) / Math.tan(Units.degreesToRadians(ty + cameraAngle));
+        Translation2d relativeTranslation = new Translation2d(calcDistance, Rotation2d.fromDegrees(tx + robotPose.getRotation().getDegrees()));
+        return robotPose.getTranslation().plus(relativeTranslation);
     }
 
     public void setLEDMode(LEDMode mode) {
