@@ -84,7 +84,7 @@ public abstract class SwerveBase extends SubsystemBase {
                                         twistVel.dtheta / dtConstant);
         }
         setModuleStates(kinematics.toSwerveModuleStates(velocity));
-        Logger.recordOutput("Swerve/DesiredModuleStates", kinematics.toSwerveModuleStates(velocity));
+        if(NAR_Robot.logWithAdvantageKit) Logger.recordOutput("Swerve/DesiredModuleStates", kinematics.toSwerveModuleStates(velocity));
     }
 
     /**
