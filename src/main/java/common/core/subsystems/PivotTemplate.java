@@ -58,7 +58,7 @@ public abstract class PivotTemplate extends NAR_PIDSubsystem{
      * @param setpoint Setpoint the pivot goes to.
      * @return Command setting pivot setpoint.
      */
-    public Command pivotTo(double setpoint){
+    public Command pidTo(double setpoint){
         return runOnce(() -> startPID(setpoint));
     }
     
@@ -67,7 +67,7 @@ public abstract class PivotTemplate extends NAR_PIDSubsystem{
      * @param power Power the motor is run at.
      * @return Command setting pivot power.
      */
-    public Command runPivot(double power){
+    public Command run(double power){
         return runOnce(() -> setPower(power));
     }
     

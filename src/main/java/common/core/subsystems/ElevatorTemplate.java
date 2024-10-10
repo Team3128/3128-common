@@ -59,7 +59,7 @@ public abstract class ElevatorTemplate extends NAR_PIDSubsystem {
      * @param setpoint Setpoint the elevator goes to.
      * @return Command setting elevator setpoint.
      */
-    public Command moveElevator(double setpoint){
+    public Command pidTo(double setpoint){
         return runOnce(() -> startPID(setpoint));
     }
     
@@ -68,7 +68,7 @@ public abstract class ElevatorTemplate extends NAR_PIDSubsystem {
      * @param power Power the motor is run at.
      * @return Command setting elevator power.
      */
-    public Command runElevator(double power){
+    public Command run(double power){
         return runOnce(() -> setPower(power));
     }
     

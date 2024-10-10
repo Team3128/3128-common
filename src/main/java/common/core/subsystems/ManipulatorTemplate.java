@@ -45,6 +45,10 @@ public abstract class ManipulatorTemplate extends SubsystemBase {
         this.motors = motors;
         configMotors();
     }
+
+    public ManipulatorTemplate(NAR_Motor... motors){
+        this(0, 0, 0, 0, 0, motors);
+    }
     
     /**
      * Configure motor settings.
@@ -82,7 +86,7 @@ public abstract class ManipulatorTemplate extends SubsystemBase {
      * @param power Power the motor is run at.
      * @return Command setting manipulator power.
      */
-    public Command runManipulator(double power){
+    public Command run(double power){
         return runOnce(()-> setPower(power));
     }
     
@@ -92,7 +96,7 @@ public abstract class ManipulatorTemplate extends SubsystemBase {
      */
     public Command intake() {
         return sequence(
-            runManipulator(intakePower),
+            run(intakePower),
             waitSeconds(lagSeconds),
             waitUntil(()-> hasObjectPresent()),
             runOnce(()-> setPower(stallPower))
@@ -104,7 +108,7 @@ public abstract class ManipulatorTemplate extends SubsystemBase {
      * @return Command to outtake a game piece.
      */
     public Command outtake() {
-        return runManipulator(outtakePower);
+        return run(outtakePower);
     }
     
     /**

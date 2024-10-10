@@ -54,7 +54,7 @@ public abstract class ShooterTemplate extends NAR_PIDSubsystem {
      * @param setpoint Desired setpoint in RPM.
      * @return Command to run shooter at a desired setpoint.
      */
-    public Command shoot(double setpoint){
+    public Command pidTo(double setpoint){
         return runOnce(() -> startPID(setpoint));
     }
     
@@ -63,7 +63,7 @@ public abstract class ShooterTemplate extends NAR_PIDSubsystem {
      * @param power Power for the motors to be run at.
      * @return Command to run the shooter at a specific power.
      */
-    public Command runShooter(double power){
+    public Command run(double power){
         return runOnce(() -> setPower(power));
     }
 
@@ -71,6 +71,4 @@ public abstract class ShooterTemplate extends NAR_PIDSubsystem {
     public double getMeasurement() {
         return motors[0].getVelocity();
     }
-    
-
 }
