@@ -2,6 +2,8 @@ package common.core.subsystems;
 
 import static edu.wpi.first.wpilibj2.command.Commands.waitSeconds;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
@@ -90,6 +92,8 @@ public abstract class NAR_PIDSubsystem extends SubsystemBase {
     private double updateTime;
     private Timer updateTimer = new Timer();
 
+    private List<BooleanSupplier> disableConditions = new ArrayList<>();
+
     private boolean shouldLog = false;
 
     /**
@@ -114,8 +118,16 @@ public abstract class NAR_PIDSubsystem extends SubsystemBase {
     public void periodic() {
         if (enabled) {
             controller.useOutput();
-            if (safetyTimer.hasElapsed(safetyThresh)) disable();
+            if (safetyTimer.hasElapsed(safetyThresh)) onSafetyTimeout();
             if (atSetpoint()) safetyTimer.restart();
+            if(getMeasurement() < min || getMeasurement() > max) onConstraintViolation();
+            for (BooleanSupplier condition : disableConditions) {
+                if (condition.getAsBoolean()) {
+                    Log.info(getName(), "Disable Condition has been triggered.");
+                    disable();
+                    break;
+                }
+            }
         }
 
         if (!shouldLog) return;
@@ -147,11 +159,14 @@ public abstract class NAR_PIDSubsystem extends SubsystemBase {
         debug = NAR_Shuffleboard.getBoolean(getName(), "TOGGLE");
         NAR_Shuffleboard.addData(getName(), "DEBUG", ()-> debug.getAsBoolean(), 2, 1);
         setpoint = NAR_Shuffleboard.debug(getName(), "Debug_Setpoint", 0, 2,2);
+        NAR_Shuffleboard.addData(getName(), "Output", ()-> controller.useOutput(), 2, 3);
 
         controller.setkS(NAR_Shuffleboard.debug(getName(), "kS", controller.getkS(), 3, 0));
         controller.setkV(NAR_Shuffleboard.debug(getName(), "kV", controller.getkV(), 3, 1));
         controller.setkA(NAR_Shuffleboard.debug(getName(), "kA", controller.getkA(), 3, 2));
         controller.setkG(NAR_Shuffleboard.debug(getName(), "kG", controller.getkG(), 3, 3));
+
+        NAR_Shuffleboard.addData(getName(), "Commands", getCurrentCommand(), 4, 0);
     }
 
     /**
@@ -180,6 +195,15 @@ public abstract class NAR_PIDSubsystem extends SubsystemBase {
     }
 
     /**
+     * Called when the safety timeout is reached.
+     * Disables the PID control.
+     */
+    public void onSafetyTimeout(){
+        Log.unusual(getName(), "Safety Timeout Reached");
+        disable();
+    }
+
+    /**
      * Sets the error which is considered tolerable for use with atSetpoint().
      *
      * @param positionTolerance Position error which is tolerable.
@@ -196,6 +220,29 @@ public abstract class NAR_PIDSubsystem extends SubsystemBase {
     public void setConstraints(double min, double max) {
         this.min = min;
         this.max = max;
+    }
+
+    /**
+     * Adds a condition to disable the PID control.
+     * @param condition The condition to disable the PID control.
+     */
+    public void addDisableCondition(BooleanSupplier condition) {
+        disableConditions.add(condition);
+    }
+
+    /**
+     * Returns the list of disable conditions
+     * @return List of disable conditions
+     */
+    public List<BooleanSupplier> getDisableConditions() {
+        return disableConditions;
+    }
+
+    /**
+     * Called when the measurement of the controller violates the constraints
+     */
+    public void onConstraintViolation() {
+        Log.unusual(getName(), "Controller Measurement Violated Constraints");
     }
 
     /**
@@ -273,6 +320,7 @@ public abstract class NAR_PIDSubsystem extends SubsystemBase {
     public void disable() {
         enabled = false;
         useOutput(0, 0);
+        Log.info(getName(), "Disabled");
     }
 
     /**
