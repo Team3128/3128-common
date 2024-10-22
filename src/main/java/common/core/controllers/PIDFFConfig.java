@@ -62,4 +62,31 @@ public class PIDFFConfig {
     public PIDFFConfig() {
         this(0, 0, 0);
     }
+
+    public double getkP(){
+        return kP;
+    }
+
+    public double getkI(){
+        return kI;
+    }
+
+    public double getkD(){
+        return kD;
+    }
+    public double getkS(){
+        return kS;
+    }
+
+    public double getkV(){
+        return kP;
+    }
+
+    public double getkG(){
+        return kG;
+    }
+    
+    public double getkA(){
+        return kA;
+    }
 }
