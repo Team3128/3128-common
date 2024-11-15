@@ -7,10 +7,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.PriorityQueue;
 
-import org.littletonrobotics.junction.AutoLogOutputManager;
-import org.littletonrobotics.junction.Logger;
-import org.littletonrobotics.junction.wpilog.WPILOGWriter;
-
 import edu.wpi.first.hal.DriverStationJNI;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.NotifierJNI;
@@ -22,15 +18,12 @@ import edu.wpi.first.wpilibj.Timer;
 
 /**
  * Team 3128's Custom Robot class
- * 
- * <p> Includes AdvantageKit and addPeriodic()
- * 
+ *  
  * <p>NOTES:
  * <ul>
  * <li> TimedRobot implements the IterativeRobotBase robot program framework.
  * <li> The TimedRobot class is intended to be subclassed by a user creating a robot program.
  * <li> Periodic() functions from the base class are called on an interval by a Notifier instance.
- * <li> AdvantageKit logging is disabled by default. 
  * </ul>
  * 
  * <p> ----------------------------------------------
@@ -39,8 +32,6 @@ import edu.wpi.first.wpilibj.Timer;
  * @author Mason Lam, Wallim
  */
 public class NAR_Robot extends IterativeRobotBase {
-
-    public static boolean logWithAdvantageKit = false;
 
     @SuppressWarnings("MemberName")
     static class Callback implements Comparable<Callback> {
@@ -98,9 +89,6 @@ public class NAR_Robot extends IterativeRobotBase {
 
     private static final PriorityQueue<Callback> m_callbacks = new PriorityQueue<>();
 
-    private Method periodicAfterUser0 = null;
-
-    private GcStatsCollector gcStatsCollector = new GcStatsCollector();
 
     /** Constructor for TimedRobot. */
     protected NAR_Robot() {
@@ -116,38 +104,8 @@ public class NAR_Robot extends IterativeRobotBase {
         super(period);
         m_startTime = Timer.getFPGATimestamp();
 
-        if(logWithAdvantageKit) {
-            Method periodicBeforeUser = null; // Method to get the periodicBeforeUser method from Logger
-            Method periodicAfterUser = null; // Method to get the periodicAfterUser method from Logger
-            try {
-                periodicBeforeUser = Logger.class.getDeclaredMethod("periodicBeforeUser");
-                periodicAfterUser = Logger.class.getDeclaredMethod("periodicAfterUser", long.class, long.class);
-            } catch (NoSuchMethodException | SecurityException e) {
-                e.printStackTrace();
-            }
 
-            periodicBeforeUser.setAccessible(true); // set the method to be accessible
-            periodicAfterUser.setAccessible(true); // set the method to be accessible
-
-            Method periodicBeforeUser0 = periodicBeforeUser;
-            periodicAfterUser0 = periodicAfterUser;
-
-            addPeriodic(() -> {
-                try {
-                    long loopCycleStart = Logger.getRealTimestamp();
-                    if (logWithAdvantageKit) periodicBeforeUser0.invoke(null);
-                    long userCodeStart = Logger.getRealTimestamp();
-                    loopFunc();
-                    long loopCycleEnd = Logger.getRealTimestamp();
-                    if (logWithAdvantageKit) gcStatsCollector.update();
-                    if (logWithAdvantageKit) periodicAfterUser0.invoke(null, loopCycleEnd - userCodeStart, userCodeStart - loopCycleStart);
-                } catch (Exception e) {
-                }
-            }, period);
-
-        } else {
-            addPeriodic(this::loopFunc, period);
-        }
+        addPeriodic(this::loopFunc, period);
 
         
         NotifierJNI.setNotifierName(m_notifier, "TimedRobot");
@@ -165,7 +123,6 @@ public class NAR_Robot extends IterativeRobotBase {
     @Override
     public void startCompetition() {
         long initStart = 0;
-        if(logWithAdvantageKit) initStart = Logger.getRealTimestamp();
         
         robotInit();
 
@@ -174,18 +131,6 @@ public class NAR_Robot extends IterativeRobotBase {
         }
 
         long initEnd = 0;
-        if(logWithAdvantageKit) initEnd = Logger.getRealTimestamp();
-
-        if (logWithAdvantageKit) {
-            try {
-                Method registerFields = AutoLogOutputManager.class.getDeclaredMethod("registerFields", Object.class);
-                registerFields.setAccessible(true);
-                registerFields.invoke(null, this);
-                periodicAfterUser0.invoke(null, initEnd - initStart, 0);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
 
         // Tell the DS that the robot is ready to be enabled
         System.out.println("********** Robot program startup complete **********");
@@ -218,57 +163,6 @@ public class NAR_Robot extends IterativeRobotBase {
 
                 callback.expirationTime += callback.period;
                 m_callbacks.add(callback);
-            }
-        }
-    }
-
-    public static enum LoggingState {
-        FULLMATCH,
-        SESSION,
-        NONE
-    }
-
-    /**
-     * Add a data receiver for Adv Kit logging to a USB drive.
-     * 
-     * @param port  true if USB drive is plugged into the top port, false if it is
-     *              plugged into the bottom port.
-     * @param state session logging or full match logging.
-     */
-    public static void addReceiver(boolean port, LoggingState state) {
-        if (state == LoggingState.NONE) {
-            return;
-        }
-
-        String info = "";
-        if (state == LoggingState.FULLMATCH) {
-            info += DriverStation.getMatchNumber() + "_" +
-                    DriverStation.getMatchType() + "_" +
-                    DriverStation.getEventName() + "_";
-        }
-        info += LocalDateTime.now().getMonthValue() + "_" +
-                LocalDateTime.now().getDayOfMonth() + "_" +
-                LocalDateTime.now().getYear() + "_T_" +
-                LocalDateTime.now().getHour() + "_" +
-                LocalDateTime.now().getMinute();
-        String folder = "";
-        if (state == LoggingState.SESSION) {
-            folder = "sessions";
-        } else {
-            folder = "matches";
-        }
-
-        if (port) {
-            try {
-                Logger.addDataReceiver(new WPILOGWriter("/media/sda1/" + folder + "/" + info + ".wpilog"));
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        } else {
-            try {
-                Logger.addDataReceiver(new WPILOGWriter("/media/sda2/" + folder + "/" + info + ".wpilog"));
-            } catch (Exception e) {
-                e.printStackTrace();
             }
         }
     }
@@ -312,27 +206,4 @@ public class NAR_Robot extends IterativeRobotBase {
     public static void addPeriodic(Runnable callback, double periodSeconds, double offsetSeconds) {
         m_callbacks.add(new Callback(callback, m_startTime, periodSeconds, offsetSeconds));
     }
-
-    private static final class GcStatsCollector {
-    private List<GarbageCollectorMXBean> gcBeans = ManagementFactory.getGarbageCollectorMXBeans();
-    private final long[] lastTimes = new long[gcBeans.size()];
-    private final long[] lastCounts = new long[gcBeans.size()];
-  
-    public void update() {
-      long accumTime = 0;
-      long accumCounts = 0;
-      for (int i = 0; i < gcBeans.size(); i++) {
-        long gcTime = gcBeans.get(i).getCollectionTime();
-        long gcCount = gcBeans.get(i).getCollectionCount();
-        accumTime += gcTime - lastTimes[i];
-        accumCounts += gcCount - lastCounts[i];
-  
-        lastTimes[i] = gcTime;
-        lastCounts[i] = gcCount;
-      }
-  
-      Logger.recordOutput("LoggedRobot/GCTimeMS", (double) accumTime);
-      Logger.recordOutput("LoggedRobot/GCCounts", (double) accumCounts);
-    }
-  }
 }

@@ -104,6 +104,10 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Displays an updating value in Shuffleboard</div>
 </dd>
+<dt><a href="common/core/subsystems/NAR_PIDSubsystem.html#addDisableCondition(java.util.function.BooleanSupplier)" class="member-name-link">addDisableCondition(BooleanSupplier)</a> - Method in class common.core.subsystems.<a href="common/core/subsystems/NAR_PIDSubsystem.html" title="class in common.core.subsystems">NAR_PIDSubsystem</a></dt>
+<dd>
+<div class="block">Adds a condition to disable the PID control.</div>
+</dd>
 <dt><a href="common/hardware/camera/Camera.html#addIgnoredTags(int...)" class="member-name-link">addIgnoredTags(int...)</a> - Static method in class common.hardware.camera.<a href="common/hardware/camera/Camera.html" title="class in common.hardware.camera">Camera</a></dt>
 <dd>
 <div class="block">Blacklists tags from use</div>
@@ -135,10 +139,6 @@ loadScripts(document, 'script');</script>
 <dt><a href="common/core/misc/NAR_Robot.html#addPeriodic(java.lang.Runnable,double,double)" class="member-name-link">addPeriodic(Runnable, double, double)</a> - Static method in class common.core.misc.<a href="common/core/misc/NAR_Robot.html" title="class in common.core.misc">NAR_Robot</a></dt>
 <dd>
 <div class="block">Add a callback to run at a specific period with a starting time offset.</div>
-</dd>
-<dt><a href="common/core/misc/NAR_Robot.html#addReceiver(boolean,common.core.misc.NAR_Robot.LoggingState)" class="member-name-link">addReceiver(boolean, NAR_Robot.LoggingState)</a> - Static method in class common.core.misc.<a href="common/core/misc/NAR_Robot.html" title="class in common.core.misc">NAR_Robot</a></dt>
-<dd>
-<div class="block">Add a data receiver for Adv Kit logging to a USB drive.</div>
 </dd>
 <dt><a href="common/utility/shuffleboard/NAR_Shuffleboard.html#addSendable(java.lang.String,java.lang.String,edu.wpi.first.util.sendable.Sendable,int,int)" class="member-name-link">addSendable(String, String, Sendable, int, int)</a> - Static method in class common.utility.shuffleboard.<a href="common/utility/shuffleboard/NAR_Shuffleboard.html" title="class in common.utility.shuffleboard">NAR_Shuffleboard</a></dt>
 <dd>
@@ -175,8 +175,6 @@ loadScripts(document, 'script');</script>
 <dt><a href="common/core/swerve/SwerveBase.html#addVisionMeasurement(edu.wpi.first.math.geometry.Pose2d,double)" class="member-name-link">addVisionMeasurement(Pose2d, double)</a> - Method in class common.core.swerve.<a href="common/core/swerve/SwerveBase.html" title="class in common.core.swerve">SwerveBase</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="common/core/swerve/SwerveModuleConfig.html#angleConfig" class="member-name-link">angleConfig</a> - Variable in class common.core.swerve.<a href="common/core/swerve/SwerveModuleConfig.html" title="class in common.core.swerve">SwerveModuleConfig</a></dt>
-<dd>&nbsp;</dd>
-<dt><a href="common/hardware/motorcontroller/NAR_Motor.NAR_MotorIO.html#appliedOutput" class="member-name-link">appliedOutput</a> - Variable in class common.hardware.motorcontroller.<a href="common/hardware/motorcontroller/NAR_Motor.NAR_MotorIO.html" title="class in common.hardware.motorcontroller">NAR_Motor.NAR_MotorIO</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="common/hardware/limelight/LimelightKey.html#AREA" class="member-name-link">AREA</a> - Enum constant in enum class common.hardware.limelight.<a href="common/hardware/limelight/LimelightKey.html" title="enum class in common.hardware.limelight">LimelightKey</a></dt>
 <dd>&nbsp;</dd>
@@ -702,6 +700,10 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Get the Differential coefficient.</div>
 </dd>
+<dt><a href="common/core/subsystems/NAR_PIDSubsystem.html#getDisableConditions()" class="member-name-link">getDisableConditions()</a> - Method in class common.core.subsystems.<a href="common/core/subsystems/NAR_PIDSubsystem.html" title="class in common.core.subsystems">NAR_PIDSubsystem</a></dt>
+<dd>
+<div class="block">Returns the list of disable conditions</div>
+</dd>
 <dt><a href="common/hardware/camera/Camera.html#getDistance(org.photonvision.targeting.PhotonTrackedTarget)" class="member-name-link">getDistance(PhotonTrackedTarget)</a> - Method in class common.hardware.camera.<a href="common/hardware/camera/Camera.html" title="class in common.hardware.camera">Camera</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="common/utility/shuffleboard/NAR_Shuffleboard.html#getDouble(java.lang.String,java.lang.String)" class="member-name-link">getDouble(String, String)</a> - Static method in class common.utility.shuffleboard.<a href="common/utility/shuffleboard/NAR_Shuffleboard.html" title="class in common.utility.shuffleboard">NAR_Shuffleboard</a></dt>
@@ -950,6 +952,8 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="common/hardware/motorcontroller/NAR_TalonSRX.html#getStallCurrent()" class="member-name-link">getStallCurrent()</a> - Method in class common.hardware.motorcontroller.<a href="common/hardware/motorcontroller/NAR_TalonSRX.html" title="class in common.hardware.motorcontroller">NAR_TalonSRX</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="common/core/subsystems/SubsystemState.html#getState()" class="member-name-link">getState()</a> - Method in interface common.core.subsystems.<a href="common/core/subsystems/SubsystemState.html" title="interface in common.core.subsystems">SubsystemState</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="common/core/swerve/SwerveModule.html#getState()" class="member-name-link">getState()</a> - Method in class common.core.swerve.<a href="common/core/swerve/SwerveModule.html" title="class in common.core.swerve">SwerveModule</a></dt>
 <dd>
 <div class="block">Returns the Swerve module's state consisting of velocity and angular position</div>
@@ -974,6 +978,8 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Get the value reference of a widget storing Strings.</div>
 </dd>
+<dt><a href="common/hardware/limelight/Limelight.html#getTargetFieldPosition(double,edu.wpi.first.math.geometry.Pose2d)" class="member-name-link">getTargetFieldPosition(double, Pose2d)</a> - Method in class common.hardware.limelight.<a href="common/hardware/limelight/Limelight.html" title="class in common.hardware.limelight">Limelight</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="common/hardware/motorcontroller/NAR_CANSpark.html#getTemperature()" class="member-name-link">getTemperature()</a> - Method in class common.hardware.motorcontroller.<a href="common/hardware/motorcontroller/NAR_CANSpark.html" title="class in common.hardware.motorcontroller">NAR_CANSpark</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="common/hardware/motorcontroller/NAR_Motor.html#getTemperature()" class="member-name-link">getTemperature()</a> - Method in class common.hardware.motorcontroller.<a href="common/hardware/motorcontroller/NAR_Motor.html" title="class in common.hardware.motorcontroller">NAR_Motor</a></dt>
@@ -1104,8 +1110,6 @@ loadScripts(document, 'script');</script>
 </dd>
 <dt><a href="common/core/swerve/SwerveBase.html#initStateCheck()" class="member-name-link">initStateCheck()</a> - Method in class common.core.swerve.<a href="common/core/swerve/SwerveBase.html" title="class in common.core.swerve">SwerveBase</a></dt>
 <dd>&nbsp;</dd>
-<dt><a href="common/hardware/motorcontroller/NAR_Motor.NAR_MotorIO.html#inputPower" class="member-name-link">inputPower</a> - Variable in class common.hardware.motorcontroller.<a href="common/hardware/motorcontroller/NAR_Motor.NAR_MotorIO.html" title="class in common.hardware.motorcontroller">NAR_Motor.NAR_MotorIO</a></dt>
-<dd>&nbsp;</dd>
 <dt><a href="common/hardware/motorcontroller/NAR_CANSpark.html#instances" class="member-name-link">instances</a> - Static variable in class common.hardware.motorcontroller.<a href="common/hardware/motorcontroller/NAR_CANSpark.html" title="class in common.hardware.motorcontroller">NAR_CANSpark</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="common/core/subsystems/ManipulatorTemplate.html#intake()" class="member-name-link">intake()</a> - Method in class common.core.subsystems.<a href="common/core/subsystems/ManipulatorTemplate.html" title="class in common.core.subsystems">ManipulatorTemplate</a></dt>
@@ -1220,7 +1224,7 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Software wrapper to obtain data from and send data to the physical Limelight.</div>
 </dd>
-<dt><a href="common/hardware/limelight/Limelight.html#%3Cinit%3E(java.lang.String,double,double,double)" class="member-name-link">Limelight(String, double, double, double)</a> - Constructor for class common.hardware.limelight.<a href="common/hardware/limelight/Limelight.html" title="class in common.hardware.limelight">Limelight</a></dt>
+<dt><a href="common/hardware/limelight/Limelight.html#%3Cinit%3E(java.lang.String,double,double,double,double)" class="member-name-link">Limelight(String, double, double, double, double)</a> - Constructor for class common.hardware.limelight.<a href="common/hardware/limelight/Limelight.html" title="class in common.hardware.limelight">Limelight</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="common/hardware/limelight/StreamMode.html#LIMELIGHT_CAMERA" class="member-name-link">LIMELIGHT_CAMERA</a> - Enum constant in enum class common.hardware.limelight.<a href="common/hardware/limelight/StreamMode.html" title="enum class in common.hardware.limelight">StreamMode</a></dt>
 <dd>&nbsp;</dd>
@@ -1240,8 +1244,6 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="common/utility/Log.html#%3Cinit%3E()" class="member-name-link">Log()</a> - Constructor for class common.utility.<a href="common/utility/Log.html" title="class in common.utility">Log</a></dt>
 <dd>&nbsp;</dd>
-<dt><a href="common/core/misc/NAR_Robot.html#logWithAdvantageKit" class="member-name-link">logWithAdvantageKit</a> - Static variable in class common.core.misc.<a href="common/core/misc/NAR_Robot.html" title="class in common.core.misc">NAR_Robot</a></dt>
-<dd>&nbsp;</dd>
 <dt><a href="common/hardware/motorcontroller/MotorControllerConstants.html#LOW_PRIORITY" class="member-name-link">LOW_PRIORITY</a> - Static variable in class common.hardware.motorcontroller.<a href="common/hardware/motorcontroller/MotorControllerConstants.html" title="class in common.hardware.motorcontroller">MotorControllerConstants</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="common/hardware/motorcontroller/MotorControllerConstants.html#LOW_PRIORITY_FREQ" class="member-name-link">LOW_PRIORITY_FREQ</a> - Static variable in class common.hardware.motorcontroller.<a href="common/hardware/motorcontroller/MotorControllerConstants.html" title="class in common.hardware.motorcontroller">MotorControllerConstants</a></dt>
@@ -1259,6 +1261,8 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Creates an Manipulator object.</div>
 </dd>
+<dt><a href="common/core/subsystems/ManipulatorTemplate.html#%3Cinit%3E(common.hardware.motorcontroller.NAR_Motor...)" class="member-name-link">ManipulatorTemplate(NAR_Motor...)</a> - Constructor for class common.core.subsystems.<a href="common/core/subsystems/ManipulatorTemplate.html" title="class in common.core.subsystems">ManipulatorTemplate</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="common/hardware/motorcontroller/MotorControllerConstants.html#MAX_PRIORITY" class="member-name-link">MAX_PRIORITY</a> - Static variable in class common.hardware.motorcontroller.<a href="common/hardware/motorcontroller/MotorControllerConstants.html" title="class in common.hardware.motorcontroller">MotorControllerConstants</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="common/hardware/motorcontroller/MotorControllerConstants.html#MAX_PRIORITY_FREQ" class="member-name-link">MAX_PRIORITY_FREQ</a> - Static variable in class common.hardware.motorcontroller.<a href="common/hardware/motorcontroller/MotorControllerConstants.html" title="class in common.hardware.motorcontroller">MotorControllerConstants</a></dt>
@@ -1313,10 +1317,6 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="common/core/subsystems/ShooterTemplate.html#motors" class="member-name-link">motors</a> - Variable in class common.core.subsystems.<a href="common/core/subsystems/ShooterTemplate.html" title="class in common.core.subsystems">ShooterTemplate</a></dt>
 <dd>&nbsp;</dd>
-<dt><a href="common/core/subsystems/ElevatorTemplate.html#moveElevator(double)" class="member-name-link">moveElevator(double)</a> - Method in class common.core.subsystems.<a href="common/core/subsystems/ElevatorTemplate.html" title="class in common.core.subsystems">ElevatorTemplate</a></dt>
-<dd>
-<div class="block">Moves elevator to a setpoint.</div>
-</dd>
 <dt><a href="common/core/swerve/SwerveConversions.html#MPSToRPM(double,double,double)" class="member-name-link">MPSToRPM(double, double, double)</a> - Static method in class common.core.swerve.<a href="common/core/swerve/SwerveConversions.html" title="class in common.core.swerve">SwerveConversions</a></dt>
 <dd>&nbsp;</dd>
 </dl>
@@ -1392,14 +1392,10 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Store conversion factors for motor</div>
 </dd>
-<dt><a href="common/hardware/motorcontroller/NAR_Motor.NAR_MotorIO.html" class="type-name-link" title="class in common.hardware.motorcontroller">NAR_Motor.NAR_MotorIO</a> - Class in <a href="common/hardware/motorcontroller/package-summary.html">common.hardware.motorcontroller</a></dt>
-<dd>&nbsp;</dd>
 <dt><a href="common/hardware/motorcontroller/NAR_Motor.Neutral.html" class="type-name-link" title="enum class in common.hardware.motorcontroller">NAR_Motor.Neutral</a> - Enum Class in <a href="common/hardware/motorcontroller/package-summary.html">common.hardware.motorcontroller</a></dt>
 <dd>
 <div class="block">Motor states when no voltage is applied</div>
 </dd>
-<dt><a href="common/hardware/motorcontroller/NAR_Motor.NAR_MotorIO.html#%3Cinit%3E()" class="member-name-link">NAR_MotorIO()</a> - Constructor for class common.hardware.motorcontroller.<a href="common/hardware/motorcontroller/NAR_Motor.NAR_MotorIO.html" title="class in common.hardware.motorcontroller">NAR_Motor.NAR_MotorIO</a></dt>
-<dd>&nbsp;</dd>
 <dt><a href="common/core/commands/NAR_PIDCommand.html" class="type-name-link" title="class in common.core.commands">NAR_PIDCommand</a> - Class in <a href="common/core/commands/package-summary.html">common.core.commands</a></dt>
 <dd>
 <div class="block">Team 3128's PIDCommand that uses a ControllerBase to control an output.</div>
@@ -1491,6 +1487,10 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="common/utility/narwhaldashboard/NarwhalDashboard.html#onClose(org.java_websocket.WebSocket,int,java.lang.String,boolean)" class="member-name-link">onClose(WebSocket, int, String, boolean)</a> - Method in class common.utility.narwhaldashboard.<a href="common/utility/narwhaldashboard/NarwhalDashboard.html" title="class in common.utility.narwhaldashboard">NarwhalDashboard</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="common/core/subsystems/NAR_PIDSubsystem.html#onConstraintViolation()" class="member-name-link">onConstraintViolation()</a> - Method in class common.core.subsystems.<a href="common/core/subsystems/NAR_PIDSubsystem.html" title="class in common.core.subsystems">NAR_PIDSubsystem</a></dt>
+<dd>
+<div class="block">Called when the measurement of the controller violates the constraints</div>
+</dd>
 <dt><a href="common/utility/narwhaldashboard/NarwhalDashboard.html#onError(org.java_websocket.WebSocket,java.lang.Exception)" class="member-name-link">onError(WebSocket, Exception)</a> - Method in class common.utility.narwhaldashboard.<a href="common/utility/narwhaldashboard/NarwhalDashboard.html" title="class in common.utility.narwhaldashboard">NarwhalDashboard</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="common/utility/narwhaldashboard/NarwhalDashboard.html#onMessage(org.java_websocket.WebSocket,java.lang.String)" class="member-name-link">onMessage(WebSocket, String)</a> - Method in class common.utility.narwhaldashboard.<a href="common/utility/narwhaldashboard/NarwhalDashboard.html" title="class in common.utility.narwhaldashboard">NarwhalDashboard</a></dt>
@@ -1500,6 +1500,10 @@ loadScripts(document, 'script');</script>
 <dt><a href="common/utility/narwhaldashboard/NarwhalDashboard.html#onOpen(org.java_websocket.WebSocket,org.java_websocket.handshake.ClientHandshake)" class="member-name-link">onOpen(WebSocket, ClientHandshake)</a> - Method in class common.utility.narwhaldashboard.<a href="common/utility/narwhaldashboard/NarwhalDashboard.html" title="class in common.utility.narwhaldashboard">NarwhalDashboard</a></dt>
 <dd>
 <div class="block">Called after connecting to the web server</div>
+</dd>
+<dt><a href="common/core/subsystems/NAR_PIDSubsystem.html#onSafetyTimeout()" class="member-name-link">onSafetyTimeout()</a> - Method in class common.core.subsystems.<a href="common/core/subsystems/NAR_PIDSubsystem.html" title="class in common.core.subsystems">NAR_PIDSubsystem</a></dt>
+<dd>
+<div class="block">Called when the safety timeout is reached.</div>
 </dd>
 <dt><a href="common/utility/narwhaldashboard/NarwhalDashboard.html#onStart()" class="member-name-link">onStart()</a> - Method in class common.utility.narwhaldashboard.<a href="common/utility/narwhaldashboard/NarwhalDashboard.html" title="class in common.utility.narwhaldashboard">NarwhalDashboard</a></dt>
 <dd>&nbsp;</dd>
@@ -1555,6 +1559,18 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Creates a config to set PID and feedforward constants.</div>
 </dd>
+<dt><a href="common/core/subsystems/ElevatorTemplate.html#pidTo(double)" class="member-name-link">pidTo(double)</a> - Method in class common.core.subsystems.<a href="common/core/subsystems/ElevatorTemplate.html" title="class in common.core.subsystems">ElevatorTemplate</a></dt>
+<dd>
+<div class="block">Moves elevator to a setpoint.</div>
+</dd>
+<dt><a href="common/core/subsystems/PivotTemplate.html#pidTo(double)" class="member-name-link">pidTo(double)</a> - Method in class common.core.subsystems.<a href="common/core/subsystems/PivotTemplate.html" title="class in common.core.subsystems">PivotTemplate</a></dt>
+<dd>
+<div class="block">Moves pivot to a setpoint.</div>
+</dd>
+<dt><a href="common/core/subsystems/ShooterTemplate.html#pidTo(double)" class="member-name-link">pidTo(double)</a> - Method in class common.core.subsystems.<a href="common/core/subsystems/ShooterTemplate.html" title="class in common.core.subsystems">ShooterTemplate</a></dt>
+<dd>
+<div class="block">Runs shooter at desired RPM.</div>
+</dd>
 <dt><a href="common/hardware/limelight/Pipeline.html" class="type-name-link" title="enum class in common.hardware.limelight">Pipeline</a> - Enum Class in <a href="common/hardware/limelight/package-summary.html">common.hardware.limelight</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="common/hardware/limelight/LimelightKey.html#PIPELINE" class="member-name-link">PIPELINE</a> - Enum constant in enum class common.hardware.limelight.<a href="common/hardware/limelight/LimelightKey.html" title="enum class in common.hardware.limelight">LimelightKey</a></dt>
@@ -1566,10 +1582,6 @@ loadScripts(document, 'script');</script>
 <dt><a href="common/core/subsystems/PivotTemplate.html#%3Cinit%3E(common.core.controllers.ControllerBase,common.hardware.motorcontroller.NAR_Motor...)" class="member-name-link">PivotTemplate(ControllerBase, NAR_Motor...)</a> - Constructor for class common.core.subsystems.<a href="common/core/subsystems/PivotTemplate.html" title="class in common.core.subsystems">PivotTemplate</a></dt>
 <dd>
 <div class="block">Creates an Pivot object.</div>
-</dd>
-<dt><a href="common/core/subsystems/PivotTemplate.html#pivotTo(double)" class="member-name-link">pivotTo(double)</a> - Method in class common.core.subsystems.<a href="common/core/subsystems/PivotTemplate.html" title="class in common.core.subsystems">PivotTemplate</a></dt>
-<dd>
-<div class="block">Moves pivot to a setpoint.</div>
 </dd>
 <dt><a href="common/utility/tester/PlateauTest.html" class="type-name-link" title="class in common.utility.tester">PlateauTest</a> - Class in <a href="common/utility/tester/package-summary.html">common.utility.tester</a></dt>
 <dd>&nbsp;</dd>
@@ -1614,8 +1626,6 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Logical inverse of the Pose exponential from 254.</div>
 </dd>
-<dt><a href="common/hardware/motorcontroller/NAR_Motor.NAR_MotorIO.html#position" class="member-name-link">position</a> - Variable in class common.hardware.motorcontroller.<a href="common/hardware/motorcontroller/NAR_Motor.NAR_MotorIO.html" title="class in common.hardware.motorcontroller">NAR_Motor.NAR_MotorIO</a></dt>
-<dd>&nbsp;</dd>
 <dt><a href="common/hardware/motorcontroller/NAR_Motor.Control.html#Position" class="member-name-link">Position</a> - Enum constant in enum class common.hardware.motorcontroller.<a href="common/hardware/motorcontroller/NAR_Motor.Control.html" title="enum class in common.hardware.motorcontroller">NAR_Motor.Control</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="common/core/controllers/Controller.Type.html#POSITION" class="member-name-link">POSITION</a> - Enum constant in enum class common.core.controllers.<a href="common/core/controllers/Controller.Type.html" title="enum class in common.core.controllers">Controller.Type</a></dt>
@@ -1688,6 +1698,8 @@ loadScripts(document, 'script');</script>
 </dd>
 <dt><a href="common/hardware/camera/ParseJson.html#returnHashMap()" class="member-name-link">returnHashMap()</a> - Method in class common.hardware.camera.<a href="common/hardware/camera/ParseJson.html" title="class in common.hardware.camera">ParseJson</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="common/hardware/limelight/Limelight.html#robotCenterDistance" class="member-name-link">robotCenterDistance</a> - Variable in class common.hardware.limelight.<a href="common/hardware/limelight/Limelight.html" title="class in common.hardware.limelight">Limelight</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="common/core/swerve/SwerveConversions.html#rotationsToDegrees(double,double)" class="member-name-link">rotationsToDegrees(double, double)</a> - Static method in class common.core.swerve.<a href="common/core/swerve/SwerveConversions.html" title="class in common.core.swerve">SwerveConversions</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="common/core/swerve/SwerveConversions.html#rotationsToMeters(double,double,double)" class="member-name-link">rotationsToMeters(double, double, double)</a> - Static method in class common.core.swerve.<a href="common/core/swerve/SwerveConversions.html" title="class in common.core.swerve">SwerveConversions</a></dt>
@@ -1698,26 +1710,26 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="common/core/swerve/SwerveConversions.html#RPMToMPS(double,double,double)" class="member-name-link">RPMToMPS(double, double, double)</a> - Static method in class common.core.swerve.<a href="common/core/swerve/SwerveConversions.html" title="class in common.core.swerve">SwerveConversions</a></dt>
 <dd>&nbsp;</dd>
-<dt><a href="common/core/subsystems/ElevatorTemplate.html#runElevator(double)" class="member-name-link">runElevator(double)</a> - Method in class common.core.subsystems.<a href="common/core/subsystems/ElevatorTemplate.html" title="class in common.core.subsystems">ElevatorTemplate</a></dt>
+<dt><a href="common/core/subsystems/ElevatorTemplate.html#run(double)" class="member-name-link">run(double)</a> - Method in class common.core.subsystems.<a href="common/core/subsystems/ElevatorTemplate.html" title="class in common.core.subsystems">ElevatorTemplate</a></dt>
 <dd>
 <div class="block">Sets elevator power.</div>
 </dd>
-<dt><a href="common/core/subsystems/ManipulatorTemplate.html#runManipulator(double)" class="member-name-link">runManipulator(double)</a> - Method in class common.core.subsystems.<a href="common/core/subsystems/ManipulatorTemplate.html" title="class in common.core.subsystems">ManipulatorTemplate</a></dt>
+<dt><a href="common/core/subsystems/ManipulatorTemplate.html#run(double)" class="member-name-link">run(double)</a> - Method in class common.core.subsystems.<a href="common/core/subsystems/ManipulatorTemplate.html" title="class in common.core.subsystems">ManipulatorTemplate</a></dt>
 <dd>
 <div class="block">Sets manipulator power.</div>
+</dd>
+<dt><a href="common/core/subsystems/PivotTemplate.html#run(double)" class="member-name-link">run(double)</a> - Method in class common.core.subsystems.<a href="common/core/subsystems/PivotTemplate.html" title="class in common.core.subsystems">PivotTemplate</a></dt>
+<dd>
+<div class="block">Sets pivot power.</div>
+</dd>
+<dt><a href="common/core/subsystems/ShooterTemplate.html#run(double)" class="member-name-link">run(double)</a> - Method in class common.core.subsystems.<a href="common/core/subsystems/ShooterTemplate.html" title="class in common.core.subsystems">ShooterTemplate</a></dt>
+<dd>
+<div class="block">Runs the shooter at a specific power.</div>
 </dd>
 <dt><a href="common/utility/narwhaldashboard/NarwhalDashboard.State.html#RUNNING" class="member-name-link">RUNNING</a> - Enum constant in enum class common.utility.narwhaldashboard.<a href="common/utility/narwhaldashboard/NarwhalDashboard.State.html" title="enum class in common.utility.narwhaldashboard">NarwhalDashboard.State</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="common/utility/tester/Tester.TestState.html#RUNNING" class="member-name-link">RUNNING</a> - Enum constant in enum class common.utility.tester.<a href="common/utility/tester/Tester.TestState.html" title="enum class in common.utility.tester">Tester.TestState</a></dt>
 <dd>&nbsp;</dd>
-<dt><a href="common/core/subsystems/PivotTemplate.html#runPivot(double)" class="member-name-link">runPivot(double)</a> - Method in class common.core.subsystems.<a href="common/core/subsystems/PivotTemplate.html" title="class in common.core.subsystems">PivotTemplate</a></dt>
-<dd>
-<div class="block">Sets pivot power.</div>
-</dd>
-<dt><a href="common/core/subsystems/ShooterTemplate.html#runShooter(double)" class="member-name-link">runShooter(double)</a> - Method in class common.core.subsystems.<a href="common/core/subsystems/ShooterTemplate.html" title="class in common.core.subsystems">ShooterTemplate</a></dt>
-<dd>
-<div class="block">Runs the shooter at a specific power.</div>
-</dd>
 <dt><a href="common/utility/tester/Tester.html#runTest(java.lang.String)" class="member-name-link">runTest(String)</a> - Method in class common.utility.tester.<a href="common/utility/tester/Tester.html" title="class in common.utility.tester">Tester</a></dt>
 <dd>
 <div class="block">Runs the Systems tests for a system.</div>
@@ -1995,6 +2007,8 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Sets the setpoint for the controller.</div>
 </dd>
+<dt><a href="common/core/subsystems/SubsystemState.html#setState(T)" class="member-name-link">setState(T)</a> - Method in interface common.core.subsystems.<a href="common/core/subsystems/SubsystemState.html" title="interface in common.core.subsystems">SubsystemState</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="common/hardware/motorcontroller/NAR_TalonSRX.html#setStatusFramePeriod(com.ctre.phoenix.motorcontrol.StatusFrameEnhanced,int)" class="member-name-link">setStatusFramePeriod(StatusFrameEnhanced, int)</a> - Method in class common.hardware.motorcontroller.<a href="common/hardware/motorcontroller/NAR_TalonSRX.html" title="class in common.hardware.motorcontroller">NAR_TalonSRX</a></dt>
 <dd>
 <div class="block">Set the rate of transmission for status frames from the TalonFX</div>
@@ -2083,10 +2097,6 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Set the z-axis deadband</div>
 </dd>
-<dt><a href="common/core/subsystems/ShooterTemplate.html#shoot(double)" class="member-name-link">shoot(double)</a> - Method in class common.core.subsystems.<a href="common/core/subsystems/ShooterTemplate.html" title="class in common.core.subsystems">ShooterTemplate</a></dt>
-<dd>
-<div class="block">Runs shooter at desired RPM.</div>
-</dd>
 <dt><a href="common/core/subsystems/ShooterTemplate.html" class="type-name-link" title="class in common.core.subsystems">ShooterTemplate</a> - Class in <a href="common/core/subsystems/package-summary.html">common.core.subsystems</a></dt>
 <dd>
 <div class="block">Team 3128's Shooter Template class.</div>
@@ -2107,8 +2117,6 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="common/hardware/motorcontroller/MotorControllerConstants.html#SPARKMAX_RPM_TO_NUpS" class="member-name-link">SPARKMAX_RPM_TO_NUpS</a> - Static variable in class common.hardware.motorcontroller.<a href="common/hardware/motorcontroller/MotorControllerConstants.html" title="class in common.hardware.motorcontroller">MotorControllerConstants</a></dt>
 <dd>&nbsp;</dd>
-<dt><a href="common/hardware/motorcontroller/NAR_Motor.NAR_MotorIO.html#stallCurrent" class="member-name-link">stallCurrent</a> - Variable in class common.hardware.motorcontroller.<a href="common/hardware/motorcontroller/NAR_Motor.NAR_MotorIO.html" title="class in common.hardware.motorcontroller">NAR_Motor.NAR_MotorIO</a></dt>
-<dd>&nbsp;</dd>
 <dt><a href="common/core/misc/NAR_Robot.html#startCompetition()" class="member-name-link">startCompetition()</a> - Method in class common.core.misc.<a href="common/core/misc/NAR_Robot.html" title="class in common.core.misc">NAR_Robot</a></dt>
 <dd>
 <div class="block">Provide an alternate "main loop" via startCompetition().</div>
@@ -2121,6 +2129,8 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Vibrates the controller</div>
 </dd>
+<dt><a href="common/core/subsystems/SubsystemState.html#stateIs(T)" class="member-name-link">stateIs(T)</a> - Method in interface common.core.subsystems.<a href="common/core/subsystems/SubsystemState.html" title="interface in common.core.subsystems">SubsystemState</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="common/hardware/motorcontroller/NAR_CANSpark.SparkMaxConfig.html#status0" class="member-name-link">status0</a> - Variable in enum class common.hardware.motorcontroller.<a href="common/hardware/motorcontroller/NAR_CANSpark.SparkMaxConfig.html" title="enum class in common.hardware.motorcontroller">NAR_CANSpark.SparkMaxConfig</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="common/hardware/motorcontroller/NAR_CANSpark.SparkMaxConfig.html#status1" class="member-name-link">status1</a> - Variable in enum class common.hardware.motorcontroller.<a href="common/hardware/motorcontroller/NAR_CANSpark.SparkMaxConfig.html" title="enum class in common.hardware.motorcontroller">NAR_CANSpark.SparkMaxConfig</a></dt>
@@ -2146,6 +2156,8 @@ loadScripts(document, 'script');</script>
 <div class="block">Stops vibrating the controller</div>
 </dd>
 <dt><a href="common/hardware/limelight/StreamMode.html" class="type-name-link" title="enum class in common.hardware.limelight">StreamMode</a> - Enum Class in <a href="common/hardware/limelight/package-summary.html">common.hardware.limelight</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="common/core/subsystems/SubsystemState.html" class="type-name-link" title="interface in common.core.subsystems">SubsystemState</a>&lt;<a href="common/core/subsystems/SubsystemState.html" title="type parameter in SubsystemState">T</a> extends <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Enum.html" title="class or interface in java.lang" class="external-link">Enum</a>&lt;<a href="common/core/subsystems/SubsystemState.html" title="type parameter in SubsystemState">T</a>&gt;&gt; - Interface in <a href="common/core/subsystems/package-summary.html">common.core.subsystems</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="common/core/swerve/SwerveBase.html" class="type-name-link" title="class in common.core.swerve">SwerveBase</a> - Class in <a href="common/core/swerve/package-summary.html">common.core.swerve</a></dt>
 <dd>&nbsp;</dd>
@@ -2289,8 +2301,6 @@ loadScripts(document, 'script');</script>
 <dt><a href="common/hardware/camera/Camera.html#updateCounter" class="member-name-link">updateCounter</a> - Static variable in class common.hardware.camera.<a href="common/hardware/camera/Camera.html" title="class in common.hardware.camera">Camera</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="common/hardware/camera/Camera.html#updatedPose" class="member-name-link">updatedPose</a> - Variable in class common.hardware.camera.<a href="common/hardware/camera/Camera.html" title="class in common.hardware.camera">Camera</a></dt>
-<dd>&nbsp;</dd>
-<dt><a href="common/hardware/motorcontroller/NAR_Motor.html#updateIO(common.hardware.motorcontroller.NAR_MotorIOAutoLogged)" class="member-name-link">updateIO(NAR_MotorIOAutoLogged)</a> - Method in class common.hardware.motorcontroller.<a href="common/hardware/motorcontroller/NAR_Motor.html" title="class in common.hardware.motorcontroller">NAR_Motor</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="common/core/controllers/ControllerBase.html#useOutput()" class="member-name-link">useOutput()</a> - Method in class common.core.controllers.<a href="common/core/controllers/ControllerBase.html" title="class in common.core.controllers">ControllerBase</a></dt>
 <dd>
@@ -2443,8 +2453,6 @@ the order they are declared.</div>
 <div class="block">Returns an array containing the constants of this enum class, in
 the order they are declared.</div>
 </dd>
-<dt><a href="common/hardware/motorcontroller/NAR_Motor.NAR_MotorIO.html#velocity" class="member-name-link">velocity</a> - Variable in class common.hardware.motorcontroller.<a href="common/hardware/motorcontroller/NAR_Motor.NAR_MotorIO.html" title="class in common.hardware.motorcontroller">NAR_Motor.NAR_MotorIO</a></dt>
-<dd>&nbsp;</dd>
 <dt><a href="common/hardware/motorcontroller/NAR_Motor.Control.html#Velocity" class="member-name-link">Velocity</a> - Enum constant in enum class common.hardware.motorcontroller.<a href="common/hardware/motorcontroller/NAR_Motor.Control.html" title="enum class in common.hardware.motorcontroller">NAR_Motor.Control</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="common/core/controllers/Controller.Type.html#VELOCITY" class="member-name-link">VELOCITY</a> - Enum constant in enum class common.core.controllers.<a href="common/core/controllers/Controller.Type.html" title="enum class in common.core.controllers">Controller.Type</a></dt>
