@@ -1,10 +1,5 @@
 package common.core.misc;
 
-import java.lang.management.GarbageCollectorMXBean;
-import java.lang.management.ManagementFactory;
-import java.lang.reflect.Method;
-import java.time.LocalDateTime;
-import java.util.List;
 import java.util.PriorityQueue;
 
 import edu.wpi.first.hal.DriverStationJNI;
@@ -12,7 +7,6 @@ import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.NotifierJNI;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.IterativeRobotBase;
 import edu.wpi.first.wpilibj.Timer;
 
@@ -122,7 +116,6 @@ public class NAR_Robot extends IterativeRobotBase {
     /** Provide an alternate "main loop" via startCompetition(). */
     @Override
     public void startCompetition() {
-        long initStart = 0;
         
         robotInit();
 
@@ -130,7 +123,6 @@ public class NAR_Robot extends IterativeRobotBase {
             simulationInit();
         }
 
-        long initEnd = 0;
 
         // Tell the DS that the robot is ready to be enabled
         System.out.println("********** Robot program startup complete **********");

@@ -1,6 +1,5 @@
 package common.core.swerve;
 
-import common.core.misc.NAR_Robot;
 import common.hardware.motorcontroller.NAR_Motor.Control;
 import common.utility.narwhaldashboard.NarwhalDashboard;
 import common.utility.shuffleboard.NAR_Shuffleboard;
