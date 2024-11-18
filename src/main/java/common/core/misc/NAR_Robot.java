@@ -15,8 +15,8 @@ import edu.wpi.first.wpilibj.Timer;
  *  
  * <p>NOTES:
  * <ul>
- * <li> TimedRobot implements the IterativeRobotBase robot program framework.
- * <li> The TimedRobot class is intended to be subclassed by a user creating a robot program.
+ * <li> NAR_Robot IS TimedRobot, just with QoL improvements.
+ * <li> The NAR_Robot class is intended to be subclassed by a user creating a robot program.
  * <li> Periodic() functions from the base class are called on an interval by a Notifier instance.
  * </ul>
  * 
@@ -102,7 +102,7 @@ public class NAR_Robot extends IterativeRobotBase {
         addPeriodic(this::loopFunc, period);
 
         
-        NotifierJNI.setNotifierName(m_notifier, "TimedRobot");
+        NotifierJNI.setNotifierName(m_notifier, "NAR_Robot");
 
         HAL.report(tResourceType.kResourceType_Framework, tInstances.kFramework_Timed);
     }
