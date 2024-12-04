@@ -26,8 +26,10 @@ public abstract class NAR_Motor implements AutoCloseable {
         public final double distanceFactor;
         public final double timeFactor;
         public final int currentLimit;
+        public final double voltageCompensation;
         public final boolean inverted;
         public final Neutral mode;
+        public final StatusFrames statusFrames;
 
         /**
          * Creates a new motor config
@@ -36,14 +38,32 @@ public abstract class NAR_Motor implements AutoCloseable {
          * @param currentLimit The currentLimit for the motor
          * @param inverted Whether or not the motor is inverted.
          * @param mode Neutral mode for the motor.
+         * @param statusFrames Status frames for the motor.
          */
-        public MotorConfig(double distanceFactor, double timeFactor, int currentLimit, boolean inverted, Neutral mode) {
+        public MotorConfig(double distanceFactor, double timeFactor, int currentLimit, double voltageCompensation, boolean inverted, Neutral mode, StatusFrames statusFrames) {
             this.distanceFactor = distanceFactor;
             this.timeFactor = timeFactor;
             this.currentLimit = currentLimit;
+            this.voltageCompensation = voltageCompensation;
             this.inverted = inverted;
             this.mode = mode;
+            this.statusFrames = statusFrames;
         }
+
+        public MotorConfig invert() {
+            return new MotorConfig(this.distanceFactor, this.timeFactor, this.currentLimit, this.voltageCompensation, !this.inverted, this.mode, this.statusFrames);
+        }
+
+        public MotorConfig invertFollower() {
+            return new MotorConfig(this.distanceFactor, this.timeFactor, this.currentLimit, this.voltageCompensation, !this.inverted, this.mode, StatusFrames.FOLLOWER);
+        }
+    }
+
+    public enum StatusFrames {
+        DEFAULT,
+        POSITION,
+        VELOCITY,
+        FOLLOWER;
     }
 
     /**
@@ -98,23 +118,23 @@ public abstract class NAR_Motor implements AutoCloseable {
         public double velocity = 0;
 	}
 
-    private NAR_MotorIOAutoLogged io;
+    // private NAR_MotorIOAutoLogged io;
 
-    public void updateIO(NAR_MotorIOAutoLogged io){
-        io.inputPower = prevValue;
-        io.appliedOutput = getAppliedOutput();
-        io.stallCurrent = getStallCurrent();
-        io.position = getPosition();
-        io.velocity = getVelocity();
-    }
+    // public void updateIO(NAR_MotorIOAutoLogged io){
+    //     io.inputPower = prevValue;
+    //     io.appliedOutput = getAppliedOutput();
+    //     io.stallCurrent = getStallCurrent();
+    //     io.position = getPosition();
+    //     io.velocity = getVelocity();
+    // }
 
     public NAR_Motor(int id){
         if (NAR_Robot.logWithAdvantageKit) {
-            io = new NAR_MotorIOAutoLogged();
-            NAR_Robot.addPeriodic(()-> {
-                updateIO(io);
-                Logger.processInputs("Motors/" + id, io);
-            }, 0.02);
+            // io = new NAR_MotorIOAutoLogged();
+            // NAR_Robot.addPeriodic(()-> {
+            //     updateIO(io);
+            //     Logger.processInputs("Motors/" + id, io);
+            // }, 0.02);
         }
     }
 
@@ -184,7 +204,22 @@ public abstract class NAR_Motor implements AutoCloseable {
         setTimeConversionFactor(config.timeFactor);
         setInverted(config.inverted);
         setCurrentLimit(config.currentLimit);
+        enableVoltageCompensation(config.voltageCompensation);
         setNeutralMode(config.mode);
+        switch(config.statusFrames) {
+            case DEFAULT:
+                setDefaultStatusFrames();
+                break;
+            case POSITION:
+                setPositionStatusFrames();
+                break;
+            case VELOCITY:
+                setVelocityStatusFrames();
+                break;
+            case FOLLOWER:
+                setFollowerStatusFrames();
+                break;
+        }
     }
 
     /**

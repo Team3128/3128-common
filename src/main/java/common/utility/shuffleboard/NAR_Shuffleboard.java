@@ -344,6 +344,21 @@ public class NAR_Shuffleboard {
     }
 
     /**
+     * Creates a debug widget, allows user to edit variable from Shuffleboard
+     * 
+     * @param tabName the title of the tab to select
+     * @param name the name of the widget
+     * @param Default starting value for the widget
+     * @param x x-coord of the widget
+     * @param y y-coord of the widget
+     * @return BooleanSupplier containing the value in the widget
+     */
+    public static BooleanSupplier debug(String tabName, String name, boolean Default, int x, int y){
+        final GenericEntry tab = addData(tabName, name, Default, x, y).withWidget(BuiltInWidgets.kToggleSwitch).getEntry();
+        return ()-> tab.getBoolean(Default);
+    }
+
+    /**
      * Get the value reference of a widget storing longs.
      * 
      * @param tabName the title of the tab to select

@@ -49,7 +49,7 @@ public class CmdSysId extends Command {
         boolean goingForward,
         Subsystem... subsystems
         ) {
-        this.data = new FFCharacterization(name);
+        this.data = new FFCharacterization(name, FFCharacterization.Type.REGRESSION, rampRateVoltsPerSec);
         this.voltageConsumer = voltageConsumer;
         this.velocitySupplier = velocitySupplier;
         this.positionSupplier = positionSupplier;

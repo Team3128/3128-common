@@ -3,8 +3,8 @@ package common.core.controllers;
 import java.util.LinkedList;
 import java.util.function.DoubleConsumer;
 import java.util.function.DoubleSupplier;
-
 import common.hardware.motorcontroller.NAR_Motor;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
@@ -22,8 +22,12 @@ public abstract class ControllerBase implements Sendable, AutoCloseable {
     private final LinkedList<DoubleConsumer> consumers = new LinkedList<DoubleConsumer>();
     protected DoubleSupplier measurement;
 
-    protected DoubleSupplier kS, kV, kA, kG;
-    protected DoubleSupplier kG_Function = ()-> 1;
+    protected PIDFFConfig config;
+
+    protected double inputMin, inputMax, outputMin, outputMax;
+
+    protected boolean enabled;
+    protected boolean disabledAtSetpoint;
 
     /**
      * Creates a base controller object to control motion.
@@ -33,12 +37,18 @@ public abstract class ControllerBase implements Sendable, AutoCloseable {
      */
     public ControllerBase(PIDFFConfig config, double period) {
         controller = new PIDController(config.kP, config.kI, config.kD, period);
-        this.kS = ()-> config.kS;
-        this.kV = ()-> config.kV;
-        this.kA = ()-> config.kA;
-        this.kG = ()-> config.kG;
+        this.config = config;
 
-        kG_Function = ()-> 1;
+        this.inputMin = Double.NEGATIVE_INFINITY;
+        this.inputMax = Double.POSITIVE_INFINITY;
+        this.outputMin = Double.NEGATIVE_INFINITY;
+        this.outputMax = Double.POSITIVE_INFINITY;
+
+        this.enabled = false;
+    }
+
+    public ControllerBase(PIDFFConfig config) {
+        this(config, 0.02);
     }
 
     /**
@@ -54,7 +64,8 @@ public abstract class ControllerBase implements Sendable, AutoCloseable {
      * @param motor {@link NAR_Motor} motor type.
      */
     public void addMotor(NAR_Motor motor) {
-        addOutput(motor::set);
+        addOutput(motor::setVolts);
+        setOutputRange(-12, 12);
     }
 
     /**
@@ -62,7 +73,8 @@ public abstract class ControllerBase implements Sendable, AutoCloseable {
      * @param motor {@link MotorController} motor type.
      */
     public void addMotor(MotorController motor) {
-        addOutput(motor::set);
+        addOutput(motor::setVoltage);
+        setOutputRange(-12, 12);
     }
 
     /**
@@ -73,13 +85,29 @@ public abstract class ControllerBase implements Sendable, AutoCloseable {
         consumers.add(output);
     }
 
+    public void configureFeedback(DoubleSupplier measurement, DoubleConsumer output){
+        setMeasurementSource(measurement);
+        addOutput(output);
+    }
+
+    public abstract void configureFeedback(NAR_Motor motor);
+
     /**
-     * Calculates and sends output.
-     * @return Calculated output.
+     * Returns the measurement of the controller.
+     * @return The measurement of the controller.
+     */
+    public double getMeasurement() {
+        return measurement.getAsDouble();
+    }
+
+    /**
+     * Calculates and sends output voltage.
+     * @return Calculated output voltage.
      */
     public double useOutput() {
-        if (measurement == null) return 0;
-        final double output = calculate(measurement.getAsDouble());
+        if(isEnabled() && atSetpoint() && disabledAtSetpoint) disable();
+        if (measurement == null || !isEnabled()) return 0;
+        final double output = MathUtil.clamp(calculate(getMeasurement()), outputMin, outputMax);
         for (final DoubleConsumer consumer : consumers) {
             consumer.accept(output);
         }
@@ -134,9 +162,7 @@ public abstract class ControllerBase implements Sendable, AutoCloseable {
      * @param kd The derivative coefficient.
      */
     public void setPID(double kp, double ki, double kd) {
-        setP(kp);
-        setI(ki);
-        setD(kd);
+        controller.setPID(kp, ki, kd);
     }
 
     /**
@@ -194,6 +220,56 @@ public abstract class ControllerBase implements Sendable, AutoCloseable {
     }
 
     /**
+     * Sets the minimum and maximum values expected from the input.
+     *
+     * <p>Input values outside of this range will be clamped.
+     *
+     * @param minimumInput The minimum value expected from the input.
+     * @param maximumInput The maximum value expected from the input.
+     */
+    public void setInputRange(double minimumInput, double maximumInput) {
+        inputMin = minimumInput;
+        inputMax = maximumInput;
+    }
+
+    /**
+     * Returns the minimum and maximum values expected from the input.
+     * 
+     * <p>First element is inputMin.
+     * <p>Second element is inputMax.
+     * 
+     * @return double[] with inputMin and inputMax.
+     */
+    public double[] getInputRange() {
+        return new double[] {inputMin, inputMax};
+    }
+
+    /**
+     * Sets the minimum and maximum values of the controller output.
+     *
+     * <p>Output values outside of this range will be clamped.
+     *
+     * @param minimumOutput The minimum value to write.
+     * @param maximumOutput The maximum value to write.
+     */
+    public void setOutputRange(double minimumOutput, double maximumOutput) {
+        outputMin = minimumOutput;
+        outputMax = maximumOutput;
+    }
+
+    /**
+     * Returns the minimum and maximum values expected from the output.
+     * 
+     * <p>First element is outputMin.
+     * <p>Second element is outputMax.
+     * 
+     * @return double[] with outputMin and outputMax.
+     */
+    public double[] getOutputRange() {
+        return new double[] {outputMin, outputMax};
+    }
+
+    /**
      * Enables continuous input.
      *
      * <p>Rather then using the max and min input range as constraints, it considers them to be the
@@ -209,20 +285,24 @@ public abstract class ControllerBase implements Sendable, AutoCloseable {
     /**
      * Sets the error which is considered tolerable for use with atSetpoint().
      *
-     * @param positionTolerance Position error which is tolerable.
+     * @param measurementTolerance Position error which is tolerable.
      */
-    public void setTolerance(double positionTolerance) {
-        setTolerance(positionTolerance, Double.POSITIVE_INFINITY);
+    public void setTolerance(double measurementTolerance) {
+        setTolerance(measurementTolerance, Double.POSITIVE_INFINITY);
     }
 
     /**
      * Sets the error which is considered tolerable for use with atSetpoint().
      *
-     * @param positionTolerance Position error which is tolerable.
-     * @param velocityTolerance Velocity error which is tolerable.
+     * @param measurementTolerance Position error which is tolerable.
+     * @param measurementROCTolerance Velocity error which is tolerable.
      */
-    public void setTolerance(double positionTolerance, double velocityTolerance) {
-        controller.setTolerance(positionTolerance, velocityTolerance);
+    public void setTolerance(double measurementTolerance, double measurementROCTolerance) {
+        controller.setTolerance(measurementTolerance, measurementROCTolerance);
+    }
+
+    public void setDisableAtSetpoint(boolean disabledAtSetpoint) {
+        this.disabledAtSetpoint = disabledAtSetpoint;
     }
 
     /**
@@ -243,7 +323,7 @@ public abstract class ControllerBase implements Sendable, AutoCloseable {
      */
     public void setSetpoint(double setpoint) {
         reset();
-        controller.setSetpoint(setpoint);
+        controller.setSetpoint(MathUtil.clamp(setpoint, inputMin, inputMax));
     }
 
     /**
@@ -263,103 +343,9 @@ public abstract class ControllerBase implements Sendable, AutoCloseable {
         }
     }
 
-    /**
-     * Sets the static gain.
-     * @param kS The constant power required to overcome static friction as a double.
-     */
-    public void setkS(double kS) {
-        setkS(()-> kS);
+    public PIDFFConfig getConfig() {
+        return this.config;
     }
-
-    /**
-     * Sets the static gain.
-     * @param kS Modifies kS based on the function.
-     */
-    public void setkS(DoubleSupplier kS) {
-        this.kS = kS;
-    }
-
-    /**
-     * Sets the velocity gain.
-     * @param kV The constant power required to maintain a set velocity as a double.
-     */
-    public void setkV(double kV) {
-        setkV(()-> kV);
-    }
-
-    /**
-     * Sets the velocity gain.
-     * @param kV Modifies kV based on the function.
-     */
-    public void setkV(DoubleSupplier kV) {
-        this.kV = kV;
-    }
-
-    /**
-     * Sets the velocity gain.
-     * @param kA Modifies kV based on the function.
-     */
-    public void setkA(DoubleSupplier kA) {
-        this.kA = kA;
-    }
-
-    /**
-     * Sets the gravity gain.
-     * @param kG The constant power required to overcome gravity as a double.
-     */
-    public void setkG(double kG) {
-        this.kG = ()-> kG;
-    }
-
-    /**
-     * Sets the gravity gain.
-     * @param kG Modifies kG based on the function.
-     */
-    public void setkG(DoubleSupplier kG) {
-        this.kG = kG;
-    }
-
-    /**
-     * Sets a function to modify gravity gain based on another factor.
-     * <p>Example use would be a Pivot which would have gravity gain dependent on angle.
-     * @param kG_Function DoubleSupplier with specified logic.
-     */
-    public void setkG_Function(DoubleSupplier kG_Function) {
-        this.kG_Function = kG_Function;
-    }
-
-    /**
-     * Returns static gain.
-     * @return returns kS as a double.
-     */
-    public double getkS() {
-        return kS.getAsDouble();
-    }
-
-    /**
-     * Returns velocity gain.
-     * @return returns kV as a double.
-     */
-    public double getkV() {
-        return kV.getAsDouble();
-    }
-
-    /**
-     * Returns acceleration gain.
-     * @return returns kA as a double.
-     */
-    public double getkA() {
-        return kA.getAsDouble();
-    }
-    
-    /**
-     * Returns gravity gain.
-     * @return returns kG as a double.
-     */
-    public double getkG() {
-        return kG.getAsDouble();
-    }
-
     /**
      * Gets the period of this controller.
      *
@@ -378,6 +364,19 @@ public abstract class ControllerBase implements Sendable, AutoCloseable {
         return controller;
     }
 
+    public void enable() {
+        enabled = true;
+        controller.reset();
+    }
+
+    public void disable() {
+        enabled = false;
+    }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+    
     @Override
     public void initSendable(SendableBuilder builder) {
         builder.setSmartDashboardType("PIDController");

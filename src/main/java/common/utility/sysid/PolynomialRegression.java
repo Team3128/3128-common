@@ -1,5 +1,8 @@
 package common.utility.sysid;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import Jama.Matrix;
 import Jama.QRDecomposition;
 
@@ -144,6 +147,14 @@ public class PolynomialRegression implements Comparable<PolynomialRegression> {
         // horner's method
         double y = 0.0;
         for (int j = degree; j >= 0; j--) y = beta(j) + (x * y);
+        return y;
+    }
+
+    public List<Double> predict(List<Double> x) {
+        List<Double> y = new ArrayList<>();
+        for(double i : x) {
+            y.add(predict(i));
+        }
         return y;
     }
 

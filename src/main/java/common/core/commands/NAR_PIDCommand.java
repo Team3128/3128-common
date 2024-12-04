@@ -8,6 +8,7 @@ import java.util.function.DoubleConsumer;
 import common.core.controllers.ControllerBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 
 /**
  * Team 3128's PIDCommand that uses a ControllerBase to control an output.
@@ -15,7 +16,7 @@ import edu.wpi.first.wpilibj2.command.Subsystem;
  * @since 2024 Crescendo
  * @author Mason Lam
  */
-public class NAR_PIDCommand extends Command {
+public class NAR_PIDCommand extends WaitCommand {
     /** Controller. */
     protected final ControllerBase controller;
 
@@ -27,7 +28,9 @@ public class NAR_PIDCommand extends Command {
             DoubleSupplier measurementSource,
             DoubleSupplier setpointSource,
             DoubleConsumer useOutput,
+            double timeout,
             Subsystem... requirements) {
+        super(timeout);
         requireNonNullParam(controller, "controller", "NAR_PIDCommand");
         requireNonNullParam(measurementSource, "measurementSource", "NAR_PIDCommand");
         requireNonNullParam(setpointSource, "setpointSource", "NAR_PIDCommand");
@@ -37,6 +40,7 @@ public class NAR_PIDCommand extends Command {
 
         controller.setMeasurementSource(measurementSource);
         controller.addOutput(useOutput);
+        controller.reset();
         addRequirements(requirements);
     }
 
@@ -57,6 +61,6 @@ public class NAR_PIDCommand extends Command {
 
     @Override
     public boolean isFinished() {
-        return controller.atSetpoint();
+        return controller.atSetpoint() || super.isFinished();
     }
 }

@@ -58,7 +58,7 @@ public class SwerveModule {
         this.maxSpeed = config.maxSpeed;
 
         final PIDFFConfig drivePIDConfig = driveConfig.pidffConfig;
-        feedforward = new SimpleMotorFeedforward(drivePIDConfig.kS, drivePIDConfig.kV, drivePIDConfig.kA);
+        feedforward = new SimpleMotorFeedforward(drivePIDConfig.getkS(), drivePIDConfig.getkV(), drivePIDConfig.getkA());
         
         /* Angle Encoder Config */
         angleEncoder = encoderConfig.encoder;

@@ -5,14 +5,15 @@ import static edu.wpi.first.wpilibj2.command.Commands.waitSeconds;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BooleanSupplier;
+import java.util.function.DoubleConsumer;
 import java.util.function.DoubleSupplier;
 
 import common.core.controllers.ControllerBase;
+import common.hardware.motorcontroller.NAR_Motor;
 import common.utility.Log;
 import common.utility.shuffleboard.NAR_Shuffleboard;
 import common.utility.tester.Tester;
 import common.utility.tester.Tester.SystemsTest;
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.PIDSubsystem;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -80,10 +81,8 @@ public abstract class NAR_PIDSubsystem extends SubsystemBase {
     }
 
     protected final ControllerBase controller;
-    protected boolean enabled;
     protected BooleanSupplier debug;
     protected DoubleSupplier setpoint;
-    private double min, max;
     private double safetyThresh;
     private Timer safetyTimer = new Timer();
 
@@ -103,10 +102,6 @@ public abstract class NAR_PIDSubsystem extends SubsystemBase {
      */
     public NAR_PIDSubsystem(ControllerBase controller) {
         this.controller = controller;
-        controller.setMeasurementSource(()-> getMeasurement());
-        controller.addOutput(output -> useOutput(output, getSetpoint()));
-        min = Double.NEGATIVE_INFINITY;
-        max = Double.POSITIVE_INFINITY;
         safetyThresh = 5;
         prevMeasurement = 0;
         prevVelocity = 0;
@@ -114,13 +109,26 @@ public abstract class NAR_PIDSubsystem extends SubsystemBase {
         updateTimer.start();
     }
 
+    public NAR_PIDSubsystem(ControllerBase controller, DoubleSupplier measurement, DoubleConsumer useOutput) {
+        this(controller);
+        controller.setMeasurementSource(measurement);
+        controller.addOutput(useOutput);
+    }
+
+    public NAR_PIDSubsystem(ControllerBase controller, NAR_Motor motor) {
+        this(controller);
+        controller.configureFeedback(motor);
+    }
+
+
+
     @Override
     public void periodic() {
-        if (enabled) {
+        if (controller.isEnabled()) {
             controller.useOutput();
             if (safetyTimer.hasElapsed(safetyThresh)) onSafetyTimeout();
             if (atSetpoint()) safetyTimer.restart();
-            if(getMeasurement() < min || getMeasurement() > max) onConstraintViolation();
+            if(controller.getMeasurement() < getInputRange()[0] || controller.getMeasurement() > getInputRange()[1]) onConstraintViolation();
             for (BooleanSupplier condition : disableConditions) {
                 if (condition.getAsBoolean()) {
                     Log.info(getName(), "Disable Condition has been triggered.");
@@ -133,7 +141,7 @@ public abstract class NAR_PIDSubsystem extends SubsystemBase {
         if (!shouldLog) return;
 
         if (updateTimer.hasElapsed(updateTime)) {
-            final double measurement = getMeasurement();
+            final double measurement = controller.getMeasurement();
             final double velocity = (measurement - prevMeasurement) / updateTimer.get();
             final double acceleration = (velocity - prevVelocity) / updateTimer.get();
             NAR_Shuffleboard.addData(getName(), "1stDerivative", velocity, 1, 2);
@@ -153,7 +161,7 @@ public abstract class NAR_PIDSubsystem extends SubsystemBase {
         NAR_Shuffleboard.addData(getName(), "AtSetpoint", ()-> atSetpoint(), 0, 3);
 
         NAR_Shuffleboard.addData(getName(), "Enabled", ()-> isEnabled(), 1, 0);
-        NAR_Shuffleboard.addData(getName(), "Measurement", ()-> getMeasurement(), 1, 1);
+        NAR_Shuffleboard.addData(getName(), "Measurement", ()-> controller.getMeasurement(), 1, 1);
 
         NAR_Shuffleboard.addData(getName(), "TOGGLE", false, 2, 0).withWidget("Toggle Button");
         debug = NAR_Shuffleboard.getBoolean(getName(), "TOGGLE");
@@ -161,12 +169,12 @@ public abstract class NAR_PIDSubsystem extends SubsystemBase {
         setpoint = NAR_Shuffleboard.debug(getName(), "Debug_Setpoint", 0, 2,2);
         NAR_Shuffleboard.addData(getName(), "Output", ()-> controller.useOutput(), 2, 3);
 
-        controller.setkS(NAR_Shuffleboard.debug(getName(), "kS", controller.getkS(), 3, 0));
-        controller.setkV(NAR_Shuffleboard.debug(getName(), "kV", controller.getkV(), 3, 1));
-        controller.setkA(NAR_Shuffleboard.debug(getName(), "kA", controller.getkA(), 3, 2));
-        controller.setkG(NAR_Shuffleboard.debug(getName(), "kG", controller.getkG(), 3, 3));
+        controller.getConfig().setkS(NAR_Shuffleboard.debug(getName(), "kS", controller.getConfig().getkS(), 3, 0));
+        controller.getConfig().setkV(NAR_Shuffleboard.debug(getName(), "kV", controller.getConfig().getkV(), 3, 1));
+        controller.getConfig().setkA(NAR_Shuffleboard.debug(getName(), "kA", controller.getConfig().getkA(), 3, 2));
+        controller.getConfig().setkG(NAR_Shuffleboard.debug(getName(), "kG", controller.getConfig().getkG(), 3, 3));
 
-        NAR_Shuffleboard.addData(getName(), "Commands", getCurrentCommand(), 4, 0);
+        
     }
 
     /**
@@ -213,16 +221,6 @@ public abstract class NAR_PIDSubsystem extends SubsystemBase {
     }
 
     /**
-     * Sets constraints for the setpoint of the PID subsystem.
-     * @param min The minimum setpoint for the subsystem
-     * @param max The maximum setpoint for the subsystem
-     */
-    public void setConstraints(double min, double max) {
-        this.min = min;
-        this.max = max;
-    }
-
-    /**
      * Adds a condition to disable the PID control.
      * @param condition The condition to disable the PID control.
      */
@@ -239,10 +237,58 @@ public abstract class NAR_PIDSubsystem extends SubsystemBase {
     }
 
     /**
+     * Sets the minimum and maximum values expected from the input.
+     *
+     * <p>Input values outside of this range will be clamped.
+     *
+     * @param minimumInput The minimum value expected from the input.
+     * @param maximumInput The maximum value expected from the input.
+     */
+    public void setInputRange(double minimumInput, double maximumInput) {
+        controller.setInputRange(minimumInput, maximumInput);
+    }
+
+    /**
+     * Returns the minimum and maximum values expected from the input.
+     * 
+     * <p>First element is inputMin.
+     * <p>Second element is inputMax.
+     * 
+     * @return double[] with inputMin and inputMax.
+     */
+    public double[] getInputRange() {
+        return controller.getInputRange();
+    }
+
+    /**
+     * Sets the minimum and maximum values of the controller output.
+     *
+     * <p>Output values outside of this range will be clamped.
+     *
+     * @param minimumOutput The minimum value to write.
+     * @param maximumOutput The maximum value to write.
+     */
+    public void setOutputRange(double minimumOutput, double maximumOutput) {
+        controller.setOutputRange(minimumOutput, maximumOutput);
+    }
+
+    /**
+     * Returns the minimum and maximum values expected from the output.
+     * 
+     * <p>First element is outputMin.
+     * <p>Second element is outputMax.
+     * 
+     * @return double[] with outputMin and outputMax.
+     */
+    public double[] getOutputRange() {
+        return controller.getOutputRange();
+    }
+
+    /**
      * Called when the measurement of the controller violates the constraints
      */
     public void onConstraintViolation() {
-        Log.unusual(getName(), "Controller Measurement Violated Constraints");
+        Log.unusual(getName(), "Controller Measurement Violated Input Constraints");
     }
 
     /**
@@ -250,7 +296,7 @@ public abstract class NAR_PIDSubsystem extends SubsystemBase {
      * @param kG_Function the function multiplied to kG
      */
     public void setkG_Function(DoubleSupplier kG_Function) {
-        controller.setkG_Function(kG_Function);
+        controller.getConfig().setkG_Function(kG_Function);
     }
 
     /**
@@ -260,7 +306,7 @@ public abstract class NAR_PIDSubsystem extends SubsystemBase {
      */
     public void startPID(double setpoint) {
         enable();
-        controller.setSetpoint(MathUtil.clamp((debug != null && debug.getAsBoolean()) ? this.setpoint.getAsDouble() : setpoint, min, max));
+        controller.setSetpoint((debug != null && debug.getAsBoolean()) ? this.setpoint.getAsDouble() : setpoint);
     }
 
     /**
@@ -294,32 +340,32 @@ public abstract class NAR_PIDSubsystem extends SubsystemBase {
         return controller.atSetpoint();
     }
 
-    /**
-     * Uses the output from the PIDController.
-     *
-     * @param output The output of the PIDController
-     * @param setpoint The setpoint of the controller.
-     */
-    protected abstract void useOutput(double output, double setpoint);
+    // /**
+    //  * Uses the output from the PIDController.
+    //  *
+    //  * @param output The output of the PIDController
+    //  * @param setpoint The setpoint of the controller.
+    //  */
+    // protected abstract void useOutput(double output, double setpoint);
 
-    /**
-     * Returns the measurement of the process variable used by the PIDController.
-     *
-     * @return the measurement of the process variable
-     */
-    protected abstract double getMeasurement();
+    // /**
+    //  * Returns the measurement of the process variable used by the PIDController.
+    //  *
+    //  * @return the measurement of the process variable
+    //  */
+    // protected abstract double getMeasurement();
 
     /** Enables the PID control. Resets the controller. */
     public void enable() {
-        enabled = true;
+        controller.enable();
         safetyTimer.restart();
         controller.reset();
     }
 
     /** Disables the PID control. Sets output to zero. */
     public void disable() {
-        enabled = false;
-        useOutput(0, 0);
+        controller.disable();
+        // useOutput(0, 0);
         Log.info(getName(), "Disabled");
     }
 
@@ -337,6 +383,6 @@ public abstract class NAR_PIDSubsystem extends SubsystemBase {
      * @return Whether the controller is enabled.
      */
     public boolean isEnabled() {
-        return enabled;
+        return controller.isEnabled();
     }
 }
