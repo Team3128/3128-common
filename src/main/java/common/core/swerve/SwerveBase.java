@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public abstract class SwerveBase extends SubsystemBase {
 
     public boolean chassisVelocityCorrection = true;
+    public boolean fieldRelative = true;
     protected double dtConstant = 0.009;
     protected double throttle = 1;
 
@@ -30,13 +31,11 @@ public abstract class SwerveBase extends SubsystemBase {
     protected final SwerveModule[] modules;
     private Pose2d estimatedPose;
 
-    public boolean fieldRelative;
     public double maxSpeed;
 
     public SwerveBase(SwerveDriveKinematics kinematics, Matrix<N3, N1> stateStdDevs, Matrix<N3, N1> visionMeasurementDevs, SwerveModuleConfig... configs) {
         this.kinematics = kinematics;
         this.maxSpeed = configs[0].maxSpeed;
-        fieldRelative = true;
         estimatedPose = new Pose2d();
 
         modules = new SwerveModule[] {
@@ -79,7 +78,7 @@ public abstract class SwerveBase extends SubsystemBase {
     }
 
     public void drive(ChassisSpeeds velocity) {
-        if(fieldRelative) velocity = ChassisSpeeds.fromRobotRelativeSpeeds(velocity, getGyroRotation2d());
+        if(fieldRelative) velocity = ChassisSpeeds.fromFieldRelativeSpeeds(velocity, getGyroRotation2d());
         if(chassisVelocityCorrection) velocity = ChassisSpeeds.discretize(velocity, dtConstant);
         setModuleStates(kinematics.toSwerveModuleStates(velocity.times(throttle)));
         Logger.recordOutput("Swerve/DesiredModuleStates", kinematics.toSwerveModuleStates(velocity));
