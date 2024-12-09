@@ -7,12 +7,10 @@ import java.util.function.BiConsumer;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
-import org.littletonrobotics.junction.Logger;
 import org.photonvision.PhotonCamera;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
-import common.core.misc.NAR_Robot;
 import common.utility.Log;
 import common.utility.shuffleboard.NAR_Shuffleboard;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
@@ -111,7 +109,6 @@ public class Camera {
 
         if (!result.hasTargets()) {
             targets = null;
-            if (NAR_Robot.logWithAdvantageKit) Logger.recordOutput("Vision/" + camera.getName(), robotPose.get());
             return;
         }
 

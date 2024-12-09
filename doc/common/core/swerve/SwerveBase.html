@@ -156,20 +156,18 @@ loadScripts(document, 'script');</script>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#drive(double,double,double)" class="member-name-link">drive</a><wbr>(double&nbsp;xVel,
  double&nbsp;yVel,
- double&nbsp;thetaVel)</code></div>
+ double&nbsp;omega)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#drive(edu.wpi.first.math.geometry.Translation2d,double,boolean)" class="member-name-link">drive</a><wbr>(edu.wpi.first.math.geometry.Translation2d&nbsp;translationVel,
- double&nbsp;rotationVel,
- boolean&nbsp;isRobotRelative)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#drive(edu.wpi.first.math.geometry.Translation2d,double)" class="member-name-link">drive</a><wbr>(edu.wpi.first.math.geometry.Translation2d&nbsp;translationVel,
+ double&nbsp;rotationVel)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#drive(edu.wpi.first.math.kinematics.ChassisSpeeds)" class="member-name-link">drive</a><wbr>(edu.wpi.first.math.kinematics.ChassisSpeeds&nbsp;velocity)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#drive(edu.wpi.first.math.geometry.Translation2d,edu.wpi.first.math.geometry.Rotation2d)" class="member-name-link">drive</a><wbr>(edu.wpi.first.math.geometry.Translation2d&nbsp;translationVel,
+ edu.wpi.first.math.geometry.Rotation2d&nbsp;rotationVel)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#driveRobotRelative(double,double,double)" class="member-name-link">driveRobotRelative</a><wbr>(double&nbsp;xVel,
- double&nbsp;yVel,
- double&nbsp;thetaVel)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#drive(edu.wpi.first.math.kinematics.ChassisSpeeds)" class="member-name-link">drive</a><wbr>(edu.wpi.first.math.kinematics.ChassisSpeeds&nbsp;velocity)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>edu.wpi.first.math.geometry.Rotation2d</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getAngleTo(edu.wpi.first.math.geometry.Translation2d)" class="member-name-link">getAngleTo</a><wbr>(edu.wpi.first.math.geometry.Translation2d&nbsp;point)</code></div>
@@ -296,6 +294,12 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
+<section class="detail" id="fieldRelative">
+<h3>fieldRelative</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">fieldRelative</span></div>
+</section>
+</li>
+<li>
 <section class="detail" id="dtConstant">
 <h3>dtConstant</h3>
 <div class="member-signature"><span class="modifiers">protected</span>&nbsp;<span class="return-type">double</span>&nbsp;<span class="element-name">dtConstant</span></div>
@@ -323,12 +327,6 @@ loadScripts(document, 'script');</script>
 <section class="detail" id="modules">
 <h3>modules</h3>
 <div class="member-signature"><span class="modifiers">protected final</span>&nbsp;<span class="return-type"><a href="SwerveModule.html" title="class in common.core.swerve">SwerveModule</a>[]</span>&nbsp;<span class="element-name">modules</span></div>
-</section>
-</li>
-<li>
-<section class="detail" id="fieldRelative">
-<h3>fieldRelative</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">fieldRelative</span></div>
 </section>
 </li>
 <li>
@@ -369,11 +367,17 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
-<section class="detail" id="drive(edu.wpi.first.math.geometry.Translation2d,double,boolean)">
+<section class="detail" id="drive(edu.wpi.first.math.geometry.Translation2d,edu.wpi.first.math.geometry.Rotation2d)">
 <h3>drive</h3>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">drive</span><wbr><span class="parameters">(edu.wpi.first.math.geometry.Translation2d&nbsp;translationVel,
- double&nbsp;rotationVel,
- boolean&nbsp;isRobotRelative)</span></div>
+ edu.wpi.first.math.geometry.Rotation2d&nbsp;rotationVel)</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="drive(edu.wpi.first.math.geometry.Translation2d,double)">
+<h3>drive</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">drive</span><wbr><span class="parameters">(edu.wpi.first.math.geometry.Translation2d&nbsp;translationVel,
+ double&nbsp;rotationVel)</span></div>
 </section>
 </li>
 <li>
@@ -381,15 +385,7 @@ loadScripts(document, 'script');</script>
 <h3>drive</h3>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">drive</span><wbr><span class="parameters">(double&nbsp;xVel,
  double&nbsp;yVel,
- double&nbsp;thetaVel)</span></div>
-</section>
-</li>
-<li>
-<section class="detail" id="driveRobotRelative(double,double,double)">
-<h3>driveRobotRelative</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">driveRobotRelative</span><wbr><span class="parameters">(double&nbsp;xVel,
- double&nbsp;yVel,
- double&nbsp;thetaVel)</span></div>
+ double&nbsp;omega)</span></div>
 </section>
 </li>
 <li>

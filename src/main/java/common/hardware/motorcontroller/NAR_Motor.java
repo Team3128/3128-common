@@ -3,9 +3,6 @@ package common.hardware.motorcontroller;
 import java.util.HashSet;
 import java.util.LinkedList;
 
-import org.littletonrobotics.junction.AutoLog;
-import org.littletonrobotics.junction.Logger;
-
 import common.core.controllers.PIDFFConfig;
 import common.core.misc.NAR_Robot;
 import common.utility.narwhaldashboard.NarwhalDashboard;
@@ -108,34 +105,10 @@ public abstract class NAR_Motor implements AutoCloseable {
     private boolean isContinuous = false;
     protected double unitConversionFactor = 1;
     protected double timeConversionFactor = 1;
-
-    @AutoLog
-	public static class NAR_MotorIO{ 
-        public double inputPower = 0;
-        public double appliedOutput = 0;
-        public double stallCurrent = 0;
-        public double position;
-        public double velocity = 0;
-	}
-
-    // private NAR_MotorIOAutoLogged io;
-
-    // public void updateIO(NAR_MotorIOAutoLogged io){
-    //     io.inputPower = prevValue;
-    //     io.appliedOutput = getAppliedOutput();
-    //     io.stallCurrent = getStallCurrent();
-    //     io.position = getPosition();
-    //     io.velocity = getVelocity();
-    // }
+    protected int id;
 
     public NAR_Motor(int id){
-        if (NAR_Robot.logWithAdvantageKit) {
-            // io = new NAR_MotorIOAutoLogged();
-            // NAR_Robot.addPeriodic(()-> {
-            //     updateIO(io);
-            //     Logger.processInputs("Motors/" + id, io);
-            // }, 0.02);
-        }
+        this.id = id;
     }
 
     /**

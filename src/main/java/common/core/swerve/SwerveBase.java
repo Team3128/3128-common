@@ -1,7 +1,5 @@
 package common.core.swerve;
 
-import org.littletonrobotics.junction.Logger;
-import common.core.misc.NAR_Robot;
 import common.hardware.motorcontroller.NAR_Motor.Control;
 import common.utility.narwhaldashboard.NarwhalDashboard;
 import common.utility.shuffleboard.NAR_Shuffleboard;
@@ -81,7 +79,6 @@ public abstract class SwerveBase extends SubsystemBase {
         if(fieldRelative) velocity = ChassisSpeeds.fromFieldRelativeSpeeds(velocity, getGyroRotation2d());
         if(chassisVelocityCorrection) velocity = ChassisSpeeds.discretize(velocity, dtConstant);
         setModuleStates(kinematics.toSwerveModuleStates(velocity.times(throttle)));
-        Logger.recordOutput("Swerve/DesiredModuleStates", kinematics.toSwerveModuleStates(velocity));
     }
 
     public void stop() {
@@ -157,10 +154,6 @@ public abstract class SwerveBase extends SubsystemBase {
     public void periodic() {
         odometry.update(getGyroRotation2d(), getPositions());
         estimatedPose = odometry.getEstimatedPosition();
-        if(NAR_Robot.logWithAdvantageKit) {
-            Logger.recordOutput("Swerve/ActualModuleStates", getStates());
-            Logger.recordOutput("Swerve/RobotRotation", getGyroRotation2d());
-        }
     }
 
     public void resetAll() {
