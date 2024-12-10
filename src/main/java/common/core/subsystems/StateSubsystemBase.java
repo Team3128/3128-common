@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.hamcrest.core.IsEqual;
 
+import common.utility.Log;
 import common.utility.shuffleboard.NAR_Shuffleboard;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
@@ -49,6 +50,7 @@ public abstract class StateSubsystemBase<S extends Enum<S>> extends SubsystemBas
     public boolean setState(S nextState) {
         Transition<S> transition = transitionManager.getTransition(getState(), nextState);
 
+        Log.info("State", "Check1");
         // if not the same state
         if(!stateEquals(nextState)) requTransition = transition;
         else return false;
@@ -57,7 +59,9 @@ public abstract class StateSubsystemBase<S extends Enum<S>> extends SubsystemBas
         if(transition == null) return false;
 
         // if not transitioning
+        Log.info("State", "Check2");
         if(!isTransitioning()) {
+            Log.info("State", "Transitioning...");
             currTransition = transition;
             currTransition.execute();
             return true;
@@ -67,7 +71,8 @@ public abstract class StateSubsystemBase<S extends Enum<S>> extends SubsystemBas
     }
 
     public Command setStateAsCommand(S nextState) {
-        return Commands.runOnce(()-> setState(nextState)).until(()-> stateEquals(nextState));
+        Log.info("State", "Check-1");
+        return Commands.runOnce(()-> {Log.info("State", "Check0"); setState(nextState);});//.until(()-> stateEquals(nextState));
     }
 
     public S getState() {
