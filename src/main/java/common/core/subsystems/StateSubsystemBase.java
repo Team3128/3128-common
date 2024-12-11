@@ -16,19 +16,18 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public abstract class StateSubsystemBase<S extends Enum<S>> extends SubsystemBase{
     
-    private S state;
-    private final Class<S> enumType;
-    private final List<StandardizedSubsystem> subsystems;
-    private TransitionManager<S> transitionManager;
-    private Transition<S> requTransition = null;
-    private Transition<S> currTransition = null;
+    protected S state;
+    protected final Class<S> enumType;
+    protected final List<StandardizedSubsystem> subsystems;
+    protected TransitionManager<S> transitionManager;
+    private Transition<S> lastScheduledTransition = null;
 
     
-    public StateSubsystemBase(S initialState, Class<S> enumType) {
+    public StateSubsystemBase(S initialState, Class<S> enumType, TransitionManager<S> transitionManager) {
         state = initialState;
         this.enumType = enumType;
         this.subsystems = new LinkedList<>();
-        transitionManager = new TransitionManager<>(enumType);
+        this.transitionManager = transitionManager;
         initStateTracker();
         registerTransitions();
     }
@@ -48,26 +47,32 @@ public abstract class StateSubsystemBase<S extends Enum<S>> extends SubsystemBas
     public abstract void registerTransitions();
 
     public boolean setState(S nextState) {
-        Transition<S> transition = transitionManager.getTransition(getState(), nextState);
-
-        Log.info("State", "Check1");
+        Log.info("COMMANDED", state.name() + " -> " + nextState.name());
         // if not the same state
-        if(!stateEquals(nextState)) requTransition = transition;
-        else return false;
-
-        // if invalid trnasition
-        if(transition == null) return false;
-
-        // if not transitioning
-        Log.info("State", "Check2");
-        if(!isTransitioning()) {
-            Log.info("State", "Transitioning...");
-            currTransition = transition;
-            currTransition.execute();
-            return true;
+        if(stateEquals(nextState)) {
+            Log.info("COMMANDED", "State already set to " + nextState.name());
+            return false;
         }
 
-        return false;
+        Transition<S> transition = transitionManager.getTransition(getState(), nextState);
+        // if invalid trnasition
+        if(transition == null) {
+            Log.info("TRANSITION", "State transition null");
+            return false;
+        }
+        Log.info("TRANSITION", transition.toString());
+
+        if(isTransitioning()) {
+            Log.info("TRANSITION", "Already transitioning, procceeding to override");
+            lastScheduledTransition.cancel();
+        }
+
+        state = nextState;
+        lastScheduledTransition = transition;
+        lastScheduledTransition.execute();
+
+        if(isTransitioning()) Log.info("State", "Transitioning...");
+        return true;
     }
 
     public Command setStateAsCommand(S nextState) {
@@ -83,20 +88,12 @@ public abstract class StateSubsystemBase<S extends Enum<S>> extends SubsystemBas
         return state.name().equals(other.name());
     }
 
-    public Transition<S> getRequTransition() {
-        return requTransition;
-    }
-
-    public Transition<S> getCurrTransition() {
-        return currTransition;
-    }
-
     public boolean isTransitioning() {
-        return currTransition != null;
+        return lastScheduledTransition != null && lastScheduledTransition.isRunning();
     }
 
     public Command stop() {
-        currTransition.cancel();
+        lastScheduledTransition.cancel();
         Command stop = new InstantCommand();
         for(StandardizedSubsystem subsystem : subsystems) {
             stop.andThen(subsystem.stop());
@@ -105,7 +102,7 @@ public abstract class StateSubsystemBase<S extends Enum<S>> extends SubsystemBas
     }
 
     public Command reset() {
-        currTransition.cancel();
+        lastScheduledTransition.cancel();
         Command reset = new InstantCommand();
         for(StandardizedSubsystem subsystem : subsystems) {
             if(subsystem instanceof PositionSubsystemBase) {
@@ -120,15 +117,8 @@ public abstract class StateSubsystemBase<S extends Enum<S>> extends SubsystemBas
     }
 
     @Override
-    public void periodic() {
-        if (isTransitioning() && currTransition.isFinished()) {
-            currTransition = null;
-        }
-    }
-
-    @Override
     public void initSendable(SendableBuilder builder) {
-        builder.setSmartDashboardType("PIDController");
+        builder.setSmartDashboardType(getName());
         for(S state : enumType.getEnumConstants()) {
             builder.addBooleanProperty(state.name(), ()-> stateEquals(state), (boolean set)->{
                 if(set) setState(state);
