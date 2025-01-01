@@ -211,10 +211,9 @@ loadScripts(document, 'script');</script>
 <div class="block">Sets the motor in coast mode</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setCurrentLimit(int)" class="member-name-link">setCurrentLimit</a><wbr>(int&nbsp;limit)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Sets the current limit in Amps.</div>
-</div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setCurrentLimit(int,int)" class="member-name-link">setCurrentLimit</a><wbr>(int&nbsp;statorLimit,
+ int&nbsp;supplyLimit)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setDefaultStatusFrames()" class="member-name-link">setDefaultStatusFrames</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
@@ -245,6 +244,16 @@ loadScripts(document, 'script');</script>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setPositionStatusFrames()" class="member-name-link">setPositionStatusFrames</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Set the status frame rate to Team 3128's for a position motor</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setStatorLimit(int)" class="member-name-link">setStatorLimit</a><wbr>(int&nbsp;limit)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Sets the stator limit in Amps.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setSupplyLimit(int)" class="member-name-link">setSupplyLimit</a><wbr>(int&nbsp;limit)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Sets the supply limit in Amps.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>protected void</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setVelocity(double,double)" class="member-name-link">setVelocity</a><wbr>(double&nbsp;rpm,
@@ -527,17 +536,38 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
-<section class="detail" id="setCurrentLimit(int)">
-<h3>setCurrentLimit</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">setCurrentLimit</span><wbr><span class="parameters">(int&nbsp;limit)</span></div>
-<div class="block"><span class="descfrm-type-label">Description copied from class:&nbsp;<code><a href="NAR_Motor.html#setCurrentLimit(int)">NAR_Motor</a></code></span></div>
-<div class="block">Sets the current limit in Amps.</div>
+<section class="detail" id="setStatorLimit(int)">
+<h3>setStatorLimit</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">setStatorLimit</span><wbr><span class="parameters">(int&nbsp;limit)</span></div>
+<div class="block"><span class="descfrm-type-label">Description copied from class:&nbsp;<code><a href="NAR_Motor.html#setStatorLimit(int)">NAR_Motor</a></code></span></div>
+<div class="block">Sets the stator limit in Amps.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
-<dd><code><a href="NAR_Motor.html#setCurrentLimit(int)">setCurrentLimit</a></code>&nbsp;in class&nbsp;<code><a href="NAR_Motor.html" title="class in common.hardware.motorcontroller">NAR_Motor</a></code></dd>
+<dd><code><a href="NAR_Motor.html#setStatorLimit(int)">setStatorLimit</a></code>&nbsp;in class&nbsp;<code><a href="NAR_Motor.html" title="class in common.hardware.motorcontroller">NAR_Motor</a></code></dd>
 <dt>Parameters:</dt>
 <dd><code>limit</code> - The current limit in Amps.</dd>
 </dl>
+</section>
+</li>
+<li>
+<section class="detail" id="setSupplyLimit(int)">
+<h3>setSupplyLimit</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">setSupplyLimit</span><wbr><span class="parameters">(int&nbsp;limit)</span></div>
+<div class="block"><span class="descfrm-type-label">Description copied from class:&nbsp;<code><a href="NAR_Motor.html#setSupplyLimit(int)">NAR_Motor</a></code></span></div>
+<div class="block">Sets the supply limit in Amps.</div>
+<dl class="notes">
+<dt>Specified by:</dt>
+<dd><code><a href="NAR_Motor.html#setSupplyLimit(int)">setSupplyLimit</a></code>&nbsp;in class&nbsp;<code><a href="NAR_Motor.html" title="class in common.hardware.motorcontroller">NAR_Motor</a></code></dd>
+<dt>Parameters:</dt>
+<dd><code>limit</code> - The current limit in Amps.</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="setCurrentLimit(int,int)">
+<h3>setCurrentLimit</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">setCurrentLimit</span><wbr><span class="parameters">(int&nbsp;statorLimit,
+ int&nbsp;supplyLimit)</span></div>
 </section>
 </li>
 <li>

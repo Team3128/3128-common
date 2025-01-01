@@ -2,6 +2,7 @@ package common.core.controllers;
 
 import java.util.function.DoubleSupplier;
 
+import common.hardware.motorcontroller.NAR_Motor;
 import common.utility.narwhaldashboard.NarwhalDashboard;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -23,11 +24,10 @@ public class TrapController extends ControllerBase {
     private TrapezoidProfile.State tempSetpoint = new TrapezoidProfile.State();
     private TrapezoidProfile.State prevSetpoint = new TrapezoidProfile.State();
     private TrapezoidProfile profile; 
-    private double minimumInput;
-    private double maximumInput;
     /**
      * Create a new object to control PID + FF logic using a trapezoid profile for a subsystem.
      * <p>Sets kP, kI, kD, kS, kV, kA, kG, constraints, period values.
+     * <p>Note: This type of controller is genrally only used for position based subsystems.
      * 
      * @param config PIDFFConfig object containing PID and Feedforward constants.
      * @param constraints Constraints for max acceleration and velocity
@@ -58,6 +58,11 @@ public class TrapController extends ControllerBase {
         this.systemVelocity = velocitySrc;
     }
 
+    public void configureFeedback(NAR_Motor motor) {
+        configureFeedback(motor::getPosition, motor::setVolts);
+        setVelocitySource(motor::getVelocity);
+    }
+
     /**
      * Sets a new setpoint, and returns the next output of the controller.
      *
@@ -80,7 +85,7 @@ public class TrapController extends ControllerBase {
     public double calculate(double measurement) {
         if (controller.isContinuousInputEnabled()) {
             // Get error which is the smallest distance between goal and measurement
-            double errorBound = (maximumInput - minimumInput) / 2.0;
+            double errorBound = (getInputRange()[1] - getInputRange()[0]) / 2.0;
             double goalMinDistance =
                 MathUtil.inputModulus(setpoint.position - measurement, -errorBound, errorBound);
             double setpointMinDistance =
@@ -119,10 +124,10 @@ public class TrapController extends ControllerBase {
      */
     @Override
     public double calculateFF(double pidOutput) {
-        final double staticGain = !atSetpoint() ? Math.copySign(getkS(), pidOutput) : 0;
-        final double velocityGain = getkV() * prevSetpoint.velocity;
-        final double accelGain = getkA() * (tempSetpoint.velocity - prevSetpoint.velocity) / getPeriod();
-        final double gravityGain = getkG() * kG_Function.getAsDouble();
+        final double staticGain = !atSetpoint() ? Math.copySign(getConfig().getkS(), pidOutput) : 0;
+        final double velocityGain = getConfig().getkV() * prevSetpoint.velocity;
+        final double accelGain = getConfig().getkA() * (tempSetpoint.velocity - prevSetpoint.velocity) / getPeriod();
+        final double gravityGain = getConfig().getkG() * getConfig().getkG_Function().getAsDouble();
         if (shouldLog) NarwhalDashboard.getInstance().sendMessage("Static Gain: " + staticGain + " Velocity Gain: " + velocityGain + " Acceleration Gain: " + accelGain + " Gravity Gain: " + gravityGain);
         return staticGain + velocityGain + accelGain + gravityGain;
     }
@@ -138,8 +143,7 @@ public class TrapController extends ControllerBase {
      */
     public void enableContinuousInput(double minimumInput, double maximumInput) {
         controller.enableContinuousInput(minimumInput, maximumInput);
-        this.minimumInput = minimumInput;
-        this.maximumInput = maximumInput;
+        setInputRange(minimumInput, maximumInput);
     }
 
     /**

@@ -110,8 +110,11 @@ loadScripts(document, 'script');</script>
 <div class="col-second even-row-color"><code><a href="#limelightTable" class="member-name-link">limelightTable</a></code></div>
 <div class="col-last even-row-color">&nbsp;</div>
 <div class="col-first odd-row-color"><code>double</code></div>
-<div class="col-second odd-row-color"><code><a href="#targetWidth" class="member-name-link">targetWidth</a></code></div>
+<div class="col-second odd-row-color"><code><a href="#robotCenterDistance" class="member-name-link">robotCenterDistance</a></code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
+<div class="col-first even-row-color"><code>double</code></div>
+<div class="col-second even-row-color"><code><a href="#targetWidth" class="member-name-link">targetWidth</a></code></div>
+<div class="col-last even-row-color">&nbsp;</div>
 </div>
 </section>
 </li>
@@ -123,10 +126,11 @@ loadScripts(document, 'script');</script>
 <div class="summary-table two-column-summary">
 <div class="table-header col-first">Constructor</div>
 <div class="table-header col-last">Description</div>
-<div class="col-constructor-name even-row-color"><code><a href="#%3Cinit%3E(java.lang.String,double,double,double)" class="member-name-link">Limelight</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;hostname,
+<div class="col-constructor-name even-row-color"><code><a href="#%3Cinit%3E(java.lang.String,double,double,double,double)" class="member-name-link">Limelight</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;hostname,
  double&nbsp;cameraAngle,
  double&nbsp;cameraHeight,
- double&nbsp;frontDistance)</code></div>
+ double&nbsp;frontDistance,
+ double&nbsp;robotCenterDistance)</code></div>
 <div class="col-last even-row-color">&nbsp;</div>
 </div>
 </section>
@@ -153,30 +157,34 @@ loadScripts(document, 'script');</script>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Set the limelight on the dashboard</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>double</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getValue(common.hardware.limelight.LimelightKey)" class="member-name-link">getValue</a><wbr>(<a href="LimelightKey.html" title="enum class in common.hardware.limelight">LimelightKey</a>&nbsp;key)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>edu.wpi.first.math.geometry.Translation2d</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getTargetFieldPosition(double,edu.wpi.first.math.geometry.Pose2d)" class="member-name-link">getTargetFieldPosition</a><wbr>(double&nbsp;targetHeight,
+ edu.wpi.first.math.geometry.Pose2d&nbsp;robotPose)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>double</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getValue(common.hardware.limelight.LimelightKey)" class="member-name-link">getValue</a><wbr>(<a href="LimelightKey.html" title="enum class in common.hardware.limelight">LimelightKey</a>&nbsp;key)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Gets the median value of the data value in a certain key output by the
  Limelight.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>double</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getValueAverage(common.hardware.limelight.LimelightKey,int)" class="member-name-link">getValueAverage</a><wbr>(<a href="LimelightKey.html" title="enum class in common.hardware.limelight">LimelightKey</a>&nbsp;key,
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>double</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getValueAverage(common.hardware.limelight.LimelightKey,int)" class="member-name-link">getValueAverage</a><wbr>(<a href="LimelightKey.html" title="enum class in common.hardware.limelight">LimelightKey</a>&nbsp;key,
  int&nbsp;numSamples)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#hasValidTarget()" class="member-name-link">hasValidTarget</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#hasValidTarget()" class="member-name-link">hasValidTarget</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Checks to see if the Limelight has a valid target</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setLEDMode(common.hardware.limelight.LEDMode)" class="member-name-link">setLEDMode</a><wbr>(<a href="LEDMode.html" title="enum class in common.hardware.limelight">LEDMode</a>&nbsp;mode)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setPipeline(common.hardware.limelight.Pipeline)" class="member-name-link">setPipeline</a><wbr>(<a href="Pipeline.html" title="enum class in common.hardware.limelight">Pipeline</a>&nbsp;pipeline)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setLEDMode(common.hardware.limelight.LEDMode)" class="member-name-link">setLEDMode</a><wbr>(<a href="LEDMode.html" title="enum class in common.hardware.limelight">LEDMode</a>&nbsp;mode)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setStreamMode(common.hardware.limelight.StreamMode)" class="member-name-link">setStreamMode</a><wbr>(<a href="StreamMode.html" title="enum class in common.hardware.limelight">StreamMode</a>&nbsp;mode)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setPipeline(common.hardware.limelight.Pipeline)" class="member-name-link">setPipeline</a><wbr>(<a href="Pipeline.html" title="enum class in common.hardware.limelight">Pipeline</a>&nbsp;pipeline)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setStreamMode(common.hardware.limelight.StreamMode)" class="member-name-link">setStreamMode</a><wbr>(<a href="StreamMode.html" title="enum class in common.hardware.limelight">StreamMode</a>&nbsp;mode)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 </div>
 </div>
 </div>
@@ -225,6 +233,12 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
+<section class="detail" id="robotCenterDistance">
+<h3>robotCenterDistance</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">double</span>&nbsp;<span class="element-name">robotCenterDistance</span></div>
+</section>
+</li>
+<li>
 <section class="detail" id="limelightTable">
 <h3>limelightTable</h3>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">edu.wpi.first.networktables.NetworkTable</span>&nbsp;<span class="element-name">limelightTable</span></div>
@@ -239,18 +253,19 @@ loadScripts(document, 'script');</script>
 <h2>Constructor Details</h2>
 <ul class="member-list">
 <li>
-<section class="detail" id="&lt;init&gt;(java.lang.String,double,double,double)">
+<section class="detail" id="&lt;init&gt;(java.lang.String,double,double,double,double)">
 <h3>Limelight</h3>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="element-name">Limelight</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;hostname,
  double&nbsp;cameraAngle,
  double&nbsp;cameraHeight,
- double&nbsp;frontDistance)</span></div>
+ double&nbsp;frontDistance,
+ double&nbsp;robotCenterDistance)</span></div>
 <dl class="notes">
 <dt>Parameters:</dt>
-<dd><code>cameraAngle</code> - - The vertical angle of the limelight</dd>
-<dd><code>cameraHeight</code> - - The height off of the ground of the limelight</dd>
-<dd><code>frontDistance</code> - - The distance between the front of the robot and the
-                      Limelight</dd>
+<dd><code>cameraAngle</code> - - The vertical angle of the limelight. Leaning backwards is positive degrees.</dd>
+<dd><code>cameraHeight</code> - - The height off of the ground of the limelight lens</dd>
+<dd><code>frontDistance</code> - - The distance between the front of the robot and the Limelight Lens</dd>
+<dd><code>robotCenterDistance</code> - - The distance between the center of the robot and the Limelight Lens</dd>
 </dl>
 </section>
 </li>
@@ -300,6 +315,13 @@ loadScripts(document, 'script');</script>
 <section class="detail" id="calculateDistToGroundTarget(double)">
 <h3>calculateDistToGroundTarget</h3>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">double</span>&nbsp;<span class="element-name">calculateDistToGroundTarget</span><wbr><span class="parameters">(double&nbsp;targetHeight)</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="getTargetFieldPosition(double,edu.wpi.first.math.geometry.Pose2d)">
+<h3>getTargetFieldPosition</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">edu.wpi.first.math.geometry.Translation2d</span>&nbsp;<span class="element-name">getTargetFieldPosition</span><wbr><span class="parameters">(double&nbsp;targetHeight,
+ edu.wpi.first.math.geometry.Pose2d&nbsp;robotPose)</span></div>
 </section>
 </li>
 <li>

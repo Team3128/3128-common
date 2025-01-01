@@ -5,6 +5,7 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.CAN;
 
 import com.ctre.phoenix6.configs.MagnetSensorConfigs;
 import com.ctre.phoenix6.hardware.CANcoder;
@@ -58,7 +59,7 @@ public class SwerveModule {
         this.maxSpeed = config.maxSpeed;
 
         final PIDFFConfig drivePIDConfig = driveConfig.pidffConfig;
-        feedforward = new SimpleMotorFeedforward(drivePIDConfig.kS, drivePIDConfig.kV, drivePIDConfig.kA);
+        feedforward = new SimpleMotorFeedforward(drivePIDConfig.getkS(), drivePIDConfig.getkV(), drivePIDConfig.getkA());
         
         /* Angle Encoder Config */
         angleEncoder = encoderConfig.encoder;
@@ -228,6 +229,14 @@ public class SwerveModule {
      */
     public NAR_Motor getAngleMotor() {
         return angleMotor;
+    }
+
+    /**
+     * Returns the angle encoder
+     * @return
+     */
+    public CANcoder getAngleEncoder() {
+        return angleEncoder;
     }
     
     /**

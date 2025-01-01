@@ -25,24 +25,31 @@ public abstract class NAR_Motor implements AutoCloseable {
     public static class MotorConfig {
         public final double distanceFactor;
         public final double timeFactor;
-        public final int currentLimit;
+        public final int supplyLimit;
+        public final int statorLimit;
         public final boolean inverted;
         public final Neutral mode;
 
         /**
          * Creates a new motor config
-         * @param distanceFactor Factor to multiply distance units by, ie. rotations
-         * @param timeFactor Factor to multiply time units by, ie. minutes
-         * @param currentLimit The currentLimit for the motor
+         * @param distanceFactor Factor to multiply distance units by (per rotations) ie. input circumference for distance
+         * @param timeFactor Factor to multiply time units by (per minutes) ie. use 60 for seconds, 1 for minutes
+         * @param statorLimit The currentLimit for the stator
+         * @param supplyLimit The currentLimit for the motor controller
          * @param inverted Whether or not the motor is inverted.
          * @param mode Neutral mode for the motor.
          */
-        public MotorConfig(double distanceFactor, double timeFactor, int currentLimit, boolean inverted, Neutral mode) {
+        public MotorConfig(double distanceFactor, double timeFactor, int statorLimit, int supplyLimit, boolean inverted, Neutral mode) {
             this.distanceFactor = distanceFactor;
             this.timeFactor = timeFactor;
-            this.currentLimit = currentLimit;
+            this.statorLimit = statorLimit;
+            this.supplyLimit = supplyLimit;
             this.inverted = inverted;
             this.mode = mode;
+        }
+
+        public MotorConfig(double distanceFactor, double timeFactor, int statorLimit, boolean inverted, Neutral mode) {
+            this(distanceFactor, timeFactor, statorLimit, 120, inverted, mode);
         }
     }
 
@@ -182,8 +189,9 @@ public abstract class NAR_Motor implements AutoCloseable {
     public void configMotor(MotorConfig config) {
         setUnitConversionFactor(config.distanceFactor);
         setTimeConversionFactor(config.timeFactor);
+        setStatorLimit(config.statorLimit);
+        setSupplyLimit(config.supplyLimit);
         setInverted(config.inverted);
-        setCurrentLimit(config.currentLimit);
         setNeutralMode(config.mode);
     }
 
@@ -360,10 +368,16 @@ public abstract class NAR_Motor implements AutoCloseable {
     public abstract void enableVoltageCompensation(double volts);
 
     /**
-	 * Sets the current limit in Amps.
+	 * Sets the stator limit in Amps.
 	 * @param limit The current limit in Amps.
 	 */
-    public abstract void setCurrentLimit(int limit);
+    public abstract void setStatorLimit(int limit);
+
+    /**
+	 * Sets the supply limit in Amps.
+	 * @param limit The current limit in Amps.
+	 */
+    public abstract void setSupplyLimit(int limit);
 
     /**
 	 * Returns motor and motor controller functionality.

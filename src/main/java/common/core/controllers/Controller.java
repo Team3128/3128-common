@@ -56,6 +56,11 @@ public class Controller extends ControllerBase {
         setMeasurementSource(()-> motor.getPosition());
     }
 
+    public void configureFeedback(NAR_Motor motor) {
+        setMeasurementSource(motor);
+        addMotor(motor);
+    }
+
     /**
      * Returns the PID output of the controller.
      * @param measurement the current measurement of the process variable.
@@ -74,9 +79,9 @@ public class Controller extends ControllerBase {
      */
     @Override
     public double calculateFF(double pidOutput) {
-        final double staticGain = !atSetpoint() ? Math.copySign(getkS(), pidOutput) : 0;
-        final double velocityGain = (type == Type.VELOCITY) ? getkV() * getSetpoint() : 0;
-        final double gravityGain = getkG() * kG_Function.getAsDouble();
+        final double staticGain = !atSetpoint() ? Math.copySign(getConfig().getkS(), pidOutput) : 0;
+        final double velocityGain = (type == Type.VELOCITY) ? getConfig().getkV() * getSetpoint() : 0;
+        final double gravityGain = getConfig().getkG() * getConfig().getkG_Function().getAsDouble();
         return staticGain + velocityGain + gravityGain;
     }
 

@@ -103,26 +103,32 @@ implements edu.wpi.first.util.sendable.Sendable, <a href="https://docs.oracle.co
 <div class="table-header col-first">Modifier and Type</div>
 <div class="table-header col-second">Field</div>
 <div class="table-header col-last">Description</div>
-<div class="col-first even-row-color"><code>protected final edu.wpi.first.math.controller.PIDController</code></div>
-<div class="col-second even-row-color"><code><a href="#controller" class="member-name-link">controller</a></code></div>
+<div class="col-first even-row-color"><code>protected <a href="PIDFFConfig.html" title="class in common.core.controllers">PIDFFConfig</a></code></div>
+<div class="col-second even-row-color"><code><a href="#config" class="member-name-link">config</a></code></div>
 <div class="col-last even-row-color">&nbsp;</div>
-<div class="col-first odd-row-color"><code>protected <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/DoubleSupplier.html" title="class or interface in java.util.function" class="external-link">DoubleSupplier</a></code></div>
-<div class="col-second odd-row-color"><code><a href="#kA" class="member-name-link">kA</a></code></div>
+<div class="col-first odd-row-color"><code>protected final edu.wpi.first.math.controller.PIDController</code></div>
+<div class="col-second odd-row-color"><code><a href="#controller" class="member-name-link">controller</a></code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
-<div class="col-first even-row-color"><code>protected <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/DoubleSupplier.html" title="class or interface in java.util.function" class="external-link">DoubleSupplier</a></code></div>
-<div class="col-second even-row-color"><code><a href="#kG" class="member-name-link">kG</a></code></div>
+<div class="col-first even-row-color"><code>protected boolean</code></div>
+<div class="col-second even-row-color"><code><a href="#disabledAtSetpoint" class="member-name-link">disabledAtSetpoint</a></code></div>
 <div class="col-last even-row-color">&nbsp;</div>
-<div class="col-first odd-row-color"><code>protected <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/DoubleSupplier.html" title="class or interface in java.util.function" class="external-link">DoubleSupplier</a></code></div>
-<div class="col-second odd-row-color"><code><a href="#kG_Function" class="member-name-link">kG_Function</a></code></div>
+<div class="col-first odd-row-color"><code>protected boolean</code></div>
+<div class="col-second odd-row-color"><code><a href="#enabled" class="member-name-link">enabled</a></code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
-<div class="col-first even-row-color"><code>protected <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/DoubleSupplier.html" title="class or interface in java.util.function" class="external-link">DoubleSupplier</a></code></div>
-<div class="col-second even-row-color"><code><a href="#kS" class="member-name-link">kS</a></code></div>
+<div class="col-first even-row-color"><code>protected double</code></div>
+<div class="col-second even-row-color"><code><a href="#inputMax" class="member-name-link">inputMax</a></code></div>
 <div class="col-last even-row-color">&nbsp;</div>
-<div class="col-first odd-row-color"><code>protected <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/DoubleSupplier.html" title="class or interface in java.util.function" class="external-link">DoubleSupplier</a></code></div>
-<div class="col-second odd-row-color"><code><a href="#kV" class="member-name-link">kV</a></code></div>
+<div class="col-first odd-row-color"><code>protected double</code></div>
+<div class="col-second odd-row-color"><code><a href="#inputMin" class="member-name-link">inputMin</a></code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
 <div class="col-first even-row-color"><code>protected <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/DoubleSupplier.html" title="class or interface in java.util.function" class="external-link">DoubleSupplier</a></code></div>
 <div class="col-second even-row-color"><code><a href="#measurement" class="member-name-link">measurement</a></code></div>
+<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-first odd-row-color"><code>protected double</code></div>
+<div class="col-second odd-row-color"><code><a href="#outputMax" class="member-name-link">outputMax</a></code></div>
+<div class="col-last odd-row-color">&nbsp;</div>
+<div class="col-first even-row-color"><code>protected double</code></div>
+<div class="col-second even-row-color"><code><a href="#outputMin" class="member-name-link">outputMin</a></code></div>
 <div class="col-last even-row-color">&nbsp;</div>
 </div>
 </section>
@@ -135,9 +141,11 @@ implements edu.wpi.first.util.sendable.Sendable, <a href="https://docs.oracle.co
 <div class="summary-table two-column-summary">
 <div class="table-header col-first">Constructor</div>
 <div class="table-header col-last">Description</div>
-<div class="col-constructor-name even-row-color"><code><a href="#%3Cinit%3E(common.core.controllers.PIDFFConfig,double)" class="member-name-link">ControllerBase</a><wbr>(<a href="PIDFFConfig.html" title="class in common.core.controllers">PIDFFConfig</a>&nbsp;config,
+<div class="col-constructor-name even-row-color"><code><a href="#%3Cinit%3E(common.core.controllers.PIDFFConfig)" class="member-name-link">ControllerBase</a><wbr>(<a href="PIDFFConfig.html" title="class in common.core.controllers">PIDFFConfig</a>&nbsp;config)</code></div>
+<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-constructor-name odd-row-color"><code><a href="#%3Cinit%3E(common.core.controllers.PIDFFConfig,double)" class="member-name-link">ControllerBase</a><wbr>(<a href="PIDFFConfig.html" title="class in common.core.controllers">PIDFFConfig</a>&nbsp;config,
  double&nbsp;period)</code></div>
-<div class="col-last even-row-color">
+<div class="col-last odd-row-color">
 <div class="block">Creates a base controller object to control motion.</div>
 </div>
 </div>
@@ -200,46 +208,57 @@ implements edu.wpi.first.util.sendable.Sendable, <a href="https://docs.oracle.co
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Closes the Controller.</div>
 </div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>abstract void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#configureFeedback(common.hardware.motorcontroller.NAR_Motor)" class="member-name-link">configureFeedback</a><wbr>(<a href="../../hardware/motorcontroller/NAR_Motor.html" title="class in common.hardware.motorcontroller">NAR_Motor</a>&nbsp;motor)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#configureFeedback(java.util.function.DoubleSupplier,java.util.function.DoubleConsumer)" class="member-name-link">configureFeedback</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/DoubleSupplier.html" title="class or interface in java.util.function" class="external-link">DoubleSupplier</a>&nbsp;measurement,
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/DoubleConsumer.html" title="class or interface in java.util.function" class="external-link">DoubleConsumer</a>&nbsp;output)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#disable()" class="member-name-link">disable</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#enable()" class="member-name-link">enable</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#enableContinuousInput(double,double)" class="member-name-link">enableContinuousInput</a><wbr>(double&nbsp;minimumInput,
  double&nbsp;maximumInput)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Enables continuous input.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>edu.wpi.first.math.controller.PIDController</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getController()" class="member-name-link">getController</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="PIDFFConfig.html" title="class in common.core.controllers">PIDFFConfig</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getConfig()" class="member-name-link">getConfig</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>edu.wpi.first.math.controller.PIDController</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getController()" class="member-name-link">getController</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns the PIDController responsible for PID output</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>double</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getD()" class="member-name-link">getD</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>double</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getD()" class="member-name-link">getD</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Get the Differential coefficient.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>double</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getI()" class="member-name-link">getI</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>double</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getI()" class="member-name-link">getI</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Get the Integral coefficient.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>double</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getkA()" class="member-name-link">getkA</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Returns acceleration gain.</div>
-</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>double</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getkG()" class="member-name-link">getkG</a>()</code></div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>double[]</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getInputRange()" class="member-name-link">getInputRange</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Returns gravity gain.</div>
+<div class="block">Returns the minimum and maximum values expected from the input.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>double</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getkS()" class="member-name-link">getkS</a>()</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getMeasurement()" class="member-name-link">getMeasurement</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Returns static gain.</div>
+<div class="block">Returns the measurement of the controller.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>double</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getkV()" class="member-name-link">getkV</a>()</code></div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>double[]</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getOutputRange()" class="member-name-link">getOutputRange</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Returns velocity gain.</div>
+<div class="block">Returns the minimum and maximum values expected from the output.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>double</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getP()" class="member-name-link">getP</a>()</code></div>
@@ -259,60 +278,35 @@ implements edu.wpi.first.util.sendable.Sendable, <a href="https://docs.oracle.co
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#initSendable(edu.wpi.first.util.sendable.SendableBuilder)" class="member-name-link">initSendable</a><wbr>(edu.wpi.first.util.sendable.SendableBuilder&nbsp;builder)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#reset()" class="member-name-link">reset</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#isEnabled()" class="member-name-link">isEnabled</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#reset()" class="member-name-link">reset</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Resets the previous error and the integral term.</div>
 </div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setConstraints(edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints)" class="member-name-link">setConstraints</a><wbr>(edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints&nbsp;constraints)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setD(double)" class="member-name-link">setD</a><wbr>(double&nbsp;kd)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Sets the Differential coefficient of the PID controller gain.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setI(double)" class="member-name-link">setI</a><wbr>(double&nbsp;ki)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setDisableAtSetpoint(boolean)" class="member-name-link">setDisableAtSetpoint</a><wbr>(boolean&nbsp;disabledAtSetpoint)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setI(double)" class="member-name-link">setI</a><wbr>(double&nbsp;ki)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Sets the Integral coefficient of the PID controller gain.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setkA(java.util.function.DoubleSupplier)" class="member-name-link">setkA</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/DoubleSupplier.html" title="class or interface in java.util.function" class="external-link">DoubleSupplier</a>&nbsp;kA)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Sets the velocity gain.</div>
-</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setkG(double)" class="member-name-link">setkG</a><wbr>(double&nbsp;kG)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setInputRange(double,double)" class="member-name-link">setInputRange</a><wbr>(double&nbsp;minimumInput,
+ double&nbsp;maximumInput)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Sets the gravity gain.</div>
-</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setkG(java.util.function.DoubleSupplier)" class="member-name-link">setkG</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/DoubleSupplier.html" title="class or interface in java.util.function" class="external-link">DoubleSupplier</a>&nbsp;kG)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Sets the gravity gain.</div>
-</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setkG_Function(java.util.function.DoubleSupplier)" class="member-name-link">setkG_Function</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/DoubleSupplier.html" title="class or interface in java.util.function" class="external-link">DoubleSupplier</a>&nbsp;kG_Function)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Sets a function to modify gravity gain based on another factor.</div>
-</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setkS(double)" class="member-name-link">setkS</a><wbr>(double&nbsp;kS)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Sets the static gain.</div>
-</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setkS(java.util.function.DoubleSupplier)" class="member-name-link">setkS</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/DoubleSupplier.html" title="class or interface in java.util.function" class="external-link">DoubleSupplier</a>&nbsp;kS)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Sets the static gain.</div>
-</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setkV(double)" class="member-name-link">setkV</a><wbr>(double&nbsp;kV)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Sets the velocity gain.</div>
-</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setkV(java.util.function.DoubleSupplier)" class="member-name-link">setkV</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/DoubleSupplier.html" title="class or interface in java.util.function" class="external-link">DoubleSupplier</a>&nbsp;kV)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Sets the velocity gain.</div>
+<div class="block">Sets the minimum and maximum values expected from the input.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setMeasurementSource(java.util.function.DoubleSupplier)" class="member-name-link">setMeasurementSource</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/DoubleSupplier.html" title="class or interface in java.util.function" class="external-link">DoubleSupplier</a>&nbsp;measurement)</code></div>
@@ -320,37 +314,43 @@ implements edu.wpi.first.util.sendable.Sendable, <a href="https://docs.oracle.co
 <div class="block">Sets the measurement source for PID control.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setP(double)" class="member-name-link">setP</a><wbr>(double&nbsp;kp)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setOutputRange(double,double)" class="member-name-link">setOutputRange</a><wbr>(double&nbsp;minimumOutput,
+ double&nbsp;maximumOutput)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Sets the minimum and maximum values of the controller output.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setP(double)" class="member-name-link">setP</a><wbr>(double&nbsp;kp)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Sets the Proportional coefficient of the PID controller gain.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setPID(double,double,double)" class="member-name-link">setPID</a><wbr>(double&nbsp;kp,
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setPID(double,double,double)" class="member-name-link">setPID</a><wbr>(double&nbsp;kp,
  double&nbsp;ki,
  double&nbsp;kd)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Sets the PID Controller gain parameters.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setSetpoint(double)" class="member-name-link">setSetpoint</a><wbr>(double&nbsp;setpoint)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setSetpoint(double)" class="member-name-link">setSetpoint</a><wbr>(double&nbsp;setpoint)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Sets the setpoint for the PIDController.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setTolerance(double)" class="member-name-link">setTolerance</a><wbr>(double&nbsp;positionTolerance)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Sets the error which is considered tolerable for use with atSetpoint().</div>
-</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setTolerance(double,double)" class="member-name-link">setTolerance</a><wbr>(double&nbsp;positionTolerance,
- double&nbsp;velocityTolerance)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setTolerance(double)" class="member-name-link">setTolerance</a><wbr>(double&nbsp;measurementTolerance)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Sets the error which is considered tolerable for use with atSetpoint().</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>double</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#useOutput()" class="member-name-link">useOutput</a>()</code></div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setTolerance(double,double)" class="member-name-link">setTolerance</a><wbr>(double&nbsp;measurementTolerance,
+ double&nbsp;measurementROCTolerance)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Calculates and sends output.</div>
+<div class="block">Sets the error which is considered tolerable for use with atSetpoint().</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>double</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#useOutput()" class="member-name-link">useOutput</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Calculates and sends output voltage.</div>
 </div>
 </div>
 </div>
@@ -382,33 +382,45 @@ implements edu.wpi.first.util.sendable.Sendable, <a href="https://docs.oracle.co
 </section>
 </li>
 <li>
-<section class="detail" id="kS">
-<h3>kS</h3>
-<div class="member-signature"><span class="modifiers">protected</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/DoubleSupplier.html" title="class or interface in java.util.function" class="external-link">DoubleSupplier</a></span>&nbsp;<span class="element-name">kS</span></div>
+<section class="detail" id="config">
+<h3>config</h3>
+<div class="member-signature"><span class="modifiers">protected</span>&nbsp;<span class="return-type"><a href="PIDFFConfig.html" title="class in common.core.controllers">PIDFFConfig</a></span>&nbsp;<span class="element-name">config</span></div>
 </section>
 </li>
 <li>
-<section class="detail" id="kV">
-<h3>kV</h3>
-<div class="member-signature"><span class="modifiers">protected</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/DoubleSupplier.html" title="class or interface in java.util.function" class="external-link">DoubleSupplier</a></span>&nbsp;<span class="element-name">kV</span></div>
+<section class="detail" id="inputMin">
+<h3>inputMin</h3>
+<div class="member-signature"><span class="modifiers">protected</span>&nbsp;<span class="return-type">double</span>&nbsp;<span class="element-name">inputMin</span></div>
 </section>
 </li>
 <li>
-<section class="detail" id="kA">
-<h3>kA</h3>
-<div class="member-signature"><span class="modifiers">protected</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/DoubleSupplier.html" title="class or interface in java.util.function" class="external-link">DoubleSupplier</a></span>&nbsp;<span class="element-name">kA</span></div>
+<section class="detail" id="inputMax">
+<h3>inputMax</h3>
+<div class="member-signature"><span class="modifiers">protected</span>&nbsp;<span class="return-type">double</span>&nbsp;<span class="element-name">inputMax</span></div>
 </section>
 </li>
 <li>
-<section class="detail" id="kG">
-<h3>kG</h3>
-<div class="member-signature"><span class="modifiers">protected</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/DoubleSupplier.html" title="class or interface in java.util.function" class="external-link">DoubleSupplier</a></span>&nbsp;<span class="element-name">kG</span></div>
+<section class="detail" id="outputMin">
+<h3>outputMin</h3>
+<div class="member-signature"><span class="modifiers">protected</span>&nbsp;<span class="return-type">double</span>&nbsp;<span class="element-name">outputMin</span></div>
 </section>
 </li>
 <li>
-<section class="detail" id="kG_Function">
-<h3>kG_Function</h3>
-<div class="member-signature"><span class="modifiers">protected</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/DoubleSupplier.html" title="class or interface in java.util.function" class="external-link">DoubleSupplier</a></span>&nbsp;<span class="element-name">kG_Function</span></div>
+<section class="detail" id="outputMax">
+<h3>outputMax</h3>
+<div class="member-signature"><span class="modifiers">protected</span>&nbsp;<span class="return-type">double</span>&nbsp;<span class="element-name">outputMax</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="enabled">
+<h3>enabled</h3>
+<div class="member-signature"><span class="modifiers">protected</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">enabled</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="disabledAtSetpoint">
+<h3>disabledAtSetpoint</h3>
+<div class="member-signature"><span class="modifiers">protected</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">disabledAtSetpoint</span></div>
 </section>
 </li>
 </ul>
@@ -431,6 +443,12 @@ implements edu.wpi.first.util.sendable.Sendable, <a href="https://docs.oracle.co
 <dd><code>config</code> - PIDFFConfig object containing PID and Feedforward constants.</dd>
 <dd><code>period</code> - The controller's update rate in seconds. Must be non-zero and positive.</dd>
 </dl>
+</section>
+</li>
+<li>
+<section class="detail" id="&lt;init&gt;(common.core.controllers.PIDFFConfig)">
+<h3>ControllerBase</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="element-name">ControllerBase</span><wbr><span class="parameters">(<a href="PIDFFConfig.html" title="class in common.core.controllers">PIDFFConfig</a>&nbsp;config)</span></div>
 </section>
 </li>
 </ul>
@@ -486,13 +504,37 @@ implements edu.wpi.first.util.sendable.Sendable, <a href="https://docs.oracle.co
 </section>
 </li>
 <li>
+<section class="detail" id="configureFeedback(java.util.function.DoubleSupplier,java.util.function.DoubleConsumer)">
+<h3>configureFeedback</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">configureFeedback</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/DoubleSupplier.html" title="class or interface in java.util.function" class="external-link">DoubleSupplier</a>&nbsp;measurement,
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/DoubleConsumer.html" title="class or interface in java.util.function" class="external-link">DoubleConsumer</a>&nbsp;output)</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="configureFeedback(common.hardware.motorcontroller.NAR_Motor)">
+<h3>configureFeedback</h3>
+<div class="member-signature"><span class="modifiers">public abstract</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">configureFeedback</span><wbr><span class="parameters">(<a href="../../hardware/motorcontroller/NAR_Motor.html" title="class in common.hardware.motorcontroller">NAR_Motor</a>&nbsp;motor)</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="getMeasurement()">
+<h3>getMeasurement</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">double</span>&nbsp;<span class="element-name">getMeasurement</span>()</div>
+<div class="block">Returns the measurement of the controller.</div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd>The measurement of the controller.</dd>
+</dl>
+</section>
+</li>
+<li>
 <section class="detail" id="useOutput()">
 <h3>useOutput</h3>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">double</span>&nbsp;<span class="element-name">useOutput</span>()</div>
-<div class="block">Calculates and sends output.</div>
+<div class="block">Calculates and sends output voltage.</div>
 <dl class="notes">
 <dt>Returns:</dt>
-<dd>Calculated output.</dd>
+<dd>Calculated output voltage.</dd>
 </dl>
 </section>
 </li>
@@ -634,6 +676,70 @@ implements edu.wpi.first.util.sendable.Sendable, <a href="https://docs.oracle.co
 </section>
 </li>
 <li>
+<section class="detail" id="setInputRange(double,double)">
+<h3>setInputRange</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">setInputRange</span><wbr><span class="parameters">(double&nbsp;minimumInput,
+ double&nbsp;maximumInput)</span></div>
+<div class="block">Sets the minimum and maximum values expected from the input.
+
+ <p>Input values outside of this range will be clamped.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>minimumInput</code> - The minimum value expected from the input.</dd>
+<dd><code>maximumInput</code> - The maximum value expected from the input.</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="getInputRange()">
+<h3>getInputRange</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">double[]</span>&nbsp;<span class="element-name">getInputRange</span>()</div>
+<div class="block">Returns the minimum and maximum values expected from the input.
+ 
+ <p>First element is inputMin.
+ <p>Second element is inputMax.</div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd>double[] with inputMin and inputMax.</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="setOutputRange(double,double)">
+<h3>setOutputRange</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">setOutputRange</span><wbr><span class="parameters">(double&nbsp;minimumOutput,
+ double&nbsp;maximumOutput)</span></div>
+<div class="block">Sets the minimum and maximum values of the controller output.
+
+ <p>Output values outside of this range will be clamped.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>minimumOutput</code> - The minimum value to write.</dd>
+<dd><code>maximumOutput</code> - The maximum value to write.</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="setConstraints(edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints)">
+<h3>setConstraints</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">setConstraints</span><wbr><span class="parameters">(edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints&nbsp;constraints)</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="getOutputRange()">
+<h3>getOutputRange</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">double[]</span>&nbsp;<span class="element-name">getOutputRange</span>()</div>
+<div class="block">Returns the minimum and maximum values expected from the output.
+ 
+ <p>First element is outputMin.
+ <p>Second element is outputMax.</div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd>double[] with outputMin and outputMax.</dd>
+</dl>
+</section>
+</li>
+<li>
 <section class="detail" id="enableContinuousInput(double,double)">
 <h3>enableContinuousInput</h3>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">enableContinuousInput</span><wbr><span class="parameters">(double&nbsp;minimumInput,
@@ -652,25 +758,31 @@ implements edu.wpi.first.util.sendable.Sendable, <a href="https://docs.oracle.co
 <li>
 <section class="detail" id="setTolerance(double)">
 <h3>setTolerance</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">setTolerance</span><wbr><span class="parameters">(double&nbsp;positionTolerance)</span></div>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">setTolerance</span><wbr><span class="parameters">(double&nbsp;measurementTolerance)</span></div>
 <div class="block">Sets the error which is considered tolerable for use with atSetpoint().</div>
 <dl class="notes">
 <dt>Parameters:</dt>
-<dd><code>positionTolerance</code> - Position error which is tolerable.</dd>
+<dd><code>measurementTolerance</code> - Position error which is tolerable.</dd>
 </dl>
 </section>
 </li>
 <li>
 <section class="detail" id="setTolerance(double,double)">
 <h3>setTolerance</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">setTolerance</span><wbr><span class="parameters">(double&nbsp;positionTolerance,
- double&nbsp;velocityTolerance)</span></div>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">setTolerance</span><wbr><span class="parameters">(double&nbsp;measurementTolerance,
+ double&nbsp;measurementROCTolerance)</span></div>
 <div class="block">Sets the error which is considered tolerable for use with atSetpoint().</div>
 <dl class="notes">
 <dt>Parameters:</dt>
-<dd><code>positionTolerance</code> - Position error which is tolerable.</dd>
-<dd><code>velocityTolerance</code> - Velocity error which is tolerable.</dd>
+<dd><code>measurementTolerance</code> - Position error which is tolerable.</dd>
+<dd><code>measurementROCTolerance</code> - Velocity error which is tolerable.</dd>
 </dl>
+</section>
+</li>
+<li>
+<section class="detail" id="setDisableAtSetpoint(boolean)">
+<h3>setDisableAtSetpoint</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">setDisableAtSetpoint</span><wbr><span class="parameters">(boolean&nbsp;disabledAtSetpoint)</span></div>
 </section>
 </li>
 <li>
@@ -716,136 +828,9 @@ implements edu.wpi.first.util.sendable.Sendable, <a href="https://docs.oracle.co
 </section>
 </li>
 <li>
-<section class="detail" id="setkS(double)">
-<h3>setkS</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">setkS</span><wbr><span class="parameters">(double&nbsp;kS)</span></div>
-<div class="block">Sets the static gain.</div>
-<dl class="notes">
-<dt>Parameters:</dt>
-<dd><code>kS</code> - The constant power required to overcome static friction as a double.</dd>
-</dl>
-</section>
-</li>
-<li>
-<section class="detail" id="setkS(java.util.function.DoubleSupplier)">
-<h3>setkS</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">setkS</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/DoubleSupplier.html" title="class or interface in java.util.function" class="external-link">DoubleSupplier</a>&nbsp;kS)</span></div>
-<div class="block">Sets the static gain.</div>
-<dl class="notes">
-<dt>Parameters:</dt>
-<dd><code>kS</code> - Modifies kS based on the function.</dd>
-</dl>
-</section>
-</li>
-<li>
-<section class="detail" id="setkV(double)">
-<h3>setkV</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">setkV</span><wbr><span class="parameters">(double&nbsp;kV)</span></div>
-<div class="block">Sets the velocity gain.</div>
-<dl class="notes">
-<dt>Parameters:</dt>
-<dd><code>kV</code> - The constant power required to maintain a set velocity as a double.</dd>
-</dl>
-</section>
-</li>
-<li>
-<section class="detail" id="setkV(java.util.function.DoubleSupplier)">
-<h3>setkV</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">setkV</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/DoubleSupplier.html" title="class or interface in java.util.function" class="external-link">DoubleSupplier</a>&nbsp;kV)</span></div>
-<div class="block">Sets the velocity gain.</div>
-<dl class="notes">
-<dt>Parameters:</dt>
-<dd><code>kV</code> - Modifies kV based on the function.</dd>
-</dl>
-</section>
-</li>
-<li>
-<section class="detail" id="setkA(java.util.function.DoubleSupplier)">
-<h3>setkA</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">setkA</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/DoubleSupplier.html" title="class or interface in java.util.function" class="external-link">DoubleSupplier</a>&nbsp;kA)</span></div>
-<div class="block">Sets the velocity gain.</div>
-<dl class="notes">
-<dt>Parameters:</dt>
-<dd><code>kA</code> - Modifies kV based on the function.</dd>
-</dl>
-</section>
-</li>
-<li>
-<section class="detail" id="setkG(double)">
-<h3>setkG</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">setkG</span><wbr><span class="parameters">(double&nbsp;kG)</span></div>
-<div class="block">Sets the gravity gain.</div>
-<dl class="notes">
-<dt>Parameters:</dt>
-<dd><code>kG</code> - The constant power required to overcome gravity as a double.</dd>
-</dl>
-</section>
-</li>
-<li>
-<section class="detail" id="setkG(java.util.function.DoubleSupplier)">
-<h3>setkG</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">setkG</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/DoubleSupplier.html" title="class or interface in java.util.function" class="external-link">DoubleSupplier</a>&nbsp;kG)</span></div>
-<div class="block">Sets the gravity gain.</div>
-<dl class="notes">
-<dt>Parameters:</dt>
-<dd><code>kG</code> - Modifies kG based on the function.</dd>
-</dl>
-</section>
-</li>
-<li>
-<section class="detail" id="setkG_Function(java.util.function.DoubleSupplier)">
-<h3>setkG_Function</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">setkG_Function</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/DoubleSupplier.html" title="class or interface in java.util.function" class="external-link">DoubleSupplier</a>&nbsp;kG_Function)</span></div>
-<div class="block">Sets a function to modify gravity gain based on another factor.
- <p>Example use would be a Pivot which would have gravity gain dependent on angle.</div>
-<dl class="notes">
-<dt>Parameters:</dt>
-<dd><code>kG_Function</code> - DoubleSupplier with specified logic.</dd>
-</dl>
-</section>
-</li>
-<li>
-<section class="detail" id="getkS()">
-<h3>getkS</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">double</span>&nbsp;<span class="element-name">getkS</span>()</div>
-<div class="block">Returns static gain.</div>
-<dl class="notes">
-<dt>Returns:</dt>
-<dd>returns kS as a double.</dd>
-</dl>
-</section>
-</li>
-<li>
-<section class="detail" id="getkV()">
-<h3>getkV</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">double</span>&nbsp;<span class="element-name">getkV</span>()</div>
-<div class="block">Returns velocity gain.</div>
-<dl class="notes">
-<dt>Returns:</dt>
-<dd>returns kV as a double.</dd>
-</dl>
-</section>
-</li>
-<li>
-<section class="detail" id="getkA()">
-<h3>getkA</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">double</span>&nbsp;<span class="element-name">getkA</span>()</div>
-<div class="block">Returns acceleration gain.</div>
-<dl class="notes">
-<dt>Returns:</dt>
-<dd>returns kA as a double.</dd>
-</dl>
-</section>
-</li>
-<li>
-<section class="detail" id="getkG()">
-<h3>getkG</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">double</span>&nbsp;<span class="element-name">getkG</span>()</div>
-<div class="block">Returns gravity gain.</div>
-<dl class="notes">
-<dt>Returns:</dt>
-<dd>returns kG as a double.</dd>
-</dl>
+<section class="detail" id="getConfig()">
+<h3>getConfig</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="PIDFFConfig.html" title="class in common.core.controllers">PIDFFConfig</a></span>&nbsp;<span class="element-name">getConfig</span>()</div>
 </section>
 </li>
 <li>
@@ -868,6 +853,24 @@ implements edu.wpi.first.util.sendable.Sendable, <a href="https://docs.oracle.co
 <dt>Returns:</dt>
 <dd>A PIDController object</dd>
 </dl>
+</section>
+</li>
+<li>
+<section class="detail" id="enable()">
+<h3>enable</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">enable</span>()</div>
+</section>
+</li>
+<li>
+<section class="detail" id="disable()">
+<h3>disable</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">disable</span>()</div>
+</section>
+</li>
+<li>
+<section class="detail" id="isEnabled()">
+<h3>isEnabled</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">isEnabled</span>()</div>
 </section>
 </li>
 <li>

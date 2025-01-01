@@ -161,10 +161,10 @@ public abstract class NAR_PIDSubsystem extends SubsystemBase {
         setpoint = NAR_Shuffleboard.debug(getName(), "Debug_Setpoint", 0, 2,2);
         NAR_Shuffleboard.addData(getName(), "Output", ()-> controller.useOutput(), 2, 3);
 
-        controller.setkS(NAR_Shuffleboard.debug(getName(), "kS", controller.getkS(), 3, 0));
-        controller.setkV(NAR_Shuffleboard.debug(getName(), "kV", controller.getkV(), 3, 1));
-        controller.setkA(NAR_Shuffleboard.debug(getName(), "kA", controller.getkA(), 3, 2));
-        controller.setkG(NAR_Shuffleboard.debug(getName(), "kG", controller.getkG(), 3, 3));
+        controller.getConfig().setkS(NAR_Shuffleboard.debug(getName(), "kS", controller.getConfig().getkS(), 3, 0));
+        controller.getConfig().setkV(NAR_Shuffleboard.debug(getName(), "kV", controller.getConfig().getkV(), 3, 1));
+        controller.getConfig().setkA(NAR_Shuffleboard.debug(getName(), "kA", controller.getConfig().getkA(), 3, 2));
+        controller.getConfig().setkG(NAR_Shuffleboard.debug(getName(), "kG", controller.getConfig().getkG(), 3, 3));
 
         NAR_Shuffleboard.addData(getName(), "Commands", getCurrentCommand(), 4, 0);
     }
@@ -250,7 +250,7 @@ public abstract class NAR_PIDSubsystem extends SubsystemBase {
      * @param kG_Function the function multiplied to kG
      */
     public void setkG_Function(DoubleSupplier kG_Function) {
-        controller.setkG_Function(kG_Function);
+        controller.getConfig().setkG_Function(kG_Function);
     }
 
     /**

@@ -90,21 +90,24 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-first">Modifier and Type</div>
 <div class="table-header col-second">Field</div>
 <div class="table-header col-last">Description</div>
+<div class="col-first even-row-color"><code>final double</code></div>
+<div class="col-second even-row-color"><code><a href="#distanceFactor" class="member-name-link">distanceFactor</a></code></div>
+<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-first odd-row-color"><code>final boolean</code></div>
+<div class="col-second odd-row-color"><code><a href="#inverted" class="member-name-link">inverted</a></code></div>
+<div class="col-last odd-row-color">&nbsp;</div>
+<div class="col-first even-row-color"><code>final <a href="NAR_Motor.Neutral.html" title="enum class in common.hardware.motorcontroller">NAR_Motor.Neutral</a></code></div>
+<div class="col-second even-row-color"><code><a href="#mode" class="member-name-link">mode</a></code></div>
+<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-first odd-row-color"><code>final int</code></div>
+<div class="col-second odd-row-color"><code><a href="#statorLimit" class="member-name-link">statorLimit</a></code></div>
+<div class="col-last odd-row-color">&nbsp;</div>
 <div class="col-first even-row-color"><code>final int</code></div>
-<div class="col-second even-row-color"><code><a href="#currentLimit" class="member-name-link">currentLimit</a></code></div>
+<div class="col-second even-row-color"><code><a href="#supplyLimit" class="member-name-link">supplyLimit</a></code></div>
 <div class="col-last even-row-color">&nbsp;</div>
 <div class="col-first odd-row-color"><code>final double</code></div>
-<div class="col-second odd-row-color"><code><a href="#distanceFactor" class="member-name-link">distanceFactor</a></code></div>
+<div class="col-second odd-row-color"><code><a href="#timeFactor" class="member-name-link">timeFactor</a></code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
-<div class="col-first even-row-color"><code>final boolean</code></div>
-<div class="col-second even-row-color"><code><a href="#inverted" class="member-name-link">inverted</a></code></div>
-<div class="col-last even-row-color">&nbsp;</div>
-<div class="col-first odd-row-color"><code>final <a href="NAR_Motor.Neutral.html" title="enum class in common.hardware.motorcontroller">NAR_Motor.Neutral</a></code></div>
-<div class="col-second odd-row-color"><code><a href="#mode" class="member-name-link">mode</a></code></div>
-<div class="col-last odd-row-color">&nbsp;</div>
-<div class="col-first even-row-color"><code>final double</code></div>
-<div class="col-second even-row-color"><code><a href="#timeFactor" class="member-name-link">timeFactor</a></code></div>
-<div class="col-last even-row-color">&nbsp;</div>
 </div>
 </section>
 </li>
@@ -118,10 +121,17 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-last">Description</div>
 <div class="col-constructor-name even-row-color"><code><a href="#%3Cinit%3E(double,double,int,boolean,common.hardware.motorcontroller.NAR_Motor.Neutral)" class="member-name-link">MotorConfig</a><wbr>(double&nbsp;distanceFactor,
  double&nbsp;timeFactor,
- int&nbsp;currentLimit,
+ int&nbsp;statorLimit,
  boolean&nbsp;inverted,
  <a href="NAR_Motor.Neutral.html" title="enum class in common.hardware.motorcontroller">NAR_Motor.Neutral</a>&nbsp;mode)</code></div>
-<div class="col-last even-row-color">
+<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-constructor-name odd-row-color"><code><a href="#%3Cinit%3E(double,double,int,int,boolean,common.hardware.motorcontroller.NAR_Motor.Neutral)" class="member-name-link">MotorConfig</a><wbr>(double&nbsp;distanceFactor,
+ double&nbsp;timeFactor,
+ int&nbsp;statorLimit,
+ int&nbsp;supplyLimit,
+ boolean&nbsp;inverted,
+ <a href="NAR_Motor.Neutral.html" title="enum class in common.hardware.motorcontroller">NAR_Motor.Neutral</a>&nbsp;mode)</code></div>
+<div class="col-last odd-row-color">
 <div class="block">Creates a new motor config</div>
 </div>
 </div>
@@ -158,9 +168,15 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
-<section class="detail" id="currentLimit">
-<h3>currentLimit</h3>
-<div class="member-signature"><span class="modifiers">public final</span>&nbsp;<span class="return-type">int</span>&nbsp;<span class="element-name">currentLimit</span></div>
+<section class="detail" id="supplyLimit">
+<h3>supplyLimit</h3>
+<div class="member-signature"><span class="modifiers">public final</span>&nbsp;<span class="return-type">int</span>&nbsp;<span class="element-name">supplyLimit</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="statorLimit">
+<h3>statorLimit</h3>
+<div class="member-signature"><span class="modifiers">public final</span>&nbsp;<span class="return-type">int</span>&nbsp;<span class="element-name">statorLimit</span></div>
 </section>
 </li>
 <li>
@@ -184,22 +200,34 @@ loadScripts(document, 'script');</script>
 <h2>Constructor Details</h2>
 <ul class="member-list">
 <li>
-<section class="detail" id="&lt;init&gt;(double,double,int,boolean,common.hardware.motorcontroller.NAR_Motor.Neutral)">
+<section class="detail" id="&lt;init&gt;(double,double,int,int,boolean,common.hardware.motorcontroller.NAR_Motor.Neutral)">
 <h3>MotorConfig</h3>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="element-name">MotorConfig</span><wbr><span class="parameters">(double&nbsp;distanceFactor,
  double&nbsp;timeFactor,
- int&nbsp;currentLimit,
+ int&nbsp;statorLimit,
+ int&nbsp;supplyLimit,
  boolean&nbsp;inverted,
  <a href="NAR_Motor.Neutral.html" title="enum class in common.hardware.motorcontroller">NAR_Motor.Neutral</a>&nbsp;mode)</span></div>
 <div class="block">Creates a new motor config</div>
 <dl class="notes">
 <dt>Parameters:</dt>
-<dd><code>distanceFactor</code> - Factor to multiply distance units by, ie. rotations</dd>
-<dd><code>timeFactor</code> - Factor to multiply time units by, ie. minutes</dd>
-<dd><code>currentLimit</code> - The currentLimit for the motor</dd>
+<dd><code>distanceFactor</code> - Factor to multiply distance units by (per rotations) ie. input circumference for distance</dd>
+<dd><code>timeFactor</code> - Factor to multiply time units by (per minutes) ie. use 60 for seconds, 1 for minutes</dd>
+<dd><code>statorLimit</code> - The currentLimit for the stator</dd>
+<dd><code>supplyLimit</code> - The currentLimit for the motor controller</dd>
 <dd><code>inverted</code> - Whether or not the motor is inverted.</dd>
 <dd><code>mode</code> - Neutral mode for the motor.</dd>
 </dl>
+</section>
+</li>
+<li>
+<section class="detail" id="&lt;init&gt;(double,double,int,boolean,common.hardware.motorcontroller.NAR_Motor.Neutral)">
+<h3>MotorConfig</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="element-name">MotorConfig</span><wbr><span class="parameters">(double&nbsp;distanceFactor,
+ double&nbsp;timeFactor,
+ int&nbsp;statorLimit,
+ boolean&nbsp;inverted,
+ <a href="NAR_Motor.Neutral.html" title="enum class in common.hardware.motorcontroller">NAR_Motor.Neutral</a>&nbsp;mode)</span></div>
 </section>
 </li>
 </ul>

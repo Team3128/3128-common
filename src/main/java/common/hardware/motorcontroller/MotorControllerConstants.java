@@ -29,6 +29,9 @@ public class MotorControllerConstants {
 
     public static final int canSparkMaxTimeout = 500; //ms
 
-    public static final int NEO_CurrentLimit = 40; //amps
-    public static final int NEO_550CurrentLimit = 20; //amps
+    public static final int NEO_STATOR_CurrentLimit = 40; //amps
+    public static final int NEO_STATOR_550CurrentLimit = 20; //amps
+    
+    public static final int NEO_SUPPLY_CurrentLimit = 120; //amps
+    public static final int NEO_SUPPLY_550CurrentLimit = 40; //amps
 }

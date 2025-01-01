@@ -1,17 +1,15 @@
 package common.core.swerve;
 
-import org.littletonrobotics.junction.Logger;
-
-import common.core.misc.NAR_Robot;
+import common.hardware.motorcontroller.NAR_Motor;
 import common.hardware.motorcontroller.NAR_Motor.Control;
 import common.utility.narwhaldashboard.NarwhalDashboard;
 import common.utility.shuffleboard.NAR_Shuffleboard;
+import common.utility.sysid.CmdSysId;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -19,24 +17,26 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public abstract class SwerveBase extends SubsystemBase {
 
-    public boolean chassisVelocityCorrection = true;
+    protected boolean chassisVelocityCorrection = true;
+    public boolean fieldRelative = true;
+    protected double dtConstant = 0.009;
+    protected double throttle = 1;
 
     protected final SwerveDriveKinematics kinematics;
     protected SwerveDrivePoseEstimator odometry;
     protected final SwerveModule[] modules;
     private Pose2d estimatedPose;
 
-    public boolean fieldRelative;
     public double maxSpeed;
 
     public SwerveBase(SwerveDriveKinematics kinematics, Matrix<N3, N1> stateStdDevs, Matrix<N3, N1> visionMeasurementDevs, SwerveModuleConfig... configs) {
         this.kinematics = kinematics;
         this.maxSpeed = configs[0].maxSpeed;
-        fieldRelative = true;
         estimatedPose = new Pose2d();
 
         modules = new SwerveModule[] {
@@ -61,55 +61,40 @@ public abstract class SwerveBase extends SubsystemBase {
         }
         NAR_Shuffleboard.addData("Swerve", "Pose", ()-> estimatedPose.toString(), 3, 0, 4, 1);
         NAR_Shuffleboard.addData("Swerve", "Robot Velocity", ()-> getRobotVelocity().toString(), 3, 1, 4, 1);
-        NAR_Shuffleboard.addData("Swerve", "Velocity", ()-> getVelocity(), 3, 3, 1, 1);
+        NAR_Shuffleboard.addData("Swerve", "Velocity", ()-> getSpeed(), 3, 3, 1, 1);
         NAR_Shuffleboard.addData("Swerve", "Field Velocity", ()-> getFieldVelocity().toString(), 3, 2, 4, 1);
         NAR_Shuffleboard.addData("Swerve", "Gyro", ()-> getYaw(), 7, 0, 2, 2).withWidget("Gyro");
     }
 
-    public void drive(Translation2d translation, double rotation, boolean fieldRelative) {
-        drive(fieldRelative ? ChassisSpeeds.fromFieldRelativeSpeeds(
-                translation.getX(), translation.getY(), rotation, getGyroRotation2d())
-                : new ChassisSpeeds(translation.getX(), translation.getY(), rotation));
+    public void drive(Translation2d translationVel, Rotation2d rotationVel) {
+        drive(new ChassisSpeeds(translationVel.getX(), translationVel.getY(), rotationVel.getRadians()));
     }
 
-    public void drive(ChassisSpeeds velocity) {
-        if (chassisVelocityCorrection) {
-            double dtConstant = 0.009;
-            Pose2d robotPoseVel = new Pose2d(velocity.vxMetersPerSecond * dtConstant,
-                                            velocity.vyMetersPerSecond * dtConstant,
-                                            Rotation2d.fromRadians(velocity.omegaRadiansPerSecond * dtConstant));
-            Twist2d twistVel = PoseLog(robotPoseVel);
+    public void drive(Translation2d translationVel, double rotationVel) {
+        drive(new ChassisSpeeds(translationVel.getX(), translationVel.getY(), rotationVel));
+    }
 
-            velocity = new ChassisSpeeds(twistVel.dx / dtConstant, twistVel.dy / dtConstant,
-                                        twistVel.dtheta / dtConstant);
-        }
-        setModuleStates(kinematics.toSwerveModuleStates(velocity));
-        Logger.recordOutput("Swerve/DesiredModuleStates", kinematics.toSwerveModuleStates(velocity));
+    // forces into robot relative speeds
+    public void drive(double xVel, double yVel, double omega) {
+        drive(ChassisSpeeds.fromRobotRelativeSpeeds(xVel, yVel, omega, getGyroRotation2d()));
     }
 
     /**
-   * Logical inverse of the Pose exponential from 254. Taken from team 3181.
-   *
-   * @param transform Pose to perform the log on.
-   * @return {@link Twist2d} of the transformed pose.
-   */
-    public static Twist2d PoseLog(final Pose2d transform) {
-        final double kEps          = 1E-9;
-        final double dtheta        = transform.getRotation().getRadians();
-        final double half_dtheta   = 0.5 * dtheta;
-        final double cos_minus_one = transform.getRotation().getCos() - 1.0;
-        double       halftheta_by_tan_of_halfdtheta;
-        if (Math.abs(cos_minus_one) < kEps)
-        {
-        halftheta_by_tan_of_halfdtheta = 1.0 - 1.0 / 12.0 * dtheta * dtheta;
-        } else
-        {
-        halftheta_by_tan_of_halfdtheta = -(half_dtheta * transform.getRotation().getSin()) / cos_minus_one;
-        }
-        final Translation2d translation_part = transform.getTranslation()
-                                                        .rotateBy(new Rotation2d(halftheta_by_tan_of_halfdtheta,
-                                                                                -half_dtheta));
-        return new Twist2d(translation_part.getX(), translation_part.getY(), dtheta);
+     * Provides user editable insulation between requests and assignments to the swerve modules
+     * @param velocity requested 
+     */
+    public void drive(ChassisSpeeds velocity) {
+        assign(velocity);
+    }
+
+    /**
+     * Assigns the requested velocity to the swerve modules
+     * @param velocity requested velocity
+     */
+    public void assign(ChassisSpeeds velocity) {
+        if(fieldRelative) velocity = ChassisSpeeds.fromFieldRelativeSpeeds(velocity, getGyroRotation2d()); // convert to field relative if applicable
+        if(chassisVelocityCorrection) velocity = ChassisSpeeds.discretize(velocity, dtConstant);
+        setModuleStates(kinematics.toSwerveModuleStates(velocity.times(throttle)));
     }
 
     public void stop() {
@@ -124,15 +109,18 @@ public abstract class SwerveBase extends SubsystemBase {
         }
     }
 
-    public void setVoltage(double volts) {
+    public void setDriveVoltage(double volts) {
         for (final SwerveModule module : modules) {
             module.getDriveMotor().setVolts(volts);
-            module.getAngleMotor().set(0, Control.Position);
         }
     }
 
     public Pose2d getPose() {
         return new Pose2d(estimatedPose.getTranslation(), getGyroRotation2d());
+    }
+
+    public Pose2d getRawEstimatedPose() {
+        return estimatedPose;
     }
 
     public void addVisionMeasurement(Pose2d pose, double timeStamp) {
@@ -146,7 +134,7 @@ public abstract class SwerveBase extends SubsystemBase {
     }
 
     public void resetOdometry(Pose2d pose) {
-        zeroGyro(pose.getRotation().getDegrees());
+        resetGyro(pose.getRotation().getDegrees());
         odometry.resetPosition(getGyroRotation2d(), getPositions(), pose);
     }
 
@@ -166,7 +154,7 @@ public abstract class SwerveBase extends SubsystemBase {
         return positions;
     }
     
-    public void toggle() {
+    public void toggleFieldRelative() {
         fieldRelative = !fieldRelative;
     }
 
@@ -182,45 +170,61 @@ public abstract class SwerveBase extends SubsystemBase {
     public void periodic() {
         odometry.update(getGyroRotation2d(), getPositions());
         estimatedPose = odometry.getEstimatedPosition();
-        if (NAR_Robot.logWithAdvantageKit) {
-            Logger.recordOutput("Swerve/ActualModuleStates", getStates());
-            Logger.recordOutput("Swerve/RobotRotation", getGyroRotation2d());
-        }
     }
 
     public void resetAll() {
         resetOdometry(new Pose2d(0,0, new Rotation2d(0)));
         resetEncoders();
+        resetGyro(0);
     }
     
-    //DON't USE RELIES ON APRIL TAG BAD ANGLE MEASUREMENT
-    public Rotation2d getRotation2d() {
-        return estimatedPose.getRotation();
+    public void xLock() {
+        modules[0].getAngleMotor().set(45, Control.Position);
+        modules[1].getAngleMotor().set(-45, Control.Position);
+        modules[2].getAngleMotor().set(135, Control.Position);
+        modules[3].getAngleMotor().set(-135, Control.Position);
     }
 
-    public void xlock() {
-        modules[0].xLock(Rotation2d.fromDegrees(45));
-        modules[1].xLock(Rotation2d.fromDegrees(-45));
-        modules[2].xLock(Rotation2d.fromDegrees(-45));
-        modules[3].xLock(Rotation2d.fromDegrees(45));
+    public void oLock() {
+        modules[0].getAngleMotor().set(135, Control.Position);
+        modules[1].getAngleMotor().set(45, Control.Position);
+        modules[2].getAngleMotor().set(-135, Control.Position);
+        modules[3].getAngleMotor().set(-45, Control.Position);
+    }
+
+    public void zeroLock() {
+        modules[0].getAngleMotor().set(0, Control.Position);
+        modules[1].getAngleMotor().set(0, Control.Position);
+        modules[2].getAngleMotor().set(0, Control.Position);
+        modules[3].getAngleMotor().set(0, Control.Position);
+    }
+
+    public Command characterize(double startDelay, double rampRate) {
+        NAR_Motor driveMotor = modules[0].getDriveMotor();
+        return new CmdSysId(
+            getName(), 
+            (volts)-> setDriveVoltage(volts), 
+            ()-> driveMotor.getVelocity(), 
+            ()-> driveMotor.getPosition(), 
+            startDelay, 
+            rampRate, 
+            4, 
+            true, 
+            this
+        );
     }
 
     public abstract double getYaw();
-
-    public Rotation2d getGyroRotation2d() {
-        return Rotation2d.fromDegrees(getYaw());
-    }
-
-    //DONT USE THIS METHOD, it relies on the bad april tag angle measurements
-    public double getHeading() {
-        return getRotation2d().getDegrees();
-    }
 
     public abstract double getPitch();
 
     public abstract double getRoll();
 
-    public abstract void zeroGyro(double reset);
+    public Rotation2d getGyroRotation2d() {
+        return Rotation2d.fromDegrees(getYaw());
+    }
+
+    public abstract void resetGyro(double reset);
 
     /**
      * Gets the current field-relative velocity (x, y and omega) of the robot
@@ -228,12 +232,8 @@ public abstract class SwerveBase extends SubsystemBase {
      * @return A ChassisSpeeds object of the current field-relative velocity
      */
     public ChassisSpeeds getFieldVelocity() {
-        // ChassisSpeeds has a method to convert from field-relative to robot-relative speeds,
-        // but not the reverse.  However, because this transform is a simple rotation, negating the
-        // angle
-        // given as the robot angle reverses the direction of rotation, and the conversion is reversed.
-        return ChassisSpeeds.fromFieldRelativeSpeeds(
-            kinematics.toChassisSpeeds(getStates()), getGyroRotation2d().unaryMinus());
+        return ChassisSpeeds.fromRobotRelativeSpeeds(
+            kinematics.toChassisSpeeds(getStates()), getGyroRotation2d());
     }
 
     /**
@@ -241,18 +241,22 @@ public abstract class SwerveBase extends SubsystemBase {
      *
      * @return A ChassisSpeeds object of the current robot-relative velocity
      */
-    public ChassisSpeeds getRobotVelocity()
-    {
+    public ChassisSpeeds getRobotVelocity() {
         return kinematics.toChassisSpeeds(getStates());
     }
 
-    public double getVelocity() {
-        final ChassisSpeeds speeds = getRobotVelocity();
-        return Math.hypot(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond);
+    public double getSpeed() {
+        final ChassisSpeeds velocity = getRobotVelocity();
+        return Math.hypot(velocity.vxMetersPerSecond, velocity.vyMetersPerSecond);
     }
 
     public SwerveModule[] getModules() {
         return modules;
+    }
+
+    public SwerveModule getModule(int moduleNumber) {
+        if(moduleNumber < 0 || moduleNumber > 3) throw new IllegalArgumentException("Module number must be between 0 and 3");
+        return modules[moduleNumber];
     }
 
     public void initStateCheck() {
@@ -260,4 +264,21 @@ public abstract class SwerveBase extends SubsystemBase {
             NarwhalDashboard.getInstance().checkState("Module" + module.moduleNumber, ()-> module.getRunningState());
         }
     }
+
+    public Pose2d getPredictedPose(ChassisSpeeds velocity, double dt) {
+        final Translation2d x = getPose().getTranslation();
+        final Rotation2d theta = getPose().getRotation();
+        final Translation2d dx = new Translation2d(velocity.vxMetersPerSecond * dt, velocity.vyMetersPerSecond * dt);
+        final Rotation2d dtheta = Rotation2d.fromRadians(velocity.omegaRadiansPerSecond * dt);
+        return new Pose2d(x.plus(dx), theta.plus(dtheta));
+    }
+
+    public Translation2d getDistanceTo(Translation2d point) {
+        return getPose().getTranslation().minus(point);
+    }
+
+    public Rotation2d getAngleTo(Translation2d point) {
+        return getPose().getRotation().minus(getDistanceTo(point).getAngle());
+    }
+
 }

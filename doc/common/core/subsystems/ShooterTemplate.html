@@ -158,19 +158,19 @@ loadScripts(document, 'script');</script>
 <div class="block">Returns the measurement of the process variable used by the PIDController.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>edu.wpi.first.wpilibj2.command.Command</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#runShooter(double)" class="member-name-link">runShooter</a><wbr>(double&nbsp;power)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Runs the shooter at a specific power.</div>
-</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>protected void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setPower(double)" class="member-name-link">setPower</a><wbr>(double&nbsp;power)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Sets power to all motors.</div>
-</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>edu.wpi.first.wpilibj2.command.Command</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#shoot(double)" class="member-name-link">shoot</a><wbr>(double&nbsp;setpoint)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#pidTo(double)" class="member-name-link">pidTo</a><wbr>(double&nbsp;setpoint)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Runs shooter at desired RPM.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>edu.wpi.first.wpilibj2.command.Command</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#run(double)" class="member-name-link">run</a><wbr>(double&nbsp;power)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Runs the shooter at a specific power.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>protected void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setPower(double)" class="member-name-link">setPower</a><wbr>(double&nbsp;power)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Sets power to all motors.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>protected void</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#useOutput(double,double)" class="member-name-link">useOutput</a><wbr>(double&nbsp;output,
@@ -183,7 +183,7 @@ loadScripts(document, 'script');</script>
 </div>
 <div class="inherited-list">
 <h3 id="methods-inherited-from-class-common.core.subsystems.NAR_PIDSubsystem">Methods inherited from class&nbsp;common.core.subsystems.<a href="NAR_PIDSubsystem.html" title="class in common.core.subsystems">NAR_PIDSubsystem</a></h3>
-<code><a href="NAR_PIDSubsystem.html#atSetpoint()">atSetpoint</a>, <a href="NAR_PIDSubsystem.html#disable()">disable</a>, <a href="NAR_PIDSubsystem.html#enable()">enable</a>, <a href="NAR_PIDSubsystem.html#enableContinuousInput(double,double)">enableContinuousInput</a>, <a href="NAR_PIDSubsystem.html#getController()">getController</a>, <a href="NAR_PIDSubsystem.html#getSetpoint()">getSetpoint</a>, <a href="NAR_PIDSubsystem.html#initShuffleboard()">initShuffleboard</a>, <a href="NAR_PIDSubsystem.html#isDebug()">isDebug</a>, <a href="NAR_PIDSubsystem.html#isEnabled()">isEnabled</a>, <a href="NAR_PIDSubsystem.html#periodic()">periodic</a>, <a href="NAR_PIDSubsystem.html#setConstraints(double,double)">setConstraints</a>, <a href="NAR_PIDSubsystem.html#setkG_Function(java.util.function.DoubleSupplier)">setkG_Function</a>, <a href="NAR_PIDSubsystem.html#setSafetyThresh(double)">setSafetyThresh</a>, <a href="NAR_PIDSubsystem.html#setTolerance(double)">setTolerance</a>, <a href="NAR_PIDSubsystem.html#setUpdateTime(double)">setUpdateTime</a>, <a href="NAR_PIDSubsystem.html#startPID(double)">startPID</a></code></div>
+<code><a href="NAR_PIDSubsystem.html#addDisableCondition(java.util.function.BooleanSupplier)">addDisableCondition</a>, <a href="NAR_PIDSubsystem.html#atSetpoint()">atSetpoint</a>, <a href="NAR_PIDSubsystem.html#disable()">disable</a>, <a href="NAR_PIDSubsystem.html#enable()">enable</a>, <a href="NAR_PIDSubsystem.html#enableContinuousInput(double,double)">enableContinuousInput</a>, <a href="NAR_PIDSubsystem.html#getController()">getController</a>, <a href="NAR_PIDSubsystem.html#getDisableConditions()">getDisableConditions</a>, <a href="NAR_PIDSubsystem.html#getSetpoint()">getSetpoint</a>, <a href="NAR_PIDSubsystem.html#initShuffleboard()">initShuffleboard</a>, <a href="NAR_PIDSubsystem.html#isDebug()">isDebug</a>, <a href="NAR_PIDSubsystem.html#isEnabled()">isEnabled</a>, <a href="NAR_PIDSubsystem.html#onConstraintViolation()">onConstraintViolation</a>, <a href="NAR_PIDSubsystem.html#onSafetyTimeout()">onSafetyTimeout</a>, <a href="NAR_PIDSubsystem.html#periodic()">periodic</a>, <a href="NAR_PIDSubsystem.html#setConstraints(double,double)">setConstraints</a>, <a href="NAR_PIDSubsystem.html#setkG_Function(java.util.function.DoubleSupplier)">setkG_Function</a>, <a href="NAR_PIDSubsystem.html#setSafetyThresh(double)">setSafetyThresh</a>, <a href="NAR_PIDSubsystem.html#setTolerance(double)">setTolerance</a>, <a href="NAR_PIDSubsystem.html#setUpdateTime(double)">setUpdateTime</a>, <a href="NAR_PIDSubsystem.html#startPID(double)">startPID</a></code></div>
 <div class="inherited-list">
 <h3 id="methods-inherited-from-class-edu.wpi.first.wpilibj2.command.SubsystemBase">Methods inherited from class&nbsp;edu.wpi.first.wpilibj2.command.SubsystemBase</h3>
 <code>addChild, getName, getSubsystem, initSendable, setName, setSubsystem</code></div>
@@ -274,9 +274,9 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
-<section class="detail" id="shoot(double)">
-<h3>shoot</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">edu.wpi.first.wpilibj2.command.Command</span>&nbsp;<span class="element-name">shoot</span><wbr><span class="parameters">(double&nbsp;setpoint)</span></div>
+<section class="detail" id="pidTo(double)">
+<h3>pidTo</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">edu.wpi.first.wpilibj2.command.Command</span>&nbsp;<span class="element-name">pidTo</span><wbr><span class="parameters">(double&nbsp;setpoint)</span></div>
 <div class="block">Runs shooter at desired RPM.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
@@ -287,9 +287,9 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
-<section class="detail" id="runShooter(double)">
-<h3>runShooter</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">edu.wpi.first.wpilibj2.command.Command</span>&nbsp;<span class="element-name">runShooter</span><wbr><span class="parameters">(double&nbsp;power)</span></div>
+<section class="detail" id="run(double)">
+<h3>run</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">edu.wpi.first.wpilibj2.command.Command</span>&nbsp;<span class="element-name">run</span><wbr><span class="parameters">(double&nbsp;power)</span></div>
 <div class="block">Runs the shooter at a specific power.</div>
 <dl class="notes">
 <dt>Parameters:</dt>

@@ -1,7 +1,8 @@
 package common.hardware.motorcontroller;
 
 import static common.hardware.motorcontroller.MotorControllerConstants.HIGH_PRIORITY_FREQ;
-import static common.hardware.motorcontroller.MotorControllerConstants.NEO_CurrentLimit;
+import static common.hardware.motorcontroller.MotorControllerConstants.NEO_STATOR_CurrentLimit;
+import static common.hardware.motorcontroller.MotorControllerConstants.NEO_SUPPLY_CurrentLimit;
 
 import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.StatusSignal;
@@ -56,7 +57,7 @@ public class NAR_TalonFX extends NAR_Motor {
         temperature = motor.getDeviceTemp();
 
         enableVoltageCompensation(12);
-        setCurrentLimit(NEO_CurrentLimit);
+        setCurrentLimit(NEO_STATOR_CurrentLimit, NEO_SUPPLY_CurrentLimit);
         configPID(pidConfig);
     }
 
@@ -172,9 +173,24 @@ public class NAR_TalonFX extends NAR_Motor {
     }
 
     @Override
-    public void setCurrentLimit(int limit) {
+    public void setStatorLimit(int limit) {
         currentLimitsConfigs.StatorCurrentLimit = limit;
         currentLimitsConfigs.StatorCurrentLimitEnable = true;
+        configTalonFX(()-> motor.getConfigurator().apply(currentLimitsConfigs));
+    }
+
+    @Override
+    public void setSupplyLimit(int limit) {
+        currentLimitsConfigs.SupplyCurrentLimit = limit;
+        currentLimitsConfigs.SupplyCurrentLimitEnable = true;
+        configTalonFX(()-> motor.getConfigurator().apply(currentLimitsConfigs));
+    }
+
+    public void setCurrentLimit(int statorLimit, int supplyLimit) {
+        currentLimitsConfigs.StatorCurrentLimit = statorLimit;
+        currentLimitsConfigs.StatorCurrentLimitEnable = true;
+        currentLimitsConfigs.SupplyCurrentLimit = supplyLimit;
+        currentLimitsConfigs.SupplyCurrentLimitEnable = true;
         configTalonFX(()-> motor.getConfigurator().apply(currentLimitsConfigs));
     }
 
