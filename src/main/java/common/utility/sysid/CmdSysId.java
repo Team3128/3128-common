@@ -17,6 +17,7 @@ public class CmdSysId extends Command {
     private final Consumer<Double> voltageConsumer;
     private final Supplier<Double> velocitySupplier;
     private final Supplier<Double> positionSupplier;
+    private final Supplier<Double> angularVelocitySupplier;
 
     private final double startDelaySecs;
     private final double rampRateVoltsPerSec;
@@ -25,6 +26,49 @@ public class CmdSysId extends Command {
     private final boolean goingForward;
 
     private final Timer timer = new Timer();
+
+    /**
+     * Creates a new command to identify feed forward constants of the subsystem.
+     * @param name Name of the test.
+     * @param voltageConsumer Motors of the subsystem.
+     * @param velocitySupplier Velocity of the subsystem.
+     * @param positionSupplier Position of the subsystem.
+     * @param angularVelocitySupplier Angular velocity of the system.
+     * @param startDelaySecs Delay before the command starts.
+     * @param rampRateVoltsPerSec Rate at which voltage increases.
+     * @param targetPosition Target position to reach.
+     * @param goingForward Direction to move in.
+     * @param subsystems Subsystems used.
+     */
+    public CmdSysId(
+        String name,
+        Consumer<Double> voltageConsumer,
+        Supplier<Double> velocitySupplier,
+        Supplier<Double> positionSupplier,
+        Supplier<Double> angularVelocitySupplier,
+        double startDelaySecs,
+        double rampRateVoltsPerSec,
+        double wheelRadius,
+        double robotRadius,
+        double torqueConstant,
+        Subsystem... subsystems
+        ) {
+        this.data = new FFCharacterization(name);
+        this.voltageConsumer = voltageConsumer;
+        this.velocitySupplier = velocitySupplier;
+        this.positionSupplier = positionSupplier;
+        this.angularVelocitySupplier = angularVelocitySupplier;
+
+        this.startDelaySecs = startDelaySecs;
+        this.rampRateVoltsPerSec = rampRateVoltsPerSec;
+
+        this.targetPosition = Double.POSITIVE_INFINITY;
+        this.goingForward = true;
+
+        data.initMOI(wheelRadius, robotRadius, torqueConstant);
+        
+        addRequirements(subsystems);
+    }
 
     /**
      * Creates a new command to identify feed forward constants of the subsystem.
@@ -53,6 +97,7 @@ public class CmdSysId extends Command {
         this.voltageConsumer = voltageConsumer;
         this.velocitySupplier = velocitySupplier;
         this.positionSupplier = positionSupplier;
+        this.angularVelocitySupplier = () -> 0.0;
 
         this.startDelaySecs = startDelaySecs;
         this.rampRateVoltsPerSec = rampRateVoltsPerSec;

@@ -11,6 +11,7 @@ public class FFCharacterization {
 
     private final String name;
     private final LinkedList<Double> velocityData = new LinkedList<>();
+    private final LinkedList<Double> angularVelocityData = new LinkedList<>();
     private final LinkedList<Double> voltageData = new LinkedList<>();
     private final LinkedList<Double> timeData = new LinkedList<>();
     private final LinkedList<Double> accelerationData = new LinkedList<>();
@@ -22,6 +23,11 @@ public class FFCharacterization {
     private double kS;
     private double kV;
     private double kA;
+    private double moi;
+
+    private double wheelRadius;
+    private double robotRadius;
+    private double torqueConstant;
 
 
     /**
@@ -30,6 +36,12 @@ public class FFCharacterization {
      */
     public FFCharacterization(String name) {
       this.name = name;
+    }
+
+    public void initMOI(double wheelRadius, double robotRadius, double torqueConstant){
+        this.wheelRadius = wheelRadius;
+        this.robotRadius = robotRadius;
+        this.torqueConstant = torqueConstant;
     }
 
     /**
@@ -45,6 +57,21 @@ public class FFCharacterization {
         timeData.add(time);
       }
     }
+
+    /**
+     * Adds the subsystem's state at a specific time.
+     * @param time Current time.
+     * @param velocity Velocity of the subsystem.
+     * @param voltage Voltage applied to the subsystem.
+     */
+    public void add(double time, double velocity, double voltage, double angularVelocity) {
+        if (Math.abs(velocity) > 1E-4) {
+          velocityData.add(Math.abs(velocity));
+          angularVelocityData.add(Math.abs(angularVelocity));
+          voltageData.add(Math.abs(voltage));
+          timeData.add(time);
+        }
+      }
 
     /**
      * Display the feedforward constants calculated from the data.
@@ -90,6 +117,8 @@ public class FFCharacterization {
 
         kA = voltageAccelerationRegression.beta(1);
 
+        moi = calculateMOI();
+
         System.out.println("FF Characterization Results (" + name + "):");
         System.out.println(
             "\tCount=" + Integer.toString(velocityData.size()) + ""
@@ -98,6 +127,33 @@ public class FFCharacterization {
         System.out.println(String.format("\tkS=%.5f", kS));                                        //ks
         System.out.println(String.format("\tkV=%.5f", kV));                                        //kv
         System.out.println(String.format("\tkA=%.5f", kA));                                        //ka
+        System.out.println(String.format("\tM=%.5f", 0));        //R2
+    }
+
+    private double calculateMOI(){
+        if(wheelRadius == 0) return 0;
+        LinkedList<Double> torques = new LinkedList<>();
+        for(int i = 0; i < velocityData.size(); i++){
+            torques.add(4 * robotRadius * torqueConstant * (velocityData.get(i) / Math.pow(wheelRadius, 2)));
+        }
+
+        PolynomialRegression angularVelocityRegression = new PolynomialRegression(
+            timeData.stream().mapToDouble(Double::doubleValue).toArray(),
+            angularVelocityData.stream().mapToDouble(Double::doubleValue).toArray(),
+            4
+        );
+
+        LinkedList<Double> angularAcceleration = new LinkedList<>();
+        angularAcceleration.addAll(
+            new PolynomialDerivative(angularVelocityRegression).evaluate(timeData)
+        );
+
+        PolynomialRegression angularAccelerationTorqueRegression = new PolynomialRegression(
+            angularAcceleration.stream().mapToDouble(Double::doubleValue).toArray(),
+            torques.stream().mapToDouble(Double::doubleValue).toArray(),
+            1
+        );
+        return angularAccelerationTorqueRegression.beta(1);
     }
 
     /**
