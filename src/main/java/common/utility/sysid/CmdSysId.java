@@ -36,8 +36,6 @@ public class CmdSysId extends Command {
      * @param angularVelocitySupplier Angular velocity of the system.
      * @param startDelaySecs Delay before the command starts.
      * @param rampRateVoltsPerSec Rate at which voltage increases.
-     * @param targetPosition Target position to reach.
-     * @param goingForward Direction to move in.
      * @param subsystems Subsystems used.
      */
     public CmdSysId(
