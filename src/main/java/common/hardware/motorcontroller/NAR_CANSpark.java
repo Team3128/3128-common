@@ -138,19 +138,18 @@ public class NAR_CANSpark extends NAR_Motor {
 		this.encoderType = encoderType;
 
 		if (encoderType == EncoderType.Relative) {
-			relativeEncoder = (SparkRelativeEncoder) motor.getEncoder();
 			//No clue what this does, but Mechanical Advantage does this so it must be good
-			configSpark(()-> relativeEncoder.setAverageDepth(2));
-			configSpark(()-> relativeEncoder.setMeasurementPeriod(10));
+			config.encoder.uvwAverageDepth(2);
+			config.encoder.uvwMeasurementPeriod(10);
+			// configSpark(()-> relativeEncoder.setMeasurementPeriod(10));
 		}
 		
 		else {
-			absoluteEncoder = motor.getAbsoluteEncoder(ControlType.kDutyCycle);
-			configSpark(()-> absoluteEncoder.setVelocityConversionFactor(60));
-			configSpark(()-> absoluteEncoder.setAverageDepth(2));
+			config.absoluteEncoder.averageDepth(2);
+			config.absoluteEncoder.velocityConversionFactor(60);
 		}
 
-		controller = motor.getPIDController();
+		controller = motor.getClosedLoopController();
 		configSpark(()-> controller.setOutputRange(-1, 1));
 		configPID(PIDconfig);
 		
@@ -280,7 +279,8 @@ public class NAR_CANSpark extends NAR_Motor {
 	 */
 	@Override
 	public void setStatorLimit(int limit) {
-		configSpark(()-> motor.setSmartCurrentLimit(limit));
+		config.smartCurrentLimit(limit);
+		// configSpark(()-> motor.setSmartCurrentLimit(limit));
 	}
 
 	/**
@@ -305,7 +305,8 @@ public class NAR_CANSpark extends NAR_Motor {
    */
 	@Override
 	public void setSupplyLimit(int limit) {
-		configSpark(()-> motor.setSecondaryCurrentLimit(limit));
+		config.secondaryCurrentLimit(limit);
+		// configSpark(()-> motor.setSecondaryCurrentLimit(limit));
 	}
 
     /**
