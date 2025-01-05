@@ -10,7 +10,6 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkLowLevel.PeriodicFrame;
 
-import com.revrobotics.spark.SparkAbsoluteEncoder.Type;
 import com.revrobotics.REVLibError;
 import com.revrobotics.spark.SparkAbsoluteEncoder;
 import com.revrobotics.spark.SparkClosedLoopController;
@@ -18,8 +17,8 @@ import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkRelativeEncoder;
 
 import com.revrobotics.spark.SparkBase.ControlType;
-import com.revrobotics.spark.SparkBase.IdleMode;
-import com.revrobotics.spark.SparkBase.FaultID;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.SparkBase.Faults;
 
 import common.core.controllers.PIDFFConfig;
 import common.core.misc.NAR_Robot;
@@ -105,8 +104,8 @@ public class NAR_CANSpark extends NAR_Motor {
 	private EncoderType encoderType;
 	private SparkRelativeEncoder relativeEncoder;
 	private SparkAbsoluteEncoder absoluteEncoder;
-	private final SparkPIDController controller;
-    protected final CANSparkBase motor;
+	private final SparkClosedLoopController controller;
+    protected final SparkBase motor;
 
     /**
 	 * Create a new object to control a SPARK motor
@@ -141,7 +140,7 @@ public class NAR_CANSpark extends NAR_Motor {
 		}
 		
 		else {
-			absoluteEncoder = motor.getAbsoluteEncoder(Type.kDutyCycle);
+			absoluteEncoder = motor.getAbsoluteEncoder(ControlType.kDutyCycle);
 			configSpark(()-> absoluteEncoder.setVelocityConversionFactor(60));
 			configSpark(()-> absoluteEncoder.setAverageDepth(2));
 		}
@@ -463,7 +462,7 @@ public class NAR_CANSpark extends NAR_Motor {
 	}
 
 	@Override
-    public CANSparkBase getMotor() {
+    public SparkBase getMotor() {
         return motor;
     }
 
@@ -471,9 +470,10 @@ public class NAR_CANSpark extends NAR_Motor {
 		return motor.getFaults();
 	}
 
-	public boolean getFault(FaultID fault) {
-		return motor.getFault(fault);
-	}
+	//TODO: Eval necessity
+	// public boolean getFault(int fault) {
+	// 	return motor.getFault(fault);
+	// }
 
 	/**
 	 * Returns motor and motor controller functionality.
@@ -481,11 +481,9 @@ public class NAR_CANSpark extends NAR_Motor {
 	 */
 	public State getState() {
 		//To do add check for motors
-		if (!motor.getFault(FaultID.kSensorFault)
-			&& !motor.getFault(FaultID.kMotorFault)
-			&& !motor.getFault(FaultID.kEEPROMCRC)
-			&& motor.getLastError() == REVLibError.kOk 
-			) {
+		if(!motor.hasActiveFault() 
+			&& !motor.hasStickyFault()
+			&& motor.getLastError() == REVLibError.kOk) {
 			return State.RUNNING;
 		}
 		return State.DISCONNECTED;
