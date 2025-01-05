@@ -1,230 +1,104 @@
 plugins {
-    id "java-library"
-    id "eclipse"
-	id "edu.wpi.first.GradleRIO" version "2024.3.2"
-    id "org.ajoberstar.grgit" version "4.1.1"
-    id "maven-publish"
-    id "io.github.mosadie.vendorJSON" version "1.0"
+    id "java"
+    id "edu.wpi.first.GradleRIO" version "2025.1.1"
 }
 
-group = archivesGroup
-
-// Sets JDK compatibility to JDK 17
-sourceCompatibility = JavaVersion.VERSION_11
-targetCompatibility = JavaVersion.VERSION_11
-
-// Configuration for build task which compiles , generates the javadoc and does the install 
-// of 3128-common in local maven cache.
-// Also used by Jitpack/GitHub Actions.
-
-if (System.getProperty("local")) {
-	println("This is a local Compile:")
-	version = "local"
-}
-else {
-	println("This is a versioned Compile:")
-	version = LibraryVersion
-}
-                    // Version identifier used for local maven cache and github releases.
-					// Should stay as "local". This allows the robot* projects on the
-					// same PC as 3128-common to pull from the local cache with the fixed
-					// version name "local" and so always be pointing at the current 3128-common
-					// version including those under development and not have to be updated
-					// each time the 3128-common version changes. Release to the world via github
-					// is based on actual version numbers and 3128-common.json.
-					//
-					// When starting a new version you can update LibraryVersion.java,
-					// overview.html and gradle.properties. DO NOT update 3128-common.json. It is
-					// maintained by the release github action when you release with github.
-					//
-					// Build in Eclispe using the Build 3128-common or Build 3128-common (Offline) 
-					// run configurations. You can push to github as much as you want.
-					//
-					// When ready to release, make sure the version number and dates are 
-					// correct in the files named above then update README.md. Final push all of your
-                    // changes to GitHub. Also check on github Actions tab if the latest commit has a
-                    // checkmark, indicating GitHub was able to build the code successfully.
-					//
-					// Then on GitHub, create a new release. This will create the release
-					// and then GitHub Actions will be triggered to compile the project and
-					// add the generated files (artifacts) to the release. Additionally, the release
-					// will become available from the Jitpack.io repository. Note that
-					// the IF statement above detects when gradle is running on GitHub Actions
-					// and sets the version varible to the actual version number (instead
-					// of "local") when compiling for release. The release action will update
-					// robolib.json to the new version on github. After release action is complete
-					// you can fetch from github with tags to get the updated 3128-common.json and
-					// release tag back into the local git repo.
-					//
-					// When all this is done, other user's robot projects that want the updated
-					// 3128-common, edit their local 3128-common.json to reflect the new version number 
-					// and on next compile, gradle will pull the new library to their PC.
-					//
-					// Or if using VSCode, run the Manage Vendor Libraries (online) command and 
-					// it will detect the new 3128-common version and offer to update the VSCode project.
-					//
-					// Warning: The github release action only works on the master branch. Do not
-					// create releases from other branches.
-					//
-					// Note: the github action files gradleCI.yml and gradleRelease.yml are
-					// located in .github\workflows.
-					//
-
-println("LibraryVersion=" + LibraryVersion + "; compile version=" + version)
-					
-// Currently does not work
-// This task updates the vendor json file for this project to the specified version.					
-vendorJSON {
-    fileName = jsonFileName
-    version = LibraryVersion
-    addJavaArtifact(archivesGroup, archivesBaseName, LibraryVersion)
-}
-
-// This section is to prevent people from accidently deploying this project to a robot. 
-// deploy {
-//     for (String task : project.gradle.startParameter.taskNames) {
-//         if (task == "deploy")
-//             throw new GradleException("This is a library project! You can't deploy it to a robot!")
-//     }
-// }
-
-// Generates Source and Javadoc jars when building.
 java {
-    withJavadocJar();
-    withSourcesJar();
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
 }
 
-// Look in local maven cache first, then maven central for dependent libraries.
-repositories {
-	// This is needed to fix problem with the url below redirecting to an http (insecure) url.
-	//maven {
-    //    url "https://www.revrobotics.com/content/sw/color-sensor-v3/sdk/maven/"
-    //    allowInsecureProtocol = true
-    //}
+def ROBOT_MAIN_CLASS = ""
 
-	mavenLocal()
-	mavenCentral()
-	maven {
-        url = uri("https://maven.pkg.github.com/Mechanical-Advantage/AdvantageKit")
-        credentials {
-            username = "Mechanical-Advantage-Bot"
-            password = "\u0067\u0068\u0070\u005f\u006e\u0056\u0051\u006a\u0055\u004f\u004c\u0061\u0079\u0066\u006e\u0078\u006e\u0037\u0051\u0049\u0054\u0042\u0032\u004c\u004a\u006d\u0055\u0070\u0073\u0031\u006d\u0037\u004c\u005a\u0030\u0076\u0062\u0070\u0063\u0051"
+// Define my targets (RoboRIO) and artifacts (deployable files)
+// This is added by GradleRIO's backing project DeployUtils.
+deploy {
+    targets {
+        roborio(getTargetTypeClass('RoboRIO')) {
+            // Team number is loaded either from the .wpilib/wpilib_preferences.json
+            // or from command line. If not found an exception will be thrown.
+            // You can use getTeamOrDefault(team) instead of getTeamNumber if you
+            // want to store a team number in this file.
+            team = project.frc.getTeamNumber()
+            debug = project.frc.getDebugOrDefault(false)
+
+            artifacts {
+                // First part is artifact name, 2nd is artifact type
+                // getTargetTypeClass is a shortcut to get the class type using a string
+
+                frcJava(getArtifactTypeClass('FRCJavaArtifact')) {
+                }
+
+                // Static files artifact
+                frcStaticFileDeploy(getArtifactTypeClass('FileTreeArtifact')) {
+                    files = project.fileTree('src/main/deploy')
+                    directory = '/home/lvuser/deploy'
+                    deleteOldFiles = false // Change to true to delete files on roboRIO that no
+                                           // longer exist in deploy directory of this project
+                }
+            }
         }
     }
 }
 
-// Setup eclipse classpath settings, so the javadoc and sources are available in eclipse
-eclipse {
-    classpath {
-        downloadJavadoc = true
-        downloadSources = true
-    }
-}
+def deployArtifact = deploy.targets.roborio.artifacts.frcJava
 
-// task(checkAkitInstall, dependsOn: "classes", type: JavaExec) {
-//     mainClass = "org.littletonrobotics.junction.CheckInstall"
-//     classpath = sourceSets.main.runtimeClasspath
-// }
-// compileJava.finalizedBy checkAkitInstall
+// Set to true to use debug for JNI.
+wpi.java.debugJni = false
 
+// Set this to true to enable desktop support.
+def includeDesktopSupport = false
 
-// Defining dependencies. In this case, WPILib (+ friends), and some vendor libraries (NavX, CTRE)
+// Defining my dependencies. In this case, WPILib (+ friends), and vendor libraries.
+// Also defines JUnit 5.
 dependencies {
+    annotationProcessor wpi.java.deps.wpilibAnnotations()
     implementation wpi.java.deps.wpilib()
     implementation wpi.java.vendor.java()
-	implementation group: 'gov.nist.math', name: 'jama', version: '1.0.3'
 
-	implementation 'org.java-websocket:Java-WebSocket:1.4.1'
-    implementation group: 'com.googlecode.json-simple', name: 'json-simple', version: '1.1.1'
-	
-	def akitJson = new groovy.json.JsonSlurper().parseText(new File(projectDir.getAbsolutePath() + "/vendordeps/AdvantageKit.json").text)
-    annotationProcessor "org.littletonrobotics.akit.junction:junction-autolog:$akitJson.version"
-        
-    // For reference, here are a few more of the easy to add libraries not currently used:
-   	//implementation pathfinder() (Jaci's)
-   	//implementation openrioMatchData()
+    roborioDebug wpi.java.deps.wpilibJniDebug(wpi.platforms.roborio)
+    roborioDebug wpi.java.vendor.jniDebug(wpi.platforms.roborio)
 
-   	// Quick guide to keywords:
-   	// api is for libraries that are expected to be needed in the main robot project.
-   	// implementation is for libraries that will not be needed in the main robot project.
-   	// (Both api and implementation keywords will have the library automatically downloaded with 3128-common)
-   	// compileOnly expects the dependency to be provided somewhere else. (Ex. by a main robot project)
-   	// compile means include in the output library jar (see below).
+    roborioRelease wpi.java.deps.wpilibJniRelease(wpi.platforms.roborio)
+    roborioRelease wpi.java.vendor.jniRelease(wpi.platforms.roborio)
+
+    nativeDebug wpi.java.deps.wpilibJniDebug(wpi.platforms.desktop)
+    nativeDebug wpi.java.vendor.jniDebug(wpi.platforms.desktop)
+    simulationDebug wpi.sim.enableDebug()
+
+    nativeRelease wpi.java.deps.wpilibJniRelease(wpi.platforms.desktop)
+    nativeRelease wpi.java.vendor.jniRelease(wpi.platforms.desktop)
+    simulationRelease wpi.sim.enableRelease()
+
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.1'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
-// These next definitions (branch and hash) attempt to find extra information to add to the the manifest of
-// the robot program jar file.
-
-// Returns either the name of the current branch, or an empty string if no git repo is found.
-def branch = { ->
-    if (grgit == null) { // If there's no git repo.
-        return ""
-    }
-
-    return grgit.branch.current().getName()
+test {
+    useJUnitPlatform()
+    systemProperty 'junit.jupiter.extensions.autodetection.enabled', 'true'
 }
 
-// Returns either the short hash of the last commit or an empty string if no git repo is found.
-def hash = { ->
-    if (grgit == null) { // If there's no git repo.
-        return ""
-    }
-    
-    return grgit.head().abbreviatedId
-}
+// Simulation configuration (e.g. environment variables).
+wpi.sim.addGui().defaultEnabled = true
+wpi.sim.addDriverstation()
 
-// Setting up 3128-common Jar File. In this case, adding version information to jar manifest.
+// Setting up my Jar File. In this case, adding all libraries into the main jar ('fat jar')
+// in order to make them all available at runtime. Also adding the manifest so WPILib
+// knows where to look for our Robot Class.
 jar {
-	from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
-    manifest {
-       	attributes("LibraryVersion": LibraryVersion)	// from gradle.properties file.
-       	attributes("Time": new Date().format("yyyy-MM-dd HH:mm:ss"))
-       	attributes("User": System.getProperty("user.name"))
-       	attributes("Branch": branch())
-       	attributes("Commit": hash())
-	}
-	duplicatesStrategy = DuplicatesStrategy.INCLUDE
+    from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
+    from sourceSets.main.allSource
+    manifest edu.wpi.first.gradlerio.GradleRIOPlugin.javaManifest(ROBOT_MAIN_CLASS)
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
 }
 
-// Create Sources Jar
-//task sourcesJar(type: Jar, dependsOn: classes) {
-//    classifier = 'sources'
-//    from sourceSets.main.allSource
-//}
+// Configure jar and deploy tasks
+deployArtifact.jarTask = jar
+wpi.java.configureExecutableTasks(jar)
+wpi.java.configureTestTasks(test)
 
-// When Javadoc is created (./gradlew.bat javadoc) it will be in this directory in the project folder.
-javadoc {
-    destinationDir = file("doc")
-    title = "3128-common"
-    options.overview = "src/main/resources/overview.html"
-    // These options obsolete with move to JDK 17.
-    //options.addBooleanOption "-no-module-directories", true
-    //options.addBooleanOption "-frames", true
-    // This option supresses all Javadoc warnings. Some warnings are usefull but many
-    // we ignore. Should review warnings with any significant changes to the library.
-	options.addStringOption('Xdoclint:all,-missing', '-quiet')
-}
-
-// Create Javadoc Jar
-//task javadocJar(type: Jar, dependsOn: javadoc) {
-//    classifier = 'javadoc'
-//    from javadoc.destinationDir
-//}
-
-// Additional artifacts to publish for JitPack
-artifacts {
-    archives sourcesJar
-    archives javadocJar
-}
-
-// Required as of gradle 7.1.1. Configures PublishToMavenLocal task. This task is required to get our
-// jars published to the local maven repository on this PC for consumption by robot projects on this PC.
-// The PubishToMavenLocal task is executed in the eclipse .launch files that run this build.
-publishing {
-    publications {
-        common(MavenPublication) {
-	    	artifactId = '3128-common'
-            from components.java
-        }
-    }
+// Configure string concat to always inline compile
+tasks.withType(JavaCompile) {
+    options.compilerArgs.add '-XDstringConcat=inline'
 }
