@@ -5,6 +5,8 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.units.AngleUnit;
+import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.CAN;
 
 import com.ctre.phoenix6.configs.MagnetSensorConfigs;
@@ -68,7 +70,7 @@ public class SwerveModule {
             absoluteAngleSupplier.setUpdateFrequency(100);
             angleEncoder.optimizeBusUtilization();
         }
-        absoluteAngle = absoluteAngleSupplier.asSupplier();
+        absoluteAngle = ()-> absoluteAngleSupplier.asSupplier().get().in(Units.Degree);
         
         
         final SensorDirectionValue direction = encoderConfig.invert ? SensorDirectionValue.Clockwise_Positive : SensorDirectionValue.CounterClockwise_Positive;
