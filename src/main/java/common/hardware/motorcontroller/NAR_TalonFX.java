@@ -18,6 +18,11 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import common.core.controllers.PIDFFConfig;
 import common.utility.Log;
 import common.utility.narwhaldashboard.NarwhalDashboard;
+import edu.wpi.first.units.Units;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Current;
+import edu.wpi.first.units.measure.Temperature;
 
 import java.util.function.Supplier;
 
@@ -41,10 +46,10 @@ public class NAR_TalonFX extends NAR_Motor {
     private final MotorOutputConfigs motorOutputConfigs = new MotorOutputConfigs();
 
     private final StatusSignal<Double> appliedOutput;
-    private final StatusSignal<Double> stallCurrent;
-    private final StatusSignal<Double> position;
-    private final StatusSignal<Double> velocity;
-    private final StatusSignal<Double> temperature;
+    private final StatusSignal<Current> stallCurrent;
+    private final StatusSignal<Angle> position;
+    private final StatusSignal<AngularVelocity> velocity;
+    private final StatusSignal<Temperature> temperature;
 
     public NAR_TalonFX(int deviceNumber, String canbus, PIDFFConfig pidConfig) {
         super(deviceNumber);
@@ -113,13 +118,15 @@ public class NAR_TalonFX extends NAR_Motor {
 
     @Override
     protected void setVelocity(double rpm, double feedForward) {
-        var velocitySetpoint = new VelocityVoltage(rpm, 0, false, feedForward, 0, false, false, false);
+        var velocitySetpoint = new VelocityVoltage(rpm);
+        velocitySetpoint.FeedForward = feedForward;
         motor.setControl(velocitySetpoint);
     }
 
     @Override
     protected void setPosition(double rotations, double feedForward) {
-        var positionSetpoint = new PositionVoltage(rotations, 0, false, feedForward, 0, false, false, false);
+        var positionSetpoint = new PositionVoltage(rotations);
+        positionSetpoint.FeedForward = feedForward;
         motor.setControl(positionSetpoint);
     }
 
@@ -135,22 +142,22 @@ public class NAR_TalonFX extends NAR_Motor {
 
     @Override
     public double getStallCurrent() {
-        return stallCurrent.refresh().getValue();
+        return stallCurrent.refresh().getValue().in(Units.Amp);
     }
 
     @Override
     protected double getRawPosition() {
-        return position.refresh().getValue();
+        return position.refresh().getValue().in(Units.Revolution);
     }
 
     @Override
     protected double getRawVelocity() {
-        return velocity.refresh().getValue() * 60.0;
+        return velocity.refresh().getValue().in(Units.RotationsPerSecond) * 60.0;
     }
 
     @Override
     public double getTemperature() {
-        return temperature.refresh().getValue();
+        return temperature.refresh().getValue().in(Units.Celsius);
     }
 
     @Override
@@ -226,7 +233,7 @@ public class NAR_TalonFX extends NAR_Motor {
         return NarwhalDashboard.State.RUNNING;
     }
 
-    @Override
+
     public TalonFX getMotor() {
         return motor;
     }

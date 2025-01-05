@@ -409,5 +409,5 @@ public abstract class NAR_Motor implements AutoCloseable {
      * Returns the motor object controlling the motion
      * @return The motor ie. SparkMax, TalonFX
      */
-    public abstract MotorController getMotor();
+    public abstract Object getMotor();
 }
