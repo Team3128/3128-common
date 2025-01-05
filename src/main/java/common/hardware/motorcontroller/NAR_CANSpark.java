@@ -17,6 +17,9 @@ import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkRelativeEncoder;
 
 import com.revrobotics.spark.SparkBase.ControlType;
+import com.revrobotics.spark.config.SparkBaseConfig;
+import com.revrobotics.spark.config.SparkFlexConfig;
+import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.SparkBase.Faults;
 
@@ -64,7 +67,7 @@ public class NAR_CANSpark extends NAR_Motor {
 	/**
 	 * Team 3128's status frames
 	 */
-	public enum SparkMaxConfig {
+	public enum NAR_SparkMaxConfig {
 		DEFAULT(HIGH_PRIORITY, HIGH_PRIORITY, HIGH_PRIORITY, NO_PRIORITY, NO_PRIORITY, NO_PRIORITY, NO_PRIORITY),
 		FOLLOWER(HIGH_PRIORITY, NO_PRIORITY, NO_PRIORITY, NO_PRIORITY, NO_PRIORITY, NO_PRIORITY, NO_PRIORITY),
 		POSITION(HIGH_PRIORITY, NO_PRIORITY, HIGH_PRIORITY, NO_PRIORITY, NO_PRIORITY, NO_PRIORITY, NO_PRIORITY),
@@ -73,7 +76,7 @@ public class NAR_CANSpark extends NAR_Motor {
 
 		public final int status0, status1, status2, status3, status4, status5, status6;
 
-		private SparkMaxConfig(int status0, int status1, int status2, int status3, int status4, int status5, int status6) {
+		private NAR_SparkMaxConfig(int status0, int status1, int status2, int status3, int status4, int status5, int status6) {
 			this.status0 = status0;
 			this.status1 = status1;
 			this.status2 = status2;
@@ -106,6 +109,7 @@ public class NAR_CANSpark extends NAR_Motor {
 	private SparkAbsoluteEncoder absoluteEncoder;
 	private final SparkClosedLoopController controller;
     protected final SparkBase motor;
+	protected final SparkBaseConfig config;
 
     /**
 	 * Create a new object to control a SPARK motor
@@ -121,10 +125,11 @@ public class NAR_CANSpark extends NAR_Motor {
 	 */
     public NAR_CANSpark(int deviceNumber, ControllerType controllerType, MotorType motorType, EncoderType encoderType, PIDFFConfig PIDconfig) {
 		super(deviceNumber);
-        motor = controllerType == ControllerType.CAN_SPARK_MAX ? new CANSparkMax(deviceNumber, motorType) : new CANSparkFlex(deviceNumber, motorType);
+        motor = controllerType == ControllerType.CAN_SPARK_MAX ? new SparkMax(deviceNumber, motorType) : new SparkFlex(deviceNumber, motorType);
+		config = controllerType == ControllerType.CAN_SPARK_MAX ? new SparkMaxConfig() : new SparkFlexConfig();
 		motor.setCANMaxRetries(0);
 		configSpark(()-> motor.clearFaults());
-		configSpark(()-> motor.restoreFactoryDefaults()); // Reset config parameters, unfollow other motor controllers
+		// configSpark(()-> motor.restoreFactoryDefaults()); // Reset config parameters, unfollow other motor controllers
 		configSpark(()-> motor.setCANTimeout(canSparkMaxTimeout));		//I have this here and I don't know why - Mason
 		enableVoltageCompensation(12.0);
 		setStatorLimit(motorType == MotorType.kBrushless ? NEO_STATOR_CurrentLimit : NEO_STATOR_550CurrentLimit);
@@ -330,7 +335,7 @@ public class NAR_CANSpark extends NAR_Motor {
 	 * <p>Each motor controller sends back status frames with different data at set rates. Use this
 	 * function to set to team 3128's preset rates.
 	 */
-	public void setStatusFrames(SparkMaxConfig config) {
+	public void setStatusFrames(NAR_SparkMaxConfig config) {
 		setPeriodicFramePeriod(PeriodicFrame.kStatus0, config.status0);
 		setPeriodicFramePeriod(PeriodicFrame.kStatus1, config.status1);
 		setPeriodicFramePeriod(PeriodicFrame.kStatus2, config.status2);
@@ -342,22 +347,22 @@ public class NAR_CANSpark extends NAR_Motor {
 
 	@Override
 	public void setDefaultStatusFrames() {
-		setStatusFrames(SparkMaxConfig.DEFAULT);
+		setStatusFrames(NAR_SparkMaxConfig.DEFAULT);
 	}
 
 	@Override
 	public void setPositionStatusFrames() {
-		setStatusFrames(SparkMaxConfig.POSITION);
+		setStatusFrames(NAR_SparkMaxConfig.POSITION);
 	}
 
 	@Override
 	public void setVelocityStatusFrames() {
-		setStatusFrames(SparkMaxConfig.VELOCITY);
+		setStatusFrames(NAR_SparkMaxConfig.VELOCITY);
 	}
 
 	@Override
 	public void setFollowerStatusFrames() {
-		setStatusFrames(SparkMaxConfig.FOLLOWER);
+		setStatusFrames(NAR_SparkMaxConfig.FOLLOWER);
 	}
 
 	/**
