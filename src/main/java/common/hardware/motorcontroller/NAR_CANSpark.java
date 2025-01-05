@@ -11,6 +11,7 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkLowLevel.PeriodicFrame;
 
 import com.revrobotics.REVLibError;
+import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkAbsoluteEncoder;
 import com.revrobotics.spark.SparkClosedLoopController;
 
@@ -22,6 +23,8 @@ import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.SparkBase.Faults;
+import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
 
 import common.core.controllers.PIDFFConfig;
 import common.core.misc.NAR_Robot;
@@ -129,7 +132,7 @@ public class NAR_CANSpark extends NAR_Motor {
 		config = controllerType == ControllerType.CAN_SPARK_MAX ? new SparkMaxConfig() : new SparkFlexConfig();
 		motor.setCANMaxRetries(0);
 		configSpark(()-> motor.clearFaults());
-		// configSpark(()-> motor.restoreFactoryDefaults()); // Reset config parameters, unfollow other motor controllers
+		motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
 		configSpark(()-> motor.setCANTimeout(canSparkMaxTimeout));		//I have this here and I don't know why - Mason
 		enableVoltageCompensation(12.0);
 		setStatorLimit(motorType == MotorType.kBrushless ? NEO_STATOR_CurrentLimit : NEO_STATOR_550CurrentLimit);
@@ -150,10 +153,8 @@ public class NAR_CANSpark extends NAR_Motor {
 		}
 
 		controller = motor.getClosedLoopController();
-		configSpark(()-> controller.setOutputRange(-1, 1));
 		configPID(PIDconfig);
-		
-		configSpark(()-> controller.setFeedbackDevice(encoderType == EncoderType.Relative ? relativeEncoder : absoluteEncoder));
+		configure();
 		instances.add(this);
     }
 
@@ -222,42 +223,12 @@ public class NAR_CANSpark extends NAR_Motor {
 		Log.info("Motors", "Failed to configure Spark Max " + motor.getDeviceId());
 	}
 
-	/**
-	 * Adds a PID tuning setup to a specific shuffleboard tab. Editing a value on the tab 
-	 * will automatically update the value on the controller.
-	 * @param tabName The title of the tab to select.
-	 * @param prefix String added before each name of PID widgets.
-	 * @param column Column to add the PID widgets to.
-	 */
-	public void initShuffleboard(String tabName, String prefix, int column) {
-		DoubleSupplier proportional = NAR_Shuffleboard.debug(tabName, prefix + "_kP", kP, column, 0);
-		DoubleSupplier integral = NAR_Shuffleboard.debug(tabName, prefix + "_kI", kI, column, 1);
-		DoubleSupplier derivative = NAR_Shuffleboard.debug(tabName, prefix + "_kD", kD, column, 2);
-		NAR_Robot.addPeriodic(()-> {
-			if (proportional.getAsDouble() == kP) {
-				kP = proportional.getAsDouble();
-				controller.setP(kP);
-			}
-		}, 0.5, 0.05);
-		NAR_Robot.addPeriodic(()-> {
-			if (integral.getAsDouble() == kI) {
-				kI = proportional.getAsDouble();
-				controller.setI(kI);
-			}
-		},0.5, 0.05);
-		NAR_Robot.addPeriodic(()-> {
-			if (derivative.getAsDouble() == kD) {
-				kD = derivative.getAsDouble();
-				controller.setD(kD);
-			}
-		}, 0.5, 0.05);
+	public void configure() {
+		motor.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
 	}
 
 	@Override
 	public void configPID(PIDFFConfig config) {
-		configSpark(()-> controller.setP(config.kP));
-		configSpark(()-> controller.setI(config.kI));
-		configSpark(()-> controller.setD(config.kD));
 		this.kP = config.kP;
 		this.kI = config.kI;
 		this.kD = config.kD;
@@ -280,7 +251,7 @@ public class NAR_CANSpark extends NAR_Motor {
 	@Override
 	public void setStatorLimit(int limit) {
 		config.smartCurrentLimit(limit);
-		// configSpark(()-> motor.setSmartCurrentLimit(limit));
+		configure();
 	}
 
 	/**
@@ -306,7 +277,7 @@ public class NAR_CANSpark extends NAR_Motor {
 	@Override
 	public void setSupplyLimit(int limit) {
 		config.secondaryCurrentLimit(limit);
-		// configSpark(()-> motor.setSecondaryCurrentLimit(limit));
+		configure();
 	}
 
     /**
@@ -327,7 +298,8 @@ public class NAR_CANSpark extends NAR_Motor {
 	 * @param periodMs Period in ms for the given frame.
 	 */
 	public void setPeriodicFramePeriod(PeriodicFrame frame, int periodMs) {
-		configSpark(()-> motor.setPeriodicFramePeriod(frame, periodMs));
+		config.signals.primaryEncoderPositionPeriodMs(periodMs);
+		configure();
 	}
 
 	/**
@@ -373,7 +345,7 @@ public class NAR_CANSpark extends NAR_Motor {
 		 if (RobotBase.isSimulation()) return REVLibError.kOk;
 
 		Timer.delay(0.5);
-		REVLibError status = motor.burnFlash();
+		REVLibError status = motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
 		Timer.delay(0.5);
 		if (status == REVLibError.kOk) {
 			Log.info("Motors", "Burned flash for Spark Max " + motor.getDeviceId());
@@ -390,7 +362,8 @@ public class NAR_CANSpark extends NAR_Motor {
 	 * @param invert Whether or not to invert motor output
      */
 	public void follow(NAR_CANSpark leader, boolean invert) {
-		configSpark(()-> motor.follow(leader.getMotor(), invert));
+		config.follow(motor);
+		configure();
 	}
 
 	@Override
@@ -404,7 +377,8 @@ public class NAR_CANSpark extends NAR_Motor {
 
 	@Override
 	public void setInverted(boolean inverted) {
-		motor.setInverted(inverted);
+		config.inverted(inverted);
+		configure();
 	}
 
     @Override
@@ -414,12 +388,12 @@ public class NAR_CANSpark extends NAR_Motor {
 
     @Override
     protected void setVelocity(double rpm, double feedForward) {
-        controller.setReference(rpm, ControlType.kVelocity, 0, feedForward);
+        controller.setReference(rpm, ControlType.kVelocity, ClosedLoopSlot.kSlot0, feedForward);
     }
 
     @Override
     protected void setPosition(double rotations, double feedForward) {
-        controller.setReference(rotations, ControlType.kPosition, 0, feedForward);
+        controller.setReference(rotations, ControlType.kPosition, ClosedLoopSlot.kSlot0, feedForward);
     }
 
     @Override
@@ -454,17 +428,20 @@ public class NAR_CANSpark extends NAR_Motor {
 
 	@Override
 	public void enableVoltageCompensation(double volts) {
-		configSpark(()-> motor.enableVoltageCompensation(volts));
+		config.voltageCompensation(volts);
+		configure();
 	}
 
 	@Override
 	protected void setBrakeMode() {
-		configSpark(()-> motor.setIdleMode(IdleMode.kBrake));
+		config.idleMode(IdleMode.kBrake);
+		configure();
 	}
 
 	@Override
 	protected void setCoastMode() {
-		configSpark(()-> motor.setIdleMode(IdleMode.kCoast));
+		config.idleMode(IdleMode.kCoast);
+		configure();
 	}
 
 	@Override
@@ -472,7 +449,7 @@ public class NAR_CANSpark extends NAR_Motor {
         return motor;
     }
 
-	public short getAllFaults() {
+	public Faults getAllFaults() {
 		return motor.getFaults();
 	}
 
