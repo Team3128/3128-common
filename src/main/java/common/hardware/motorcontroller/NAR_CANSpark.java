@@ -3,19 +3,23 @@ package common.hardware.motorcontroller;
 import java.util.LinkedList;
 import java.util.function.DoubleSupplier;
 
-import com.revrobotics.CANSparkBase;
-import com.revrobotics.CANSparkFlex;
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkLowLevel.MotorType;
-import com.revrobotics.CANSparkLowLevel.PeriodicFrame;
-import com.revrobotics.SparkAbsoluteEncoder.Type;
+import com.revrobotics.spark.SparkBase;
+import com.revrobotics.spark.SparkFlex;
+import com.revrobotics.spark.SparkMax;
+
+import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.SparkLowLevel.PeriodicFrame;
+
+import com.revrobotics.spark.SparkAbsoluteEncoder.Type;
 import com.revrobotics.REVLibError;
-import com.revrobotics.SparkAbsoluteEncoder;
-import com.revrobotics.SparkPIDController;
-import com.revrobotics.SparkRelativeEncoder;
-import com.revrobotics.CANSparkBase.ControlType;
-import com.revrobotics.CANSparkBase.IdleMode;
-import com.revrobotics.CANSparkBase.FaultID;
+import com.revrobotics.spark.SparkAbsoluteEncoder;
+import com.revrobotics.spark.SparkClosedLoopController;
+
+import com.revrobotics.spark.SparkRelativeEncoder;
+
+import com.revrobotics.spark.SparkBase.ControlType;
+import com.revrobotics.spark.SparkBase.IdleMode;
+import com.revrobotics.spark.SparkBase.FaultID;
 
 import common.core.controllers.PIDFFConfig;
 import common.core.misc.NAR_Robot;
@@ -30,7 +34,7 @@ import java.util.function.Supplier;
 import static common.hardware.motorcontroller.MotorControllerConstants.*;
 
 /**
- * Team 3128's streamlined {@link CANSparkBase} class.
+ * Team 3128's streamlined {@link SparkBase} class.
  * @since 2023 Charged Up
  * @author Mason Lam
  */
