@@ -3,9 +3,6 @@ package common.hardware.motorcontroller;
 import java.util.HashSet;
 import java.util.LinkedList;
 
-import org.littletonrobotics.junction.AutoLog;
-import org.littletonrobotics.junction.Logger;
-
 import common.core.controllers.PIDFFConfig;
 import common.core.misc.NAR_Robot;
 import common.utility.narwhaldashboard.NarwhalDashboard;
