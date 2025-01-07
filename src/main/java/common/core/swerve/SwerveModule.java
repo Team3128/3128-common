@@ -6,6 +6,8 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.units.Units;
+import edu.wpi.first.units.measure.Angle;
+
 import com.ctre.phoenix6.configs.MagnetSensorConfigs;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
@@ -44,7 +46,7 @@ public class SwerveModule {
 
     private Rotation2d lastAngle;
 
-    private final Supplier<Double> absoluteAngle;
+    private final Supplier<Angle> absoluteAngle;
 
     /**
      * Creates a new Swerve Module object
@@ -67,7 +69,7 @@ public class SwerveModule {
             absoluteAngleSupplier.setUpdateFrequency(100);
             angleEncoder.optimizeBusUtilization();
         }
-        absoluteAngle = ()-> absoluteAngleSupplier.asSupplier().get().in(Units.Degree);
+        absoluteAngle = absoluteAngleSupplier.asSupplier();
         
         
         final SensorDirectionValue direction = encoderConfig.invert ? SensorDirectionValue.Clockwise_Positive : SensorDirectionValue.CounterClockwise_Positive;
@@ -162,7 +164,7 @@ public class SwerveModule {
      * Returns the current angle of the CANCoder
      */
     public Rotation2d getAbsoluteAngle(){
-        return Rotation2d.fromDegrees(MathUtil.inputModulus(absoluteAngle.get() * 360 - encoderConfig.encoderOffset, -180, 180));
+        return Rotation2d.fromDegrees(MathUtil.inputModulus(absoluteAngle.get().in(Units.Degrees) - encoderConfig.encoderOffset, -180, 180));
     }
 
     /**
