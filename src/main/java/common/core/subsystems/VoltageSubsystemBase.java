@@ -69,4 +69,13 @@ public abstract class VoltageSubsystemBase extends SubsystemBase implements NAR_
     public Command stop(){
         return run(0);
     }
+
+    /**
+     * Resets the position of the motors to 0
+     * 
+     * @return Command resetting the position of the motors to 0
+     */
+    public Command reset() {
+        return runOnce(()-> leader.resetPosition(0));
+    }
 }
