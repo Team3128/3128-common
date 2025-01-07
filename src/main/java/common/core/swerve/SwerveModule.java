@@ -92,7 +92,6 @@ public class SwerveModule {
         angleMotor.configMotor(angleConfig.motorConfig);
         angleMotor.configPID(angleConfig.pidffConfig);
         angleMotor.enableContinuousInput(-180, 180);
-        angleMotor.setDefaultStatusFrames();
         resetToAbsolute();
     }
 
@@ -103,7 +102,6 @@ public class SwerveModule {
         driveMotor.configMotor(driveConfig.motorConfig);
         driveMotor.configPID(driveConfig.pidffConfig);
         driveMotor.resetPosition(0);
-        driveMotor.setDefaultStatusFrames();
     }
 
     /**

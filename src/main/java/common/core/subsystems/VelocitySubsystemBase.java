@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.function.DoubleSupplier;
 import common.core.controllers.ControllerBase;
 import common.hardware.motorcontroller.NAR_Motor;
+import common.utility.sysid.CmdSysId;
 import edu.wpi.first.wpilibj2.command.Command;
 import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
@@ -14,7 +15,7 @@ import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
  * @since 2024 Crescendo
  * @author Teja Yaramada
  */
-public abstract class VelocitySubsystemBase extends NAR_PIDSubsystem {
+public abstract class VelocitySubsystemBase extends NAR_PIDSubsystem implements NAR_Subsystem {
 
     protected final NAR_Motor leader;
 
@@ -37,11 +38,6 @@ public abstract class VelocitySubsystemBase extends NAR_PIDSubsystem {
         configMotors();
         configController();
     }
-
-    /**
-     * Configure motor settings.
-     */
-    protected abstract void configMotors();
 
     /**
      * Configure controller settings.
@@ -72,6 +68,10 @@ public abstract class VelocitySubsystemBase extends NAR_PIDSubsystem {
         return run(0);
     }
 
+    public Command reset() {
+        return runOnce(()-> leader.resetPosition(0));
+    }
+
     /**
      * Sets controller setpoint and enables controller.
      * 
@@ -90,5 +90,26 @@ public abstract class VelocitySubsystemBase extends NAR_PIDSubsystem {
      */
     public Command pidTo(DoubleSupplier setpoint) {
         return pidTo(setpoint.getAsDouble());
+    }
+
+    /**
+     * Returns current of the first motor.
+     */
+    public double getCurrent(){
+        return leader.getStallCurrent();
+    }
+
+    public Command characterization(double startDelaySecs, double rampRateVoltsPerSec) {
+        return new CmdSysId(
+            getName(), 
+            leader::setVolts, 
+            leader::getVelocity, 
+            leader::getPosition, 
+            startDelaySecs,
+            rampRateVoltsPerSec,
+            controller.getInputRange()[1], 
+            true, 
+            this
+        ).beforeStarting(reset());
     }
 }

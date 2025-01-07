@@ -1,7 +1,6 @@
 package common.hardware.motorcontroller;
 
 import java.util.LinkedList;
-import java.util.function.DoubleSupplier;
 
 import com.revrobotics.spark.SparkBase;
 import com.revrobotics.spark.SparkFlex;
@@ -27,10 +26,8 @@ import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 
 import common.core.controllers.PIDFFConfig;
-import common.core.misc.NAR_Robot;
 import common.utility.Log;
 import common.utility.narwhaldashboard.NarwhalDashboard.State;
-import common.utility.shuffleboard.NAR_Shuffleboard;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
 
@@ -111,8 +108,8 @@ public class NAR_CANSpark extends NAR_Motor {
 	private SparkRelativeEncoder relativeEncoder;
 	private SparkAbsoluteEncoder absoluteEncoder;
 	private final SparkClosedLoopController controller;
-    protected final SparkBase motor;
-	protected final SparkBaseConfig config;
+    private final SparkBase motor;
+	private final SparkBaseConfig config;
 
     /**
 	 * Create a new object to control a SPARK motor
@@ -382,17 +379,17 @@ public class NAR_CANSpark extends NAR_Motor {
 	}
 
     @Override
-    protected void setPercentOutput(double speed) {
+    public void setPercentOutput(double speed) {
         controller.setReference(speed, ControlType.kDutyCycle);
     }
 
     @Override
-    protected void setVelocity(double rpm, double feedForward) {
+    public void setVelocity(double rpm, double feedForward) {
         controller.setReference(rpm, ControlType.kVelocity, ClosedLoopSlot.kSlot0, feedForward);
     }
 
     @Override
-    protected void setPosition(double rotations, double feedForward) {
+    public void setPosition(double rotations, double feedForward) {
         controller.setReference(rotations, ControlType.kPosition, ClosedLoopSlot.kSlot0, feedForward);
     }
 
@@ -407,17 +404,17 @@ public class NAR_CANSpark extends NAR_Motor {
 	}
 	
 	@Override
-	protected void resetRawPosition(double rotations) {
+	public void resetRawPosition(double rotations) {
 		if (encoderType == EncoderType.Relative) relativeEncoder.setPosition(rotations);
 	}
 
     @Override
-    protected double getRawPosition() {
+    public double getRawPosition() {
         return encoderType == EncoderType.Relative ? relativeEncoder.getPosition() : absoluteEncoder.getPosition();
     }
 
     @Override
-    protected double getRawVelocity() {
+    public double getRawVelocity() {
         return encoderType == EncoderType.Relative ? relativeEncoder.getVelocity() : absoluteEncoder.getVelocity();
     }
 
@@ -433,13 +430,13 @@ public class NAR_CANSpark extends NAR_Motor {
 	}
 
 	@Override
-	protected void setBrakeMode() {
+	public void setBrakeMode() {
 		config.idleMode(IdleMode.kBrake);
 		configure();
 	}
 
 	@Override
-	protected void setCoastMode() {
+	public void setCoastMode() {
 		config.idleMode(IdleMode.kCoast);
 		configure();
 	}

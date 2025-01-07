@@ -102,11 +102,17 @@ loadScripts(document, 'script');</script>
 <div class="col-first odd-row-color"><code>final int</code></div>
 <div class="col-second odd-row-color"><code><a href="#statorLimit" class="member-name-link">statorLimit</a></code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
-<div class="col-first even-row-color"><code>final int</code></div>
-<div class="col-second even-row-color"><code><a href="#supplyLimit" class="member-name-link">supplyLimit</a></code></div>
+<div class="col-first even-row-color"><code>final <a href="NAR_Motor.StatusFrames.html" title="enum class in common.hardware.motorcontroller">NAR_Motor.StatusFrames</a></code></div>
+<div class="col-second even-row-color"><code><a href="#statusFrames" class="member-name-link">statusFrames</a></code></div>
+<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-first odd-row-color"><code>final int</code></div>
+<div class="col-second odd-row-color"><code><a href="#supplyLimit" class="member-name-link">supplyLimit</a></code></div>
+<div class="col-last odd-row-color">&nbsp;</div>
+<div class="col-first even-row-color"><code>final double</code></div>
+<div class="col-second even-row-color"><code><a href="#timeFactor" class="member-name-link">timeFactor</a></code></div>
 <div class="col-last even-row-color">&nbsp;</div>
 <div class="col-first odd-row-color"><code>final double</code></div>
-<div class="col-second odd-row-color"><code><a href="#timeFactor" class="member-name-link">timeFactor</a></code></div>
+<div class="col-second odd-row-color"><code><a href="#voltageCompensation" class="member-name-link">voltageCompensation</a></code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
 </div>
 </section>
@@ -125,12 +131,29 @@ loadScripts(document, 'script');</script>
  boolean&nbsp;inverted,
  <a href="NAR_Motor.Neutral.html" title="enum class in common.hardware.motorcontroller">NAR_Motor.Neutral</a>&nbsp;mode)</code></div>
 <div class="col-last even-row-color">&nbsp;</div>
-<div class="col-constructor-name odd-row-color"><code><a href="#%3Cinit%3E(double,double,int,int,boolean,common.hardware.motorcontroller.NAR_Motor.Neutral)" class="member-name-link">MotorConfig</a><wbr>(double&nbsp;distanceFactor,
+<div class="col-constructor-name odd-row-color"><code><a href="#%3Cinit%3E(double,double,int,boolean,common.hardware.motorcontroller.NAR_Motor.Neutral,common.hardware.motorcontroller.NAR_Motor.StatusFrames)" class="member-name-link">MotorConfig</a><wbr>(double&nbsp;distanceFactor,
+ double&nbsp;timeFactor,
+ int&nbsp;statorLimit,
+ boolean&nbsp;inverted,
+ <a href="NAR_Motor.Neutral.html" title="enum class in common.hardware.motorcontroller">NAR_Motor.Neutral</a>&nbsp;mode,
+ <a href="NAR_Motor.StatusFrames.html" title="enum class in common.hardware.motorcontroller">NAR_Motor.StatusFrames</a>&nbsp;statusFrames)</code></div>
+<div class="col-last odd-row-color">&nbsp;</div>
+<div class="col-constructor-name even-row-color"><code><a href="#%3Cinit%3E(double,double,int,double,boolean,common.hardware.motorcontroller.NAR_Motor.Neutral,common.hardware.motorcontroller.NAR_Motor.StatusFrames)" class="member-name-link">MotorConfig</a><wbr>(double&nbsp;distanceFactor,
+ double&nbsp;timeFactor,
+ int&nbsp;statorLimit,
+ double&nbsp;voltageCompensation,
+ boolean&nbsp;inverted,
+ <a href="NAR_Motor.Neutral.html" title="enum class in common.hardware.motorcontroller">NAR_Motor.Neutral</a>&nbsp;mode,
+ <a href="NAR_Motor.StatusFrames.html" title="enum class in common.hardware.motorcontroller">NAR_Motor.StatusFrames</a>&nbsp;statusFrames)</code></div>
+<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-constructor-name odd-row-color"><code><a href="#%3Cinit%3E(double,double,int,int,double,boolean,common.hardware.motorcontroller.NAR_Motor.Neutral,common.hardware.motorcontroller.NAR_Motor.StatusFrames)" class="member-name-link">MotorConfig</a><wbr>(double&nbsp;distanceFactor,
  double&nbsp;timeFactor,
  int&nbsp;statorLimit,
  int&nbsp;supplyLimit,
+ double&nbsp;voltageCompensation,
  boolean&nbsp;inverted,
- <a href="NAR_Motor.Neutral.html" title="enum class in common.hardware.motorcontroller">NAR_Motor.Neutral</a>&nbsp;mode)</code></div>
+ <a href="NAR_Motor.Neutral.html" title="enum class in common.hardware.motorcontroller">NAR_Motor.Neutral</a>&nbsp;mode,
+ <a href="NAR_Motor.StatusFrames.html" title="enum class in common.hardware.motorcontroller">NAR_Motor.StatusFrames</a>&nbsp;statusFrames)</code></div>
 <div class="col-last odd-row-color">
 <div class="block">Creates a new motor config</div>
 </div>
@@ -180,6 +203,12 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
+<section class="detail" id="voltageCompensation">
+<h3>voltageCompensation</h3>
+<div class="member-signature"><span class="modifiers">public final</span>&nbsp;<span class="return-type">double</span>&nbsp;<span class="element-name">voltageCompensation</span></div>
+</section>
+</li>
+<li>
 <section class="detail" id="inverted">
 <h3>inverted</h3>
 <div class="member-signature"><span class="modifiers">public final</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">inverted</span></div>
@@ -191,6 +220,12 @@ loadScripts(document, 'script');</script>
 <div class="member-signature"><span class="modifiers">public final</span>&nbsp;<span class="return-type"><a href="NAR_Motor.Neutral.html" title="enum class in common.hardware.motorcontroller">NAR_Motor.Neutral</a></span>&nbsp;<span class="element-name">mode</span></div>
 </section>
 </li>
+<li>
+<section class="detail" id="statusFrames">
+<h3>statusFrames</h3>
+<div class="member-signature"><span class="modifiers">public final</span>&nbsp;<span class="return-type"><a href="NAR_Motor.StatusFrames.html" title="enum class in common.hardware.motorcontroller">NAR_Motor.StatusFrames</a></span>&nbsp;<span class="element-name">statusFrames</span></div>
+</section>
+</li>
 </ul>
 </section>
 </li>
@@ -200,14 +235,16 @@ loadScripts(document, 'script');</script>
 <h2>Constructor Details</h2>
 <ul class="member-list">
 <li>
-<section class="detail" id="&lt;init&gt;(double,double,int,int,boolean,common.hardware.motorcontroller.NAR_Motor.Neutral)">
+<section class="detail" id="&lt;init&gt;(double,double,int,int,double,boolean,common.hardware.motorcontroller.NAR_Motor.Neutral,common.hardware.motorcontroller.NAR_Motor.StatusFrames)">
 <h3>MotorConfig</h3>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="element-name">MotorConfig</span><wbr><span class="parameters">(double&nbsp;distanceFactor,
  double&nbsp;timeFactor,
  int&nbsp;statorLimit,
  int&nbsp;supplyLimit,
+ double&nbsp;voltageCompensation,
  boolean&nbsp;inverted,
- <a href="NAR_Motor.Neutral.html" title="enum class in common.hardware.motorcontroller">NAR_Motor.Neutral</a>&nbsp;mode)</span></div>
+ <a href="NAR_Motor.Neutral.html" title="enum class in common.hardware.motorcontroller">NAR_Motor.Neutral</a>&nbsp;mode,
+ <a href="NAR_Motor.StatusFrames.html" title="enum class in common.hardware.motorcontroller">NAR_Motor.StatusFrames</a>&nbsp;statusFrames)</span></div>
 <div class="block">Creates a new motor config</div>
 <dl class="notes">
 <dt>Parameters:</dt>
@@ -215,9 +252,34 @@ loadScripts(document, 'script');</script>
 <dd><code>timeFactor</code> - Factor to multiply time units by (per minutes) ie. use 60 for seconds, 1 for minutes</dd>
 <dd><code>statorLimit</code> - The currentLimit for the stator</dd>
 <dd><code>supplyLimit</code> - The currentLimit for the motor controller</dd>
+<dd><code>voltageCompensation</code> - The voltage compensation for the motor</dd>
 <dd><code>inverted</code> - Whether or not the motor is inverted.</dd>
 <dd><code>mode</code> - Neutral mode for the motor.</dd>
+<dd><code>statusFrames</code> - Status frames for the motor.</dd>
 </dl>
+</section>
+</li>
+<li>
+<section class="detail" id="&lt;init&gt;(double,double,int,double,boolean,common.hardware.motorcontroller.NAR_Motor.Neutral,common.hardware.motorcontroller.NAR_Motor.StatusFrames)">
+<h3>MotorConfig</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="element-name">MotorConfig</span><wbr><span class="parameters">(double&nbsp;distanceFactor,
+ double&nbsp;timeFactor,
+ int&nbsp;statorLimit,
+ double&nbsp;voltageCompensation,
+ boolean&nbsp;inverted,
+ <a href="NAR_Motor.Neutral.html" title="enum class in common.hardware.motorcontroller">NAR_Motor.Neutral</a>&nbsp;mode,
+ <a href="NAR_Motor.StatusFrames.html" title="enum class in common.hardware.motorcontroller">NAR_Motor.StatusFrames</a>&nbsp;statusFrames)</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="&lt;init&gt;(double,double,int,boolean,common.hardware.motorcontroller.NAR_Motor.Neutral,common.hardware.motorcontroller.NAR_Motor.StatusFrames)">
+<h3>MotorConfig</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="element-name">MotorConfig</span><wbr><span class="parameters">(double&nbsp;distanceFactor,
+ double&nbsp;timeFactor,
+ int&nbsp;statorLimit,
+ boolean&nbsp;inverted,
+ <a href="NAR_Motor.Neutral.html" title="enum class in common.hardware.motorcontroller">NAR_Motor.Neutral</a>&nbsp;mode,
+ <a href="NAR_Motor.StatusFrames.html" title="enum class in common.hardware.motorcontroller">NAR_Motor.StatusFrames</a>&nbsp;statusFrames)</span></div>
 </section>
 </li>
 <li>
