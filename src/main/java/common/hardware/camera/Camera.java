@@ -2,6 +2,7 @@ package common.hardware.camera;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.DoubleSupplier;
@@ -35,6 +36,7 @@ public class Camera {
     public static final LinkedList<Camera> cameras = new LinkedList<Camera>();
 
     private PhotonPipelineResult result = new PhotonPipelineResult();
+    private List<PhotonPipelineResult> resultList = new ArrayList<PhotonPipelineResult>();
 
     
     private static DoubleSupplier gyro;
@@ -102,30 +104,33 @@ public class Camera {
     public void update() {
         if (isDisabled) return;
         hasSeenTag = false;
-        result = camera.getLatestResult();
+        // result = camera.getLatestResult();
+        resultList = camera.getAllUnreadResults();
 
-        if (!result.hasTargets()) {
-            return;
-        }
-
-        Pose2d estPos = getGyroPose(result);
-
-        /*
-         * Checks if the the robot has a good estimate
-         */
-
-        if(!isGoodEstimate(estPos)) {
-            updateCounter++;
-            if (updateCounter <= overrideThreshold) {
-                hasSeenTag = false; 
+        for (PhotonPipelineResult result : resultList) {
+            if (!result.hasTargets()) {
                 return;
             }
+    
+            Pose2d estPos = getGyroPose(result);
+    
+            /*
+             * Checks if the the robot has a good estimate
+             */
+    
+            if(!isGoodEstimate(estPos)) {
+                updateCounter++;
+                if (updateCounter <= overrideThreshold) {
+                    hasSeenTag = false; 
+                    return;
+                }
+            }
+            else {
+                updateCounter = 0;
+            } 
+            
+            odometry.accept(estPos, result.getTimestampSeconds());
         }
-        else {
-            updateCounter = 0;
-        } 
-        
-        odometry.accept(estPos, result.getTimestampSeconds());
     }
 
 

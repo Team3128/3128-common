@@ -17,7 +17,7 @@ import static edu.wpi.first.wpilibj2.command.Commands.*;
  * @since 2024 Crescendo
  * @author Teja Yaramada
  */
-public abstract class PositionSubsystemBase extends NAR_PIDSubsystem{
+public abstract class PositionSubsystemBase extends NAR_PIDSubsystem implements NAR_Subsystem {
 
     protected final NAR_Motor leader;
 
@@ -40,11 +40,6 @@ public abstract class PositionSubsystemBase extends NAR_PIDSubsystem{
         configMotors();
         configController();
     }
-
-    /**
-     * Configure motor settings.
-     */
-    protected abstract void configMotors();
 
     /**
      * Configure controller settings.
@@ -107,6 +102,13 @@ public abstract class PositionSubsystemBase extends NAR_PIDSubsystem{
 
     public Command reset() {
         return reset(controller.getInputRange()[0]);
+    }
+
+    /**
+     * Returns current of the first motor.
+     */
+    public double getCurrent(){
+        return leader.getStallCurrent();
     }
 
     /**

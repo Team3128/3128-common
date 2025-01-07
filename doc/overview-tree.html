@@ -52,6 +52,7 @@ loadScripts(document, 'script');</script>
 <ul class="horizontal">
 <li><a href="common/core/commands/package-tree.html">common.core.commands</a>, </li>
 <li><a href="common/core/controllers/package-tree.html">common.core.controllers</a>, </li>
+<li><a href="common/core/fsm/package-tree.html">common.core.fsm</a>, </li>
 <li><a href="common/core/misc/package-tree.html">common.core.misc</a>, </li>
 <li><a href="common/core/subsystems/package-tree.html">common.core.subsystems</a>, </li>
 <li><a href="common/core/swerve/package-tree.html">common.core.swerve</a>, </li>
@@ -147,14 +148,15 @@ loadScripts(document, 'script');</script>
 </li>
 <li class="circle">edu.wpi.first.wpilibj2.command.SubsystemBase (implements edu.wpi.first.util.sendable.Sendable, edu.wpi.first.wpilibj2.command.Subsystem)
 <ul>
+<li class="circle">common.core.fsm.<a href="common/core/fsm/FSMSubsystemBase.html" class="type-name-link" title="class in common.core.fsm">FSMSubsystemBase</a>&lt;S&gt;</li>
 <li class="circle">common.core.subsystems.<a href="common/core/subsystems/NAR_PIDSubsystem.html" class="type-name-link" title="class in common.core.subsystems">NAR_PIDSubsystem</a>
 <ul>
-<li class="circle">common.core.subsystems.<a href="common/core/subsystems/PositionSubsystemBase.html" class="type-name-link" title="class in common.core.subsystems">PositionSubsystemBase</a></li>
-<li class="circle">common.core.subsystems.<a href="common/core/subsystems/VelocitySubsystemBase.html" class="type-name-link" title="class in common.core.subsystems">VelocitySubsystemBase</a></li>
+<li class="circle">common.core.subsystems.<a href="common/core/subsystems/PositionSubsystemBase.html" class="type-name-link" title="class in common.core.subsystems">PositionSubsystemBase</a> (implements common.core.subsystems.<a href="common/core/subsystems/NAR_Subsystem.html" title="interface in common.core.subsystems">NAR_Subsystem</a>)</li>
+<li class="circle">common.core.subsystems.<a href="common/core/subsystems/VelocitySubsystemBase.html" class="type-name-link" title="class in common.core.subsystems">VelocitySubsystemBase</a> (implements common.core.subsystems.<a href="common/core/subsystems/NAR_Subsystem.html" title="interface in common.core.subsystems">NAR_Subsystem</a>)</li>
 </ul>
 </li>
 <li class="circle">common.core.swerve.<a href="common/core/swerve/SwerveBase.html" class="type-name-link" title="class in common.core.swerve">SwerveBase</a></li>
-<li class="circle">common.core.subsystems.<a href="common/core/subsystems/VoltageSubsystemBase.html" class="type-name-link" title="class in common.core.subsystems">VoltageSubsystemBase</a></li>
+<li class="circle">common.core.subsystems.<a href="common/core/subsystems/VoltageSubsystemBase.html" class="type-name-link" title="class in common.core.subsystems">VoltageSubsystemBase</a> (implements common.core.subsystems.<a href="common/core/subsystems/NAR_Subsystem.html" title="interface in common.core.subsystems">NAR_Subsystem</a>)</li>
 </ul>
 </li>
 <li class="circle">common.core.swerve.<a href="common/core/swerve/SwerveConversions.html" class="type-name-link" title="class in common.core.swerve">SwerveConversions</a></li>
@@ -163,6 +165,8 @@ loadScripts(document, 'script');</script>
 <li class="circle">common.core.swerve.<a href="common/core/swerve/SwerveModuleConfig.SwerveEncoderConfig.html" class="type-name-link" title="class in common.core.swerve">SwerveModuleConfig.SwerveEncoderConfig</a></li>
 <li class="circle">common.core.swerve.<a href="common/core/swerve/SwerveModuleConfig.SwerveMotorConfig.html" class="type-name-link" title="class in common.core.swerve">SwerveModuleConfig.SwerveMotorConfig</a></li>
 <li class="circle">common.utility.tester.<a href="common/utility/tester/Tester.html" class="type-name-link" title="class in common.utility.tester">Tester</a></li>
+<li class="circle">common.core.fsm.<a href="common/core/fsm/Transition.html" class="type-name-link" title="class in common.core.fsm">Transition</a>&lt;T&gt;</li>
+<li class="circle">common.core.fsm.<a href="common/core/fsm/TransitionMap.html" class="type-name-link" title="class in common.core.fsm">TransitionMap</a>&lt;S&gt;</li>
 <li class="circle">org.java_websocket.WebSocketAdapter (implements org.java_websocket.WebSocketListener)
 <ul>
 <li class="circle">org.java_websocket.AbstractWebSocket
@@ -176,6 +180,16 @@ loadScripts(document, 'script');</script>
 </li>
 </ul>
 </li>
+</ul>
+</li>
+</ul>
+</section>
+<section class="hierarchy">
+<h2 title="Interface Hierarchy">Interface Hierarchy</h2>
+<ul>
+<li class="circle">edu.wpi.first.wpilibj2.command.Subsystem
+<ul>
+<li class="circle">common.core.subsystems.<a href="common/core/subsystems/NAR_Subsystem.html" class="type-name-link" title="interface in common.core.subsystems">NAR_Subsystem</a></li>
 </ul>
 </li>
 </ul>
@@ -203,11 +217,13 @@ loadScripts(document, 'script');</script>
 <li class="circle">common.hardware.motorcontroller.<a href="common/hardware/motorcontroller/NAR_CANSpark.NAR_SparkMaxConfig.html" class="type-name-link" title="enum class in common.hardware.motorcontroller">NAR_CANSpark.NAR_SparkMaxConfig</a></li>
 <li class="circle">common.hardware.motorcontroller.<a href="common/hardware/motorcontroller/NAR_Motor.Control.html" class="type-name-link" title="enum class in common.hardware.motorcontroller">NAR_Motor.Control</a></li>
 <li class="circle">common.hardware.motorcontroller.<a href="common/hardware/motorcontroller/NAR_Motor.Neutral.html" class="type-name-link" title="enum class in common.hardware.motorcontroller">NAR_Motor.Neutral</a></li>
+<li class="circle">common.hardware.motorcontroller.<a href="common/hardware/motorcontroller/NAR_Motor.StatusFrames.html" class="type-name-link" title="enum class in common.hardware.motorcontroller">NAR_Motor.StatusFrames</a></li>
 <li class="circle">common.hardware.input.<a href="common/hardware/input/NAR_XboxController.XboxButton.html" class="type-name-link" title="enum class in common.hardware.input">NAR_XboxController.XboxButton</a></li>
 <li class="circle">common.utility.narwhaldashboard.<a href="common/utility/narwhaldashboard/NarwhalDashboard.State.html" class="type-name-link" title="enum class in common.utility.narwhaldashboard">NarwhalDashboard.State</a></li>
 <li class="circle">common.hardware.limelight.<a href="common/hardware/limelight/Pipeline.html" class="type-name-link" title="enum class in common.hardware.limelight">Pipeline</a></li>
 <li class="circle">common.hardware.limelight.<a href="common/hardware/limelight/StreamMode.html" class="type-name-link" title="enum class in common.hardware.limelight">StreamMode</a></li>
 <li class="circle">common.utility.tester.<a href="common/utility/tester/Tester.TestState.html" class="type-name-link" title="enum class in common.utility.tester">Tester.TestState</a></li>
+<li class="circle">common.core.fsm.<a href="common/core/fsm/TransitionMap.TransitionType.html" class="type-name-link" title="enum class in common.core.fsm">TransitionMap.TransitionType</a></li>
 </ul>
 </li>
 </ul>

@@ -24,8 +24,10 @@ public abstract class NAR_Motor implements AutoCloseable {
         public final double timeFactor;
         public final int supplyLimit;
         public final int statorLimit;
+        public final double voltageCompensation;
         public final boolean inverted;
         public final Neutral mode;
+        public final StatusFrames statusFrames;
 
         /**
          * Creates a new motor config
@@ -33,21 +35,40 @@ public abstract class NAR_Motor implements AutoCloseable {
          * @param timeFactor Factor to multiply time units by (per minutes) ie. use 60 for seconds, 1 for minutes
          * @param statorLimit The currentLimit for the stator
          * @param supplyLimit The currentLimit for the motor controller
+         * @param voltageCompensation The voltage compensation for the motor
          * @param inverted Whether or not the motor is inverted.
          * @param mode Neutral mode for the motor.
+         * @param statusFrames Status frames for the motor.
          */
-        public MotorConfig(double distanceFactor, double timeFactor, int statorLimit, int supplyLimit, boolean inverted, Neutral mode) {
+        public MotorConfig(double distanceFactor, double timeFactor, int statorLimit, int supplyLimit, double voltageCompensation, boolean inverted, Neutral mode, StatusFrames statusFrames) {
             this.distanceFactor = distanceFactor;
             this.timeFactor = timeFactor;
             this.statorLimit = statorLimit;
             this.supplyLimit = supplyLimit;
+            this.voltageCompensation = voltageCompensation;
             this.inverted = inverted;
             this.mode = mode;
+            this.statusFrames = statusFrames;
+        }
+
+        public MotorConfig(double distanceFactor, double timeFactor, int statorLimit, double voltageCompensation, boolean inverted, Neutral mode, StatusFrames statusFrames) {
+            this(distanceFactor, timeFactor, statorLimit, 120, voltageCompensation, inverted, mode, statusFrames);
+        }
+
+        public MotorConfig(double distanceFactor, double timeFactor, int statorLimit, boolean inverted, Neutral mode, StatusFrames statusFrames) {
+            this(distanceFactor, timeFactor, statorLimit, 120, 12, inverted, mode, statusFrames);
         }
 
         public MotorConfig(double distanceFactor, double timeFactor, int statorLimit, boolean inverted, Neutral mode) {
-            this(distanceFactor, timeFactor, statorLimit, 120, inverted, mode);
+            this(distanceFactor, timeFactor, statorLimit, 120, 12, inverted, mode, StatusFrames.DEFAULT);
         }
+    }
+
+    public enum StatusFrames {
+        DEFAULT,
+        POSITION,
+        VELOCITY,
+        FOLLOWER;
     }
 
     /**
@@ -161,10 +182,25 @@ public abstract class NAR_Motor implements AutoCloseable {
     public void configMotor(MotorConfig config) {
         setUnitConversionFactor(config.distanceFactor);
         setTimeConversionFactor(config.timeFactor);
+        setInverted(config.inverted);
         setStatorLimit(config.statorLimit);
         setSupplyLimit(config.supplyLimit);
-        setInverted(config.inverted);
+        enableVoltageCompensation(config.voltageCompensation);
         setNeutralMode(config.mode);
+        switch(config.statusFrames) {
+            case DEFAULT:
+                setDefaultStatusFrames();
+                break;
+            case POSITION:
+                setPositionStatusFrames();
+                break;
+            case VELOCITY:
+                setVelocityStatusFrames();
+                break;
+            case FOLLOWER:
+                setFollowerStatusFrames();
+                break;
+        }
     }
 
     /**

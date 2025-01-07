@@ -1,6 +1,7 @@
 package common.core.subsystems;
 
 import java.util.Arrays;
+
 import common.hardware.motorcontroller.NAR_Motor;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -11,7 +12,7 @@ import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
  * @since 2024 Crescendo
  * @author Teja Yaramada
  */
-public abstract class VoltageSubsystemBase extends SubsystemBase {
+public abstract class VoltageSubsystemBase extends SubsystemBase implements NAR_Subsystem {
     
     protected final NAR_Motor leader;
     private double currentThreshold;
@@ -30,12 +31,6 @@ public abstract class VoltageSubsystemBase extends SubsystemBase {
         this(30, leader, followers);
     }
 
-
-    
-    /**
-     * Configure motor settings.
-     */
-    protected abstract void configMotors();
     
     /**
      * Returns current of the first motor.
