@@ -21,15 +21,15 @@ public abstract class FSMSubsystemBase<S extends Enum<S>> extends SubsystemBase 
 
     protected static LinkedList<NAR_Subsystem> subsystems;
 
-    public FSMSubsystemBase(Class<S> enumType) {
+    public FSMSubsystemBase(Class<S> enumType, TransitionMap<S> transitionMap) {
         this.enumType = enumType;
-        this.transitionMap = new TransitionMap<S>(enumType);
+        this.transitionMap = transitionMap;
         registerTransitions();
         initStateTracker();
     }
 
-    public FSMSubsystemBase(Class<S> enumType, S initalState) {
-        this(enumType);
+    public FSMSubsystemBase(Class<S> enumType, TransitionMap<S> transitionMap, S initalState) {
+        this(enumType, transitionMap);
         this.currentState = initalState;
     }
 
@@ -63,7 +63,8 @@ public abstract class FSMSubsystemBase<S extends Enum<S>> extends SubsystemBase 
     }
 
     public boolean stateEquals(S state) {
-        return currentState.name().equals(state.name());
+        if(state == null || currentState == null) return false;
+        return currentState.equals(state);
     }
 
     public S getState() {
@@ -102,8 +103,10 @@ public abstract class FSMSubsystemBase<S extends Enum<S>> extends SubsystemBase 
 
     public abstract void registerTransitions();
 
-    public void addSubsystem(NAR_Subsystem subsystem) {
-        subsystems.add(subsystem);
+    public void addSubsystem(NAR_Subsystem... subsystem) {
+        for(NAR_Subsystem sub : subsystem) {
+            subsystems.add(sub);
+        }
     }
 
     public void reset() {
@@ -126,15 +129,15 @@ public abstract class FSMSubsystemBase<S extends Enum<S>> extends SubsystemBase 
         return null;
     }
 
-    public Command run() {
+    public Command run(double power) {
         return runOnce(()-> {
-            subsystems.forEach((subsystem)-> subsystem.run());
+            subsystems.forEach((subsystem)-> subsystem.run(power));
         });
     }
 
-    public Command runVolts() {
+    public Command runVolts(double volts) {
         return runOnce(()-> {
-            subsystems.forEach((subsystem)-> subsystem.runVolts());
+            subsystems.forEach((subsystem)-> subsystem.runVolts(volts));
         });
     }
 

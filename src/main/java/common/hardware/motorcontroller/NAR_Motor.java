@@ -62,6 +62,18 @@ public abstract class NAR_Motor implements AutoCloseable {
         public MotorConfig(double distanceFactor, double timeFactor, int statorLimit, boolean inverted, Neutral mode) {
             this(distanceFactor, timeFactor, statorLimit, 120, 12, inverted, mode, StatusFrames.DEFAULT);
         }
+
+        public MotorConfig invert() {
+            return new MotorConfig(this.distanceFactor, this.timeFactor, this.statorLimit, this.supplyLimit, this.voltageCompensation, !this.inverted, this.mode, this.statusFrames);
+        }
+
+        public MotorConfig invertFollower() {
+            return new MotorConfig(this.distanceFactor, this.timeFactor, this.statorLimit, this.supplyLimit, this.voltageCompensation, !this.inverted, this.mode, StatusFrames.FOLLOWER);
+        }
+
+        public MotorConfig follower() {
+            return new MotorConfig(this.distanceFactor, this.timeFactor, this.statorLimit, this.supplyLimit, this.voltageCompensation, this.inverted, this.mode, StatusFrames.FOLLOWER);
+        }
     }
 
     public enum StatusFrames {
@@ -345,7 +357,19 @@ public abstract class NAR_Motor implements AutoCloseable {
     }
 
     /**
+     * Sets a motor's output based on the leader's
+     * @param leader The motor to follow
+     * @param config Motor settings
+     */
+    public void follow(NAR_Motor leader, MotorConfig config) {
+        leader.followers.add(this);
+        leaders.add(leader);
+        configMotor(config.follower());
+    }
+
+    /**
      * Sets the motor's idle mode, its behavior when no voltage is applied
+     * Followers will follow the leader's idle mode
      * @param mode Type of idle mode
      */
     public void setNeutralMode(Neutral mode) {
@@ -357,6 +381,7 @@ public abstract class NAR_Motor implements AutoCloseable {
                 setCoastMode();
                 break;
         }
+        followers.forEach(follower -> follower.setNeutralMode(mode));
     }
 
     /**

@@ -3,6 +3,7 @@ package common.core.subsystems;
 import java.util.Arrays;
 
 import common.hardware.motorcontroller.NAR_Motor;
+import common.hardware.motorcontroller.NAR_Motor.Neutral;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
@@ -30,6 +31,11 @@ public abstract class VoltageSubsystemBase extends SubsystemBase implements NAR_
     public VoltageSubsystemBase(NAR_Motor leader, NAR_Motor... followers){
         this(30, leader, followers);
     }
+
+    /**
+     * Configure motor settings.
+     */
+    protected abstract void configMotors();
 
     
     /**
@@ -68,5 +74,9 @@ public abstract class VoltageSubsystemBase extends SubsystemBase implements NAR_
      */
     public Command stop(){
         return run(0);
+    }
+
+    public void setNeutralMode(Neutral mode) {
+        leader.setNeutralMode(mode);
     }
 }

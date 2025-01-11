@@ -83,15 +83,34 @@ public class TransitionMap<S extends Enum<S>> {
         addConvergingTransition(state, () -> {});
     }
 
-    @SafeVarargs
-    public final void addConvergingTransitions(S... states) {
-        for (S state : states) {
-            addConvergingTransition(state);
+    @SuppressWarnings("unchecked")
+    /**
+     * Link multiple states to a single state using the same transition command
+     * @param command Transition command
+     * @param incomingState End state of all the transitions
+     * @param outGoingStates Starting states of the each of the transitions
+     */
+    public void addConvergingTransitions(Command command, S incomingState, S... outGoingStates) {
+        for (S outGoingState : outGoingStates) {
+            addTransition(outGoingState, incomingState, command);
         }
     }
 
     @SuppressWarnings("unchecked")
-    public void applyConvergingFunction(Function<S, Command> function, S... states) {
+    /**
+     * Link multiple states to a single state using the same transition command
+     * @param commandFunction Transition command that takes in each outgoing state
+     * @param incomingState End state of all the transitions
+     * @param outGoingStates Starting states of the each of the transitions
+     */
+    public void addConvergingFunctions(Function<S, Command> commandFunction, S incomingState, S... outGoingStates) {
+        for (S outGoingState : outGoingStates) {
+            addTransition(outGoingState, incomingState, commandFunction.apply(outGoingState));
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public void addConvergingFunctions(Function<S, Command> function, S... states) {
         for (S s1 : states) {
             Command result = function.apply(s1);
             if (result != null) {
@@ -100,8 +119,8 @@ public class TransitionMap<S extends Enum<S>> {
         }
     }
 
-    public void applyConvergingFunction(Function<S, Command> function) {
-        applyConvergingFunction(function, states);
+    public void addConvergingFunctions(Function<S, Command> function) {
+        addConvergingFunctions(function, states);
     }
 
     /**
@@ -140,18 +159,23 @@ public class TransitionMap<S extends Enum<S>> {
     }
 
     
-    @SuppressWarnings("unchecked")
-    public void applyDivergingFunction(Function<S, Command> function, S... states) {
-        for (S s1 : states) {
-            Command result = function.apply(s1);
-            if (result != null) {
-                addDivergingTransition(s1, result);
-            }
-        }
+    /**
+     * Adds a transition from the given states to every other state
+     * @param function function to apply to each incoming state
+     * @param state states to diverge from
+     */
+    public void applyDivergingFunction(Function<S, Command> function, S state) {
+        applyDivergingFunction(function, state, states);
     }
 
-    public void applyDivergingFunction(Function<S, Command> function) {
-        applyDivergingFunction(function, states);
+    @SuppressWarnings("unchecked")
+    public void applyDivergingFunction(Function<S, Command> function, S divergentState, S... divergeToStates) {
+        for(S divergeToState : divergeToStates) {
+            Command result = function.apply(divergentState);
+            if (result != null) {
+                addTransition(divergentState, divergeToState, result);
+            }
+        }
     }
 
     /**

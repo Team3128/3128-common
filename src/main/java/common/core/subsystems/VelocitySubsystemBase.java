@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.function.DoubleSupplier;
 import common.core.controllers.ControllerBase;
 import common.hardware.motorcontroller.NAR_Motor;
+import common.hardware.motorcontroller.NAR_Motor.Neutral;
 import common.utility.sysid.CmdSysId;
 import edu.wpi.first.wpilibj2.command.Command;
 import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
@@ -38,6 +39,11 @@ public abstract class VelocitySubsystemBase extends NAR_PIDSubsystem implements 
         configMotors();
         configController();
     }
+
+    /**
+     * Configure motor settings.
+     */
+    protected abstract void configMotors();
 
     /**
      * Configure controller settings.
@@ -97,6 +103,10 @@ public abstract class VelocitySubsystemBase extends NAR_PIDSubsystem implements 
      */
     public double getCurrent(){
         return leader.getStallCurrent();
+    }
+
+    public void setNeutralMode(Neutral mode) {
+        leader.setNeutralMode(mode);
     }
 
     public Command characterization(double startDelaySecs, double rampRateVoltsPerSec) {
