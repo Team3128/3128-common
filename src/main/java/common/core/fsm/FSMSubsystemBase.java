@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import common.core.subsystems.NAR_Subsystem;
+import common.hardware.motorcontroller.NAR_Motor.Neutral;
 import common.utility.shuffleboard.NAR_Shuffleboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -127,6 +128,10 @@ public abstract class FSMSubsystemBase<S extends Enum<S>> extends SubsystemBase 
             }
         }
         return null;
+    }
+
+    public void setNeutralMode(Neutral mode) {
+        getSubsystems().forEach(subsystem -> subsystem.setNeutralMode(mode));
     }
 
     public Command run(double power) {

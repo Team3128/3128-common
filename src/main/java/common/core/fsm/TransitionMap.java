@@ -236,6 +236,15 @@ public class TransitionMap<S extends Enum<S>> {
         addCommutativeTransition(start, end, Commands.runOnce(run1), Commands.runOnce(run2));
     }
 
+    public void applyCommutativeFunction(Function<S, Command> function, S... states) {
+        for(S state1 : states) {
+            for(S state2 : states) {
+                addTransition(state1, state2, function.apply(state2));
+                addTransition(state2, state1, function.apply(state1));
+            }
+        }
+    }
+
     @SuppressWarnings("unchecked")
     private Transition<S> getAsTransition(int x, int y) {
         return (Transition<S>) adjacencyMap[x][y];
