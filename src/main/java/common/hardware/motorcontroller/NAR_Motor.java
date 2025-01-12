@@ -54,6 +54,10 @@ public abstract class NAR_Motor implements AutoCloseable {
         public MotorConfig invertFollower() {
             return new MotorConfig(this.distanceFactor, this.timeFactor, this.currentLimit, this.voltageCompensation, !this.inverted, this.mode, StatusFrames.FOLLOWER);
         }
+
+        public MotorConfig follower() {
+            return new MotorConfig(this.distanceFactor, this.timeFactor, this.currentLimit, this.voltageCompensation, this.inverted, this.mode, StatusFrames.FOLLOWER);
+        }
     }
 
     public enum StatusFrames {
