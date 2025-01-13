@@ -57,6 +57,7 @@ public abstract class FSMSubsystemBase<S extends Enum<S>> extends SubsystemBase 
 
         currentTransition = transition;
         currentTransition.getCommand().schedule();
+        currentState = nextState;
     }
 
     public Command setStateCommand(S nextState) {
