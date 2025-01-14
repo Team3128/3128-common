@@ -262,6 +262,7 @@ public class TransitionMap<S extends Enum<S>> {
      * @param transition The transition to set to the graph
      */
     public void setTransition(Transition<S> transition) {
+        if(transition.getOutgoingState().ordinal() == transition.getIncomingState().ordinal()) return;
         adjacencyMap[transition.getOutgoingState().ordinal()][transition.getIncomingState().ordinal()] = transition;
     }
 
@@ -316,5 +317,15 @@ public class TransitionMap<S extends Enum<S>> {
             if (in != null) incoming.add(in);
         }
         return incoming;
+    }
+
+    @Override
+    public String toString() {
+        String out = "Adjacency Map " + enumType.getCanonicalName();
+        for(Object[] row : adjacencyMap) {
+            out = out + "\n";
+            out = out + Arrays.toString(row);
+        }
+        return out;
     }
 }

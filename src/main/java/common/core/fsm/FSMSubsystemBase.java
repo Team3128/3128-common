@@ -20,12 +20,12 @@ public abstract class FSMSubsystemBase<S extends Enum<S>> extends SubsystemBase 
     private final TransitionMap<S> transitionMap;
     private final Class<S> enumType;
 
-    protected static LinkedList<NAR_Subsystem> subsystems;
+    protected static List<NAR_Subsystem> subsystems = new LinkedList<NAR_Subsystem>();
 
     public FSMSubsystemBase(Class<S> enumType, TransitionMap<S> transitionMap) {
         this.enumType = enumType;
         this.transitionMap = transitionMap;
-        registerTransitions();
+        // registerTransitions();
         initStateTracker();
     }
 
@@ -148,7 +148,7 @@ public abstract class FSMSubsystemBase<S extends Enum<S>> extends SubsystemBase 
     }
 
     public Command stop() {
-        currentTransition.cancel();
+        if(currentTransition != null) currentTransition.cancel();
         return runOnce(()-> {
             subsystems.forEach((subsystem)-> subsystem.stop());
         });
