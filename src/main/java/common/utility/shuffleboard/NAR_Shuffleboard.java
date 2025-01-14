@@ -171,7 +171,7 @@ public class NAR_Shuffleboard {
             tabs.get(tabName).get(name).m_supply = supply;
             return tabs.get(tabName).get(name).m_widget;
         }
-        SimpleWidget widget = Shuffleboard.getTab(tabName).add(name,supply.get()).withPosition(x, y).withSize(width, height);
+        SimpleWidget widget = Shuffleboard.getTab(tabName).add(name,supply.get()).withPosition(x, y).withSize(width, height).withWidget(BuiltInWidgets.kTextView);
         tabs.get(tabName).put(name, new WidgetInfo(widget,supply));
         return widget;
     }
@@ -197,7 +197,7 @@ public class NAR_Shuffleboard {
             tabs.get(tabName).get(name).m_entry.setValue(data);
             return tabs.get(tabName).get(name).m_widget;
         }
-        SimpleWidget widget = Shuffleboard.getTab(tabName).add(name,data).withPosition(x, y).withSize(width,height);
+        SimpleWidget widget = Shuffleboard.getTab(tabName).add(name,data).withPosition(x, y).withSize(width,height).withWidget(BuiltInWidgets.kTextView);
         tabs.get(tabName).put(name, new WidgetInfo(widget,null));
         return widget;
     }
@@ -235,7 +235,7 @@ public class NAR_Shuffleboard {
                 create_tab(tabName);
                 fillEntryPositions(x, y, width, height, tabName);
             }
-            return Shuffleboard.getTab(tabName).add(name, data).withPosition(x,y).withSize(width, height);
+            return Shuffleboard.getTab(tabName).add(name, data).withPosition(x,y).withSize(width, height).withWidget(BuiltInWidgets.kTextView);
         }
         catch(Exception e) {
             e.printStackTrace();

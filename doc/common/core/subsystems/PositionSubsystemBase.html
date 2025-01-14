@@ -183,7 +183,9 @@ implements <a href="NAR_Subsystem.html" title="interface in common.core.subsyste
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>edu.wpi.first.wpilibj2.command.Command</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#reset()" class="member-name-link">reset</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Resets the position of the motors to 0</div>
+</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>edu.wpi.first.wpilibj2.command.Command</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#reset(double)" class="member-name-link">reset</a><wbr>(double&nbsp;position)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
@@ -216,7 +218,7 @@ implements <a href="NAR_Subsystem.html" title="interface in common.core.subsyste
 <code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#clone()" title="class or interface in java.lang" class="external-link">clone</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#equals(java.lang.Object)" title="class or interface in java.lang" class="external-link">equals</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#finalize()" title="class or interface in java.lang" class="external-link">finalize</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#getClass()" title="class or interface in java.lang" class="external-link">getClass</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#hashCode()" title="class or interface in java.lang" class="external-link">hashCode</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#notify()" title="class or interface in java.lang" class="external-link">notify</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#notifyAll()" title="class or interface in java.lang" class="external-link">notifyAll</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#toString()" title="class or interface in java.lang" class="external-link">toString</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#wait()" title="class or interface in java.lang" class="external-link">wait</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#wait(long)" title="class or interface in java.lang" class="external-link">wait</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#wait(long,int)" title="class or interface in java.lang" class="external-link">wait</a></code></div>
 <div class="inherited-list">
 <h3 id="methods-inherited-from-class-common.core.subsystems.NAR_Subsystem">Methods inherited from interface&nbsp;common.core.subsystems.<a href="NAR_Subsystem.html" title="interface in common.core.subsystems">NAR_Subsystem</a></h3>
-<code><a href="NAR_Subsystem.html#configMotors()">configMotors</a>, <a href="NAR_Subsystem.html#initShuffleboard()">initShuffleboard</a>, <a href="NAR_Subsystem.html#run()">run</a>, <a href="NAR_Subsystem.html#runVolts()">runVolts</a></code></div>
+<code><a href="NAR_Subsystem.html#configMotors()">configMotors</a>, <a href="NAR_Subsystem.html#initShuffleboard()">initShuffleboard</a></code></div>
 <div class="inherited-list">
 <h3 id="methods-inherited-from-class-edu.wpi.first.wpilibj2.command.Subsystem">Methods inherited from interface&nbsp;edu.wpi.first.wpilibj2.command.Subsystem</h3>
 <code>defer, getCurrentCommand, getDefaultCommand, getName, periodic, register, removeDefaultCommand, run, runEnd, runOnce, setDefaultCommand, simulationPeriodic, startEnd, startRun</code></div>
@@ -281,6 +283,8 @@ implements <a href="NAR_Subsystem.html" title="interface in common.core.subsyste
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">edu.wpi.first.wpilibj2.command.Command</span>&nbsp;<span class="element-name">run</span><wbr><span class="parameters">(double&nbsp;power)</span></div>
 <div class="block">Sets power to motor.</div>
 <dl class="notes">
+<dt>Specified by:</dt>
+<dd><code><a href="NAR_Subsystem.html#run(double)">run</a></code>&nbsp;in interface&nbsp;<code><a href="NAR_Subsystem.html" title="interface in common.core.subsystems">NAR_Subsystem</a></code></dd>
 <dt>Parameters:</dt>
 <dd><code>power</code> - Setpoint the pivot goes to.</dd>
 <dt>Returns:</dt>
@@ -292,6 +296,10 @@ implements <a href="NAR_Subsystem.html" title="interface in common.core.subsyste
 <section class="detail" id="runVolts(double)">
 <h3>runVolts</h3>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">edu.wpi.first.wpilibj2.command.Command</span>&nbsp;<span class="element-name">runVolts</span><wbr><span class="parameters">(double&nbsp;volts)</span></div>
+<dl class="notes">
+<dt>Specified by:</dt>
+<dd><code><a href="NAR_Subsystem.html#runVolts(double)">runVolts</a></code>&nbsp;in interface&nbsp;<code><a href="NAR_Subsystem.html" title="interface in common.core.subsystems">NAR_Subsystem</a></code></dd>
+</dl>
 </section>
 </li>
 <li>
@@ -350,9 +358,12 @@ implements <a href="NAR_Subsystem.html" title="interface in common.core.subsyste
 <section class="detail" id="reset()">
 <h3>reset</h3>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">edu.wpi.first.wpilibj2.command.Command</span>&nbsp;<span class="element-name">reset</span>()</div>
+<div class="block">Resets the position of the motors to 0</div>
 <dl class="notes">
 <dt>Specified by:</dt>
 <dd><code><a href="NAR_Subsystem.html#reset()">reset</a></code>&nbsp;in interface&nbsp;<code><a href="NAR_Subsystem.html" title="interface in common.core.subsystems">NAR_Subsystem</a></code></dd>
+<dt>Returns:</dt>
+<dd>Command resetting the position of the motors to 0</dd>
 </dl>
 </section>
 </li>
