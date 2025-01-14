@@ -126,15 +126,15 @@ public abstract class FSMSubsystemBase<S extends Enum<S>> extends SubsystemBase 
         return null;
     }
 
-    public Command run() {
+    public Command run(double power) {
         return runOnce(()-> {
-            subsystems.forEach((subsystem)-> subsystem.run());
+            subsystems.forEach((subsystem)-> subsystem.run(power));
         });
     }
 
-    public Command runVolts() {
+    public Command runVolts(double volts) {
         return runOnce(()-> {
-            subsystems.forEach((subsystem)-> subsystem.runVolts());
+            subsystems.forEach((subsystem)-> subsystem.runVolts(volts));
         });
     }
 

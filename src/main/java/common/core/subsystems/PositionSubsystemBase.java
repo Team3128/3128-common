@@ -99,7 +99,12 @@ public abstract class PositionSubsystemBase extends NAR_PIDSubsystem implements 
     public Command reset(double position) {
         return runOnce(()-> leader.resetPosition(position)).beforeStarting(()-> disable());
     }
-
+    
+    /**
+     * Resets the position of the motors to 0
+     * 
+     * @return Command resetting the position of the motors to 0
+     */
     public Command reset() {
         return reset(controller.getInputRange()[0]);
     }

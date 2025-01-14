@@ -12,9 +12,9 @@ public interface NAR_Subsystem extends Subsystem{
     
     abstract Command reset();
 
-    abstract Command run();
+    abstract Command run(double power);
 
-    public Command runVolts();
+    public Command runVolts(double volts);
 
     public Command stop();
 

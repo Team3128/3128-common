@@ -68,6 +68,11 @@ public abstract class VelocitySubsystemBase extends NAR_PIDSubsystem implements 
         return run(0);
     }
 
+    /**
+     * Resets the position of the motors to 0
+     * 
+     * @return Command resetting the position of the motors to 0
+     */
     public Command reset() {
         return runOnce(()-> leader.resetPosition(0));
     }
