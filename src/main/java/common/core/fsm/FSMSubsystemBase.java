@@ -5,6 +5,7 @@ import java.util.List;
 
 import common.core.subsystems.NAR_Subsystem;
 import common.hardware.motorcontroller.NAR_Motor.Neutral;
+import common.utility.Log;
 import common.utility.shuffleboard.NAR_Shuffleboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -12,10 +13,10 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public abstract class FSMSubsystemBase<S extends Enum<S>> extends SubsystemBase {
     
-    private Transition<S> currentTransition;
-    private S currentState;
-    private Transition<S> requestTransition;
-    private S previousState;
+    protected Transition<S> currentTransition;
+    protected S currentState;
+    protected Transition<S> requestTransition;
+    protected S previousState;
 
     private final TransitionMap<S> transitionMap;
     private final Class<S> enumType;
@@ -40,28 +41,12 @@ public abstract class FSMSubsystemBase<S extends Enum<S>> extends SubsystemBase 
         }
     }
 
-    public void setState(S nextState) {
-        Transition<S> transition = transitionMap.getTransition(getState(), nextState);
+    public abstract Command setState(S nextState);
 
-        // if not the same state
-        if(!stateEquals(nextState)) requestTransition = transition;
-        else return;
-
-        // if invalid trnasition
-        if(transition == null) return;
-
-        // if not transitioning
-        if(isTransitioning()) {
-            currentTransition.cancel();
-        }
-
-        currentTransition = transition;
-        currentTransition.getCommand().schedule();
-        currentState = nextState;
-    }
 
     public Command setStateCommand(S nextState) {
-        return Commands.runOnce(()-> setState(nextState));
+        System.out.println("RUNNING SETSTATECOMMAND");
+        return Commands.runOnce(()-> setState(nextState)).beforeStarting(Commands.print("STATE COMMAND"));
     }
 
     public boolean stateEquals(S state) {
@@ -86,6 +71,7 @@ public abstract class FSMSubsystemBase<S extends Enum<S>> extends SubsystemBase 
     }
 
     public boolean isTransitioning() {
+        if (currentTransition == null) return false;
         return currentTransition.isFinished();
     }
 

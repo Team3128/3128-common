@@ -95,6 +95,18 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-first">Modifier and Type</div>
 <div class="table-header col-second">Field</div>
 <div class="table-header col-last">Description</div>
+<div class="col-first even-row-color"><code>protected <a href="FSMSubsystemBase.html" title="type parameter in FSMSubsystemBase">S</a></code></div>
+<div class="col-second even-row-color"><code><a href="#currentState" class="member-name-link">currentState</a></code></div>
+<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-first odd-row-color"><code>protected <a href="Transition.html" title="class in common.core.fsm">Transition</a>&lt;<a href="FSMSubsystemBase.html" title="type parameter in FSMSubsystemBase">S</a>&gt;</code></div>
+<div class="col-second odd-row-color"><code><a href="#currentTransition" class="member-name-link">currentTransition</a></code></div>
+<div class="col-last odd-row-color">&nbsp;</div>
+<div class="col-first even-row-color"><code>protected <a href="FSMSubsystemBase.html" title="type parameter in FSMSubsystemBase">S</a></code></div>
+<div class="col-second even-row-color"><code><a href="#previousState" class="member-name-link">previousState</a></code></div>
+<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-first odd-row-color"><code>protected <a href="Transition.html" title="class in common.core.fsm">Transition</a>&lt;<a href="FSMSubsystemBase.html" title="type parameter in FSMSubsystemBase">S</a>&gt;</code></div>
+<div class="col-second odd-row-color"><code><a href="#requestTransition" class="member-name-link">requestTransition</a></code></div>
+<div class="col-last odd-row-color">&nbsp;</div>
 <div class="col-first even-row-color"><code>protected static <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="../subsystems/NAR_Subsystem.html" title="interface in common.core.subsystems">NAR_Subsystem</a>&gt;</code></div>
 <div class="col-second even-row-color"><code><a href="#subsystems" class="member-name-link">subsystems</a></code></div>
 <div class="col-last even-row-color">&nbsp;</div>
@@ -125,8 +137,8 @@ loadScripts(document, 'script');</script>
 <h2>Method Summary</h2>
 <div id="method-summary-table">
 <div class="table-tabs" role="tablist" aria-orientation="horizontal"><button id="method-summary-table-tab0" role="tab" aria-selected="true" aria-controls="method-summary-table.tabpanel" tabindex="0" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table', 3)" class="active-table-tab">All Methods</button><button id="method-summary-table-tab2" role="tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab2', 3)" class="table-tab">Instance Methods</button><button id="method-summary-table-tab3" role="tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab3', 3)" class="table-tab">Abstract Methods</button><button id="method-summary-table-tab4" role="tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab4', 3)" class="table-tab">Concrete Methods</button></div>
-<div id="method-summary-table.tabpanel" role="tabpanel" aria-labelledby="method-summary-table-tab0">
-<div class="summary-table three-column-summary">
+<div id="method-summary-table.tabpanel" role="tabpanel">
+<div class="summary-table three-column-summary" aria-labelledby="method-summary-table-tab0">
 <div class="table-header col-first">Modifier and Type</div>
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
@@ -183,9 +195,9 @@ loadScripts(document, 'script');</script>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setNeutralMode(common.hardware.motorcontroller.NAR_Motor.Neutral)" class="member-name-link">setNeutralMode</a><wbr>(<a href="../../hardware/motorcontroller/NAR_Motor.Neutral.html" title="enum class in common.hardware.motorcontroller">NAR_Motor.Neutral</a>&nbsp;mode)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setState(S)" class="member-name-link">setState</a><wbr>(<a href="FSMSubsystemBase.html" title="type parameter in FSMSubsystemBase">S</a>&nbsp;nextState)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>abstract edu.wpi.first.wpilibj2.command.Command</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#setState(S)" class="member-name-link">setState</a><wbr>(<a href="FSMSubsystemBase.html" title="type parameter in FSMSubsystemBase">S</a>&nbsp;nextState)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">&nbsp;</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>edu.wpi.first.wpilibj2.command.Command</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setStateCommand(S)" class="member-name-link">setStateCommand</a><wbr>(<a href="FSMSubsystemBase.html" title="type parameter in FSMSubsystemBase">S</a>&nbsp;nextState)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
@@ -218,6 +230,30 @@ loadScripts(document, 'script');</script>
 <section class="field-details" id="field-detail">
 <h2>Field Details</h2>
 <ul class="member-list">
+<li>
+<section class="detail" id="currentTransition">
+<h3>currentTransition</h3>
+<div class="member-signature"><span class="modifiers">protected</span>&nbsp;<span class="return-type"><a href="Transition.html" title="class in common.core.fsm">Transition</a>&lt;<a href="FSMSubsystemBase.html" title="type parameter in FSMSubsystemBase">S</a> extends <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Enum.html" title="class or interface in java.lang" class="external-link">Enum</a>&lt;<a href="FSMSubsystemBase.html" title="type parameter in FSMSubsystemBase">S</a>&gt;&gt;</span>&nbsp;<span class="element-name">currentTransition</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="currentState">
+<h3>currentState</h3>
+<div class="member-signature"><span class="modifiers">protected</span>&nbsp;<span class="return-type"><a href="FSMSubsystemBase.html" title="type parameter in FSMSubsystemBase">S</a> extends <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Enum.html" title="class or interface in java.lang" class="external-link">Enum</a>&lt;<a href="FSMSubsystemBase.html" title="type parameter in FSMSubsystemBase">S</a>&gt;</span>&nbsp;<span class="element-name">currentState</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="requestTransition">
+<h3>requestTransition</h3>
+<div class="member-signature"><span class="modifiers">protected</span>&nbsp;<span class="return-type"><a href="Transition.html" title="class in common.core.fsm">Transition</a>&lt;<a href="FSMSubsystemBase.html" title="type parameter in FSMSubsystemBase">S</a> extends <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Enum.html" title="class or interface in java.lang" class="external-link">Enum</a>&lt;<a href="FSMSubsystemBase.html" title="type parameter in FSMSubsystemBase">S</a>&gt;&gt;</span>&nbsp;<span class="element-name">requestTransition</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="previousState">
+<h3>previousState</h3>
+<div class="member-signature"><span class="modifiers">protected</span>&nbsp;<span class="return-type"><a href="FSMSubsystemBase.html" title="type parameter in FSMSubsystemBase">S</a> extends <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Enum.html" title="class or interface in java.lang" class="external-link">Enum</a>&lt;<a href="FSMSubsystemBase.html" title="type parameter in FSMSubsystemBase">S</a>&gt;</span>&nbsp;<span class="element-name">previousState</span></div>
+</section>
+</li>
 <li>
 <section class="detail" id="subsystems">
 <h3>subsystems</h3>
@@ -264,7 +300,7 @@ loadScripts(document, 'script');</script>
 <li>
 <section class="detail" id="setState(S)">
 <h3 id="setState(java.lang.Enum)">setState</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">setState</span><wbr><span class="parameters">(<a href="FSMSubsystemBase.html" title="type parameter in FSMSubsystemBase">S</a>&nbsp;nextState)</span></div>
+<div class="member-signature"><span class="modifiers">public abstract</span>&nbsp;<span class="return-type">edu.wpi.first.wpilibj2.command.Command</span>&nbsp;<span class="element-name">setState</span><wbr><span class="parameters">(<a href="FSMSubsystemBase.html" title="type parameter in FSMSubsystemBase">S</a>&nbsp;nextState)</span></div>
 </section>
 </li>
 <li>
