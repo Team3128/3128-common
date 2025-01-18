@@ -5,6 +5,7 @@ import java.util.List;
 
 import common.core.subsystems.NAR_Subsystem;
 import common.hardware.motorcontroller.NAR_Motor.Neutral;
+import common.utility.Log;
 import common.utility.shuffleboard.NAR_Shuffleboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -43,7 +44,8 @@ public abstract class FSMSubsystemBase<S extends Enum<S>> extends SubsystemBase 
     public abstract Command setState(S nextState);
 
     public Command setStateCommand(S nextState) {
-        return Commands.runOnce(()-> setState(nextState));
+        System.out.println("RUNNING SETSTATECOMMAND");
+        return Commands.runOnce(()-> setState(nextState)).beforeStarting(Commands.print("STATE COMMAND"));
     }
 
     public boolean stateEquals(S otherState) {
