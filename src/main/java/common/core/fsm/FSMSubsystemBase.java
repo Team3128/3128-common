@@ -12,10 +12,10 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public abstract class FSMSubsystemBase<S extends Enum<S>> extends SubsystemBase {
     
-    private Transition<S> currentTransition;
-    private S currentState;
-    private Transition<S> requestTransition;
-    private S previousState;
+    protected Transition<S> currentTransition;
+    protected S currentState;
+    protected Transition<S> requestTransition;
+    protected S previousState;
 
     private final TransitionMap<S> transitionMap;
     private final Class<S> enumType;
@@ -36,37 +36,19 @@ public abstract class FSMSubsystemBase<S extends Enum<S>> extends SubsystemBase 
 
     public void initStateTracker() {
         for(S state : enumType.getEnumConstants()) {
-            NAR_Shuffleboard.addData(this.getName(), state.name(), ()-> stateEquals(state), (state.ordinal() % 4), state.ordinal() / 4);
+            NAR_Shuffleboard.addData(this.getName(), state.name(), ()-> stateEquals(state), (state.ordinal() % 8), state.ordinal() / 8);
         }
     }
 
-    public void setState(S nextState) {
-        Transition<S> transition = transitionMap.getTransition(getState(), nextState);
-
-        // if not the same state
-        if(!stateEquals(nextState)) requestTransition = transition;
-        else return;
-
-        // if invalid trnasition
-        if(transition == null) return;
-
-        // if not transitioning
-        if(isTransitioning()) {
-            currentTransition.cancel();
-        }
-
-        currentTransition = transition;
-        currentTransition.getCommand().schedule();
-        currentState = nextState;
-    }
+    public abstract Command setState(S nextState);
 
     public Command setStateCommand(S nextState) {
         return Commands.runOnce(()-> setState(nextState));
     }
 
-    public boolean stateEquals(S state) {
-        if(state == null || currentState == null) return false;
-        return currentState.equals(state);
+    public boolean stateEquals(S otherState) {
+        if(otherState == null || currentState == null) return false;
+        return currentState.name().equals(otherState.name()) && !isTransitioning();
     }
 
     public S getState() {
@@ -86,6 +68,7 @@ public abstract class FSMSubsystemBase<S extends Enum<S>> extends SubsystemBase 
     }
 
     public boolean isTransitioning() {
+        if(currentTransition == null) return false;
         return currentTransition.isFinished();
     }
 

@@ -236,6 +236,7 @@ public class TransitionMap<S extends Enum<S>> {
         addCommutativeTransition(start, end, Commands.runOnce(run1), Commands.runOnce(run2));
     }
 
+    @SuppressWarnings("unchecked")
     public void applyCommutativeFunction(Function<S, Command> function, S... states) {
         for(S state1 : states) {
             for(S state2 : states) {

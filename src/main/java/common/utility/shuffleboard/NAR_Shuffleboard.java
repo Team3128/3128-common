@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj.shuffleboard.ComplexWidget;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj.shuffleboard.SimpleWidget;
+import edu.wpi.first.wpilibj.shuffleboard.WidgetType;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 /**
@@ -172,6 +173,8 @@ public class NAR_Shuffleboard {
             return tabs.get(tabName).get(name).m_widget;
         }
         SimpleWidget widget = Shuffleboard.getTab(tabName).add(name,supply.get()).withPosition(x, y).withSize(width, height);
+        if(supply.get() instanceof Boolean) widget.withWidget(BuiltInWidgets.kBooleanBox);
+        else widget.withWidget(BuiltInWidgets.kTextView);
         tabs.get(tabName).put(name, new WidgetInfo(widget,supply));
         return widget;
     }
