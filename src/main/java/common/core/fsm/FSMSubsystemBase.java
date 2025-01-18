@@ -23,6 +23,8 @@ public abstract class FSMSubsystemBase<S extends Enum<S>> extends SubsystemBase 
 
     protected static List<NAR_Subsystem> subsystems = new LinkedList<NAR_Subsystem>();
 
+    public boolean printStatus = false;
+
     public FSMSubsystemBase(Class<S> enumType, TransitionMap<S> transitionMap) {
         this.enumType = enumType;
         this.transitionMap = transitionMap;
@@ -40,11 +42,41 @@ public abstract class FSMSubsystemBase<S extends Enum<S>> extends SubsystemBase 
             NAR_Shuffleboard.addData(this.getName(), state.name(), ()-> stateEquals(state), (state.ordinal() % 8), state.ordinal() / 8);
         }
     }
+    
+    public void setState(S nextState) {
+        if(printStatus) System.out.println("Robot attempting to set state. \n\tFROM: " + currentState.name() + "\n\t  TO: " + nextState.name());
+        Transition<S> transition = transitionMap.getTransition(getState(), nextState);
+        
+        // if not the same state
+        if(!stateEquals(nextState)) requestTransition = transition;
+        else {
+            if(printStatus) System.out.println("Invalid Transition: Requested state already reached. \nExiting...");
+            return;
+        }
 
-    public abstract Command setState(S nextState);
+        // if invalid trnasition
+        if(transition == null) {
+            if(printStatus) System.out.println("Invalid Transition: Transition is null. \nExiting...");
+            return;
+        }
+
+        if(printStatus) System.out.println("Valid Transition: " + transition.toString());
+
+
+        // if not transitioning
+        if(isTransitioning()) {
+            if(printStatus) System.out.println("Canceling current transitions...");
+            currentTransition.cancel();
+        }
+
+        if(printStatus) System.out.println("Scheduling transition...");
+        currentTransition = transition;
+        currentTransition.getCommand().schedule();
+        currentState = nextState;
+        return;
+    }
 
     public Command setStateCommand(S nextState) {
-        System.out.println("RUNNING SETSTATECOMMAND");
         return Commands.runOnce(()-> setState(nextState)).beforeStarting(Commands.print("STATE COMMAND"));
     }
 
