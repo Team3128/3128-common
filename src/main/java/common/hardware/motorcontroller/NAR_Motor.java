@@ -354,6 +354,8 @@ public abstract class NAR_Motor implements AutoCloseable {
     public void follow(NAR_Motor leader) {
         leader.followers.add(this);
         leaders.add(leader);
+        System.out.println(leader.followers.toString());
+        System.out.println(leader.followers.size());
     }
 
     /**

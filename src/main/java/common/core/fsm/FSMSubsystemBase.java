@@ -23,7 +23,7 @@ public abstract class FSMSubsystemBase<S extends Enum<S>> extends SubsystemBase 
 
     protected static List<NAR_Subsystem> subsystems = new LinkedList<NAR_Subsystem>();
 
-    public boolean printStatus = false;
+    public boolean printStatus = true;
 
     public FSMSubsystemBase(Class<S> enumType, TransitionMap<S> transitionMap) {
         this.enumType = enumType;

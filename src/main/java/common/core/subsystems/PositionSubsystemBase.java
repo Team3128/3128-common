@@ -36,7 +36,11 @@ public abstract class PositionSubsystemBase extends NAR_PIDSubsystem implements 
         requireNonNullParam(leader, "leader", "PositionSubsystemBase");
         
         this.leader = leader;
-        Arrays.stream(followers).forEach((follower)-> follower.follow(this.leader));
+        System.out.println("DWAEFSGRHDTJFNMOJAWENSGLSENGISENGLSUENGLSKEJGN");
+        for(NAR_Motor follower : followers) {
+            follower.follow(leader);
+            System.out.println("Follower added");
+        }
         
         configMotors();
         configController();

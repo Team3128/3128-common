@@ -8,8 +8,9 @@ import com.revrobotics.spark.SparkMax;
 
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkLowLevel.PeriodicFrame;
-
+import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.REVLibError;
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkAbsoluteEncoder;
 import com.revrobotics.spark.SparkClosedLoopController;
@@ -105,8 +106,8 @@ public class NAR_CANSpark extends NAR_Motor {
 	
 	private double kP, kI, kD;
 	private EncoderType encoderType;
-	private SparkRelativeEncoder relativeEncoder;
-	private SparkAbsoluteEncoder absoluteEncoder;
+	private RelativeEncoder relativeEncoder;
+	private AbsoluteEncoder absoluteEncoder;
 	private final SparkClosedLoopController controller;
     private final SparkBase motor;
 	private final SparkBaseConfig config;
@@ -137,6 +138,7 @@ public class NAR_CANSpark extends NAR_Motor {
 
 		this.encoderType = encoderType;
 
+		relativeEncoder = motor.getEncoder();
 		if (encoderType == EncoderType.Relative) {
 			//No clue what this does, but Mechanical Advantage does this so it must be good
 			config.encoder.uvwAverageDepth(2);
