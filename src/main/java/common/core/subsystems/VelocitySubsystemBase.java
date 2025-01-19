@@ -28,8 +28,8 @@ public abstract class VelocitySubsystemBase extends NAR_PIDSubsystem implements 
      * @param followers The follower motors that follow the leader motor.
      */
     public VelocitySubsystemBase(ControllerBase controller, NAR_Motor leader, NAR_Motor... followers) {
-        super(controller, leader);
-        
+        super(controller, Arrays.asList(followers));
+        //TODO: Fix this stuff it is compelte garbage
         requireNonNullParam(controller, "controller", "PositionSubsystemBase");
         requireNonNullParam(leader, "leader", "PositionSubsystemBase");
         

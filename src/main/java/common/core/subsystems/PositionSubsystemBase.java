@@ -30,7 +30,7 @@ public abstract class PositionSubsystemBase extends NAR_PIDSubsystem implements 
      * @param motors The motors of the subsystem.
      */
     public PositionSubsystemBase(ControllerBase controller, NAR_Motor... motors) {
-        super(controller, motors);
+        super(controller, Arrays.asList(motors));
         
         requireNonNullParam(controller, "controller", "PositionSubsystemBase");
         requireNonNullParam(motors, "leader", "PositionSubsystemBase");

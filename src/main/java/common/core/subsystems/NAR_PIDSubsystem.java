@@ -115,11 +115,11 @@ public abstract class NAR_PIDSubsystem extends SubsystemBase {
         controller.addOutput(useOutput);
     }
 
-    public NAR_PIDSubsystem(ControllerBase controller, NAR_Motor... motors) {
+    public NAR_PIDSubsystem(ControllerBase controller, List<NAR_Motor> motors) {
         this(controller);
-        controller.configureFeedback(motors[0]);
-        for(int i = 1; i < motors.length; i++) {
-            controller.addMotor(motors[i]);
+        controller.configureFeedback(motors.get(0));
+        for(int i = 1; i < motors.size(); i++) {
+            controller.addMotor(motors.get(i));
         }
     }
 
