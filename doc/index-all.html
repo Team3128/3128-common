@@ -1014,6 +1014,8 @@ loadScripts(document, 'script');</script>
 </dd>
 <dt><a href="common/hardware/camera/Camera.html#getPoseAmbiguity(org.photonvision.targeting.PhotonTrackedTarget)" class="member-name-link">getPoseAmbiguity(PhotonTrackedTarget)</a> - Method in class common.hardware.camera.<a href="common/hardware/camera/Camera.html" title="class in common.hardware.camera">Camera</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="common/core/subsystems/PositionSubsystemBase.html#getPosition()" class="member-name-link">getPosition()</a> - Method in class common.core.subsystems.<a href="common/core/subsystems/PositionSubsystemBase.html" title="class in common.core.subsystems">PositionSubsystemBase</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="common/hardware/motorcontroller/NAR_Motor.html#getPosition()" class="member-name-link">getPosition()</a> - Method in class common.hardware.motorcontroller.<a href="common/hardware/motorcontroller/NAR_Motor.html" title="class in common.hardware.motorcontroller">NAR_Motor</a></dt>
 <dd>
 <div class="block">Returns the current motor position, default unit - rotations</div>
@@ -1184,6 +1186,8 @@ loadScripts(document, 'script');</script>
  Limelight.</div>
 </dd>
 <dt><a href="common/hardware/limelight/Limelight.html#getValueAverage(common.hardware.limelight.LimelightKey,int)" class="member-name-link">getValueAverage(LimelightKey, int)</a> - Method in class common.hardware.limelight.<a href="common/hardware/limelight/Limelight.html" title="class in common.hardware.limelight">Limelight</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="common/core/subsystems/PositionSubsystemBase.html#getVelocity()" class="member-name-link">getVelocity()</a> - Method in class common.core.subsystems.<a href="common/core/subsystems/PositionSubsystemBase.html" title="class in common.core.subsystems">PositionSubsystemBase</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="common/hardware/motorcontroller/NAR_Motor.html#getVelocity()" class="member-name-link">getVelocity()</a> - Method in class common.hardware.motorcontroller.<a href="common/hardware/motorcontroller/NAR_Motor.html" title="class in common.hardware.motorcontroller">NAR_Motor</a></dt>
 <dd>
@@ -1392,8 +1396,6 @@ loadScripts(document, 'script');</script>
 <dl class="index">
 <dt><a href="common/hardware/limelight/LimelightKey.html#LATENCY" class="member-name-link">LATENCY</a> - Enum constant in enum class common.hardware.limelight.<a href="common/hardware/limelight/LimelightKey.html" title="enum class in common.hardware.limelight">LimelightKey</a></dt>
 <dd>&nbsp;</dd>
-<dt><a href="common/core/subsystems/PositionSubsystemBase.html#leader" class="member-name-link">leader</a> - Variable in class common.core.subsystems.<a href="common/core/subsystems/PositionSubsystemBase.html" title="class in common.core.subsystems">PositionSubsystemBase</a></dt>
-<dd>&nbsp;</dd>
 <dt><a href="common/core/subsystems/VelocitySubsystemBase.html#leader" class="member-name-link">leader</a> - Variable in class common.core.subsystems.<a href="common/core/subsystems/VelocitySubsystemBase.html" title="class in common.core.subsystems">VelocitySubsystemBase</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="common/core/subsystems/VoltageSubsystemBase.html#leader" class="member-name-link">leader</a> - Variable in class common.core.subsystems.<a href="common/core/subsystems/VoltageSubsystemBase.html" title="class in common.core.subsystems">VoltageSubsystemBase</a></dt>
@@ -1484,6 +1486,8 @@ loadScripts(document, 'script');</script>
 <div class="block">Constants for motor control / conversion.</div>
 </dd>
 <dt><a href="common/hardware/motorcontroller/MotorControllerConstants.html#%3Cinit%3E()" class="member-name-link">MotorControllerConstants()</a> - Constructor for class common.hardware.motorcontroller.<a href="common/hardware/motorcontroller/MotorControllerConstants.html" title="class in common.hardware.motorcontroller">MotorControllerConstants</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="common/core/subsystems/PositionSubsystemBase.html#motors" class="member-name-link">motors</a> - Variable in class common.core.subsystems.<a href="common/core/subsystems/PositionSubsystemBase.html" title="class in common.core.subsystems">PositionSubsystemBase</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="common/core/swerve/SwerveConversions.html#MPSToRPM(double,double,double)" class="member-name-link">MPSToRPM(double, double, double)</a> - Static method in class common.core.swerve.<a href="common/core/swerve/SwerveConversions.html" title="class in common.core.swerve">SwerveConversions</a></dt>
 <dd>&nbsp;</dd>
@@ -1580,7 +1584,7 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Creates a new PIDSubsystem.</div>
 </dd>
-<dt><a href="common/core/subsystems/NAR_PIDSubsystem.html#%3Cinit%3E(common.core.controllers.ControllerBase,common.hardware.motorcontroller.NAR_Motor)" class="member-name-link">NAR_PIDSubsystem(ControllerBase, NAR_Motor)</a> - Constructor for class common.core.subsystems.<a href="common/core/subsystems/NAR_PIDSubsystem.html" title="class in common.core.subsystems">NAR_PIDSubsystem</a></dt>
+<dt><a href="common/core/subsystems/NAR_PIDSubsystem.html#%3Cinit%3E(common.core.controllers.ControllerBase,common.hardware.motorcontroller.NAR_Motor...)" class="member-name-link">NAR_PIDSubsystem(ControllerBase, NAR_Motor...)</a> - Constructor for class common.core.subsystems.<a href="common/core/subsystems/NAR_PIDSubsystem.html" title="class in common.core.subsystems">NAR_PIDSubsystem</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="common/core/subsystems/NAR_PIDSubsystem.html#%3Cinit%3E(common.core.controllers.ControllerBase,java.util.function.DoubleSupplier,java.util.function.DoubleConsumer)" class="member-name-link">NAR_PIDSubsystem(ControllerBase, DoubleSupplier, DoubleConsumer)</a> - Constructor for class common.core.subsystems.<a href="common/core/subsystems/NAR_PIDSubsystem.html" title="class in common.core.subsystems">NAR_PIDSubsystem</a></dt>
 <dd>&nbsp;</dd>
@@ -1810,7 +1814,7 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Team 3128's Position Subsystem Base.</div>
 </dd>
-<dt><a href="common/core/subsystems/PositionSubsystemBase.html#%3Cinit%3E(common.core.controllers.ControllerBase,common.hardware.motorcontroller.NAR_Motor,common.hardware.motorcontroller.NAR_Motor...)" class="member-name-link">PositionSubsystemBase(ControllerBase, NAR_Motor, NAR_Motor...)</a> - Constructor for class common.core.subsystems.<a href="common/core/subsystems/PositionSubsystemBase.html" title="class in common.core.subsystems">PositionSubsystemBase</a></dt>
+<dt><a href="common/core/subsystems/PositionSubsystemBase.html#%3Cinit%3E(common.core.controllers.ControllerBase,common.hardware.motorcontroller.NAR_Motor...)" class="member-name-link">PositionSubsystemBase(ControllerBase, NAR_Motor...)</a> - Constructor for class common.core.subsystems.<a href="common/core/subsystems/PositionSubsystemBase.html" title="class in common.core.subsystems">PositionSubsystemBase</a></dt>
 <dd>
 <div class="block">Creates an PositionSubsystemBase object.</div>
 </dd>

@@ -113,8 +113,8 @@ implements <a href="NAR_Subsystem.html" title="interface in common.core.subsyste
 <div class="table-header col-first">Modifier and Type</div>
 <div class="table-header col-second">Field</div>
 <div class="table-header col-last">Description</div>
-<div class="col-first even-row-color"><code>protected final <a href="../../hardware/motorcontroller/NAR_Motor.html" title="class in common.hardware.motorcontroller">NAR_Motor</a></code></div>
-<div class="col-second even-row-color"><code><a href="#leader" class="member-name-link">leader</a></code></div>
+<div class="col-first even-row-color"><code>protected final <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="../../hardware/motorcontroller/NAR_Motor.html" title="class in common.hardware.motorcontroller">NAR_Motor</a>&gt;</code></div>
+<div class="col-second even-row-color"><code><a href="#motors" class="member-name-link">motors</a></code></div>
 <div class="col-last even-row-color">&nbsp;</div>
 </div>
 <div class="inherited-list">
@@ -130,9 +130,8 @@ implements <a href="NAR_Subsystem.html" title="interface in common.core.subsyste
 <div class="summary-table two-column-summary">
 <div class="table-header col-first">Constructor</div>
 <div class="table-header col-last">Description</div>
-<div class="col-constructor-name even-row-color"><code><a href="#%3Cinit%3E(common.core.controllers.ControllerBase,common.hardware.motorcontroller.NAR_Motor,common.hardware.motorcontroller.NAR_Motor...)" class="member-name-link">PositionSubsystemBase</a><wbr>(<a href="../controllers/ControllerBase.html" title="class in common.core.controllers">ControllerBase</a>&nbsp;controller,
- <a href="../../hardware/motorcontroller/NAR_Motor.html" title="class in common.hardware.motorcontroller">NAR_Motor</a>&nbsp;leader,
- <a href="../../hardware/motorcontroller/NAR_Motor.html" title="class in common.hardware.motorcontroller">NAR_Motor</a>...&nbsp;followers)</code></div>
+<div class="col-constructor-name even-row-color"><code><a href="#%3Cinit%3E(common.core.controllers.ControllerBase,common.hardware.motorcontroller.NAR_Motor...)" class="member-name-link">PositionSubsystemBase</a><wbr>(<a href="../controllers/ControllerBase.html" title="class in common.core.controllers">ControllerBase</a>&nbsp;controller,
+ <a href="../../hardware/motorcontroller/NAR_Motor.html" title="class in common.hardware.motorcontroller">NAR_Motor</a>...&nbsp;motors)</code></div>
 <div class="col-last even-row-color">
 <div class="block">Creates an PositionSubsystemBase object.</div>
 </div>
@@ -145,8 +144,8 @@ implements <a href="NAR_Subsystem.html" title="interface in common.core.subsyste
 <h2>Method Summary</h2>
 <div id="method-summary-table">
 <div class="table-tabs" role="tablist" aria-orientation="horizontal"><button id="method-summary-table-tab0" role="tab" aria-selected="true" aria-controls="method-summary-table.tabpanel" tabindex="0" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table', 3)" class="active-table-tab">All Methods</button><button id="method-summary-table-tab2" role="tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab2', 3)" class="table-tab">Instance Methods</button><button id="method-summary-table-tab3" role="tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab3', 3)" class="table-tab">Abstract Methods</button><button id="method-summary-table-tab4" role="tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab4', 3)" class="table-tab">Concrete Methods</button></div>
-<div id="method-summary-table.tabpanel" role="tabpanel">
-<div class="summary-table three-column-summary" aria-labelledby="method-summary-table-tab0">
+<div id="method-summary-table.tabpanel" role="tabpanel" aria-labelledby="method-summary-table-tab0">
+<div class="summary-table three-column-summary">
 <div class="table-header col-first">Modifier and Type</div>
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
@@ -169,6 +168,12 @@ implements <a href="NAR_Subsystem.html" title="interface in common.core.subsyste
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns current of the first motor.</div>
 </div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>double</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getPosition()" class="member-name-link">getPosition</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>double</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getVelocity()" class="member-name-link">getVelocity</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>edu.wpi.first.wpilibj2.command.Command</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#homing(double,double,double)" class="member-name-link">homing</a><wbr>(double&nbsp;power,
  double&nbsp;delay,
@@ -240,9 +245,9 @@ implements <a href="NAR_Subsystem.html" title="interface in common.core.subsyste
 <h2>Field Details</h2>
 <ul class="member-list">
 <li>
-<section class="detail" id="leader">
-<h3>leader</h3>
-<div class="member-signature"><span class="modifiers">protected final</span>&nbsp;<span class="return-type"><a href="../../hardware/motorcontroller/NAR_Motor.html" title="class in common.hardware.motorcontroller">NAR_Motor</a></span>&nbsp;<span class="element-name">leader</span></div>
+<section class="detail" id="motors">
+<h3>motors</h3>
+<div class="member-signature"><span class="modifiers">protected final</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="../../hardware/motorcontroller/NAR_Motor.html" title="class in common.hardware.motorcontroller">NAR_Motor</a>&gt;</span>&nbsp;<span class="element-name">motors</span></div>
 </section>
 </li>
 </ul>
@@ -254,17 +259,15 @@ implements <a href="NAR_Subsystem.html" title="interface in common.core.subsyste
 <h2>Constructor Details</h2>
 <ul class="member-list">
 <li>
-<section class="detail" id="&lt;init&gt;(common.core.controllers.ControllerBase,common.hardware.motorcontroller.NAR_Motor,common.hardware.motorcontroller.NAR_Motor...)">
+<section class="detail" id="&lt;init&gt;(common.core.controllers.ControllerBase,common.hardware.motorcontroller.NAR_Motor...)">
 <h3>PositionSubsystemBase</h3>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="element-name">PositionSubsystemBase</span><wbr><span class="parameters">(<a href="../controllers/ControllerBase.html" title="class in common.core.controllers">ControllerBase</a>&nbsp;controller,
- <a href="../../hardware/motorcontroller/NAR_Motor.html" title="class in common.hardware.motorcontroller">NAR_Motor</a>&nbsp;leader,
- <a href="../../hardware/motorcontroller/NAR_Motor.html" title="class in common.hardware.motorcontroller">NAR_Motor</a>...&nbsp;followers)</span></div>
+ <a href="../../hardware/motorcontroller/NAR_Motor.html" title="class in common.hardware.motorcontroller">NAR_Motor</a>...&nbsp;motors)</span></div>
 <div class="block">Creates an PositionSubsystemBase object.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>controller</code> - Controller for motion control.</dd>
-<dd><code>leader</code> - The leader motor which subsequent motors should follow.</dd>
-<dd><code>followers</code> - The follower motors that follow the leader motor.</dd>
+<dd><code>motors</code> - The motors of the subsystem.</dd>
 </dl>
 </section>
 </li>
@@ -396,6 +399,18 @@ implements <a href="NAR_Subsystem.html" title="interface in common.core.subsyste
 <dt>Specified by:</dt>
 <dd><code><a href="NAR_Subsystem.html#setNeutralMode(common.hardware.motorcontroller.NAR_Motor.Neutral)">setNeutralMode</a></code>&nbsp;in interface&nbsp;<code><a href="NAR_Subsystem.html" title="interface in common.core.subsystems">NAR_Subsystem</a></code></dd>
 </dl>
+</section>
+</li>
+<li>
+<section class="detail" id="getPosition()">
+<h3>getPosition</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">double</span>&nbsp;<span class="element-name">getPosition</span>()</div>
+</section>
+</li>
+<li>
+<section class="detail" id="getVelocity()">
+<h3>getVelocity</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">double</span>&nbsp;<span class="element-name">getVelocity</span>()</div>
 </section>
 </li>
 <li>
