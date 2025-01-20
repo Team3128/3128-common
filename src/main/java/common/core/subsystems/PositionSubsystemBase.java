@@ -1,6 +1,5 @@
 package common.core.subsystems;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.function.DoubleSupplier;
 import common.core.controllers.ControllerBase;
@@ -33,7 +32,7 @@ public abstract class PositionSubsystemBase extends NAR_PIDSubsystem implements 
         super(controller, List.of(motors));
         
         requireNonNullParam(controller, "controller", "PositionSubsystemBase");
-        requireNonNullParam(motors, "motor", "PositionSubsystemBase");
+        requireNonNullParam(motors, "motors", "PositionSubsystemBase");
         
         this.motors = List.of(motors);
 
@@ -82,7 +81,8 @@ public abstract class PositionSubsystemBase extends NAR_PIDSubsystem implements 
      * @return Command setting pivot setpoint.
      */
     public Command pidTo(double setpoint) {
-        return runOnce(()-> startPID(setpoint));
+        return runOnce(()-> startPID(setpoint))
+        ;
     }
 
     /**
@@ -105,8 +105,13 @@ public abstract class PositionSubsystemBase extends NAR_PIDSubsystem implements 
         return runOnce(()-> motors.forEach(motor -> motor.resetPosition(position))).beforeStarting(()-> disable());
     }
 
+    /**
+     * Reset measurement position to controller position minimum.
+     * 
+     * @return Command that resets the pivot position.
+     */
     public Command reset() {
-        return reset(controller.getInputRange()[0]);
+        return runOnce(()-> motors.forEach(motor -> motor.resetPosition(controller.getInputRange()[0]))).beforeStarting(()-> disable());
     }
 
     /**
@@ -116,14 +121,29 @@ public abstract class PositionSubsystemBase extends NAR_PIDSubsystem implements 
         return motors.get(0).getStallCurrent();
     }
 
+    /**
+     * Set the neutral mode for all motors in the mechanism.
+     * 
+     * @param mode The neutral mode to set to.
+     */
     public void setNeutralMode(Neutral mode) {
         motors.forEach(motor -> motor.setNeutralMode(mode));
     }
 
+    /**
+     * Get the position of the mechanism relative to its reset.
+     * 
+     * @return The position of the first motor.
+     */
     public double getPosition() {
         return motors.get(0).getPosition();
     }
 
+    /**
+     * Get the velocity of the mechanism.
+     * 
+     * @return The velocity of the first motor.
+     */
     public double getVelocity() {
         return motors.get(0).getVelocity();
     }

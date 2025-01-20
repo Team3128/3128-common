@@ -23,13 +23,17 @@ public abstract class FSMSubsystemBase<S extends Enum<S>> extends SubsystemBase 
 
     protected static List<NAR_Subsystem> subsystems = new LinkedList<NAR_Subsystem>();
 
-    public boolean printStatus = true;
-
     public FSMSubsystemBase(Class<S> enumType, TransitionMap<S> transitionMap) {
         this.enumType = enumType;
         this.transitionMap = transitionMap;
-        // registerTransitions();
         initStateTracker();
+        try{
+            registerTransitions();
+        } catch(Exception e) {
+            Log.divider(10);
+            Log.recoverable(getName(), "Failed to load TransitionMap in constructor");
+            Log.divider(10);
+        }
     }
 
     public FSMSubsystemBase(Class<S> enumType, TransitionMap<S> transitionMap, S initalState) {
@@ -38,50 +42,68 @@ public abstract class FSMSubsystemBase<S extends Enum<S>> extends SubsystemBase 
     }
 
     public void initStateTracker() {
+        NAR_Shuffleboard.addData(this.getName(), "Transition Count", ()-> transitionMap.getTransitionCount(), 0, 0);
+        NAR_Shuffleboard.addData(this.getName(), "Previous State", ()-> {if(getPreviousState() != null) return getPreviousState().name(); else return "Null";}, 1, 0);
+        NAR_Shuffleboard.addData(this.getName(), "Current State", ()-> {if(getState() != null) return getState().name(); else return "Null";}, 2, 0);
+        NAR_Shuffleboard.addData(this.getName(), "Valid Transition", ()-> getRequestTransition() != null, 3, 0);
         for(S state : enumType.getEnumConstants()) {
-            NAR_Shuffleboard.addData(this.getName(), state.name(), ()-> stateEquals(state), (state.ordinal() % 8), state.ordinal() / 8);
+            NAR_Shuffleboard.addData(this.getName(), state.name(), ()-> stateEquals(state), (state.ordinal() % 8), state.ordinal() / 8 + 1);
         }
     }
     
     public void setState(S nextState) {
-        if(printStatus) System.out.println("Robot attempting to set state. \n\tFROM: " + currentState.name() + "\n\t  TO: " + nextState.name());
+        if(transitionMap.isEmpty()) {
+            registerTransitions();
+            Log.debug(Log.Type.STATE_MACHINE, getName(), "Registering Transitions");
+        }
+
+        if(nextState == null) {
+            Log.recoverable(getName(), "Null state requested");
+            return;
+        }
+
+        Log.debug(Log.Type.STATE_MACHINE, getName(), "Robot attempting to set state. \n\tFROM: " + currentState.name() + "\n\t  TO: " + nextState.name());
         Transition<S> transition = transitionMap.getTransition(getState(), nextState);
         
         // if not the same state
         if(!stateEquals(nextState)) requestTransition = transition;
         else {
-            if(printStatus) System.out.println("Invalid Transition: Requested state already reached. \nExiting...");
+            Log.recoverable(getName(), "Invalid Transition: Requested state already reached");
             return;
         }
 
         // if invalid trnasition
         if(transition == null) {
-            if(printStatus) System.out.println("Invalid Transition: Transition is null. \nExiting...");
+            Log.recoverable(getName(), "Invalid Transition: Requested transition null");
             return;
         }
 
-        if(printStatus) System.out.println("Valid Transition: " + transition.toString());
+        Log.debug(Log.Type.STATE_MACHINE, getName(), "Valid Transition: " + transition);
 
 
         // if not transitioning
         if(isTransitioning()) {
-            if(printStatus) System.out.println("Canceling current transitions...");
+            Log.debug(Log.Type.STATE_MACHINE, getName(), "Canceling current transition...");
             currentTransition.cancel();
         }
 
-        if(printStatus) System.out.println("Scheduling transition...");
+        Log.debug(Log.Type.STATE_MACHINE, getName(), "Scheduling transition...");
         currentTransition = transition;
         currentTransition.getCommand().schedule();
+        previousState = currentState;
         currentState = nextState;
         return;
     }
 
     public Command setStateCommand(S nextState) {
-        return Commands.runOnce(()-> setState(nextState)).beforeStarting(Commands.print("STATE COMMAND"));
+        return Commands.runOnce(()-> setState(nextState));
     }
 
     public boolean stateEquals(S otherState) {
-        if(otherState == null || currentState == null) return false;
+        if(otherState == null || currentState == null) {
+            Log.recoverable(getName(), "Null state passed");
+            return false;
+        }
         return currentState.name().equals(otherState.name()) && !isTransitioning();
     }
 
@@ -149,19 +171,20 @@ public abstract class FSMSubsystemBase<S extends Enum<S>> extends SubsystemBase 
     }
 
     public void setNeutralMode(Neutral mode) {
+        Log.debug(getName(), "Neutral Mode set to " + mode.name());
         getSubsystems().forEach(subsystem -> subsystem.setNeutralMode(mode));
     }
 
     public Command run(double power) {
         return runOnce(()-> {
             subsystems.forEach((subsystem)-> subsystem.run(power));
-        });
+        }).beforeStarting(runOnce(()-> Log.debug(Log.Type.STATE_MACHINE, getName(), "Set to run at " + power + " power")));
     }
 
     public Command runVolts(double volts) {
         return runOnce(()-> {
             subsystems.forEach((subsystem)-> subsystem.runVolts(volts));
-        });
+        }).beforeStarting(runOnce(()-> Log.debug(Log.Type.STATE_MACHINE, getName(), "Set to run at " + volts + " volts")));
     }
 
     public Command stop() {

@@ -26,6 +26,8 @@ public class TransitionMap<S extends Enum<S>> {
     @SuppressWarnings("unused")
     private final Class<S> enumType;
     private final S[] states;
+    private boolean isEmpty;
+    private int transitionCount;
 
     public TransitionMap(Class<S> enumType) {
         this.enumType = enumType;
@@ -33,6 +35,30 @@ public class TransitionMap<S extends Enum<S>> {
         
 
         adjacencyMap = new Object[states.length][states.length];
+        isEmpty = true;
+        transitionCount = 0;
+    }
+
+    /**
+     * @return Whether the transition map is empty
+     */
+    public boolean isEmpty() {
+        if(!isEmpty && transitionCount > 0) return false;
+        isEmpty = true;
+        transitionCount = 0;
+        for(Object[] row : adjacencyMap){
+            for(Object transition : row) {
+                if(transition != null) {
+                    isEmpty = false;
+                    transitionCount++;
+                }
+            }
+        }
+        return isEmpty;
+    }
+
+    public int getTransitionCount() {
+        return transitionCount;
     }
 
     /**
@@ -42,6 +68,7 @@ public class TransitionMap<S extends Enum<S>> {
      * @param transition The transition to add to the graph
      */
     public void addTransition(Transition<S> transition) {
+        transitionCount++;
         setTransition(transition);
     }
 
@@ -263,11 +290,13 @@ public class TransitionMap<S extends Enum<S>> {
      * @param transition The transition to set to the graph
      */
     public void setTransition(Transition<S> transition) {
+        if(transition != null && isEmpty) isEmpty = false;
         if(transition.getOutgoingState().ordinal() == transition.getIncomingState().ordinal()) return;
         adjacencyMap[transition.getOutgoingState().ordinal()][transition.getIncomingState().ordinal()] = transition;
     }
 
     public void removeTransition(S start, S end) {
+        transitionCount--;
         adjacencyMap[start.ordinal()][end.ordinal()] = null;
     }
 
@@ -289,6 +318,7 @@ public class TransitionMap<S extends Enum<S>> {
                 removeTransition(s1, s2);
             }
         }
+        isEmpty = true;
     }
 
     /**

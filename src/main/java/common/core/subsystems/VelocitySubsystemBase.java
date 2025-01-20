@@ -1,6 +1,7 @@
 package common.core.subsystems;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.function.DoubleSupplier;
 import common.core.controllers.ControllerBase;
 import common.hardware.motorcontroller.NAR_Motor;
@@ -18,24 +19,22 @@ import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
  */
 public abstract class VelocitySubsystemBase extends NAR_PIDSubsystem implements NAR_Subsystem {
 
-    protected final NAR_Motor leader;
+    protected final List<NAR_Motor> motors;
 
     /**
      * Creates an VelocitySubsystemBase object.
      * 
      * @param controller Controller for motion control.
-     * @param leader The leader motor which subsequent motors should follow.
-     * @param followers The follower motors that follow the leader motor.
+     * @param motors The motors of the subsystem.
      */
-    public VelocitySubsystemBase(ControllerBase controller, NAR_Motor leader, NAR_Motor... followers) {
-        super(controller, Arrays.asList(followers));
-        //TODO: Fix this stuff it is compelte garbage
-        requireNonNullParam(controller, "controller", "PositionSubsystemBase");
-        requireNonNullParam(leader, "leader", "PositionSubsystemBase");
+    public VelocitySubsystemBase(ControllerBase controller, NAR_Motor... motors) {
+        super(controller, List.of(motors));
         
-        this.leader = leader;
-        Arrays.stream(followers).forEach((follower)-> follower.follow(this.leader));
+        requireNonNullParam(controller, "controller", "VelocitySubsystemBase");
+        requireNonNullParam(motors, "motors", "VelocitySubsystemBase");
         
+        this.motors = List.of(motors);
+
         configMotors();
         configController();
     }
@@ -57,12 +56,12 @@ public abstract class VelocitySubsystemBase extends NAR_PIDSubsystem implements 
      * @return Command setting pivot setpoint.
      */
     public Command run(double power) {
-        return runOnce(()-> leader.set(power)).beforeStarting(()-> disable());
+        return runOnce(()-> motors.forEach(motor -> motor.set(power))).beforeStarting(()-> disable());
     }
 
 
     public Command runVolts(double volts) {
-        return runOnce(()-> leader.setVolts(volts)).beforeStarting(()-> disable());
+        return runOnce(()-> motors.forEach(motor -> motor.setVolts(volts))).beforeStarting(()-> disable());
     }
 
     /**
@@ -72,10 +71,6 @@ public abstract class VelocitySubsystemBase extends NAR_PIDSubsystem implements 
      */
     public Command stop(){
         return run(0);
-    }
-
-    public Command reset() {
-        return runOnce(()-> leader.resetPosition(0));
     }
 
     /**
@@ -95,26 +90,58 @@ public abstract class VelocitySubsystemBase extends NAR_PIDSubsystem implements 
      * @return Command setting pivot setpoint.
      */
     public Command pidTo(DoubleSupplier setpoint) {
-        return pidTo(setpoint.getAsDouble());
+        return runOnce(()-> startPID(setpoint.getAsDouble()));
+    }
+
+    /**
+     * Reset measurement position to controller position minimum.
+     * 
+     * @return Command that resets the pivot position.
+     */
+    public Command reset() {
+        return runOnce(()-> motors.forEach(motor -> motor.resetPosition(controller.getInputRange()[0]))).beforeStarting(()-> disable());
     }
 
     /**
      * Returns current of the first motor.
      */
     public double getCurrent(){
-        return leader.getStallCurrent();
+        return motors.get(0).getStallCurrent();
     }
 
+    /**
+     * Set the neutral mode for all motors in the mechanism.
+     * 
+     * @param mode The neutral mode to set to.
+     */
     public void setNeutralMode(Neutral mode) {
-        leader.setNeutralMode(mode);
+        motors.forEach(motor -> motor.setNeutralMode(mode));
+    }
+
+    /**
+     * Get the position of the mechanism relative to its reset.
+     * 
+     * @return The position of the first motor.
+     */
+    public double getPosition() {
+        return motors.get(0).getPosition();
+    }
+
+    /**
+     * Get the velocity of the mechanism.
+     * 
+     * @return The velocity of the first motor.
+     */
+    public double getVelocity() {
+        return motors.get(0).getVelocity();
     }
 
     public Command characterization(double startDelaySecs, double rampRateVoltsPerSec) {
         return new CmdSysId(
             getName(), 
-            leader::setVolts, 
-            leader::getVelocity, 
-            leader::getPosition, 
+            this::runVolts, 
+            this::getVelocity, 
+            this::getPosition, 
             startDelaySecs,
             rampRateVoltsPerSec,
             controller.getInputRange()[1], 

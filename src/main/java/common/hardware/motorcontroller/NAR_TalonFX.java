@@ -15,9 +15,12 @@ import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.revrobotics.spark.SparkFlex;
+
 import common.core.controllers.PIDFFConfig;
 import common.utility.Log;
 import common.utility.narwhaldashboard.NarwhalDashboard;
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
@@ -144,6 +147,11 @@ public class NAR_TalonFX extends NAR_Motor {
     public double getStallCurrent() {
         return stallCurrent.refresh().getValue().in(Units.Amp);
     }
+
+    @Override
+	public double getTorque() {
+		return DCMotor.getKrakenX60(1).withReduction(unitConversionFactor).getTorque(getStallCurrent());
+	}
 
     @Override
     protected double getRawPosition() {

@@ -342,7 +342,7 @@ public class NAR_Shuffleboard {
      * @return DoubleSupplier containing the value in the widget
      */
     public static DoubleSupplier debug(String tabName, String name, double Default, int x, int y) {
-        final GenericEntry tab = addData(tabName, name, Default, x, y).getEntry();
+        final GenericEntry tab = addData(tabName, name, Default, x, y).withWidget(BuiltInWidgets.kTextView).getEntry();
         return ()-> tab.getDouble(Default);
     }
 

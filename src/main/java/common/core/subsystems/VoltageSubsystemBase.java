@@ -1,6 +1,7 @@
 package common.core.subsystems;
 
 import java.util.Arrays;
+import java.util.List;
 
 import common.hardware.motorcontroller.NAR_Motor;
 import common.hardware.motorcontroller.NAR_Motor.Neutral;
@@ -15,35 +16,26 @@ import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
  */
 public abstract class VoltageSubsystemBase extends SubsystemBase implements NAR_Subsystem {
     
-    protected final NAR_Motor leader;
+    protected final List<NAR_Motor> motors;
     private double currentThreshold;
 
-    public VoltageSubsystemBase(double currentThreshold, NAR_Motor leader, NAR_Motor... followers){
-        requireNonNullParam(leader, "leader", "PositionSubsystemBase");
+    public VoltageSubsystemBase(double currentThreshold, NAR_Motor... motors){
+        requireNonNullParam(motors, "motors", "VoltageSubsystemBase");
         
-        this.leader = leader;
-        Arrays.stream(followers).forEach((follower)-> follower.follow(this.leader));
+        this.motors = List.of(motors);
         this.currentThreshold = currentThreshold;
         
         configMotors();
     }
 
-    public VoltageSubsystemBase(NAR_Motor leader, NAR_Motor... followers){
-        this(30, leader, followers);
+    public VoltageSubsystemBase(NAR_Motor... motors){
+        this(30, motors);
     }
 
     /**
      * Configure motor settings.
      */
     protected abstract void configMotors();
-
-    
-    /**
-     * Returns current of the first motor.
-     */
-    public double getCurrent(){
-        return leader.getStallCurrent();
-    }
     
     /**
      * Returns whether manipulator has an object.
@@ -52,19 +44,19 @@ public abstract class VoltageSubsystemBase extends SubsystemBase implements NAR_
         return Math.abs(getCurrent()) > currentThreshold;
     }
     
-     /**
+    /**
      * Sets power to motor.
      * 
      * @param power Setpoint the pivot goes to.
      * @return Command setting pivot setpoint.
      */
     public Command run(double power) {
-        return runOnce(()-> leader.set(power));
+        return runOnce(()-> motors.forEach(motor -> motor.set(power)));
     }
 
 
     public Command runVolts(double volts) {
-        return runOnce(()-> leader.setVolts(volts));
+        return runOnce(()-> motors.forEach(motor -> motor.setVolts(volts)));
     }
 
     /**
@@ -76,7 +68,22 @@ public abstract class VoltageSubsystemBase extends SubsystemBase implements NAR_
         return run(0);
     }
 
+    /**
+     * Returns current of the first motor.
+     */
+    public double getCurrent(){
+        return motors.get(0).getStallCurrent();
+    }
+
     public void setNeutralMode(Neutral mode) {
-        leader.setNeutralMode(mode);
+        motors.forEach(motor -> motor.setNeutralMode(mode));
+    }
+
+    public double getPosition() {
+        return motors.get(0).getPosition();
+    }
+
+    public double getVelocity() {
+        return motors.get(0).getVelocity();
     }
 }

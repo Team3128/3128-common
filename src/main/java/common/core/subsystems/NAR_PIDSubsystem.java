@@ -140,7 +140,7 @@ public abstract class NAR_PIDSubsystem extends SubsystemBase {
                 }
             }
         }
-
+        
         if (!shouldLog) return;
 
         if (updateTimer.hasElapsed(updateTime)) {
@@ -361,13 +361,13 @@ public abstract class NAR_PIDSubsystem extends SubsystemBase {
         controller.enable();
         safetyTimer.restart();
         controller.reset();
+        Log.debug(Log.Type.CONTROLLER, getName(), "Enabled PID");
     }
 
     /** Disables the PID control. Sets output to zero. */
     public void disable() {
         controller.disable();
-        // useOutput(0, 0);
-        Log.info(getName(), "Disabled");
+        Log.debug(Log.Type.CONTROLLER, getName(), "Disabled PID");
     }
 
     /**

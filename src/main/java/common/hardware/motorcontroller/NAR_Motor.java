@@ -5,8 +5,10 @@ import java.util.LinkedList;
 
 import common.core.controllers.PIDFFConfig;
 import common.core.misc.NAR_Robot;
+import common.utility.Log;
 import common.utility.narwhaldashboard.NarwhalDashboard;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 
 /**
@@ -74,6 +76,20 @@ public abstract class NAR_Motor implements AutoCloseable {
         public MotorConfig follower() {
             return new MotorConfig(this.distanceFactor, this.timeFactor, this.statorLimit, this.supplyLimit, this.voltageCompensation, this.inverted, this.mode, StatusFrames.FOLLOWER);
         }
+
+        @Override
+        public String toString() {
+            String output = "Motor Config";
+            output.concat("\n Distance Factor: " + distanceFactor + ". \tEvery one true rotation of the motor will be measured as " + distanceFactor + " rotation(s).");
+            output.concat("\n Time Factor: " + timeFactor + ". \tMotor velocity will be measured in units equivalent to " + (1 / timeFactor) + " rotations per minute.");
+            output.concat("\n Stator Limit: " + statorLimit + ". \tThe maximum current applied to the stator is " + statorLimit + " amps. Max torque limited.");
+            output.concat("\n Supply Limit: " + supplyLimit + ". \tThe maximum current applied to the motor is " + supplyLimit + " amps.");
+            output.concat("\n Voltage Compensation: " + voltageCompensation + ". \tThe maximum voltage applied to the motor is " + voltageCompensation + " volts.");
+            output.concat("\n Inversion: " + inverted + ". \t" + (inverted ? ("Clockwise is positive angular displacement.") : ("Counter-Clockwise is positive angular displacement.")));
+            output.concat("\n Neutral Mode: " + mode.name() + ". \tWhen no output is applied the motor will " + mode.name().toLowerCase() + ".");
+            output.concat("\n Status Frames: " + statusFrames.name() + ". \tThe motor will send status frames consistent with a " + statusFrames.name().toLowerCase() + " motor.");
+            return output;
+        }
     }
 
     public enum StatusFrames {
@@ -117,6 +133,7 @@ public abstract class NAR_Motor implements AutoCloseable {
     }
 
     private final LinkedList<NAR_Motor> followers = new LinkedList<NAR_Motor>();
+    private final int id;
     private double prevValue = 0;
     private Control prevMode = Control.PercentOutput;
     private double prevFeedForward = 0;
@@ -127,6 +144,7 @@ public abstract class NAR_Motor implements AutoCloseable {
     protected double timeConversionFactor = 1;
 
     public NAR_Motor(int id){
+        this.id = id;
         
     }
 
@@ -213,6 +231,8 @@ public abstract class NAR_Motor implements AutoCloseable {
                 setFollowerStatusFrames();
                 break;
         }
+
+        Log.debug(Log.Type.MOTOR, "Motor (" + this.id + ")", config.toString());
     }
 
     /**
@@ -311,6 +331,12 @@ public abstract class NAR_Motor implements AutoCloseable {
      * @return Double measuring the stall current of the motor
      */
     public abstract double getStallCurrent();
+
+    /**
+     * Returns the torque applied by the motor stator
+     * @return
+     */
+    public abstract double getTorque();
 
     /**
      * Returns the current motor position, default unit - rotations

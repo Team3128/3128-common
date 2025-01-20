@@ -1,8 +1,61 @@
 package common.utility;
 
+import java.util.List;
+
 import edu.wpi.first.wpilibj.DriverStation;
 
+/**
+ * @since Rapid React 2022
+ * @author Jude Lifset, Teja Yaramada
+ */
 public class Log {
+
+	public static boolean logDebug = false;
+
+	public enum Type {
+		PRIMARY(0),
+		SECONDARY(1),
+		TERTIARY(2),
+
+		STATE_MACHINE(0),
+		MECHANISM(1),
+		CONTROLLER(1),
+		MOTOR(2),
+		VISION(0);
+
+		private boolean enabled;
+		private int level;
+		
+		private Type(int level) {
+			this.enabled = false;
+			this.level = level;
+		}
+
+		public int getLevel() {
+			return this.level;
+		}
+
+		public void enable() {
+			this.enabled = true;
+		}
+
+		public void disable() {
+			this.enabled = false;
+		}
+
+		public boolean getEnabled() {
+			return this.enabled;
+		}
+
+		public static void enable(Type... type) {
+			List.of(type).forEach(logType -> logType.enable());
+		}
+
+		public static void disable(Type... type) {
+			List.of(type).forEach(logType -> logType.disable());
+		}
+	}
+
 	/**
 	 * Log a FATAL error, after which the robot cannot (properly) function. <br>
 	 * 
@@ -74,10 +127,30 @@ public class Log {
 	 * @param message
 	 */
 	public static void debug(String category, String message) {
-		log("Debug", category, message);
+		debug(Type.PRIMARY, category, message);
+	}
+
+	/**
+	 * Log a message which is not important during normal operation, but is useful
+	 * if you're trying to debug the robot.
+	 * 
+	 * @param type
+	 * @param category
+	 * @param message
+	 */
+	public static void debug(Type type, String category, String message) {
+		if(logDebug && type.getEnabled()) log(type, "Debug", category, message);
+	}
+
+	public static void divider(int length) {
+		System.out.println("-".repeat(length));
 	}
 
 	private static void log(String severity, String category, String message) {
-		System.out.println(String.format("[%s] [%s] %s", severity, category, message));
+		log(Type.PRIMARY, severity, category, message);
+	}
+
+	private static void log(Type type, String severity, String category, String message) {
+		System.out.println("\t".repeat(type.getLevel()) + String.format("[%s] [%s] %s", severity, category, message));
 	}
 }
