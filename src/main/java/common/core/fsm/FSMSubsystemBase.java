@@ -54,7 +54,7 @@ public abstract class FSMSubsystemBase<S extends Enum<S>> extends SubsystemBase 
     public void setState(S nextState) {
         if(transitionMap.isEmpty()) {
             registerTransitions();
-            Log.debug(Log.Type.STATE_MACHINE, getName(), "Registering Transitions");
+            Log.debug(Log.Type.STATE_MACHINE_PRIMARY, getName(), "Registering Transitions");
         }
 
         if(nextState == null) {
@@ -62,32 +62,32 @@ public abstract class FSMSubsystemBase<S extends Enum<S>> extends SubsystemBase 
             return;
         }
 
-        Log.debug(Log.Type.STATE_MACHINE, getName(), "Robot attempting to set state. \n\tFROM: " + currentState.name() + "\n\t  TO: " + nextState.name());
+        Log.debug(Log.Type.STATE_MACHINE_PRIMARY, getName(), "Robot attempting to set state. FROM: " + currentState.name() + "  TO: " + nextState.name());
         Transition<S> transition = transitionMap.getTransition(getState(), nextState);
         
         // if not the same state
         if(!stateEquals(nextState)) requestTransition = transition;
         else {
-            Log.recoverable(getName(), "Invalid Transition: Requested state already reached");
+            Log.debug(Log.Type.STATE_MACHINE_SECONDARY, getName(), "Invalid Transition: Requested state already reached");
             return;
         }
 
         // if invalid trnasition
         if(transition == null) {
-            Log.recoverable(getName(), "Invalid Transition: Requested transition null");
+            Log.unusual(getName(), "Invalid Transition: Requested transition null");
             return;
         }
 
-        Log.debug(Log.Type.STATE_MACHINE, getName(), "Valid Transition: " + transition);
+        Log.debug(Log.Type.STATE_MACHINE_SECONDARY, getName(), "Valid Transition: " + transition);
 
 
         // if not transitioning
         if(isTransitioning()) {
-            Log.debug(Log.Type.STATE_MACHINE, getName(), "Canceling current transition...");
+            Log.debug(Log.Type.STATE_MACHINE_SECONDARY, getName(), "Canceling current transition...");
             currentTransition.cancel();
         }
 
-        Log.debug(Log.Type.STATE_MACHINE, getName(), "Scheduling transition...");
+        Log.debug(Log.Type.STATE_MACHINE_SECONDARY, getName(), "Scheduling transition...");
         currentTransition = transition;
         currentTransition.getCommand().schedule();
         previousState = currentState;
@@ -100,7 +100,8 @@ public abstract class FSMSubsystemBase<S extends Enum<S>> extends SubsystemBase 
     }
 
     public boolean stateEquals(S otherState) {
-        if(otherState == null || currentState == null) {
+        if(currentState == null) return false;
+        if(otherState == null) {
             Log.recoverable(getName(), "Null state passed");
             return false;
         }
@@ -178,13 +179,13 @@ public abstract class FSMSubsystemBase<S extends Enum<S>> extends SubsystemBase 
     public Command run(double power) {
         return runOnce(()-> {
             subsystems.forEach((subsystem)-> subsystem.run(power));
-        }).beforeStarting(runOnce(()-> Log.debug(Log.Type.STATE_MACHINE, getName(), "Set to run at " + power + " power")));
+        }).beforeStarting(runOnce(()-> Log.debug(Log.Type.STATE_MACHINE_PRIMARY, getName(), "Set to run at " + power + " power")));
     }
 
     public Command runVolts(double volts) {
         return runOnce(()-> {
             subsystems.forEach((subsystem)-> subsystem.runVolts(volts));
-        }).beforeStarting(runOnce(()-> Log.debug(Log.Type.STATE_MACHINE, getName(), "Set to run at " + volts + " volts")));
+        }).beforeStarting(runOnce(()-> Log.debug(Log.Type.STATE_MACHINE_PRIMARY, getName(), "Set to run at " + volts + " volts")));
     }
 
     public Command stop() {

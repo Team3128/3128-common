@@ -1,5 +1,7 @@
 package common.utility;
 
+import static common.utility.Log.Type.STATE_MACHINE_PRIMARY;
+
 import java.util.List;
 
 import edu.wpi.first.wpilibj.DriverStation;
@@ -17,11 +19,12 @@ public class Log {
 		SECONDARY(1),
 		TERTIARY(2),
 
-		STATE_MACHINE(0),
-		MECHANISM(1),
-		CONTROLLER(1),
-		MOTOR(2),
-		VISION(0);
+		STATE_MACHINE_PRIMARY(1),
+		STATE_MACHINE_SECONDARY(2),
+		MECHANISM(2),
+		CONTROLLER(2),
+		MOTOR(3),
+		VISION(1);
 
 		private boolean enabled;
 		private int level;
@@ -139,7 +142,9 @@ public class Log {
 	 * @param message
 	 */
 	public static void debug(Type type, String category, String message) {
-		if(logDebug && type.getEnabled()) log(type, "Debug", category, message);
+		int level = type.getLevel();
+		if(type.name().contains("STATE_MACHINE") && !category.contains("Robot")) level++;
+		if(logDebug && type.getEnabled()) log(level, "Debug", category, message);
 	}
 
 	public static void divider(int length) {
@@ -147,10 +152,10 @@ public class Log {
 	}
 
 	private static void log(String severity, String category, String message) {
-		log(Type.PRIMARY, severity, category, message);
+		log(Type.PRIMARY.getLevel(), severity, category, message);
 	}
 
-	private static void log(Type type, String severity, String category, String message) {
-		System.out.println("\t".repeat(type.getLevel()) + String.format("[%s] [%s] %s", severity, category, message));
+	private static void log(int level, String severity, String category, String message) {
+		System.out.println("\t\t".repeat(level) + String.format("[%s] [%s] %s", severity, category, message));
 	}
 }
