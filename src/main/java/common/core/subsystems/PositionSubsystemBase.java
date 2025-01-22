@@ -169,7 +169,7 @@ public abstract class PositionSubsystemBase extends NAR_PIDSubsystem implements 
     public Command characterization(double startDelaySecs, double rampRateVoltsPerSec) {
         return new CmdSysId(
             getName(), 
-            this::runVolts, 
+            volts -> motors.forEach(motor -> motor.setVolts(volts)), 
             this::getVelocity, 
             this::getPosition, 
             startDelaySecs,

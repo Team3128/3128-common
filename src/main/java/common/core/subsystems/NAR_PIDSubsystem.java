@@ -15,6 +15,7 @@ import common.utility.shuffleboard.NAR_Shuffleboard;
 import common.utility.tester.Tester;
 import common.utility.tester.Tester.SystemsTest;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj2.command.PIDSubsystem;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -166,9 +167,9 @@ public abstract class NAR_PIDSubsystem extends SubsystemBase {
         NAR_Shuffleboard.addData(getName(), "Enabled", ()-> isEnabled(), 1, 0);
         NAR_Shuffleboard.addData(getName(), "Measurement", ()-> controller.getMeasurement(), 1, 1);
 
-        NAR_Shuffleboard.addData(getName(), "TOGGLE", false, 2, 0).withWidget("Toggle Button");
+        NAR_Shuffleboard.addData(getName(), "TOGGLE", false, 2, 0).withWidget(BuiltInWidgets.kToggleButton);
         debug = NAR_Shuffleboard.getBoolean(getName(), "TOGGLE");
-        NAR_Shuffleboard.addData(getName(), "DEBUG", ()-> debug.getAsBoolean(), 2, 1);
+        NAR_Shuffleboard.addData(getName(), "DEBUG", () -> debug.getAsBoolean(), 2, 1);
         setpoint = NAR_Shuffleboard.debug(getName(), "Debug_Setpoint", 0, 2,2);
         NAR_Shuffleboard.addData(getName(), "Output", ()-> controller.useOutput(), 2, 3);
 
