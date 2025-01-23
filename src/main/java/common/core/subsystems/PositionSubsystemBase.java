@@ -69,7 +69,7 @@ public abstract class PositionSubsystemBase extends NAR_PIDSubsystem implements 
      * @param power The power to command to the motors.
      * @return Command setting the power to the motors.
      */
-    public Command runCommand(double power) {
+    public Command run(double power) {
         return applyCommand(motor -> motor.set(power));
     }
 
