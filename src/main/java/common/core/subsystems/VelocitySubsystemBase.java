@@ -2,6 +2,7 @@ package common.core.subsystems;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.DoubleSupplier;
 import common.core.controllers.ControllerBase;
 import common.hardware.motorcontroller.NAR_Motor;
@@ -49,6 +50,15 @@ public abstract class VelocitySubsystemBase extends NAR_PIDSubsystem implements 
      */
     protected abstract void configController();
 
+    protected void apply(Consumer<NAR_Motor> action) {
+        disable();
+        motors.forEach(action);
+    }
+
+    protected Command applyCommand(Consumer<NAR_Motor> action) {
+        return runOnce(()-> apply(action));
+    }
+
     /**
      * Sets power to motor.
      * 
@@ -56,12 +66,12 @@ public abstract class VelocitySubsystemBase extends NAR_PIDSubsystem implements 
      * @return Command setting pivot setpoint.
      */
     public Command run(double power) {
-        return runOnce(()-> motors.forEach(motor -> motor.set(power))).beforeStarting(()-> disable());
+        return applyCommand(motor -> motor.set(power));
     }
 
 
     public Command runVolts(double volts) {
-        return runOnce(()-> motors.forEach(motor -> motor.setVolts(volts))).beforeStarting(()-> disable());
+        return applyCommand(motor -> motor.setVolts(volts));
     }
 
     /**
@@ -99,7 +109,7 @@ public abstract class VelocitySubsystemBase extends NAR_PIDSubsystem implements 
      * @return Command that resets the pivot position.
      */
     public Command reset() {
-        return runOnce(()-> motors.forEach(motor -> motor.resetPosition(controller.getInputRange()[0]))).beforeStarting(()-> disable());
+        return applyCommand(motor -> motor.resetPosition(controller.getInputRange()[0]));
     }
 
     /**
@@ -115,7 +125,7 @@ public abstract class VelocitySubsystemBase extends NAR_PIDSubsystem implements 
      * @param mode The neutral mode to set to.
      */
     public void setNeutralMode(Neutral mode) {
-        motors.forEach(motor -> motor.setNeutralMode(mode));
+        apply(motor -> motor.setNeutralMode(mode));
     }
 
     /**
@@ -136,10 +146,14 @@ public abstract class VelocitySubsystemBase extends NAR_PIDSubsystem implements 
         return motors.get(0).getVelocity();
     }
 
-    public Command characterization(double startDelaySecs, double rampRateVoltsPerSec) {
+    public Command charicterization(double startDelaySecs, double rampRateVoltsPerSec) {
+        return characterization(startDelaySecs, rampRateVoltsPerSec, controller.getInputRange()[0], controller.getInputRange()[1]);
+    }
+
+    public Command characterization(double startDelaySecs, double rampRateVoltsPerSec, double startPosition, double endPosition) {
         return new CmdSysId(
             getName(), 
-            this::runVolts, 
+            volts -> apply(motor -> motor.setVolts(volts)), 
             this::getVelocity, 
             this::getPosition, 
             startDelaySecs,

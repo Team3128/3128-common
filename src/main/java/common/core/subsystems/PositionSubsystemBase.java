@@ -1,11 +1,13 @@
 package common.core.subsystems;
 
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.DoubleSupplier;
 import common.core.controllers.ControllerBase;
 import common.hardware.motorcontroller.NAR_Motor;
 import common.hardware.motorcontroller.NAR_Motor.Neutral;
 import common.utility.sysid.CmdSysId;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj2.command.Command;
 
 import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
@@ -21,6 +23,7 @@ import static edu.wpi.first.wpilibj2.command.Commands.*;
 public abstract class PositionSubsystemBase extends NAR_PIDSubsystem implements NAR_Subsystem {
 
     protected final List<NAR_Motor> motors;
+    protected final SimpleMotorFeedforward ff;
 
     /**
      * Creates an PositionSubsystemBase object.
@@ -30,6 +33,7 @@ public abstract class PositionSubsystemBase extends NAR_PIDSubsystem implements 
      */
     public PositionSubsystemBase(ControllerBase controller, NAR_Motor... motors) {
         super(controller, List.of(motors));
+        ff = new SimpleMotorFeedforward(controller.getConfig().getkS(), controller.getConfig().getkV(), controller.getConfig().getkA());
         
         requireNonNullParam(controller, "controller", "PositionSubsystemBase");
         requireNonNullParam(motors, "motors", "PositionSubsystemBase");
@@ -50,19 +54,33 @@ public abstract class PositionSubsystemBase extends NAR_PIDSubsystem implements 
      */
     protected abstract void configController();
 
-    /**
-     * Sets power to motor.
-     * 
-     * @param power Setpoint the pivot goes to.
-     * @return Command setting pivot setpoint.
-     */
-    public Command run(double power) {
-        return runOnce(()-> motors.forEach(motor -> motor.set(power))).beforeStarting(()-> disable());
+    protected void apply(Consumer<NAR_Motor> action) {
+        disable();
+        motors.forEach(action);
     }
 
+    protected Command applyCommand(Consumer<NAR_Motor> action) {
+        return runOnce(()-> apply(action));
+    }
 
+    /**
+     * Sets power to motors.
+     * 
+     * @param power The power to command to the motors.
+     * @return Command setting the power to the motors.
+     */
+    public Command runCommand(double power) {
+        return applyCommand(motor -> motor.set(power));
+    }
+
+    /**
+     * Sets voltage to motors.
+     * 
+     * @param volts The voltage to command to the motors.
+     * @return Command setting the voltage to the motors.
+     */
     public Command runVolts(double volts) {
-        return runOnce(()-> motors.forEach(motor -> motor.setVolts(volts))).beforeStarting(()-> disable());
+        return applyCommand(motor -> motor.setVolts(volts));
     }
 
     /**
@@ -96,22 +114,22 @@ public abstract class PositionSubsystemBase extends NAR_PIDSubsystem implements 
     }
 
     /**
-     * Reset measurement position.
+     * Reset measurement position to controller position minimum.
      * 
-     * @param position Position to reset to.
-     * @return Command that resets the pivot position.
+     * @return Command resetting the position to the controller input minimum.
      */
-    public Command reset(double position) {
-        return runOnce(()-> motors.forEach(motor -> motor.resetPosition(position))).beforeStarting(()-> disable());
+    public Command reset() {
+        return reset(controller.getInputRange()[0]);
     }
 
     /**
-     * Reset measurement position to controller position minimum.
+     * Reset measurement position.
      * 
-     * @return Command that resets the pivot position.
+     * @param position Position to reset to.
+     * @return Command resetting the position.
      */
-    public Command reset() {
-        return runOnce(()-> motors.forEach(motor -> motor.resetPosition(controller.getInputRange()[0]))).beforeStarting(()-> disable());
+    public Command reset(double position) {
+        return applyCommand(motor -> motor.resetPosition(position));
     }
 
     /**
@@ -127,7 +145,7 @@ public abstract class PositionSubsystemBase extends NAR_PIDSubsystem implements 
      * @param mode The neutral mode to set to.
      */
     public void setNeutralMode(Neutral mode) {
-        motors.forEach(motor -> motor.setNeutralMode(mode));
+        apply(motor -> motor.setNeutralMode(mode));
     }
 
     /**
@@ -161,24 +179,26 @@ public abstract class PositionSubsystemBase extends NAR_PIDSubsystem implements 
             run(power),
             waitSeconds(delay),
             waitUntil(()-> (getCurrent() > currentLimit)),
-            reset(controller.getInputRange()[0]),
+            reset(),
             stop()
         ).beforeStarting(()-> disable());
     }
 
-    public Command characterization(double startDelaySecs, double rampRateVoltsPerSec) {
+    public Command charicterization(double startDelaySecs, double rampRateVoltsPerSec) {
+        return characterization(startDelaySecs, rampRateVoltsPerSec, controller.getInputRange()[0], controller.getInputRange()[1]);
+    }
+
+    public Command characterization(double startDelaySecs, double rampRateVoltsPerSec, double startPosition, double endPosition) {
         return new CmdSysId(
             getName(), 
-            volts -> motors.forEach(motor -> motor.setVolts(volts)), 
+            volts -> apply(motor -> motor.setVolts(volts)), 
             this::getVelocity, 
             this::getPosition, 
             startDelaySecs,
             rampRateVoltsPerSec,
-            controller.getInputRange()[1], 
+            endPosition, 
             true, 
             this
-        ).beforeStarting(reset(controller.getInputRange()[0]));
+        ).beforeStarting(reset(startPosition));
     }
-
-
 }
