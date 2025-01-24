@@ -223,7 +223,7 @@ public abstract class PositionSubsystemBase extends NAR_PIDSubsystem implements 
         ).beforeStarting(()-> disable());
     }
 
-    public Command charicterization(double startDelaySecs, double rampRateVoltsPerSec) {
+    public Command characterization(double startDelaySecs, double rampRateVoltsPerSec) {
         return characterization(startDelaySecs, rampRateVoltsPerSec, controller.getInputRange()[0], controller.getInputRange()[1]);
     }
 
