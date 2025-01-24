@@ -2,6 +2,7 @@ package common.hardware.input;
 
 import java.util.HashMap;
 
+import common.utility.shuffleboard.NAR_Shuffleboard;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
@@ -202,5 +203,11 @@ public class NAR_XboxController extends XboxController {
      */
     public void stopVibrate() {
         setRumble(RumbleType.kBothRumble, 0);
+    }
+
+    public void initShuffleboard() {
+        for(XboxButton button : buttons.keySet()) {
+            NAR_Shuffleboard.addData("Controller", button.name(), ()-> buttons.get(button).getAsBoolean(), (button.ordinal() % 6), button.ordinal() / 6);
+        }
     }
 }

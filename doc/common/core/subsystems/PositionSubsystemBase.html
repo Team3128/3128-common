@@ -113,9 +113,12 @@ implements <a href="NAR_Subsystem.html" title="interface in common.core.subsyste
 <div class="table-header col-first">Modifier and Type</div>
 <div class="table-header col-second">Field</div>
 <div class="table-header col-last">Description</div>
-<div class="col-first even-row-color"><code>protected final <a href="../../hardware/motorcontroller/NAR_Motor.html" title="class in common.hardware.motorcontroller">NAR_Motor</a></code></div>
-<div class="col-second even-row-color"><code><a href="#leader" class="member-name-link">leader</a></code></div>
+<div class="col-first even-row-color"><code>protected final edu.wpi.first.math.controller.SimpleMotorFeedforward</code></div>
+<div class="col-second even-row-color"><code><a href="#ff" class="member-name-link">ff</a></code></div>
 <div class="col-last even-row-color">&nbsp;</div>
+<div class="col-first odd-row-color"><code>protected final <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="../../hardware/motorcontroller/NAR_Motor.html" title="class in common.hardware.motorcontroller">NAR_Motor</a>&gt;</code></div>
+<div class="col-second odd-row-color"><code><a href="#motors" class="member-name-link">motors</a></code></div>
+<div class="col-last odd-row-color">&nbsp;</div>
 </div>
 <div class="inherited-list">
 <h3 id="fields-inherited-from-class-common.core.subsystems.NAR_PIDSubsystem">Fields inherited from class&nbsp;common.core.subsystems.<a href="NAR_PIDSubsystem.html" title="class in common.core.subsystems">NAR_PIDSubsystem</a></h3>
@@ -130,9 +133,8 @@ implements <a href="NAR_Subsystem.html" title="interface in common.core.subsyste
 <div class="summary-table two-column-summary">
 <div class="table-header col-first">Constructor</div>
 <div class="table-header col-last">Description</div>
-<div class="col-constructor-name even-row-color"><code><a href="#%3Cinit%3E(common.core.controllers.ControllerBase,common.hardware.motorcontroller.NAR_Motor,common.hardware.motorcontroller.NAR_Motor...)" class="member-name-link">PositionSubsystemBase</a><wbr>(<a href="../controllers/ControllerBase.html" title="class in common.core.controllers">ControllerBase</a>&nbsp;controller,
- <a href="../../hardware/motorcontroller/NAR_Motor.html" title="class in common.hardware.motorcontroller">NAR_Motor</a>&nbsp;leader,
- <a href="../../hardware/motorcontroller/NAR_Motor.html" title="class in common.hardware.motorcontroller">NAR_Motor</a>...&nbsp;followers)</code></div>
+<div class="col-constructor-name even-row-color"><code><a href="#%3Cinit%3E(common.core.controllers.ControllerBase,common.hardware.motorcontroller.NAR_Motor...)" class="member-name-link">PositionSubsystemBase</a><wbr>(<a href="../controllers/ControllerBase.html" title="class in common.core.controllers">ControllerBase</a>&nbsp;controller,
+ <a href="../../hardware/motorcontroller/NAR_Motor.html" title="class in common.hardware.motorcontroller">NAR_Motor</a>...&nbsp;motors)</code></div>
 <div class="col-last even-row-color">
 <div class="block">Creates an PositionSubsystemBase object.</div>
 </div>
@@ -150,19 +152,46 @@ implements <a href="NAR_Subsystem.html" title="interface in common.core.subsyste
 <div class="table-header col-first">Modifier and Type</div>
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>protected void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#apply(java.util.function.Consumer)" class="member-name-link">apply</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Consumer.html" title="class or interface in java.util.function" class="external-link">Consumer</a>&lt;<a href="../../hardware/motorcontroller/NAR_Motor.html" title="class in common.hardware.motorcontroller">NAR_Motor</a>&gt;&nbsp;action)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>protected edu.wpi.first.wpilibj2.command.Command</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#applyCommand(java.util.function.Consumer)" class="member-name-link">applyCommand</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Consumer.html" title="class or interface in java.util.function" class="external-link">Consumer</a>&lt;<a href="../../hardware/motorcontroller/NAR_Motor.html" title="class in common.hardware.motorcontroller">NAR_Motor</a>&gt;&nbsp;action)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>edu.wpi.first.wpilibj2.command.Command</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#characterization(double,double)" class="member-name-link">characterization</a><wbr>(double&nbsp;startDelaySecs,
  double&nbsp;rampRateVoltsPerSec)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>protected abstract void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#configController()" class="member-name-link">configController</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>edu.wpi.first.wpilibj2.command.Command</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#characterization(double,double,double,double)" class="member-name-link">characterization</a><wbr>(double&nbsp;startDelaySecs,
+ double&nbsp;rampRateVoltsPerSec,
+ double&nbsp;startPosition,
+ double&nbsp;endPosition)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>protected abstract void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#configController()" class="member-name-link">configController</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Configure controller settings.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>protected abstract void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#configMotors()" class="member-name-link">configMotors</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="block">Configure motor settings.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>double</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getCurrent()" class="member-name-link">getCurrent</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns current of the first motor.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>double</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getPosition()" class="member-name-link">getPosition</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Get the position of the mechanism relative to its reset.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>double</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getVelocity()" class="member-name-link">getVelocity</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Get the velocity of the mechanism.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>edu.wpi.first.wpilibj2.command.Command</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#homing(double,double,double)" class="member-name-link">homing</a><wbr>(double&nbsp;power,
@@ -181,28 +210,60 @@ implements <a href="NAR_Subsystem.html" title="interface in common.core.subsyste
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Sets controller setpoint and enables controller.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>edu.wpi.first.wpilibj2.command.Command</code></div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#reset()" class="member-name-link">reset</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Resets the position of the motors to 0</div>
+<div class="block">Resets measurement position to controller position minimum.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>edu.wpi.first.wpilibj2.command.Command</code></div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#reset(double)" class="member-name-link">reset</a><wbr>(double&nbsp;position)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Reset measurement position.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>edu.wpi.first.wpilibj2.command.Command</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#run(double)" class="member-name-link">run</a><wbr>(double&nbsp;power)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#resetCommand()" class="member-name-link">resetCommand</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Sets power to motor.</div>
+<div class="block">Command resetting position to controller position minimum.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>edu.wpi.first.wpilibj2.command.Command</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#runVolts(double)" class="member-name-link">runVolts</a><wbr>(double&nbsp;volts)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>edu.wpi.first.wpilibj2.command.Command</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#stop()" class="member-name-link">stop</a>()</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#resetCommand(double)" class="member-name-link">resetCommand</a><wbr>(double&nbsp;position)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Command resetting position.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#run(double)" class="member-name-link">run</a><wbr>(double&nbsp;power)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Stops all motors in the subsystem.</div>
+<div class="block">Sets power to motors.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>edu.wpi.first.wpilibj2.command.Command</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#runCommand(double)" class="member-name-link">runCommand</a><wbr>(double&nbsp;power)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Command setting power to motors.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#runVolts(double)" class="member-name-link">runVolts</a><wbr>(double&nbsp;volts)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Sets voltage to motors.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>edu.wpi.first.wpilibj2.command.Command</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#runVoltsCommand(double)" class="member-name-link">runVoltsCommand</a><wbr>(double&nbsp;volts)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Command setting voltage to motors.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setNeutralMode(common.hardware.motorcontroller.NAR_Motor.Neutral)" class="member-name-link">setNeutralMode</a><wbr>(<a href="../../hardware/motorcontroller/NAR_Motor.Neutral.html" title="enum class in common.hardware.motorcontroller">NAR_Motor.Neutral</a>&nbsp;mode)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Set the neutral mode for all motors in the mechanism.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#stop()" class="member-name-link">stop</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Stops all motors.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>edu.wpi.first.wpilibj2.command.Command</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#stopCommand()" class="member-name-link">stopCommand</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Command stopping all motors.</div>
 </div>
 </div>
 </div>
@@ -218,7 +279,7 @@ implements <a href="NAR_Subsystem.html" title="interface in common.core.subsyste
 <code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#clone()" title="class or interface in java.lang" class="external-link">clone</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#equals(java.lang.Object)" title="class or interface in java.lang" class="external-link">equals</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#finalize()" title="class or interface in java.lang" class="external-link">finalize</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#getClass()" title="class or interface in java.lang" class="external-link">getClass</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#hashCode()" title="class or interface in java.lang" class="external-link">hashCode</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#notify()" title="class or interface in java.lang" class="external-link">notify</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#notifyAll()" title="class or interface in java.lang" class="external-link">notifyAll</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#toString()" title="class or interface in java.lang" class="external-link">toString</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#wait()" title="class or interface in java.lang" class="external-link">wait</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#wait(long)" title="class or interface in java.lang" class="external-link">wait</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#wait(long,int)" title="class or interface in java.lang" class="external-link">wait</a></code></div>
 <div class="inherited-list">
 <h3 id="methods-inherited-from-class-common.core.subsystems.NAR_Subsystem">Methods inherited from interface&nbsp;common.core.subsystems.<a href="NAR_Subsystem.html" title="interface in common.core.subsystems">NAR_Subsystem</a></h3>
-<code><a href="NAR_Subsystem.html#configMotors()">configMotors</a>, <a href="NAR_Subsystem.html#initShuffleboard()">initShuffleboard</a></code></div>
+<code><a href="NAR_Subsystem.html#configMotors()">configMotors</a>, <a href="NAR_Subsystem.html#initShuffleboard()">initShuffleboard</a>, <a href="NAR_Subsystem.html#run()">run</a>, <a href="NAR_Subsystem.html#runVolts()">runVolts</a></code></div>
 <div class="inherited-list">
 <h3 id="methods-inherited-from-class-edu.wpi.first.wpilibj2.command.Subsystem">Methods inherited from interface&nbsp;edu.wpi.first.wpilibj2.command.Subsystem</h3>
 <code>defer, getCurrentCommand, getDefaultCommand, getName, periodic, register, removeDefaultCommand, run, runEnd, runOnce, setDefaultCommand, simulationPeriodic, startEnd, startRun</code></div>
@@ -234,9 +295,15 @@ implements <a href="NAR_Subsystem.html" title="interface in common.core.subsyste
 <h2>Field Details</h2>
 <ul class="member-list">
 <li>
-<section class="detail" id="leader">
-<h3>leader</h3>
-<div class="member-signature"><span class="modifiers">protected final</span>&nbsp;<span class="return-type"><a href="../../hardware/motorcontroller/NAR_Motor.html" title="class in common.hardware.motorcontroller">NAR_Motor</a></span>&nbsp;<span class="element-name">leader</span></div>
+<section class="detail" id="motors">
+<h3>motors</h3>
+<div class="member-signature"><span class="modifiers">protected final</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="../../hardware/motorcontroller/NAR_Motor.html" title="class in common.hardware.motorcontroller">NAR_Motor</a>&gt;</span>&nbsp;<span class="element-name">motors</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="ff">
+<h3>ff</h3>
+<div class="member-signature"><span class="modifiers">protected final</span>&nbsp;<span class="return-type">edu.wpi.first.math.controller.SimpleMotorFeedforward</span>&nbsp;<span class="element-name">ff</span></div>
 </section>
 </li>
 </ul>
@@ -248,17 +315,15 @@ implements <a href="NAR_Subsystem.html" title="interface in common.core.subsyste
 <h2>Constructor Details</h2>
 <ul class="member-list">
 <li>
-<section class="detail" id="&lt;init&gt;(common.core.controllers.ControllerBase,common.hardware.motorcontroller.NAR_Motor,common.hardware.motorcontroller.NAR_Motor...)">
+<section class="detail" id="&lt;init&gt;(common.core.controllers.ControllerBase,common.hardware.motorcontroller.NAR_Motor...)">
 <h3>PositionSubsystemBase</h3>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="element-name">PositionSubsystemBase</span><wbr><span class="parameters">(<a href="../controllers/ControllerBase.html" title="class in common.core.controllers">ControllerBase</a>&nbsp;controller,
- <a href="../../hardware/motorcontroller/NAR_Motor.html" title="class in common.hardware.motorcontroller">NAR_Motor</a>&nbsp;leader,
- <a href="../../hardware/motorcontroller/NAR_Motor.html" title="class in common.hardware.motorcontroller">NAR_Motor</a>...&nbsp;followers)</span></div>
+ <a href="../../hardware/motorcontroller/NAR_Motor.html" title="class in common.hardware.motorcontroller">NAR_Motor</a>...&nbsp;motors)</span></div>
 <div class="block">Creates an PositionSubsystemBase object.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>controller</code> - Controller for motion control.</dd>
-<dd><code>leader</code> - The leader motor which subsequent motors should follow.</dd>
-<dd><code>followers</code> - The follower motors that follow the leader motor.</dd>
+<dd><code>motors</code> - The motors of the subsystem.</dd>
 </dl>
 </section>
 </li>
@@ -271,6 +336,13 @@ implements <a href="NAR_Subsystem.html" title="interface in common.core.subsyste
 <h2>Method Details</h2>
 <ul class="member-list">
 <li>
+<section class="detail" id="configMotors()">
+<h3>configMotors</h3>
+<div class="member-signature"><span class="modifiers">protected abstract</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">configMotors</span>()</div>
+<div class="block">Configure motor settings.</div>
+</section>
+</li>
+<li>
 <section class="detail" id="configController()">
 <h3>configController</h3>
 <div class="member-signature"><span class="modifiers">protected abstract</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">configController</span>()</div>
@@ -278,17 +350,40 @@ implements <a href="NAR_Subsystem.html" title="interface in common.core.subsyste
 </section>
 </li>
 <li>
+<section class="detail" id="apply(java.util.function.Consumer)">
+<h3>apply</h3>
+<div class="member-signature"><span class="modifiers">protected</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">apply</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Consumer.html" title="class or interface in java.util.function" class="external-link">Consumer</a>&lt;<a href="../../hardware/motorcontroller/NAR_Motor.html" title="class in common.hardware.motorcontroller">NAR_Motor</a>&gt;&nbsp;action)</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="applyCommand(java.util.function.Consumer)">
+<h3>applyCommand</h3>
+<div class="member-signature"><span class="modifiers">protected</span>&nbsp;<span class="return-type">edu.wpi.first.wpilibj2.command.Command</span>&nbsp;<span class="element-name">applyCommand</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Consumer.html" title="class or interface in java.util.function" class="external-link">Consumer</a>&lt;<a href="../../hardware/motorcontroller/NAR_Motor.html" title="class in common.hardware.motorcontroller">NAR_Motor</a>&gt;&nbsp;action)</span></div>
+</section>
+</li>
+<li>
 <section class="detail" id="run(double)">
 <h3>run</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">edu.wpi.first.wpilibj2.command.Command</span>&nbsp;<span class="element-name">run</span><wbr><span class="parameters">(double&nbsp;power)</span></div>
-<div class="block">Sets power to motor.</div>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">run</span><wbr><span class="parameters">(double&nbsp;power)</span></div>
+<div class="block">Sets power to motors.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
 <dd><code><a href="NAR_Subsystem.html#run(double)">run</a></code>&nbsp;in interface&nbsp;<code><a href="NAR_Subsystem.html" title="interface in common.core.subsystems">NAR_Subsystem</a></code></dd>
 <dt>Parameters:</dt>
-<dd><code>power</code> - Setpoint the pivot goes to.</dd>
+<dd><code>power</code> - The power to set the motors to.</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="runCommand(double)">
+<h3>runCommand</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">edu.wpi.first.wpilibj2.command.Command</span>&nbsp;<span class="element-name">runCommand</span><wbr><span class="parameters">(double&nbsp;power)</span></div>
+<div class="block">Command setting power to motors.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>power</code> - The power to set the motors to.</dd>
 <dt>Returns:</dt>
-<dd>Command setting pivot setpoint.</dd>
+<dd>Command setting the power to the motors.</dd>
 </dl>
 </section>
 </li>
@@ -296,22 +391,29 @@ implements <a href="NAR_Subsystem.html" title="interface in common.core.subsyste
 <section class="detail" id="runVolts(double)">
 <h3>runVolts</h3>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">edu.wpi.first.wpilibj2.command.Command</span>&nbsp;<span class="element-name">runVolts</span><wbr><span class="parameters">(double&nbsp;volts)</span></div>
-<dl class="notes">
-<dt>Specified by:</dt>
-<dd><code><a href="NAR_Subsystem.html#runVolts(double)">runVolts</a></code>&nbsp;in interface&nbsp;<code><a href="NAR_Subsystem.html" title="interface in common.core.subsystems">NAR_Subsystem</a></code></dd>
-</dl>
 </section>
 </li>
 <li>
 <section class="detail" id="stop()">
 <h3>stop</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">edu.wpi.first.wpilibj2.command.Command</span>&nbsp;<span class="element-name">stop</span>()</div>
-<div class="block">Stops all motors in the subsystem.</div>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">stop</span>()</div>
+<div class="block">Stops all motors.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
 <dd><code><a href="NAR_Subsystem.html#stop()">stop</a></code>&nbsp;in interface&nbsp;<code><a href="NAR_Subsystem.html" title="interface in common.core.subsystems">NAR_Subsystem</a></code></dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="stopCommand()">
+<h3>stopCommand</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">edu.wpi.first.wpilibj2.command.Command</span>&nbsp;<span class="element-name">stopCommand</span>()</div>
+<div class="block">Command stopping all motors.</div>
+<dl class="notes">
+<dt>Specified by:</dt>
+<dd><code><a href="NAR_Subsystem.html#stopCommand()">stopCommand</a></code>&nbsp;in interface&nbsp;<code><a href="NAR_Subsystem.html" title="interface in common.core.subsystems">NAR_Subsystem</a></code></dd>
 <dt>Returns:</dt>
-<dd>Command stopping the subsystem motors.</dd>
+<dd>Command stopping all the motors.</dd>
 </dl>
 </section>
 </li>
@@ -342,15 +444,37 @@ implements <a href="NAR_Subsystem.html" title="interface in common.core.subsyste
 </section>
 </li>
 <li>
+<section class="detail" id="reset()">
+<h3>reset</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">reset</span>()</div>
+<div class="block">Resets measurement position to controller position minimum.</div>
+<dl class="notes">
+<dt>Specified by:</dt>
+<dd><code><a href="NAR_Subsystem.html#reset()">reset</a></code>&nbsp;in interface&nbsp;<code><a href="NAR_Subsystem.html" title="interface in common.core.subsystems">NAR_Subsystem</a></code></dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="resetCommand()">
+<h3>resetCommand</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">edu.wpi.first.wpilibj2.command.Command</span>&nbsp;<span class="element-name">resetCommand</span>()</div>
+<div class="block">Command resetting position to controller position minimum.</div>
+<dl class="notes">
+<dt>Specified by:</dt>
+<dd><code><a href="NAR_Subsystem.html#resetCommand()">resetCommand</a></code>&nbsp;in interface&nbsp;<code><a href="NAR_Subsystem.html" title="interface in common.core.subsystems">NAR_Subsystem</a></code></dd>
+<dt>Returns:</dt>
+<dd>Command resetting the position to the controller position minimum.</dd>
+</dl>
+</section>
+</li>
+<li>
 <section class="detail" id="reset(double)">
 <h3>reset</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">edu.wpi.first.wpilibj2.command.Command</span>&nbsp;<span class="element-name">reset</span><wbr><span class="parameters">(double&nbsp;position)</span></div>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">reset</span><wbr><span class="parameters">(double&nbsp;position)</span></div>
 <div class="block">Reset measurement position.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>position</code> - Position to reset to.</dd>
-<dt>Returns:</dt>
-<dd>Command that resets the pivot position.</dd>
 </dl>
 </section>
 </li>
@@ -358,12 +482,9 @@ implements <a href="NAR_Subsystem.html" title="interface in common.core.subsyste
 <section class="detail" id="reset()">
 <h3>reset</h3>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">edu.wpi.first.wpilibj2.command.Command</span>&nbsp;<span class="element-name">reset</span>()</div>
-<div class="block">Resets the position of the motors to 0</div>
 <dl class="notes">
 <dt>Specified by:</dt>
 <dd><code><a href="NAR_Subsystem.html#reset()">reset</a></code>&nbsp;in interface&nbsp;<code><a href="NAR_Subsystem.html" title="interface in common.core.subsystems">NAR_Subsystem</a></code></dd>
-<dt>Returns:</dt>
-<dd>Command resetting the position of the motors to 0</dd>
 </dl>
 </section>
 </li>
@@ -375,6 +496,41 @@ implements <a href="NAR_Subsystem.html" title="interface in common.core.subsyste
 <dl class="notes">
 <dt>Specified by:</dt>
 <dd><code><a href="NAR_Subsystem.html#getCurrent()">getCurrent</a></code>&nbsp;in interface&nbsp;<code><a href="NAR_Subsystem.html" title="interface in common.core.subsystems">NAR_Subsystem</a></code></dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="setNeutralMode(common.hardware.motorcontroller.NAR_Motor.Neutral)">
+<h3>setNeutralMode</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">setNeutralMode</span><wbr><span class="parameters">(<a href="../../hardware/motorcontroller/NAR_Motor.Neutral.html" title="enum class in common.hardware.motorcontroller">NAR_Motor.Neutral</a>&nbsp;mode)</span></div>
+<div class="block">Set the neutral mode for all motors in the mechanism.</div>
+<dl class="notes">
+<dt>Specified by:</dt>
+<dd><code><a href="NAR_Subsystem.html#setNeutralMode(common.hardware.motorcontroller.NAR_Motor.Neutral)">setNeutralMode</a></code>&nbsp;in interface&nbsp;<code><a href="NAR_Subsystem.html" title="interface in common.core.subsystems">NAR_Subsystem</a></code></dd>
+<dt>Parameters:</dt>
+<dd><code>mode</code> - The neutral mode to set to.</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="getPosition()">
+<h3>getPosition</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">double</span>&nbsp;<span class="element-name">getPosition</span>()</div>
+<div class="block">Get the position of the mechanism relative to its reset.</div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd>The position of the first motor.</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="getVelocity()">
+<h3>getVelocity</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">double</span>&nbsp;<span class="element-name">getVelocity</span>()</div>
+<div class="block">Get the velocity of the mechanism.</div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd>The velocity of the first motor.</dd>
 </dl>
 </section>
 </li>
@@ -400,6 +556,15 @@ implements <a href="NAR_Subsystem.html" title="interface in common.core.subsyste
 <h3>characterization</h3>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">edu.wpi.first.wpilibj2.command.Command</span>&nbsp;<span class="element-name">characterization</span><wbr><span class="parameters">(double&nbsp;startDelaySecs,
  double&nbsp;rampRateVoltsPerSec)</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="characterization(double,double,double,double)">
+<h3>characterization</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">edu.wpi.first.wpilibj2.command.Command</span>&nbsp;<span class="element-name">characterization</span><wbr><span class="parameters">(double&nbsp;startDelaySecs,
+ double&nbsp;rampRateVoltsPerSec,
+ double&nbsp;startPosition,
+ double&nbsp;endPosition)</span></div>
 </section>
 </li>
 </ul>

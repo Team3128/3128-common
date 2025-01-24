@@ -15,6 +15,7 @@ import common.utility.shuffleboard.NAR_Shuffleboard;
 import common.utility.tester.Tester;
 import common.utility.tester.Tester.SystemsTest;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj2.command.PIDSubsystem;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -115,9 +116,12 @@ public abstract class NAR_PIDSubsystem extends SubsystemBase {
         controller.addOutput(useOutput);
     }
 
-    public NAR_PIDSubsystem(ControllerBase controller, NAR_Motor motor) {
+    public NAR_PIDSubsystem(ControllerBase controller, List<NAR_Motor> motors) {
         this(controller);
-        controller.configureFeedback(motor);
+        controller.configureFeedback(motors.get(0));
+        for(int i = 1; i < motors.size(); i++) {
+            controller.addMotor(motors.get(i));
+        }
     }
 
 
@@ -137,7 +141,7 @@ public abstract class NAR_PIDSubsystem extends SubsystemBase {
                 }
             }
         }
-
+        
         if (!shouldLog) return;
 
         if (updateTimer.hasElapsed(updateTime)) {
@@ -163,9 +167,9 @@ public abstract class NAR_PIDSubsystem extends SubsystemBase {
         NAR_Shuffleboard.addData(getName(), "Enabled", ()-> isEnabled(), 1, 0);
         NAR_Shuffleboard.addData(getName(), "Measurement", ()-> controller.getMeasurement(), 1, 1);
 
-        NAR_Shuffleboard.addData(getName(), "TOGGLE", false, 2, 0).withWidget("Toggle Button");
+        NAR_Shuffleboard.addData(getName(), "TOGGLE", false, 2, 0).withWidget(BuiltInWidgets.kToggleButton);
         debug = NAR_Shuffleboard.getBoolean(getName(), "TOGGLE");
-        NAR_Shuffleboard.addData(getName(), "DEBUG", ()-> debug.getAsBoolean(), 2, 1);
+        NAR_Shuffleboard.addData(getName(), "DEBUG", () -> debug.getAsBoolean(), 2, 1);
         setpoint = NAR_Shuffleboard.debug(getName(), "Debug_Setpoint", 0, 2,2);
         NAR_Shuffleboard.addData(getName(), "Output", ()-> controller.useOutput(), 2, 3);
 
@@ -358,13 +362,13 @@ public abstract class NAR_PIDSubsystem extends SubsystemBase {
         controller.enable();
         safetyTimer.restart();
         controller.reset();
+        Log.debug(Log.Type.CONTROLLER, getName(), "Enabled PID");
     }
 
     /** Disables the PID control. Sets output to zero. */
     public void disable() {
         controller.disable();
-        // useOutput(0, 0);
-        Log.info(getName(), "Disabled");
+        Log.debug(Log.Type.CONTROLLER, getName(), "Disabled PID");
     }
 
     /**

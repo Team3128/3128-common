@@ -26,6 +26,8 @@ public class TransitionMap<S extends Enum<S>> {
     @SuppressWarnings("unused")
     private final Class<S> enumType;
     private final S[] states;
+    private boolean isEmpty;
+    private int transitionCount;
 
     public TransitionMap(Class<S> enumType) {
         this.enumType = enumType;
@@ -33,6 +35,30 @@ public class TransitionMap<S extends Enum<S>> {
         
 
         adjacencyMap = new Object[states.length][states.length];
+        isEmpty = true;
+        transitionCount = 0;
+    }
+
+    /**
+     * @return Whether the transition map is empty
+     */
+    public boolean isEmpty() {
+        if(!isEmpty && transitionCount > 0) return false;
+        isEmpty = true;
+        transitionCount = 0;
+        for(Object[] row : adjacencyMap){
+            for(Object transition : row) {
+                if(transition != null) {
+                    isEmpty = false;
+                    transitionCount++;
+                }
+            }
+        }
+        return isEmpty;
+    }
+
+    public int getTransitionCount() {
+        return transitionCount;
     }
 
     /**
@@ -42,6 +68,7 @@ public class TransitionMap<S extends Enum<S>> {
      * @param transition The transition to add to the graph
      */
     public void addTransition(Transition<S> transition) {
+        transitionCount++;
         setTransition(transition);
     }
 
@@ -83,15 +110,34 @@ public class TransitionMap<S extends Enum<S>> {
         addConvergingTransition(state, () -> {});
     }
 
-    @SafeVarargs
-    public final void addConvergingTransitions(S... states) {
-        for (S state : states) {
-            addConvergingTransition(state);
+    @SuppressWarnings("unchecked")
+    /**
+     * Link multiple states to a single state using the same transition command
+     * @param command Transition command
+     * @param incomingState End state of all the transitions
+     * @param outGoingStates Starting states of the each of the transitions
+     */
+    public void addConvergingTransitions(Command command, S incomingState, S... outGoingStates) {
+        for (S outGoingState : outGoingStates) {
+            addTransition(outGoingState, incomingState, command);
         }
     }
 
     @SuppressWarnings("unchecked")
-    public void applyConvergingFunction(Function<S, Command> function, S... states) {
+    /**
+     * Link multiple states to a single state using the same transition command
+     * @param commandFunction Transition command that takes in each outgoing state
+     * @param incomingState End state of all the transitions
+     * @param outGoingStates Starting states of the each of the transitions
+     */
+    public void addConvergingFunctions(Function<S, Command> commandFunction, S incomingState, S... outGoingStates) {
+        for (S outGoingState : outGoingStates) {
+            addTransition(outGoingState, incomingState, commandFunction.apply(outGoingState));
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public void addConvergingFunctions(Function<S, Command> function, S... states) {
         for (S s1 : states) {
             Command result = function.apply(s1);
             if (result != null) {
@@ -100,8 +146,8 @@ public class TransitionMap<S extends Enum<S>> {
         }
     }
 
-    public void applyConvergingFunction(Function<S, Command> function) {
-        applyConvergingFunction(function, states);
+    public void addConvergingFunctions(Function<S, Command> function) {
+        addConvergingFunctions(function, states);
     }
 
     /**
@@ -140,18 +186,23 @@ public class TransitionMap<S extends Enum<S>> {
     }
 
     
-    @SuppressWarnings("unchecked")
-    public void applyDivergingFunction(Function<S, Command> function, S... states) {
-        for (S s1 : states) {
-            Command result = function.apply(s1);
-            if (result != null) {
-                addDivergingTransition(s1, result);
-            }
-        }
+    /**
+     * Adds a transition from the given states to every other state
+     * @param function function to apply to each incoming state
+     * @param state states to diverge from
+     */
+    public void applyDivergingFunction(Function<S, Command> function, S state) {
+        applyDivergingFunction(function, state, states);
     }
 
-    public void applyDivergingFunction(Function<S, Command> function) {
-        applyDivergingFunction(function, states);
+    @SuppressWarnings("unchecked")
+    public void applyDivergingFunction(Function<S, Command> function, S divergentState, S... divergeToStates) {
+        for(S divergeToState : divergeToStates) {
+            Command result = function.apply(divergentState);
+            if (result != null) {
+                addTransition(divergentState, divergeToState, result);
+            }
+        }
     }
 
     /**
@@ -213,6 +264,16 @@ public class TransitionMap<S extends Enum<S>> {
     }
 
     @SuppressWarnings("unchecked")
+    public void applyCommutativeFunction(Function<S, Command> function, S... states) {
+        for(S state1 : states) {
+            for(S state2 : states) {
+                addTransition(state1, state2, function.apply(state2));
+                addTransition(state2, state1, function.apply(state1));
+            }
+        }
+    }
+
+    @SuppressWarnings("unchecked")
     private Transition<S> getAsTransition(int x, int y) {
         return (Transition<S>) adjacencyMap[x][y];
     }
@@ -229,10 +290,13 @@ public class TransitionMap<S extends Enum<S>> {
      * @param transition The transition to set to the graph
      */
     public void setTransition(Transition<S> transition) {
+        if(transition != null && isEmpty) isEmpty = false;
+        if(transition.getOutgoingState().ordinal() == transition.getIncomingState().ordinal()) return;
         adjacencyMap[transition.getOutgoingState().ordinal()][transition.getIncomingState().ordinal()] = transition;
     }
 
     public void removeTransition(S start, S end) {
+        transitionCount--;
         adjacencyMap[start.ordinal()][end.ordinal()] = null;
     }
 
@@ -254,6 +318,7 @@ public class TransitionMap<S extends Enum<S>> {
                 removeTransition(s1, s2);
             }
         }
+        isEmpty = true;
     }
 
     /**
@@ -283,5 +348,15 @@ public class TransitionMap<S extends Enum<S>> {
             if (in != null) incoming.add(in);
         }
         return incoming;
+    }
+
+    @Override
+    public String toString() {
+        String out = "Adjacency Map " + enumType.getCanonicalName();
+        for(Object[] row : adjacencyMap) {
+            out = out + "\n";
+            out = out + Arrays.toString(row);
+        }
+        return out;
     }
 }

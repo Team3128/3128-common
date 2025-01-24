@@ -8,13 +8,11 @@ import com.revrobotics.spark.SparkMax;
 
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkLowLevel.PeriodicFrame;
-
+import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.REVLibError;
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.ClosedLoopSlot;
-import com.revrobotics.spark.SparkAbsoluteEncoder;
 import com.revrobotics.spark.SparkClosedLoopController;
-
-import com.revrobotics.spark.SparkRelativeEncoder;
 
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.config.SparkBaseConfig;
@@ -28,6 +26,7 @@ import com.revrobotics.spark.SparkBase.ResetMode;
 import common.core.controllers.PIDFFConfig;
 import common.utility.Log;
 import common.utility.narwhaldashboard.NarwhalDashboard.State;
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
 
@@ -105,8 +104,8 @@ public class NAR_CANSpark extends NAR_Motor {
 	
 	private double kP, kI, kD;
 	private EncoderType encoderType;
-	private SparkRelativeEncoder relativeEncoder;
-	private SparkAbsoluteEncoder absoluteEncoder;
+	private RelativeEncoder relativeEncoder;
+	private AbsoluteEncoder absoluteEncoder;
 	private final SparkClosedLoopController controller;
     private final SparkBase motor;
 	private final SparkBaseConfig config;
@@ -130,20 +129,19 @@ public class NAR_CANSpark extends NAR_Motor {
 		motor.setCANMaxRetries(0);
 		configSpark(()-> motor.clearFaults());
 		motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
-		configSpark(()-> motor.setCANTimeout(canSparkMaxTimeout));		//I have this here and I don't know why - Mason
+		configSpark(()-> motor.setCANTimeout(canSparkMaxTimeout));
 		enableVoltageCompensation(12.0);
 		setStatorLimit(motorType == MotorType.kBrushless ? NEO_STATOR_CurrentLimit : NEO_STATOR_550CurrentLimit);
 		setSupplyLimit(motorType == MotorType.kBrushless ? NEO_SUPPLY_CurrentLimit : NEO_SUPPLY_550CurrentLimit);
 
 		this.encoderType = encoderType;
 
+		relativeEncoder = motor.getEncoder();
 		if (encoderType == EncoderType.Relative) {
 			//No clue what this does, but Mechanical Advantage does this so it must be good
 			config.encoder.uvwAverageDepth(2);
 			config.encoder.uvwMeasurementPeriod(10);
-			// configSpark(()-> relativeEncoder.setMeasurementPeriod(10));
 		}
-		
 		else {
 			config.absoluteEncoder.averageDepth(2);
 			config.absoluteEncoder.velocityConversionFactor(60);
@@ -229,6 +227,12 @@ public class NAR_CANSpark extends NAR_Motor {
 		this.kP = config.kP;
 		this.kI = config.kI;
 		this.kD = config.kD;
+
+		this.config.closedLoop
+		.p(kP)
+		.i(kI)
+		.d(kD);
+		configure();
 	}
 
 	/**
@@ -401,6 +405,12 @@ public class NAR_CANSpark extends NAR_Motor {
 	@Override
 	public double getStallCurrent() {
 		return motor.getOutputCurrent();
+	}
+
+	@Override
+	public double getTorque() {
+		if(motor instanceof SparkFlex) return DCMotor.getNEO(1).withReduction(unitConversionFactor).getTorque(getStallCurrent());
+		return DCMotor.getNeoVortex(1).withReduction(unitConversionFactor).getTorque(getStallCurrent());
 	}
 	
 	@Override

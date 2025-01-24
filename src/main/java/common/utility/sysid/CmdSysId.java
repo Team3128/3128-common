@@ -6,6 +6,8 @@ import edu.wpi.first.wpilibj2.command.Subsystem;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import common.utility.Log;
+
 /**
  * Team 3128's command to identify feed forward constants.
  * @since 2024 Crescendo
@@ -133,13 +135,16 @@ public class CmdSysId extends Command {
         data.clear();
         setVoltage(0.0);
         timer.restart();
+        Log.info("SysId", "Test init");
     }
 
     @Override
     public void execute() {
+        Log.info("SysId", "timer: " + timer.get());
         if (timer.get() < startDelaySecs) return;
 
         double voltage = (timer.get() - startDelaySecs) * rampRateVoltsPerSec * (goingForward ? 1 : -1);
+        Log.info("SysId", "voltage: " + voltage);
 
         setVoltage(voltage);
         updateData(voltage);
@@ -164,6 +169,7 @@ public class CmdSysId extends Command {
      */
     private void setVoltage(double voltage) {
         voltageConsumer.accept(voltage);
+        Log.info("SYSID", "Voltage: " + voltage);
     }
 
     /**
