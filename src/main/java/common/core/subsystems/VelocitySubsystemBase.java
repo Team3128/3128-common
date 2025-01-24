@@ -63,24 +63,29 @@ public abstract class VelocitySubsystemBase extends NAR_PIDSubsystem implements 
      * Sets power to motor.
      * 
      * @param power Setpoint the pivot goes to.
-     * @return Command setting pivot setpoint.
      */
-    public Command run(double power) {
+    public void run(double power) {
+        apply(motor -> motor.set(power));
+    }
+    public Command runCommand(double power) {
         return applyCommand(motor -> motor.set(power));
     }
 
-
-    public Command runVolts(double volts) {
+    public void runVolts(double volts) {
+        apply(motor -> motor.setVolts(volts));
+    }
+    public Command runVoltsCommand(double volts) {
         return applyCommand(motor -> motor.setVolts(volts));
     }
 
     /**
      * Stops all motors in the subsystem.
-     * 
-     * @return Command stopping the subsystem motors.
      */
-    public Command stop(){
-        return run(0);
+    public void stop() {
+        run(0);
+    }
+    public Command stopCommand(){
+        return runCommand(0);
     }
 
     /**
@@ -105,10 +110,11 @@ public abstract class VelocitySubsystemBase extends NAR_PIDSubsystem implements 
 
     /**
      * Reset measurement position to controller position minimum.
-     * 
-     * @return Command that resets the pivot position.
      */
-    public Command reset() {
+    public void reset() {
+        apply(motor -> motor.resetPosition(controller.getInputRange()[0]));
+    }
+    public Command resetCommand() {
         return applyCommand(motor -> motor.resetPosition(controller.getInputRange()[0]));
     }
 
@@ -153,7 +159,7 @@ public abstract class VelocitySubsystemBase extends NAR_PIDSubsystem implements 
     public Command characterization(double startDelaySecs, double rampRateVoltsPerSec, double startPosition, double endPosition) {
         return new CmdSysId(
             getName(), 
-            volts -> apply(motor -> motor.setVolts(volts)), 
+            this::runVolts, 
             this::getVelocity, 
             this::getPosition, 
             startDelaySecs,
@@ -161,6 +167,6 @@ public abstract class VelocitySubsystemBase extends NAR_PIDSubsystem implements 
             controller.getInputRange()[1], 
             true, 
             this
-        ).beforeStarting(reset());
+        ).beforeStarting(resetCommand());
     }
 }

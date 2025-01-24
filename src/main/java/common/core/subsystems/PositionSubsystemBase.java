@@ -66,30 +66,55 @@ public abstract class PositionSubsystemBase extends NAR_PIDSubsystem implements 
     /**
      * Sets power to motors.
      * 
-     * @param power The power to command to the motors.
+     * @param power The power to set the motors to.
+     */
+    public void run(double power) {
+        apply(motor -> motor.set(power));
+    }
+
+    /**
+     * Command setting power to motors.
+     * 
+     * @param power The power to set the motors to.
      * @return Command setting the power to the motors.
      */
-    public Command run(double power) {
+    public Command runCommand(double power) {
         return applyCommand(motor -> motor.set(power));
     }
 
     /**
      * Sets voltage to motors.
      * 
-     * @param volts The voltage to command to the motors.
+     * @param volts The voltage to set the motors to.
+     */
+    public void runVolts(double volts) {
+        apply(motor -> motor.setVolts(volts));
+    }
+
+    /**
+     * Command setting voltage to motors.
+     * 
+     * @param volts The voltage to set the motors to.
      * @return Command setting the voltage to the motors.
      */
-    public Command runVolts(double volts) {
+    public Command runVoltsCommand(double volts) {
         return applyCommand(motor -> motor.setVolts(volts));
     }
 
     /**
-     * Stops all motors in the subsystem.
-     * 
-     * @return Command stopping the subsystem motors.
+     * Stops all motors.
      */
-    public Command stop(){
-        return run(0);
+    public void stop() {
+        run(0);
+    }
+
+    /**
+     * Command stopping all motors.
+     * 
+     * @return Command stopping all the motors.
+     */
+    public Command stopCommand(){
+        return runCommand(0);
     }
 
     /**
@@ -99,8 +124,7 @@ public abstract class PositionSubsystemBase extends NAR_PIDSubsystem implements 
      * @return Command setting pivot setpoint.
      */
     public Command pidTo(double setpoint) {
-        return runOnce(()-> startPID(setpoint))
-        ;
+        return runOnce(()-> startPID(setpoint));
     }
 
     /**
@@ -114,21 +138,36 @@ public abstract class PositionSubsystemBase extends NAR_PIDSubsystem implements 
     }
 
     /**
-     * Reset measurement position to controller position minimum.
-     * 
-     * @return Command resetting the position to the controller input minimum.
+     * Resets measurement position to controller position minimum.
      */
-    public Command reset() {
-        return reset(controller.getInputRange()[0]);
+    public void reset() {
+        reset(controller.getInputRange()[0]);
+    }
+    
+    /**
+     * Command resetting position to controller position minimum.
+     * 
+     * @return Command resetting the position to the controller position minimum.
+     */
+    public Command resetCommand() {
+        return resetCommand(controller.getInputRange()[0]);
     }
 
     /**
      * Reset measurement position.
      * 
      * @param position Position to reset to.
+     */
+    public void reset(double position) {
+        apply(motor -> motor.resetPosition(position));
+    }
+
+    /**
+     * Command resetting position.
+     * @param position Position to reset to.
      * @return Command resetting the position.
      */
-    public Command reset(double position) {
+    public Command resetCommand(double position) {
         return applyCommand(motor -> motor.resetPosition(position));
     }
 
@@ -176,11 +215,11 @@ public abstract class PositionSubsystemBase extends NAR_PIDSubsystem implements 
      */
     public Command homing(double power, double delay, double currentLimit){
         return sequence(
-            run(power),
+            runCommand(power),
             waitSeconds(delay),
             waitUntil(()-> (getCurrent() > currentLimit)),
-            reset(),
-            stop()
+            resetCommand(),
+            stopCommand()
         ).beforeStarting(()-> disable());
     }
 
@@ -191,7 +230,7 @@ public abstract class PositionSubsystemBase extends NAR_PIDSubsystem implements 
     public Command characterization(double startDelaySecs, double rampRateVoltsPerSec, double startPosition, double endPosition) {
         return new CmdSysId(
             getName(), 
-            volts -> apply(motor -> motor.setVolts(volts)), 
+            this::runVolts, 
             this::getVelocity, 
             this::getPosition, 
             startDelaySecs,
@@ -199,6 +238,6 @@ public abstract class PositionSubsystemBase extends NAR_PIDSubsystem implements 
             endPosition, 
             true, 
             this
-        ).beforeStarting(reset(startPosition));
+        ).beforeStarting(resetCommand(startPosition));
     }
 }

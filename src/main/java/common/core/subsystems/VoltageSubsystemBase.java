@@ -2,6 +2,7 @@ package common.core.subsystems;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Consumer;
 
 import common.hardware.motorcontroller.NAR_Motor;
 import common.hardware.motorcontroller.NAR_Motor.Neutral;
@@ -44,28 +45,41 @@ public abstract class VoltageSubsystemBase extends SubsystemBase implements NAR_
         return Math.abs(getCurrent()) > currentThreshold;
     }
     
+    protected void apply(Consumer<NAR_Motor> action) {
+        motors.forEach(action);
+    }
+
+    protected Command applyCommand(Consumer<NAR_Motor> action) {
+        return runOnce(()-> apply(action));
+    }
     /**
      * Sets power to motor.
      * 
      * @param power Setpoint the pivot goes to.
-     * @return Command setting pivot setpoint.
      */
-    public Command run(double power) {
-        return runOnce(()-> motors.forEach(motor -> motor.set(power)));
+    public void run(double power) {
+        apply(motor -> motor.set(power));
+    }
+    public Command runCommand(double power) {
+        return applyCommand(motor -> motor.set(power));
     }
 
 
-    public Command runVolts(double volts) {
-        return runOnce(()-> motors.forEach(motor -> motor.setVolts(volts)));
+    public void runVolts(double volts) {
+        apply(motor -> motor.setVolts(volts));
+    }
+    public Command runVoltsCommand(double volts) {
+        return applyCommand(motor -> motor.setVolts(volts));
     }
 
     /**
      * Stops all motors in the subsystem.
-     * 
-     * @return Command stopping the subsystem motors.
      */
-    public Command stop(){
-        return run(0);
+    public void stop() {
+        run(0);
+    }
+    public Command stopCommand() {
+        return runCommand(0);
     }
 
     /**
