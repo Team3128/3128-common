@@ -107,4 +107,11 @@ public abstract class VoltageSubsystemBase extends SubsystemBase implements NAR_
     public void reset() {
         apply(motor -> motor.resetPosition(0));
     }
+
+    /**
+     * Resets the position of the motor.
+     */
+    public Command resetCommand() {
+        return applyCommand(motor -> motor.resetPosition(0));
+    }
 }

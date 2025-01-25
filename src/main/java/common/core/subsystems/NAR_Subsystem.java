@@ -20,7 +20,5 @@ public interface NAR_Subsystem extends Subsystem{
 
     public void initShuffleboard();
 
-    public double getCurrent();
-
     public void setNeutralMode(Neutral mode);
 }

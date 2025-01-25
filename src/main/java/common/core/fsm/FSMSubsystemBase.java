@@ -11,7 +11,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public abstract class FSMSubsystemBase<S extends Enum<S>> extends SubsystemBase {
+public abstract class FSMSubsystemBase<S extends Enum<S>> extends SubsystemBase implements NAR_Subsystem{
     
     protected Transition<S> currentTransition;
     protected S currentState;
@@ -26,7 +26,7 @@ public abstract class FSMSubsystemBase<S extends Enum<S>> extends SubsystemBase 
     public FSMSubsystemBase(Class<S> enumType, TransitionMap<S> transitionMap) {
         this.enumType = enumType;
         this.transitionMap = transitionMap;
-        initStateTracker();
+        initShuffleboard();
         try{
             registerTransitions();
         } catch(Exception e) {
@@ -41,7 +41,8 @@ public abstract class FSMSubsystemBase<S extends Enum<S>> extends SubsystemBase 
         this.currentState = initalState;
     }
 
-    public void initStateTracker() {
+    @Override
+    public void initShuffleboard() {
         NAR_Shuffleboard.addData(this.getName(), "Transition Count", ()-> transitionMap.getTransitionCount(), 0, 0);
         NAR_Shuffleboard.addData(this.getName(), "Previous State", ()-> {if(getPreviousState() != null) return getPreviousState().name(); else return "Null";}, 1, 0);
         NAR_Shuffleboard.addData(this.getName(), "Current State", ()-> {if(getState() != null) return getState().name(); else return "Null";}, 2, 0);
@@ -151,11 +152,17 @@ public abstract class FSMSubsystemBase<S extends Enum<S>> extends SubsystemBase 
         }
     }
 
+    @Override
     public void reset() {
         stop();
         for(NAR_Subsystem subsystem : subsystems) {
             subsystem.reset();
         }
+    }
+
+    @Override
+    public Command resetCommand() {
+        return runOnce(()-> reset()).beforeStarting(()-> Log.debug(Log.Type.STATE_MACHINE_SECONDARY, getName(), "Commanded to reset"));
     }
 
     public List<NAR_Subsystem> getSubsystems() {
@@ -171,27 +178,40 @@ public abstract class FSMSubsystemBase<S extends Enum<S>> extends SubsystemBase 
         return null;
     }
 
+    @Override
     public void setNeutralMode(Neutral mode) {
         Log.debug(getName(), "Neutral Mode set to " + mode.name());
         getSubsystems().forEach(subsystem -> subsystem.setNeutralMode(mode));
     }
 
-    public Command run(double power) {
-        return runOnce(()-> {
-            subsystems.forEach((subsystem)-> subsystem.run(power));
-        }).beforeStarting(runOnce(()-> Log.debug(Log.Type.STATE_MACHINE_PRIMARY, getName(), "Set to run at " + power + " power")));
+    @Override
+    public void run(double power) {
+        subsystems.forEach(subsystem-> subsystem.run(power));
     }
 
-    public Command runVolts(double volts) {
-        return runOnce(()-> {
-            subsystems.forEach((subsystem)-> subsystem.runVolts(volts));
-        }).beforeStarting(runOnce(()-> Log.debug(Log.Type.STATE_MACHINE_PRIMARY, getName(), "Set to run at " + volts + " volts")));
+    @Override
+    public Command runCommand(double power) {
+        return runOnce(()-> run(power)).beforeStarting(()-> Log.debug(Log.Type.STATE_MACHINE_SECONDARY, getName(), "Set to run at " + power + " power"));
     }
 
-    public Command stop() {
+    @Override
+    public void runVolts(double volts) {
+        subsystems.forEach((subsystem)-> subsystem.runVolts(volts));
+    }
+
+    @Override
+    public Command runVoltsCommand(double volts) {
+        return runOnce(()-> runVolts(volts)).beforeStarting(()-> Log.debug(Log.Type.STATE_MACHINE_SECONDARY, getName(), "Set to run at " + volts + " volts"));
+    }
+
+    @Override
+    public void stop() {
         if(currentTransition != null) currentTransition.cancel();
-        return runOnce(()-> {
-            subsystems.forEach((subsystem)-> subsystem.stop());
-        });
+        subsystems.forEach((subsystem)-> subsystem.stop());
+    }
+
+    @Override
+    public Command stopCommand() {
+        return runOnce(()-> stop()).beforeStarting(()-> Log.debug(Log.Type.STATE_MACHINE_SECONDARY, getName(), "Commanded to Stop"));
     }
 }
