@@ -2,16 +2,19 @@ package common.core.fsm;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Consumer;
 
 import common.core.subsystems.NAR_Subsystem;
 import common.hardware.motorcontroller.NAR_Motor.Neutral;
 import common.utility.Log;
 import common.utility.shuffleboard.NAR_Shuffleboard;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public abstract class FSMSubsystemBase<S extends Enum<S>> extends SubsystemBase implements NAR_Subsystem{
+public abstract class FSMSubsystemBase<S extends Enum<S>> extends SubsystemBase implements NAR_Subsystem, Sendable{
     
     protected Transition<S> currentTransition;
     protected S currentState;
@@ -21,7 +24,7 @@ public abstract class FSMSubsystemBase<S extends Enum<S>> extends SubsystemBase 
     private final TransitionMap<S> transitionMap;
     private final Class<S> enumType;
 
-    protected List<NAR_Subsystem> subsystems = new LinkedList<NAR_Subsystem>();
+    protected List<NAR_Subsystem> mechanisms = new LinkedList<NAR_Subsystem>();
 
     public FSMSubsystemBase(Class<S> enumType, TransitionMap<S> transitionMap) {
         this.enumType = enumType;
@@ -146,16 +149,21 @@ public abstract class FSMSubsystemBase<S extends Enum<S>> extends SubsystemBase 
 
     public abstract void registerTransitions();
 
-    public void addSubsystem(NAR_Subsystem... subsystems) {
-        this.subsystems = List.of(subsystems);
-        // for(NAR_Subsystem sub : subsystem) {
-        //     subsystems.add(sub);
-        // }
+    public void addMechanisms(NAR_Subsystem... mechanisms) {
+        this.mechanisms = List.of(mechanisms);
+    }
+
+    public void apply(Consumer<NAR_Subsystem> action) {
+        mechanisms.forEach(action);
+    }
+
+    public Command applyCommand(Consumer<NAR_Subsystem> action) {
+        return runOnce(()-> apply(action));
     }
 
     public void reset() {
         stop();
-        for(NAR_Subsystem subsystem : subsystems) {
+        for(NAR_Subsystem subsystem : mechanisms) {
             subsystem.reset();
         }
     }
@@ -164,12 +172,12 @@ public abstract class FSMSubsystemBase<S extends Enum<S>> extends SubsystemBase 
         return runOnce(()-> reset()).beforeStarting(()-> Log.debug(Log.Type.STATE_MACHINE_SECONDARY, getName(), "Commanded to reset"));
     }
 
-    public List<NAR_Subsystem> getSubsystems() {
-        return subsystems;
+    public List<NAR_Subsystem> getMechanisms() {
+        return mechanisms;
     }
 
-    public NAR_Subsystem getSubsystem(String name) {
-        for(NAR_Subsystem subsystem : subsystems) {
+    public NAR_Subsystem getMechanism(String name) {
+        for(NAR_Subsystem subsystem : mechanisms) {
             if(subsystem.getName().equals(name)) {
                 return subsystem;
             }
@@ -179,11 +187,11 @@ public abstract class FSMSubsystemBase<S extends Enum<S>> extends SubsystemBase 
 
     public void setNeutralMode(Neutral mode) {
         Log.debug(getName(), "Neutral Mode set to " + mode.name());
-        getSubsystems().forEach(subsystem -> subsystem.setNeutralMode(mode));
+        getMechanisms().forEach(subsystem -> subsystem.setNeutralMode(mode));
     }
 
     public void run(double power) {
-        subsystems.forEach(subsystem-> subsystem.run(power));
+        mechanisms.forEach(subsystem-> subsystem.run(power));
     }
 
     public Command runCommand(double power) {
@@ -191,7 +199,7 @@ public abstract class FSMSubsystemBase<S extends Enum<S>> extends SubsystemBase 
     }
 
     public void runVolts(double volts) {
-        subsystems.forEach((subsystem)-> subsystem.runVolts(volts));
+        mechanisms.forEach((subsystem)-> subsystem.runVolts(volts));
     }
 
     public Command runVoltsCommand(double volts) {
@@ -200,7 +208,7 @@ public abstract class FSMSubsystemBase<S extends Enum<S>> extends SubsystemBase 
 
     public void stop() {
         if(currentTransition != null) currentTransition.cancel();
-        subsystems.forEach((subsystem)-> subsystem.stop());
+        mechanisms.forEach((subsystem)-> subsystem.stop());
     }
 
     public Command stopCommand() {

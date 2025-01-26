@@ -6,10 +6,11 @@ import java.util.function.DoubleSupplier;
 import common.core.controllers.ControllerBase;
 import common.hardware.motorcontroller.NAR_Motor;
 import common.hardware.motorcontroller.NAR_Motor.Neutral;
+import common.utility.shuffleboard.NAR_Shuffleboard;
 import common.utility.sysid.CmdSysId;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj2.command.Command;
-
 import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 import static edu.wpi.first.wpilibj2.command.Commands.*;
 
@@ -24,6 +25,7 @@ public abstract class PositionSubsystemBase extends NAR_PIDSubsystem implements 
 
     protected final List<NAR_Motor> motors;
     protected final SimpleMotorFeedforward ff;
+    protected DoubleSupplier debugVoltage;
 
     /**
      * Creates an PositionSubsystemBase object.
@@ -239,5 +241,17 @@ public abstract class PositionSubsystemBase extends NAR_PIDSubsystem implements 
             true, 
             this
         ).beforeStarting(resetCommand(startPosition));
+    }
+
+    @Override
+    public void initShuffleboard() {
+    super.initShuffleboard();
+    NAR_Shuffleboard.addData(getName(), "Voltage", ()-> motors.get(0).getAppliedOutput() * 12, 6, 1);
+        NAR_Shuffleboard.addData(getName(), "Current", ()-> motors.get(0).getStallCurrent(), 3, 3);
+        NAR_Shuffleboard.addSendable(getName(), "Reset", either(resetCommand(), print("DEBUG NOT ON"), debug), 4, 0, 2, 1).withWidget(BuiltInWidgets.kCommand);
+        NAR_Shuffleboard.addSendable(getName(), "Enable", either(startEnd(()-> pidTo(setpoint), ()-> disable()), print("DEBUG NOT ON"), debug), 4, 1, 2, 1).withWidget(BuiltInWidgets.kCommand);
+        debugVoltage = NAR_Shuffleboard.debug(getName(), "Debug Volts", 0, 7, 1);
+        NAR_Shuffleboard.addSendable(getName(), "Run Volts", either(startEnd(()-> runVolts(debugVoltage.getAsDouble()), ()-> stop()), print("DEBUG NOT ON"), debug), 6, 0, 2, 1).withWidget(BuiltInWidgets.kCommand);
+        
     }
 }

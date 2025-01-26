@@ -332,7 +332,7 @@ public class NAR_Shuffleboard {
     }
 
     /**
-     * Creates a debug widget, allows user to edit variable from Shuffleboard
+     * Creates a debug text view widget, allows user to edit variable from Shuffleboard
      * 
      * @param tabName the title of the tab to select
      * @param name the name of the widget
@@ -344,6 +344,36 @@ public class NAR_Shuffleboard {
     public static DoubleSupplier debug(String tabName, String name, double Default, int x, int y) {
         final GenericEntry tab = addData(tabName, name, Default, x, y).withWidget(BuiltInWidgets.kTextView).getEntry();
         return ()-> tab.getDouble(Default);
+    }
+
+    /**
+     * Creates a debug switch widget, allows user to edit variable from Shuffleboard
+     * 
+     * @param tabName the title of the tab to select
+     * @param name the name of the widget
+     * @param Default starting value for the widget
+     * @param x x-coord of the widget
+     * @param y y-coord of the widget
+     * @return BooleanSupplier containing the value in the widget
+     */
+    public static BooleanSupplier debugSwitch(String tabName, String name, boolean Default, int x, int y) {
+        final GenericEntry tab = addData(tabName, name, Default, x, y).withWidget(BuiltInWidgets.kToggleSwitch).getEntry();
+        return ()-> tab.getBoolean(Default);
+    }
+
+    /**
+     * Creates a debug button widget, allows user to edit variable from Shuffleboard
+     * 
+     * @param tabName the title of the tab to select
+     * @param name the name of the widget
+     * @param Default starting value for the widget
+     * @param x x-coord of the widget
+     * @param y y-coord of the widget
+     * @return BooleanSupplier containing the value in the widget
+     */
+    public static BooleanSupplier debugButton(String tabName, String name, boolean Default, int x, int y) {
+        final GenericEntry tab = addData(tabName, name, Default, x, y).withWidget(BuiltInWidgets.kToggleButton).getEntry();
+        return ()-> tab.getBoolean(Default);
     }
 
     /**

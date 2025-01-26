@@ -148,8 +148,8 @@ public abstract class NAR_PIDSubsystem extends SubsystemBase {
             final double measurement = controller.getMeasurement();
             final double velocity = (measurement - prevMeasurement) / updateTimer.get();
             final double acceleration = (velocity - prevVelocity) / updateTimer.get();
-            NAR_Shuffleboard.addData(getName(), "1stDerivative", velocity, 1, 2);
-            NAR_Shuffleboard.addData(getName(), "2ndDerivative", acceleration, 1, 3);
+            NAR_Shuffleboard.addData(getName(), "1stDerivative", velocity, 3, 1);
+            NAR_Shuffleboard.addData(getName(), "2ndDerivative", acceleration, 3, 2);
             prevMeasurement = measurement;
             prevVelocity = velocity;
             updateTimer.restart();
@@ -160,23 +160,24 @@ public abstract class NAR_PIDSubsystem extends SubsystemBase {
      */
     public void initShuffleboard() {
         shouldLog = true;
-        NAR_Shuffleboard.addSendable(getName(), "PID_Controller", controller, 0, 0);
-        NAR_Shuffleboard.addData(getName(), "Setpoint", ()-> getSetpoint(), 0, 2);
-        NAR_Shuffleboard.addData(getName(), "AtSetpoint", ()-> atSetpoint(), 0, 3);
+        NAR_Shuffleboard.addData(getName(), "Enabled", this::isEnabled, 0, 0);
+        NAR_Shuffleboard.addData(getName(), "AtSetpoint", this::atSetpoint, 1, 0);
+        NAR_Shuffleboard.addData(getName(), "Measurement", controller::getMeasurement, 0, 1);
+        NAR_Shuffleboard.addData(getName(), "Setpoint", this::getSetpoint, 1, 1);
 
-        NAR_Shuffleboard.addData(getName(), "Enabled", ()-> isEnabled(), 1, 0);
-        NAR_Shuffleboard.addData(getName(), "Measurement", ()-> controller.getMeasurement(), 1, 1);
+        debug = NAR_Shuffleboard.debugSwitch(getName(), "DEBUG", false, 2, 0);
+        setpoint = NAR_Shuffleboard.debug(getName(), "Debug_Setpoint", 0, 2,1);
+        NAR_Shuffleboard.addData(getName(), "UseOutput", controller::useOutput, 3, 0);
 
-        NAR_Shuffleboard.addData(getName(), "TOGGLE", false, 2, 0).withWidget(BuiltInWidgets.kToggleButton);
-        debug = NAR_Shuffleboard.getBoolean(getName(), "TOGGLE");
-        NAR_Shuffleboard.addData(getName(), "DEBUG", () -> debug.getAsBoolean(), 2, 1);
-        setpoint = NAR_Shuffleboard.debug(getName(), "Debug_Setpoint", 0, 2,2);
-        NAR_Shuffleboard.addData(getName(), "Output", ()-> controller.useOutput(), 2, 3);
+        NAR_Shuffleboard.addSendable(getName(), "PID_Controller", controller, 0, 2).withSize(1, 2);
 
-        controller.getConfig().setkS(NAR_Shuffleboard.debug(getName(), "kS", controller.getConfig().getkS(), 3, 0));
-        controller.getConfig().setkV(NAR_Shuffleboard.debug(getName(), "kV", controller.getConfig().getkV(), 3, 1));
-        controller.getConfig().setkA(NAR_Shuffleboard.debug(getName(), "kA", controller.getConfig().getkA(), 3, 2));
-        controller.getConfig().setkG(NAR_Shuffleboard.debug(getName(), "kG", controller.getConfig().getkG(), 3, 3));
+        controller.getConfig().setkS(NAR_Shuffleboard.debug(getName(), "kS", controller.getConfig().getkS(), 1, 2));
+        controller.getConfig().setkV(NAR_Shuffleboard.debug(getName(), "kV", controller.getConfig().getkV(), 2, 2));
+        controller.getConfig().setkA(NAR_Shuffleboard.debug(getName(), "kA", controller.getConfig().getkA(), 2, 3));
+        controller.getConfig().setkG(NAR_Shuffleboard.debug(getName(), "kG", controller.getConfig().getkG(), 1, 3));
+
+        NAR_Shuffleboard.addData(getName(), "Measurement Graph", controller::getMeasurement, 4, 2, 2, 2).withWidget(BuiltInWidgets.kGraph);
+        NAR_Shuffleboard.addData(getName(), "Setpoint Graph", controller::getSetpoint, 6, 2, 2, 2).withWidget(BuiltInWidgets.kGraph);
     }
 
     /**

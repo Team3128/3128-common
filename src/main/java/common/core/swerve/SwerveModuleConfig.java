@@ -35,13 +35,15 @@ public class SwerveModuleConfig {
         }
     }
 
+    public final String moduleName;
     public final int moduleNumber;
     public final SwerveMotorConfig driveConfig;
     public final SwerveMotorConfig angleConfig;
     public final SwerveEncoderConfig encoderConfig;
     public final double maxSpeed;
 
-    public SwerveModuleConfig(int moduleNumber, SwerveMotorConfig driveConfig, SwerveMotorConfig angleConfig, SwerveEncoderConfig encoderConfig, double maxSpeed){
+    public SwerveModuleConfig(String moduleName, int moduleNumber, SwerveMotorConfig driveConfig, SwerveMotorConfig angleConfig, SwerveEncoderConfig encoderConfig, double maxSpeed){
+        this.moduleName = moduleName;
         this.moduleNumber = moduleNumber;
         this.driveConfig = driveConfig;
         this.angleConfig = angleConfig;
