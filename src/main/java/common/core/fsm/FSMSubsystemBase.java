@@ -21,7 +21,7 @@ public abstract class FSMSubsystemBase<S extends Enum<S>> extends SubsystemBase 
     private final TransitionMap<S> transitionMap;
     private final Class<S> enumType;
 
-    protected static List<NAR_Subsystem> subsystems = new LinkedList<NAR_Subsystem>();
+    protected List<NAR_Subsystem> subsystems = new LinkedList<NAR_Subsystem>();
 
     public FSMSubsystemBase(Class<S> enumType, TransitionMap<S> transitionMap) {
         this.enumType = enumType;
@@ -31,7 +31,7 @@ public abstract class FSMSubsystemBase<S extends Enum<S>> extends SubsystemBase 
             registerTransitions();
         } catch(Exception e) {
             Log.divider(10);
-            Log.recoverable(getName(), "Failed to load TransitionMap in constructor");
+            Log.unusual(getName(), "Failed to load TransitionMap in constructor");
             Log.divider(10);
         }
     }
@@ -146,13 +146,13 @@ public abstract class FSMSubsystemBase<S extends Enum<S>> extends SubsystemBase 
 
     public abstract void registerTransitions();
 
-    public void addSubsystem(NAR_Subsystem... subsystem) {
-        for(NAR_Subsystem sub : subsystem) {
-            subsystems.add(sub);
-        }
+    public void addSubsystem(NAR_Subsystem... subsystems) {
+        this.subsystems = List.of(subsystems);
+        // for(NAR_Subsystem sub : subsystem) {
+        //     subsystems.add(sub);
+        // }
     }
 
-    @Override
     public void reset() {
         stop();
         for(NAR_Subsystem subsystem : subsystems) {
@@ -160,7 +160,6 @@ public abstract class FSMSubsystemBase<S extends Enum<S>> extends SubsystemBase 
         }
     }
 
-    @Override
     public Command resetCommand() {
         return runOnce(()-> reset()).beforeStarting(()-> Log.debug(Log.Type.STATE_MACHINE_SECONDARY, getName(), "Commanded to reset"));
     }
@@ -178,39 +177,32 @@ public abstract class FSMSubsystemBase<S extends Enum<S>> extends SubsystemBase 
         return null;
     }
 
-    @Override
     public void setNeutralMode(Neutral mode) {
         Log.debug(getName(), "Neutral Mode set to " + mode.name());
         getSubsystems().forEach(subsystem -> subsystem.setNeutralMode(mode));
     }
 
-    @Override
     public void run(double power) {
         subsystems.forEach(subsystem-> subsystem.run(power));
     }
 
-    @Override
     public Command runCommand(double power) {
         return runOnce(()-> run(power)).beforeStarting(()-> Log.debug(Log.Type.STATE_MACHINE_SECONDARY, getName(), "Set to run at " + power + " power"));
     }
 
-    @Override
     public void runVolts(double volts) {
         subsystems.forEach((subsystem)-> subsystem.runVolts(volts));
     }
 
-    @Override
     public Command runVoltsCommand(double volts) {
         return runOnce(()-> runVolts(volts)).beforeStarting(()-> Log.debug(Log.Type.STATE_MACHINE_SECONDARY, getName(), "Set to run at " + volts + " volts"));
     }
 
-    @Override
     public void stop() {
         if(currentTransition != null) currentTransition.cancel();
         subsystems.forEach((subsystem)-> subsystem.stop());
     }
 
-    @Override
     public Command stopCommand() {
         return runOnce(()-> stop()).beforeStarting(()-> Log.debug(Log.Type.STATE_MACHINE_SECONDARY, getName(), "Commanded to Stop"));
     }

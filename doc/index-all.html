@@ -861,8 +861,6 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Returns the Controller object controlling the subsystem</div>
 </dd>
-<dt><a href="common/core/subsystems/NAR_Subsystem.html#getCurrent()" class="member-name-link">getCurrent()</a> - Method in interface common.core.subsystems.<a href="common/core/subsystems/NAR_Subsystem.html" title="interface in common.core.subsystems">NAR_Subsystem</a></dt>
-<dd>&nbsp;</dd>
 <dt><a href="common/core/subsystems/PositionSubsystemBase.html#getCurrent()" class="member-name-link">getCurrent()</a> - Method in class common.core.subsystems.<a href="common/core/subsystems/PositionSubsystemBase.html" title="class in common.core.subsystems">PositionSubsystemBase</a></dt>
 <dd>
 <div class="block">Returns current of the first motor.</div>
@@ -1335,6 +1333,8 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="common/core/controllers/TrapController.html#initSendable(edu.wpi.first.util.sendable.SendableBuilder)" class="member-name-link">initSendable(SendableBuilder)</a> - Method in class common.core.controllers.<a href="common/core/controllers/TrapController.html" title="class in common.core.controllers">TrapController</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="common/core/fsm/FSMSubsystemBase.html#initShuffleboard()" class="member-name-link">initShuffleboard()</a> - Method in class common.core.fsm.<a href="common/core/fsm/FSMSubsystemBase.html" title="class in common.core.fsm">FSMSubsystemBase</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="common/core/subsystems/NAR_PIDSubsystem.html#initShuffleboard()" class="member-name-link">initShuffleboard()</a> - Method in class common.core.subsystems.<a href="common/core/subsystems/NAR_PIDSubsystem.html" title="class in common.core.subsystems">NAR_PIDSubsystem</a></dt>
 <dd>
 <div class="block">Initializes shuffleboard with debug elements for PID + FF values.</div>
@@ -1348,8 +1348,6 @@ loadScripts(document, 'script');</script>
 <dt><a href="common/hardware/input/NAR_XboxController.html#initShuffleboard()" class="member-name-link">initShuffleboard()</a> - Method in class common.hardware.input.<a href="common/hardware/input/NAR_XboxController.html" title="class in common.hardware.input">NAR_XboxController</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="common/core/swerve/SwerveBase.html#initStateCheck()" class="member-name-link">initStateCheck()</a> - Method in class common.core.swerve.<a href="common/core/swerve/SwerveBase.html" title="class in common.core.swerve">SwerveBase</a></dt>
-<dd>&nbsp;</dd>
-<dt><a href="common/core/fsm/FSMSubsystemBase.html#initStateTracker()" class="member-name-link">initStateTracker()</a> - Method in class common.core.fsm.<a href="common/core/fsm/FSMSubsystemBase.html" title="class in common.core.fsm">FSMSubsystemBase</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="common/core/controllers/ControllerBase.html#inputMax" class="member-name-link">inputMax</a> - Variable in class common.core.controllers.<a href="common/core/controllers/ControllerBase.html" title="class in common.core.controllers">ControllerBase</a></dt>
 <dd>&nbsp;</dd>
@@ -1963,6 +1961,8 @@ loadScripts(document, 'script');</script>
 </dd>
 <dt><a href="common/core/swerve/SwerveBase.html#resetAll()" class="member-name-link">resetAll()</a> - Method in class common.core.swerve.<a href="common/core/swerve/SwerveBase.html" title="class in common.core.swerve">SwerveBase</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="common/core/fsm/FSMSubsystemBase.html#resetCommand()" class="member-name-link">resetCommand()</a> - Method in class common.core.fsm.<a href="common/core/fsm/FSMSubsystemBase.html" title="class in common.core.fsm">FSMSubsystemBase</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="common/core/subsystems/NAR_Subsystem.html#resetCommand()" class="member-name-link">resetCommand()</a> - Method in interface common.core.subsystems.<a href="common/core/subsystems/NAR_Subsystem.html" title="interface in common.core.subsystems">NAR_Subsystem</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="common/core/subsystems/PositionSubsystemBase.html#resetCommand()" class="member-name-link">resetCommand()</a> - Method in class common.core.subsystems.<a href="common/core/subsystems/PositionSubsystemBase.html" title="class in common.core.subsystems">PositionSubsystemBase</a></dt>
@@ -1971,6 +1971,10 @@ loadScripts(document, 'script');</script>
 </dd>
 <dt><a href="common/core/subsystems/VelocitySubsystemBase.html#resetCommand()" class="member-name-link">resetCommand()</a> - Method in class common.core.subsystems.<a href="common/core/subsystems/VelocitySubsystemBase.html" title="class in common.core.subsystems">VelocitySubsystemBase</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="common/core/subsystems/VoltageSubsystemBase.html#resetCommand()" class="member-name-link">resetCommand()</a> - Method in class common.core.subsystems.<a href="common/core/subsystems/VoltageSubsystemBase.html" title="class in common.core.subsystems">VoltageSubsystemBase</a></dt>
+<dd>
+<div class="block">Resets the position of the motor.</div>
+</dd>
 <dt><a href="common/core/subsystems/PositionSubsystemBase.html#resetCommand(double)" class="member-name-link">resetCommand(double)</a> - Method in class common.core.subsystems.<a href="common/core/subsystems/PositionSubsystemBase.html" title="class in common.core.subsystems">PositionSubsystemBase</a></dt>
 <dd>
 <div class="block">Command resetting position.</div>
@@ -2027,6 +2031,8 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Sets power to motor.</div>
 </dd>
+<dt><a href="common/core/fsm/FSMSubsystemBase.html#runCommand(double)" class="member-name-link">runCommand(double)</a> - Method in class common.core.fsm.<a href="common/core/fsm/FSMSubsystemBase.html" title="class in common.core.fsm">FSMSubsystemBase</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="common/core/subsystems/NAR_Subsystem.html#runCommand(double)" class="member-name-link">runCommand(double)</a> - Method in interface common.core.subsystems.<a href="common/core/subsystems/NAR_Subsystem.html" title="interface in common.core.subsystems">NAR_Subsystem</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="common/core/subsystems/PositionSubsystemBase.html#runCommand(double)" class="member-name-link">runCommand(double)</a> - Method in class common.core.subsystems.<a href="common/core/subsystems/PositionSubsystemBase.html" title="class in common.core.subsystems">PositionSubsystemBase</a></dt>
@@ -2056,6 +2062,8 @@ loadScripts(document, 'script');</script>
 <dt><a href="common/core/subsystems/VelocitySubsystemBase.html#runVolts(double)" class="member-name-link">runVolts(double)</a> - Method in class common.core.subsystems.<a href="common/core/subsystems/VelocitySubsystemBase.html" title="class in common.core.subsystems">VelocitySubsystemBase</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="common/core/subsystems/VoltageSubsystemBase.html#runVolts(double)" class="member-name-link">runVolts(double)</a> - Method in class common.core.subsystems.<a href="common/core/subsystems/VoltageSubsystemBase.html" title="class in common.core.subsystems">VoltageSubsystemBase</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="common/core/fsm/FSMSubsystemBase.html#runVoltsCommand(double)" class="member-name-link">runVoltsCommand(double)</a> - Method in class common.core.fsm.<a href="common/core/fsm/FSMSubsystemBase.html" title="class in common.core.fsm">FSMSubsystemBase</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="common/core/subsystems/NAR_Subsystem.html#runVoltsCommand(double)" class="member-name-link">runVoltsCommand(double)</a> - Method in interface common.core.subsystems.<a href="common/core/subsystems/NAR_Subsystem.html" title="interface in common.core.subsystems">NAR_Subsystem</a></dt>
 <dd>&nbsp;</dd>
@@ -2503,6 +2511,8 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Stops the Swerve Module from moving</div>
 </dd>
+<dt><a href="common/core/fsm/FSMSubsystemBase.html#stopCommand()" class="member-name-link">stopCommand()</a> - Method in class common.core.fsm.<a href="common/core/fsm/FSMSubsystemBase.html" title="class in common.core.fsm">FSMSubsystemBase</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="common/core/subsystems/NAR_Subsystem.html#stopCommand()" class="member-name-link">stopCommand()</a> - Method in interface common.core.subsystems.<a href="common/core/subsystems/NAR_Subsystem.html" title="interface in common.core.subsystems">NAR_Subsystem</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="common/core/subsystems/PositionSubsystemBase.html#stopCommand()" class="member-name-link">stopCommand()</a> - Method in class common.core.subsystems.<a href="common/core/subsystems/PositionSubsystemBase.html" title="class in common.core.subsystems">PositionSubsystemBase</a></dt>
@@ -2519,7 +2529,7 @@ loadScripts(document, 'script');</script>
 </dd>
 <dt><a href="common/hardware/limelight/StreamMode.html" class="type-name-link" title="enum class in common.hardware.limelight">StreamMode</a> - Enum Class in <a href="common/hardware/limelight/package-summary.html">common.hardware.limelight</a></dt>
 <dd>&nbsp;</dd>
-<dt><a href="common/core/fsm/FSMSubsystemBase.html#subsystems" class="member-name-link">subsystems</a> - Static variable in class common.core.fsm.<a href="common/core/fsm/FSMSubsystemBase.html" title="class in common.core.fsm">FSMSubsystemBase</a></dt>
+<dt><a href="common/core/fsm/FSMSubsystemBase.html#subsystems" class="member-name-link">subsystems</a> - Variable in class common.core.fsm.<a href="common/core/fsm/FSMSubsystemBase.html" title="class in common.core.fsm">FSMSubsystemBase</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="common/hardware/motorcontroller/NAR_Motor.MotorConfig.html#supplyLimit" class="member-name-link">supplyLimit</a> - Variable in class common.hardware.motorcontroller.<a href="common/hardware/motorcontroller/NAR_Motor.MotorConfig.html" title="class in common.hardware.motorcontroller">NAR_Motor.MotorConfig</a></dt>
 <dd>&nbsp;</dd>
