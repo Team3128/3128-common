@@ -248,10 +248,10 @@ public abstract class PositionSubsystemBase extends NAR_PIDSubsystem implements 
     super.initShuffleboard();
     NAR_Shuffleboard.addData(getName(), "Voltage", ()-> motors.get(0).getAppliedOutput() * 12, 6, 1);
         NAR_Shuffleboard.addData(getName(), "Current", ()-> motors.get(0).getStallCurrent(), 3, 3);
-        NAR_Shuffleboard.addSendable(getName(), "Reset", either(resetCommand(), print("DEBUG NOT ON"), debug), 4, 0, 2, 1).withWidget(BuiltInWidgets.kCommand);
-        NAR_Shuffleboard.addSendable(getName(), "Enable", either(startEnd(()-> pidTo(setpoint), ()-> disable()), print("DEBUG NOT ON"), debug), 4, 1, 2, 1).withWidget(BuiltInWidgets.kCommand);
+        NAR_Shuffleboard.addCommand(getName(), "Reset", either(resetCommand(), print("DEBUG NOT ON"), debug), 4, 0);
+        NAR_Shuffleboard.addCommand(getName(), "Enable", either(startEnd(()-> pidTo(setpoint), ()-> disable()), print("DEBUG NOT ON"), debug), 4, 1);
         debugVoltage = NAR_Shuffleboard.debug(getName(), "Debug Volts", 0, 7, 1);
-        NAR_Shuffleboard.addSendable(getName(), "Run Volts", either(startEnd(()-> runVolts(debugVoltage.getAsDouble()), ()-> stop()), print("DEBUG NOT ON"), debug), 6, 0, 2, 1).withWidget(BuiltInWidgets.kCommand);
-        
+        NAR_Shuffleboard.addCommand(getName(), "Run Volts", either(startEnd(()-> runVolts(debugVoltage.getAsDouble()), ()-> stop()), print("DEBUG NOT ON"), debug), 6, 0);
+        NAR_Shuffleboard.addCommand(getName(), "Characterize", this.characterization(1, 0.5), 0, 4);
     }
 }

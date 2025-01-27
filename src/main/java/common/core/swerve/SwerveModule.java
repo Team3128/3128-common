@@ -168,6 +168,13 @@ public class SwerveModule {
     }
 
     /**
+     * Returns the current angle of the CANCoder
+     */
+    public Rotation2d getRawAbsoluteAngle(){
+        return Rotation2d.fromDegrees(MathUtil.inputModulus(absoluteAngle.get().in(Units.Degrees), -180, 180));
+    }
+
+    /**
      * Returns the Swerve module's state consisting of velocity and angular position
      * @return A swerve module state
      */

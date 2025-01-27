@@ -1,7 +1,12 @@
 package common.core.swerve;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+
 import common.hardware.motorcontroller.NAR_Motor;
 import common.hardware.motorcontroller.NAR_Motor.Control;
+import common.utility.Log;
 import common.utility.narwhaldashboard.NarwhalDashboard;
 import common.utility.shuffleboard.NAR_Shuffleboard;
 import common.utility.sysid.CmdSysId;
@@ -64,6 +69,8 @@ public abstract class SwerveBase extends SubsystemBase {
         NAR_Shuffleboard.addData("Swerve", "Velocity", ()-> getSpeed(), 3, 3, 1, 1);
         NAR_Shuffleboard.addData("Swerve", "Field Velocity", ()-> getFieldVelocity().toString(), 3, 2, 4, 1);
         NAR_Shuffleboard.addData("Swerve", "Gyro", ()-> getYaw(), 7, 0, 2, 2).withWidget("Gyro");
+        NAR_Shuffleboard.addCommand("Swerve", "Reset Gyro", runOnce(()-> resetGyro(0)), 7, 2);
+        NAR_Shuffleboard.addCommand("Swerve", "Identify Offsets", identifyOffsetsCommand(), 7, 3);
     }
 
     public void drive(Translation2d translationVel, Rotation2d rotationVel) {
@@ -279,6 +286,15 @@ public abstract class SwerveBase extends SubsystemBase {
 
     public Rotation2d getAngleTo(Translation2d point) {
         return getPose().getRotation().minus(getDistanceTo(point).getAngle());
+    }
+
+    public Command identifyOffsetsCommand() {
+        return runOnce(()-> {
+            for(SwerveModule module : getModules()) {
+                double rawAngle = module.getRawAbsoluteAngle().getDegrees();
+                System.out.println("public static final double MOD" + module.moduleNumber + "_CANCODER_OFFSET = " + rawAngle + ";");
+            }
+        });
     }
 
 }

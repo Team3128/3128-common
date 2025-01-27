@@ -15,12 +15,14 @@ import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.networktables.NetworkTableValue;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
+import edu.wpi.first.wpilibj.BuiltInAccelerometer;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.ComplexWidget;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj.shuffleboard.SimpleWidget;
 import edu.wpi.first.wpilibj.shuffleboard.WidgetType;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 /**
@@ -244,6 +246,20 @@ public class NAR_Shuffleboard {
             e.printStackTrace();
             return null;
         }
+    }
+
+    /**
+     * Displays Commaned Buttons and Triggers
+     * 
+     * @param tabName the title of the tab to select
+     * @param name the name of the widget
+     * @param command command to display
+     * @param x x-coord of the widget
+     * @param y y-coord of the widget
+     * @return sendable widget that can be modified
+     */
+    public static ComplexWidget addCommand(String tabName, String name, Command command, int x, int y) {
+        return addSendable(tabName, name, command, x, y, 2, 1).withWidget(BuiltInWidgets.kCommand);
     }
 
     /**
