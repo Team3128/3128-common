@@ -240,7 +240,7 @@ public class NAR_Shuffleboard {
                 create_tab(tabName);
                 fillEntryPositions(x, y, width, height, tabName);
             }
-            return Shuffleboard.getTab(tabName).add(name, data).withPosition(x,y).withSize(width, height).withWidget(BuiltInWidgets.kTextView);
+            return Shuffleboard.getTab(tabName).add(name, data).withPosition(x,y).withSize(width, height);
         }
         catch(Exception e) {
             e.printStackTrace();
@@ -259,7 +259,7 @@ public class NAR_Shuffleboard {
      * @return sendable widget that can be modified
      */
     public static ComplexWidget addCommand(String tabName, String name, Command command, int x, int y) {
-        return addSendable(tabName, name, command, x, y, 2, 1).withWidget(BuiltInWidgets.kCommand);
+        return addSendable(tabName, name, command, x, y, 1, 1).withWidget(BuiltInWidgets.kCommand);
     }
 
     /**

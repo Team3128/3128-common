@@ -30,7 +30,7 @@ public abstract class SwerveBase extends SubsystemBase {
     protected boolean chassisVelocityCorrection = true;
     public boolean fieldRelative = true;
     protected double dtConstant = 0.009;
-    protected double throttle = 1;
+    public double throttle = 1;
 
     protected final SwerveDriveKinematics kinematics;
     protected SwerveDrivePoseEstimator odometry;
@@ -215,7 +215,7 @@ public abstract class SwerveBase extends SubsystemBase {
             ()-> driveMotor.getPosition(), 
             startDelay, 
             rampRate, 
-            4, 
+            10, 
             true, 
             this
         );

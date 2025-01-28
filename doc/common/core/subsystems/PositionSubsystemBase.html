@@ -113,12 +113,15 @@ implements <a href="NAR_Subsystem.html" title="interface in common.core.subsyste
 <div class="table-header col-first">Modifier and Type</div>
 <div class="table-header col-second">Field</div>
 <div class="table-header col-last">Description</div>
-<div class="col-first even-row-color"><code>protected final edu.wpi.first.math.controller.SimpleMotorFeedforward</code></div>
-<div class="col-second even-row-color"><code><a href="#ff" class="member-name-link">ff</a></code></div>
+<div class="col-first even-row-color"><code>protected <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/DoubleSupplier.html" title="class or interface in java.util.function" class="external-link">DoubleSupplier</a></code></div>
+<div class="col-second even-row-color"><code><a href="#debugVoltage" class="member-name-link">debugVoltage</a></code></div>
 <div class="col-last even-row-color">&nbsp;</div>
-<div class="col-first odd-row-color"><code>protected final <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="../../hardware/motorcontroller/NAR_Motor.html" title="class in common.hardware.motorcontroller">NAR_Motor</a>&gt;</code></div>
-<div class="col-second odd-row-color"><code><a href="#motors" class="member-name-link">motors</a></code></div>
+<div class="col-first odd-row-color"><code>protected final edu.wpi.first.math.controller.SimpleMotorFeedforward</code></div>
+<div class="col-second odd-row-color"><code><a href="#ff" class="member-name-link">ff</a></code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
+<div class="col-first even-row-color"><code>protected final <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="../../hardware/motorcontroller/NAR_Motor.html" title="class in common.hardware.motorcontroller">NAR_Motor</a>&gt;</code></div>
+<div class="col-second even-row-color"><code><a href="#motors" class="member-name-link">motors</a></code></div>
+<div class="col-last even-row-color">&nbsp;</div>
 </div>
 <div class="inherited-list">
 <h3 id="fields-inherited-from-class-common.core.subsystems.NAR_PIDSubsystem">Fields inherited from class&nbsp;common.core.subsystems.<a href="NAR_PIDSubsystem.html" title="class in common.core.subsystems">NAR_PIDSubsystem</a></h3>
@@ -200,69 +203,74 @@ implements <a href="NAR_Subsystem.html" title="interface in common.core.subsyste
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Homing command for the subsystem.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>edu.wpi.first.wpilibj2.command.Command</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#pidTo(double)" class="member-name-link">pidTo</a><wbr>(double&nbsp;setpoint)</code></div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#initShuffleboard()" class="member-name-link">initShuffleboard</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Sets controller setpoint and enables controller.</div>
+<div class="block">Initializes shuffleboard with debug elements for PID + FF values.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>edu.wpi.first.wpilibj2.command.Command</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#pidTo(java.util.function.DoubleSupplier)" class="member-name-link">pidTo</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/DoubleSupplier.html" title="class or interface in java.util.function" class="external-link">DoubleSupplier</a>&nbsp;setpoint)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#pidTo(double)" class="member-name-link">pidTo</a><wbr>(double&nbsp;setpoint)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Sets controller setpoint and enables controller.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#reset()" class="member-name-link">reset</a>()</code></div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>edu.wpi.first.wpilibj2.command.Command</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#pidTo(java.util.function.DoubleSupplier)" class="member-name-link">pidTo</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/DoubleSupplier.html" title="class or interface in java.util.function" class="external-link">DoubleSupplier</a>&nbsp;setpoint)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Sets controller setpoint and enables controller.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#reset()" class="member-name-link">reset</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Resets measurement position to controller position minimum.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#reset(double)" class="member-name-link">reset</a><wbr>(double&nbsp;position)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#reset(double)" class="member-name-link">reset</a><wbr>(double&nbsp;position)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Reset measurement position.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>edu.wpi.first.wpilibj2.command.Command</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#resetCommand()" class="member-name-link">resetCommand</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>edu.wpi.first.wpilibj2.command.Command</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#resetCommand()" class="member-name-link">resetCommand</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Command resetting position to controller position minimum.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>edu.wpi.first.wpilibj2.command.Command</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#resetCommand(double)" class="member-name-link">resetCommand</a><wbr>(double&nbsp;position)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>edu.wpi.first.wpilibj2.command.Command</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#resetCommand(double)" class="member-name-link">resetCommand</a><wbr>(double&nbsp;position)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Command resetting position.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#run(double)" class="member-name-link">run</a><wbr>(double&nbsp;power)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#run(double)" class="member-name-link">run</a><wbr>(double&nbsp;power)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Sets power to motors.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>edu.wpi.first.wpilibj2.command.Command</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#runCommand(double)" class="member-name-link">runCommand</a><wbr>(double&nbsp;power)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>edu.wpi.first.wpilibj2.command.Command</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#runCommand(double)" class="member-name-link">runCommand</a><wbr>(double&nbsp;power)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Command setting power to motors.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#runVolts(double)" class="member-name-link">runVolts</a><wbr>(double&nbsp;volts)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#runVolts(double)" class="member-name-link">runVolts</a><wbr>(double&nbsp;volts)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Sets voltage to motors.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>edu.wpi.first.wpilibj2.command.Command</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#runVoltsCommand(double)" class="member-name-link">runVoltsCommand</a><wbr>(double&nbsp;volts)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>edu.wpi.first.wpilibj2.command.Command</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#runVoltsCommand(double)" class="member-name-link">runVoltsCommand</a><wbr>(double&nbsp;volts)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Command setting voltage to motors.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setNeutralMode(common.hardware.motorcontroller.NAR_Motor.Neutral)" class="member-name-link">setNeutralMode</a><wbr>(<a href="../../hardware/motorcontroller/NAR_Motor.Neutral.html" title="enum class in common.hardware.motorcontroller">NAR_Motor.Neutral</a>&nbsp;mode)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setNeutralMode(common.hardware.motorcontroller.NAR_Motor.Neutral)" class="member-name-link">setNeutralMode</a><wbr>(<a href="../../hardware/motorcontroller/NAR_Motor.Neutral.html" title="enum class in common.hardware.motorcontroller">NAR_Motor.Neutral</a>&nbsp;mode)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Set the neutral mode for all motors in the mechanism.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#stop()" class="member-name-link">stop</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#stop()" class="member-name-link">stop</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Stops all motors.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>edu.wpi.first.wpilibj2.command.Command</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#stopCommand()" class="member-name-link">stopCommand</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>edu.wpi.first.wpilibj2.command.Command</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#stopCommand()" class="member-name-link">stopCommand</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Command stopping all motors.</div>
 </div>
 </div>
@@ -270,16 +278,13 @@ implements <a href="NAR_Subsystem.html" title="interface in common.core.subsyste
 </div>
 <div class="inherited-list">
 <h3 id="methods-inherited-from-class-common.core.subsystems.NAR_PIDSubsystem">Methods inherited from class&nbsp;common.core.subsystems.<a href="NAR_PIDSubsystem.html" title="class in common.core.subsystems">NAR_PIDSubsystem</a></h3>
-<code><a href="NAR_PIDSubsystem.html#addDisableCondition(java.util.function.BooleanSupplier)">addDisableCondition</a>, <a href="NAR_PIDSubsystem.html#atSetpoint()">atSetpoint</a>, <a href="NAR_PIDSubsystem.html#disable()">disable</a>, <a href="NAR_PIDSubsystem.html#enable()">enable</a>, <a href="NAR_PIDSubsystem.html#enableContinuousInput(double,double)">enableContinuousInput</a>, <a href="NAR_PIDSubsystem.html#getController()">getController</a>, <a href="NAR_PIDSubsystem.html#getDisableConditions()">getDisableConditions</a>, <a href="NAR_PIDSubsystem.html#getInputRange()">getInputRange</a>, <a href="NAR_PIDSubsystem.html#getOutputRange()">getOutputRange</a>, <a href="NAR_PIDSubsystem.html#getSetpoint()">getSetpoint</a>, <a href="NAR_PIDSubsystem.html#initShuffleboard()">initShuffleboard</a>, <a href="NAR_PIDSubsystem.html#isDebug()">isDebug</a>, <a href="NAR_PIDSubsystem.html#isEnabled()">isEnabled</a>, <a href="NAR_PIDSubsystem.html#onConstraintViolation()">onConstraintViolation</a>, <a href="NAR_PIDSubsystem.html#onSafetyTimeout()">onSafetyTimeout</a>, <a href="NAR_PIDSubsystem.html#periodic()">periodic</a>, <a href="NAR_PIDSubsystem.html#setInputRange(double,double)">setInputRange</a>, <a href="NAR_PIDSubsystem.html#setkG_Function(java.util.function.DoubleSupplier)">setkG_Function</a>, <a href="NAR_PIDSubsystem.html#setOutputRange(double,double)">setOutputRange</a>, <a href="NAR_PIDSubsystem.html#setSafetyThresh(double)">setSafetyThresh</a>, <a href="NAR_PIDSubsystem.html#setTolerance(double)">setTolerance</a>, <a href="NAR_PIDSubsystem.html#setUpdateTime(double)">setUpdateTime</a>, <a href="NAR_PIDSubsystem.html#startPID(double)">startPID</a></code></div>
+<code><a href="NAR_PIDSubsystem.html#addDisableCondition(java.util.function.BooleanSupplier)">addDisableCondition</a>, <a href="NAR_PIDSubsystem.html#atSetpoint()">atSetpoint</a>, <a href="NAR_PIDSubsystem.html#disable()">disable</a>, <a href="NAR_PIDSubsystem.html#enable()">enable</a>, <a href="NAR_PIDSubsystem.html#enableContinuousInput(double,double)">enableContinuousInput</a>, <a href="NAR_PIDSubsystem.html#getController()">getController</a>, <a href="NAR_PIDSubsystem.html#getDisableConditions()">getDisableConditions</a>, <a href="NAR_PIDSubsystem.html#getInputRange()">getInputRange</a>, <a href="NAR_PIDSubsystem.html#getOutputRange()">getOutputRange</a>, <a href="NAR_PIDSubsystem.html#getSetpoint()">getSetpoint</a>, <a href="NAR_PIDSubsystem.html#isDebug()">isDebug</a>, <a href="NAR_PIDSubsystem.html#isEnabled()">isEnabled</a>, <a href="NAR_PIDSubsystem.html#onConstraintViolation()">onConstraintViolation</a>, <a href="NAR_PIDSubsystem.html#onSafetyTimeout()">onSafetyTimeout</a>, <a href="NAR_PIDSubsystem.html#periodic()">periodic</a>, <a href="NAR_PIDSubsystem.html#setInputRange(double,double)">setInputRange</a>, <a href="NAR_PIDSubsystem.html#setkG_Function(java.util.function.DoubleSupplier)">setkG_Function</a>, <a href="NAR_PIDSubsystem.html#setOutputRange(double,double)">setOutputRange</a>, <a href="NAR_PIDSubsystem.html#setSafetyThresh(double)">setSafetyThresh</a>, <a href="NAR_PIDSubsystem.html#setTolerance(double)">setTolerance</a>, <a href="NAR_PIDSubsystem.html#setUpdateTime(double)">setUpdateTime</a>, <a href="NAR_PIDSubsystem.html#startPID(double)">startPID</a></code></div>
 <div class="inherited-list">
 <h3 id="methods-inherited-from-class-edu.wpi.first.wpilibj2.command.SubsystemBase">Methods inherited from class&nbsp;edu.wpi.first.wpilibj2.command.SubsystemBase</h3>
 <code>addChild, getName, getSubsystem, initSendable, setName, setSubsystem</code></div>
 <div class="inherited-list">
 <h3 id="methods-inherited-from-class-java.lang.Object">Methods inherited from class&nbsp;java.lang.<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a></h3>
 <code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#clone()" title="class or interface in java.lang" class="external-link">clone</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#equals(java.lang.Object)" title="class or interface in java.lang" class="external-link">equals</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#finalize()" title="class or interface in java.lang" class="external-link">finalize</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#getClass()" title="class or interface in java.lang" class="external-link">getClass</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#hashCode()" title="class or interface in java.lang" class="external-link">hashCode</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#notify()" title="class or interface in java.lang" class="external-link">notify</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#notifyAll()" title="class or interface in java.lang" class="external-link">notifyAll</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#toString()" title="class or interface in java.lang" class="external-link">toString</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#wait()" title="class or interface in java.lang" class="external-link">wait</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#wait(long)" title="class or interface in java.lang" class="external-link">wait</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#wait(long,int)" title="class or interface in java.lang" class="external-link">wait</a></code></div>
-<div class="inherited-list">
-<h3 id="methods-inherited-from-class-common.core.subsystems.NAR_Subsystem">Methods inherited from interface&nbsp;common.core.subsystems.<a href="NAR_Subsystem.html" title="interface in common.core.subsystems">NAR_Subsystem</a></h3>
-<code><a href="NAR_Subsystem.html#initShuffleboard()">initShuffleboard</a></code></div>
 <div class="inherited-list">
 <h3 id="methods-inherited-from-class-edu.wpi.first.wpilibj2.command.Subsystem">Methods inherited from interface&nbsp;edu.wpi.first.wpilibj2.command.Subsystem</h3>
 <code>defer, getCurrentCommand, getDefaultCommand, getName, periodic, register, removeDefaultCommand, run, runEnd, runOnce, setDefaultCommand, simulationPeriodic, startEnd, startRun</code></div>
@@ -304,6 +309,12 @@ implements <a href="NAR_Subsystem.html" title="interface in common.core.subsyste
 <section class="detail" id="ff">
 <h3>ff</h3>
 <div class="member-signature"><span class="modifiers">protected final</span>&nbsp;<span class="return-type">edu.wpi.first.math.controller.SimpleMotorFeedforward</span>&nbsp;<span class="element-name">ff</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="debugVoltage">
+<h3>debugVoltage</h3>
+<div class="member-signature"><span class="modifiers">protected</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/DoubleSupplier.html" title="class or interface in java.util.function" class="external-link">DoubleSupplier</a></span>&nbsp;<span class="element-name">debugVoltage</span></div>
 </section>
 </li>
 </ul>
@@ -588,6 +599,20 @@ implements <a href="NAR_Subsystem.html" title="interface in common.core.subsyste
  double&nbsp;rampRateVoltsPerSec,
  double&nbsp;startPosition,
  double&nbsp;endPosition)</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="initShuffleboard()">
+<h3>initShuffleboard</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">initShuffleboard</span>()</div>
+<div class="block"><span class="descfrm-type-label">Description copied from class:&nbsp;<code><a href="NAR_PIDSubsystem.html#initShuffleboard()">NAR_PIDSubsystem</a></code></span></div>
+<div class="block">Initializes shuffleboard with debug elements for PID + FF values.</div>
+<dl class="notes">
+<dt>Specified by:</dt>
+<dd><code><a href="NAR_Subsystem.html#initShuffleboard()">initShuffleboard</a></code>&nbsp;in interface&nbsp;<code><a href="NAR_Subsystem.html" title="interface in common.core.subsystems">NAR_Subsystem</a></code></dd>
+<dt>Overrides:</dt>
+<dd><code><a href="NAR_PIDSubsystem.html#initShuffleboard()">initShuffleboard</a></code>&nbsp;in class&nbsp;<code><a href="NAR_PIDSubsystem.html" title="class in common.core.subsystems">NAR_PIDSubsystem</a></code></dd>
+</dl>
 </section>
 </li>
 </ul>

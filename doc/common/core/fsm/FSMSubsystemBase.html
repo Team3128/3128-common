@@ -83,7 +83,7 @@ loadScripts(document, 'script');</script>
 <hr>
 <div class="type-signature"><span class="modifiers">public abstract class </span><span class="element-name type-name-label">FSMSubsystemBase&lt;S extends <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Enum.html" title="class or interface in java.lang" class="external-link">Enum</a>&lt;S&gt;&gt;</span>
 <span class="extends-implements">extends edu.wpi.first.wpilibj2.command.SubsystemBase
-implements <a href="../subsystems/NAR_Subsystem.html" title="interface in common.core.subsystems">NAR_Subsystem</a></span></div>
+implements <a href="../subsystems/NAR_Subsystem.html" title="interface in common.core.subsystems">NAR_Subsystem</a>, edu.wpi.first.util.sendable.Sendable</span></div>
 </section>
 <section class="summary">
 <ul class="summary-list">
@@ -102,14 +102,14 @@ implements <a href="../subsystems/NAR_Subsystem.html" title="interface in common
 <div class="col-first odd-row-color"><code>protected <a href="Transition.html" title="class in common.core.fsm">Transition</a>&lt;<a href="FSMSubsystemBase.html" title="type parameter in FSMSubsystemBase">S</a>&gt;</code></div>
 <div class="col-second odd-row-color"><code><a href="#currentTransition" class="member-name-link">currentTransition</a></code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
-<div class="col-first even-row-color"><code>protected <a href="FSMSubsystemBase.html" title="type parameter in FSMSubsystemBase">S</a></code></div>
-<div class="col-second even-row-color"><code><a href="#previousState" class="member-name-link">previousState</a></code></div>
-<div class="col-last even-row-color">&nbsp;</div>
-<div class="col-first odd-row-color"><code>protected <a href="Transition.html" title="class in common.core.fsm">Transition</a>&lt;<a href="FSMSubsystemBase.html" title="type parameter in FSMSubsystemBase">S</a>&gt;</code></div>
-<div class="col-second odd-row-color"><code><a href="#requestTransition" class="member-name-link">requestTransition</a></code></div>
-<div class="col-last odd-row-color">&nbsp;</div>
 <div class="col-first even-row-color"><code>protected <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="../subsystems/NAR_Subsystem.html" title="interface in common.core.subsystems">NAR_Subsystem</a>&gt;</code></div>
-<div class="col-second even-row-color"><code><a href="#subsystems" class="member-name-link">subsystems</a></code></div>
+<div class="col-second even-row-color"><code><a href="#mechanisms" class="member-name-link">mechanisms</a></code></div>
+<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-first odd-row-color"><code>protected <a href="FSMSubsystemBase.html" title="type parameter in FSMSubsystemBase">S</a></code></div>
+<div class="col-second odd-row-color"><code><a href="#previousState" class="member-name-link">previousState</a></code></div>
+<div class="col-last odd-row-color">&nbsp;</div>
+<div class="col-first even-row-color"><code>protected <a href="Transition.html" title="class in common.core.fsm">Transition</a>&lt;<a href="FSMSubsystemBase.html" title="type parameter in FSMSubsystemBase">S</a>&gt;</code></div>
+<div class="col-second even-row-color"><code><a href="#requestTransition" class="member-name-link">requestTransition</a></code></div>
 <div class="col-last even-row-color">&nbsp;</div>
 </div>
 </section>
@@ -144,7 +144,7 @@ implements <a href="../subsystems/NAR_Subsystem.html" title="interface in common
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#addSubsystem(common.core.subsystems.NAR_Subsystem...)" class="member-name-link">addSubsystem</a><wbr>(<a href="../subsystems/NAR_Subsystem.html" title="interface in common.core.subsystems">NAR_Subsystem</a>...&nbsp;subsystems)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#addMechanisms(common.core.subsystems.NAR_Subsystem...)" class="member-name-link">addMechanisms</a><wbr>(<a href="../subsystems/NAR_Subsystem.html" title="interface in common.core.subsystems">NAR_Subsystem</a>...&nbsp;mechanisms)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#addTransition(common.core.fsm.Transition)" class="member-name-link">addTransition</a><wbr>(<a href="Transition.html" title="class in common.core.fsm">Transition</a>&lt;<a href="FSMSubsystemBase.html" title="type parameter in FSMSubsystemBase">S</a>&gt;&nbsp;transition)</code></div>
@@ -157,8 +157,20 @@ implements <a href="../subsystems/NAR_Subsystem.html" title="interface in common
  <a href="FSMSubsystemBase.html" title="type parameter in FSMSubsystemBase">S</a>&nbsp;end,
  edu.wpi.first.wpilibj2.command.Command&nbsp;command)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#apply(java.util.function.Consumer)" class="member-name-link">apply</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Consumer.html" title="class or interface in java.util.function" class="external-link">Consumer</a>&lt;<a href="../subsystems/NAR_Subsystem.html" title="interface in common.core.subsystems">NAR_Subsystem</a>&gt;&nbsp;action)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>edu.wpi.first.wpilibj2.command.Command</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#applyCommand(java.util.function.Consumer)" class="member-name-link">applyCommand</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Consumer.html" title="class or interface in java.util.function" class="external-link">Consumer</a>&lt;<a href="../subsystems/NAR_Subsystem.html" title="interface in common.core.subsystems">NAR_Subsystem</a>&gt;&nbsp;action)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="Transition.html" title="class in common.core.fsm">Transition</a>&lt;<a href="FSMSubsystemBase.html" title="type parameter in FSMSubsystemBase">S</a>&gt;</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getCurrentTransition()" class="member-name-link">getCurrentTransition</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="../subsystems/NAR_Subsystem.html" title="interface in common.core.subsystems">NAR_Subsystem</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getMechanism(java.lang.String)" class="member-name-link">getMechanism</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;name)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="../subsystems/NAR_Subsystem.html" title="interface in common.core.subsystems">NAR_Subsystem</a>&gt;</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getMechanisms()" class="member-name-link">getMechanisms</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="FSMSubsystemBase.html" title="type parameter in FSMSubsystemBase">S</a></code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getPreviousState()" class="member-name-link">getPreviousState</a>()</code></div>
@@ -168,12 +180,6 @@ implements <a href="../subsystems/NAR_Subsystem.html" title="interface in common
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="FSMSubsystemBase.html" title="type parameter in FSMSubsystemBase">S</a></code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getState()" class="member-name-link">getState</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="../subsystems/NAR_Subsystem.html" title="interface in common.core.subsystems">NAR_Subsystem</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getSubsystem(java.lang.String)" class="member-name-link">getSubsystem</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;name)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="../subsystems/NAR_Subsystem.html" title="interface in common.core.subsystems">NAR_Subsystem</a>&gt;</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getSubsystems()" class="member-name-link">getSubsystems</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#initShuffleboard()" class="member-name-link">initShuffleboard</a>()</code></div>
@@ -230,6 +236,9 @@ implements <a href="../subsystems/NAR_Subsystem.html" title="interface in common
 <h3 id="methods-inherited-from-class-java.lang.Object">Methods inherited from class&nbsp;java.lang.<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a></h3>
 <code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#clone()" title="class or interface in java.lang" class="external-link">clone</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#equals(java.lang.Object)" title="class or interface in java.lang" class="external-link">equals</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#finalize()" title="class or interface in java.lang" class="external-link">finalize</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#getClass()" title="class or interface in java.lang" class="external-link">getClass</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#hashCode()" title="class or interface in java.lang" class="external-link">hashCode</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#notify()" title="class or interface in java.lang" class="external-link">notify</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#notifyAll()" title="class or interface in java.lang" class="external-link">notifyAll</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#toString()" title="class or interface in java.lang" class="external-link">toString</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#wait()" title="class or interface in java.lang" class="external-link">wait</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#wait(long)" title="class or interface in java.lang" class="external-link">wait</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#wait(long,int)" title="class or interface in java.lang" class="external-link">wait</a></code></div>
 <div class="inherited-list">
+<h3 id="methods-inherited-from-class-edu.wpi.first.util.sendable.Sendable">Methods inherited from interface&nbsp;edu.wpi.first.util.sendable.Sendable</h3>
+<code>initSendable</code></div>
+<div class="inherited-list">
 <h3 id="methods-inherited-from-class-edu.wpi.first.wpilibj2.command.Subsystem">Methods inherited from interface&nbsp;edu.wpi.first.wpilibj2.command.Subsystem</h3>
 <code>defer, getCurrentCommand, getDefaultCommand, getName, periodic, register, removeDefaultCommand, run, runEnd, runOnce, setDefaultCommand, simulationPeriodic, startEnd, startRun</code></div>
 </section>
@@ -268,9 +277,9 @@ implements <a href="../subsystems/NAR_Subsystem.html" title="interface in common
 </section>
 </li>
 <li>
-<section class="detail" id="subsystems">
-<h3>subsystems</h3>
-<div class="member-signature"><span class="modifiers">protected</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="../subsystems/NAR_Subsystem.html" title="interface in common.core.subsystems">NAR_Subsystem</a>&gt;</span>&nbsp;<span class="element-name">subsystems</span></div>
+<section class="detail" id="mechanisms">
+<h3>mechanisms</h3>
+<div class="member-signature"><span class="modifiers">protected</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="../subsystems/NAR_Subsystem.html" title="interface in common.core.subsystems">NAR_Subsystem</a>&gt;</span>&nbsp;<span class="element-name">mechanisms</span></div>
 </section>
 </li>
 </ul>
@@ -389,9 +398,21 @@ implements <a href="../subsystems/NAR_Subsystem.html" title="interface in common
 </section>
 </li>
 <li>
-<section class="detail" id="addSubsystem(common.core.subsystems.NAR_Subsystem...)">
-<h3>addSubsystem</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">addSubsystem</span><wbr><span class="parameters">(<a href="../subsystems/NAR_Subsystem.html" title="interface in common.core.subsystems">NAR_Subsystem</a>...&nbsp;subsystems)</span></div>
+<section class="detail" id="addMechanisms(common.core.subsystems.NAR_Subsystem...)">
+<h3>addMechanisms</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">addMechanisms</span><wbr><span class="parameters">(<a href="../subsystems/NAR_Subsystem.html" title="interface in common.core.subsystems">NAR_Subsystem</a>...&nbsp;mechanisms)</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="apply(java.util.function.Consumer)">
+<h3>apply</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">apply</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Consumer.html" title="class or interface in java.util.function" class="external-link">Consumer</a>&lt;<a href="../subsystems/NAR_Subsystem.html" title="interface in common.core.subsystems">NAR_Subsystem</a>&gt;&nbsp;action)</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="applyCommand(java.util.function.Consumer)">
+<h3>applyCommand</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">edu.wpi.first.wpilibj2.command.Command</span>&nbsp;<span class="element-name">applyCommand</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Consumer.html" title="class or interface in java.util.function" class="external-link">Consumer</a>&lt;<a href="../subsystems/NAR_Subsystem.html" title="interface in common.core.subsystems">NAR_Subsystem</a>&gt;&nbsp;action)</span></div>
 </section>
 </li>
 <li>
@@ -415,15 +436,15 @@ implements <a href="../subsystems/NAR_Subsystem.html" title="interface in common
 </section>
 </li>
 <li>
-<section class="detail" id="getSubsystems()">
-<h3>getSubsystems</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="../subsystems/NAR_Subsystem.html" title="interface in common.core.subsystems">NAR_Subsystem</a>&gt;</span>&nbsp;<span class="element-name">getSubsystems</span>()</div>
+<section class="detail" id="getMechanisms()">
+<h3>getMechanisms</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="../subsystems/NAR_Subsystem.html" title="interface in common.core.subsystems">NAR_Subsystem</a>&gt;</span>&nbsp;<span class="element-name">getMechanisms</span>()</div>
 </section>
 </li>
 <li>
-<section class="detail" id="getSubsystem(java.lang.String)">
-<h3>getSubsystem</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="../subsystems/NAR_Subsystem.html" title="interface in common.core.subsystems">NAR_Subsystem</a></span>&nbsp;<span class="element-name">getSubsystem</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;name)</span></div>
+<section class="detail" id="getMechanism(java.lang.String)">
+<h3>getMechanism</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="../subsystems/NAR_Subsystem.html" title="interface in common.core.subsystems">NAR_Subsystem</a></span>&nbsp;<span class="element-name">getMechanism</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;name)</span></div>
 </section>
 </li>
 <li>

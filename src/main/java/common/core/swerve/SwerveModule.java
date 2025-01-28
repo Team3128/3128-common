@@ -31,7 +31,6 @@ public class SwerveModule {
 
     public static boolean shouldOptimizeCAN = true;
 
-    public final String moudleName;
     public final int moduleNumber;
     private final NAR_Motor angleMotor;
     private final NAR_Motor driveMotor;
@@ -54,7 +53,6 @@ public class SwerveModule {
      * @param config Settings for the Swerve Module.
      */
     public SwerveModule(SwerveModuleConfig config){
-        this.moudleName = config.moduleName;
         this.moduleNumber = config.moduleNumber;
         this.driveConfig = config.driveConfig;
         this.angleConfig = config.angleConfig;
