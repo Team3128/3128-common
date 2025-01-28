@@ -171,10 +171,10 @@ public abstract class NAR_PIDSubsystem extends SubsystemBase {
 
         NAR_Shuffleboard.addSendable(getName(), "PID_Controller", controller, 2, 1, 2, 3).withWidget(BuiltInWidgets.kPIDController);
 
-        controller.getConfig().setkS(NAR_Shuffleboard.debug(getName(), "kS", controller.getConfig().getkS(), 0, 2));
-        controller.getConfig().setkV(NAR_Shuffleboard.debug(getName(), "kV", controller.getConfig().getkV(), 1, 2));
-        controller.getConfig().setkA(NAR_Shuffleboard.debug(getName(), "kA", controller.getConfig().getkA(), 1, 3));
-        controller.getConfig().setkG(NAR_Shuffleboard.debug(getName(), "kG", controller.getConfig().getkG(), 0, 3));
+        // controller.getConfig().setkS(NAR_Shuffleboard.debug(getName(), "kS", controller.getConfig().getkS(), 0, 2));
+        // controller.getConfig().setkV(NAR_Shuffleboard.debug(getName(), "kV", controller.getConfig().getkV(), 1, 2));
+        // controller.getConfig().setkA(NAR_Shuffleboard.debug(getName(), "kA", controller.getConfig().getkA(), 1, 3));
+        // controller.getConfig().setkG(NAR_Shuffleboard.debug(getName(), "kG", controller.getConfig().getkG(), 0, 3));
 
         NAR_Shuffleboard.addData(getName(), "Measurement Graph", controller::getMeasurement, 7, 0, 2, 2).withWidget(BuiltInWidgets.kGraph);
         NAR_Shuffleboard.addData(getName(), "Setpoint Graph", controller::getSetpoint, 7, 0, 2, 2).withWidget(BuiltInWidgets.kGraph);

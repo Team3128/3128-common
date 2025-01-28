@@ -90,6 +90,7 @@ public abstract class PositionSubsystemBase extends NAR_PIDSubsystem implements 
      * @param volts The voltage to set the motors to.
      */
     public void runVolts(double volts) {
+        System.out.println("Running Volts at " + volts);
         apply(motor -> motor.setVolts(volts));
     }
 
@@ -101,6 +102,10 @@ public abstract class PositionSubsystemBase extends NAR_PIDSubsystem implements 
      */
     public Command runVoltsCommand(double volts) {
         return applyCommand(motor -> motor.setVolts(volts));
+    }
+
+    public double getVolts() {
+        return motors.get(0).getAppliedOutput() * 12;
     }
 
     /**
@@ -246,12 +251,15 @@ public abstract class PositionSubsystemBase extends NAR_PIDSubsystem implements 
     @Override
     public void initShuffleboard() {
         super.initShuffleboard();
-        NAR_Shuffleboard.addData(getName(), "Voltage", ()-> motors.get(0).getAppliedOutput() * 12, 4, 2);
         NAR_Shuffleboard.addData(getName(), "Current", ()-> motors.get(0).getStallCurrent(), 5, 1);
-        NAR_Shuffleboard.addCommand(getName(), "Reset", either(resetCommand().andThen(print("Resetting to " + controller.getInputRange()[0])), print("DEBUG NOT ON"), debug), 4, 0);
         NAR_Shuffleboard.addCommand(getName(), "Enable", either(startEnd(()-> startPID(setpoint.getAsDouble()), ()-> disable()), print("DEBUG NOT ON"), debug), 6, 1);
-        debugVoltage = NAR_Shuffleboard.debug(getName(), "Debug Volts", 0, 4, 1);
-        NAR_Shuffleboard.addCommand(getName(), "Run Volts", either(startEnd(()-> runVolts(debugVoltage.getAsDouble()), ()-> stop()), print("DEBUG NOT ON"), debug), 5, 2);
-        NAR_Shuffleboard.addCommand(getName(), "Characterize", this.characterization(1, 0.5), 6, 2);
+    }
+
+    public void FFWidgets(ControllerBase controller, int x, int y) {
+        controller.getConfig().setkS(NAR_Shuffleboard.debug(getName(), "kS", controller.getConfig().getkS(), x, y));
+        controller.getConfig().setkV(NAR_Shuffleboard.debug(getName(), "kV", controller.getConfig().getkV(), x + 1, y));
+        controller.getConfig().setkA(NAR_Shuffleboard.debug(getName(), "kA", controller.getConfig().getkA(), x + 1, y + 1));
+        controller.getConfig().setkG(NAR_Shuffleboard.debug(getName(), "kG", controller.getConfig().getkG(), x, y + 1));
+        NAR_Shuffleboard.addCommand(getName(), "Characterize", this.characterization(1, 0.5), x, y + 2).withSize(2, 1);
     }
 }

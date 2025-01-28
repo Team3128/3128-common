@@ -112,6 +112,14 @@ public abstract class FSMSubsystemBase<S extends Enum<S>> extends SubsystemBase 
         return currentState.name().equals(otherState.name()) && !isTransitioning();
     }
 
+    @SuppressWarnings("unchecked")
+    public boolean stateEquals(S... otherStates) {
+        for(S otherState : otherStates) {
+            if(stateEquals(otherState)) return true;
+        }
+        return false;
+    }
+
     public S getState() {
         return currentState;
     }
@@ -204,6 +212,10 @@ public abstract class FSMSubsystemBase<S extends Enum<S>> extends SubsystemBase 
 
     public Command runVoltsCommand(double volts) {
         return runOnce(()-> runVolts(volts)).beforeStarting(()-> Log.debug(Log.Type.STATE_MACHINE_SECONDARY, getName(), "Set to run at " + volts + " volts"));
+    }
+
+    public double getVolts() {
+        return mechanisms.get(0).getVolts();
     }
 
     public void stop() {

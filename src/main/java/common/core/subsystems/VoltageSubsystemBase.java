@@ -72,6 +72,10 @@ public abstract class VoltageSubsystemBase extends SubsystemBase implements NAR_
         return applyCommand(motor -> motor.setVolts(volts));
     }
 
+    public double getVolts() {
+        return motors.get(0).getAppliedOutput() * 12;
+    }
+
     /**
      * Stops all motors in the subsystem.
      */
