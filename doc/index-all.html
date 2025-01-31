@@ -124,7 +124,7 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Adds a transition from every state to the given state</div>
 </dd>
-<dt><a href="common/core/fsm/TransitionMap.html#addConvergingTransitions(edu.wpi.first.wpilibj2.command.Command,S,S...)" class="member-name-link">addConvergingTransitions(Command, S, S...)</a> - Method in class common.core.fsm.<a href="common/core/fsm/TransitionMap.html" title="class in common.core.fsm">TransitionMap</a></dt>
+<dt><a href="common/core/fsm/TransitionMap.html#addConvergingTransitions(S,java.util.List,edu.wpi.first.wpilibj2.command.Command)" class="member-name-link">addConvergingTransitions(S, List&lt;S&gt;, Command)</a> - Method in class common.core.fsm.<a href="common/core/fsm/TransitionMap.html" title="class in common.core.fsm">TransitionMap</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="common/utility/shuffleboard/NAR_Shuffleboard.html#addData(java.lang.String,java.lang.String,java.lang.Object)" class="member-name-link">addData(String, String, Object)</a> - Static method in class common.utility.shuffleboard.<a href="common/utility/shuffleboard/NAR_Shuffleboard.html" title="class in common.utility.shuffleboard">NAR_Shuffleboard</a></dt>
 <dd>
@@ -188,6 +188,8 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Adds a motor for controller to send output</div>
 </dd>
+<dt><a href="common/core/fsm/TransitionMap.html#addOneToOneTransitions(java.util.List,java.util.List,java.util.function.Function)" class="member-name-link">addOneToOneTransitions(List&lt;S&gt;, List&lt;S&gt;, Function&lt;S, Command&gt;)</a> - Method in class common.core.fsm.<a href="common/core/fsm/TransitionMap.html" title="class in common.core.fsm">TransitionMap</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="common/core/controllers/ControllerBase.html#addOutput(java.util.function.DoubleConsumer)" class="member-name-link">addOutput(DoubleConsumer)</a> - Method in class common.core.controllers.<a href="common/core/controllers/ControllerBase.html" title="class in common.core.controllers">ControllerBase</a></dt>
 <dd>
 <div class="block">Adds an output source for controller to send output</div>
@@ -270,7 +272,7 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="common/core/subsystems/VoltageSubsystemBase.html#applyCommand(java.util.function.Consumer)" class="member-name-link">applyCommand(Consumer&lt;NAR_Motor&gt;)</a> - Method in class common.core.subsystems.<a href="common/core/subsystems/VoltageSubsystemBase.html" title="class in common.core.subsystems">VoltageSubsystemBase</a></dt>
 <dd>&nbsp;</dd>
-<dt><a href="common/core/fsm/TransitionMap.html#applyCommutativeFunction(java.util.function.Function,S...)" class="member-name-link">applyCommutativeFunction(Function&lt;S, Command&gt;, S...)</a> - Method in class common.core.fsm.<a href="common/core/fsm/TransitionMap.html" title="class in common.core.fsm">TransitionMap</a></dt>
+<dt><a href="common/core/fsm/TransitionMap.html#applyCommutativeFunction(java.util.function.Function,java.util.List)" class="member-name-link">applyCommutativeFunction(Function&lt;S, Command&gt;, List&lt;S&gt;)</a> - Method in class common.core.fsm.<a href="common/core/fsm/TransitionMap.html" title="class in common.core.fsm">TransitionMap</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="common/core/fsm/TransitionMap.html#applyDivergingFunction(java.util.function.Function,S)" class="member-name-link">applyDivergingFunction(Function&lt;S, Command&gt;, S)</a> - Method in class common.core.fsm.<a href="common/core/fsm/TransitionMap.html" title="class in common.core.fsm">TransitionMap</a></dt>
 <dd>
@@ -790,6 +792,8 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Creates a new FFCharacterization object to store data.</div>
 </dd>
+<dt><a href="common/core/subsystems/PositionSubsystemBase.html#FFWidgets(common.core.controllers.ControllerBase,int,int)" class="member-name-link">FFWidgets(ControllerBase, int, int)</a> - Method in class common.core.subsystems.<a href="common/core/subsystems/PositionSubsystemBase.html" title="class in common.core.subsystems">PositionSubsystemBase</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="common/core/swerve/SwerveBase.html#fieldRelative" class="member-name-link">fieldRelative</a> - Variable in class common.core.swerve.<a href="common/core/swerve/SwerveBase.html" title="class in common.core.swerve">SwerveBase</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="common/hardware/limelight/LimelightKey.html#FITTED_LONG" class="member-name-link">FITTED_LONG</a> - Enum constant in enum class common.hardware.limelight.<a href="common/hardware/limelight/LimelightKey.html" title="enum class in common.hardware.limelight">LimelightKey</a></dt>
@@ -1278,6 +1282,16 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Returns the current motor velocity, default unit - RPM</div>
 </dd>
+<dt><a href="common/core/fsm/FSMSubsystemBase.html#getVolts()" class="member-name-link">getVolts()</a> - Method in class common.core.fsm.<a href="common/core/fsm/FSMSubsystemBase.html" title="class in common.core.fsm">FSMSubsystemBase</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="common/core/subsystems/NAR_Subsystem.html#getVolts()" class="member-name-link">getVolts()</a> - Method in interface common.core.subsystems.<a href="common/core/subsystems/NAR_Subsystem.html" title="interface in common.core.subsystems">NAR_Subsystem</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="common/core/subsystems/PositionSubsystemBase.html#getVolts()" class="member-name-link">getVolts()</a> - Method in class common.core.subsystems.<a href="common/core/subsystems/PositionSubsystemBase.html" title="class in common.core.subsystems">PositionSubsystemBase</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="common/core/subsystems/VelocitySubsystemBase.html#getVolts()" class="member-name-link">getVolts()</a> - Method in class common.core.subsystems.<a href="common/core/subsystems/VelocitySubsystemBase.html" title="class in common.core.subsystems">VelocitySubsystemBase</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="common/core/subsystems/VoltageSubsystemBase.html#getVolts()" class="member-name-link">getVolts()</a> - Method in class common.core.subsystems.<a href="common/core/subsystems/VoltageSubsystemBase.html" title="class in common.core.subsystems">VoltageSubsystemBase</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="common/hardware/input/NAR_Joystick.html#getX()" class="member-name-link">getX()</a> - Method in class common.hardware.input.<a href="common/hardware/input/NAR_Joystick.html" title="class in common.hardware.input">NAR_Joystick</a></dt>
 <dd>
 <div class="block">Returns the Joystick's x axis value</div>
@@ -2029,6 +2043,8 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Resets the angle motor to the CANCoder position</div>
 </dd>
+<dt><a href="common/core/subsystems/NAR_Subsystem.html#resetWidget(java.util.function.BooleanSupplier,int,int)" class="member-name-link">resetWidget(BooleanSupplier, int, int)</a> - Method in interface common.core.subsystems.<a href="common/core/subsystems/NAR_Subsystem.html" title="interface in common.core.subsystems">NAR_Subsystem</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="common/hardware/camera/ParseJson.html#returnHashMap()" class="member-name-link">returnHashMap()</a> - Method in class common.hardware.camera.<a href="common/hardware/camera/ParseJson.html" title="class in common.hardware.camera">ParseJson</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="common/hardware/limelight/Limelight.html#robotCenterDistance" class="member-name-link">robotCenterDistance</a> - Variable in class common.hardware.limelight.<a href="common/hardware/limelight/Limelight.html" title="class in common.hardware.limelight">Limelight</a></dt>
@@ -2102,6 +2118,10 @@ loadScripts(document, 'script');</script>
 <dt><a href="common/core/subsystems/VelocitySubsystemBase.html#runVoltsCommand(double)" class="member-name-link">runVoltsCommand(double)</a> - Method in class common.core.subsystems.<a href="common/core/subsystems/VelocitySubsystemBase.html" title="class in common.core.subsystems">VelocitySubsystemBase</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="common/core/subsystems/VoltageSubsystemBase.html#runVoltsCommand(double)" class="member-name-link">runVoltsCommand(double)</a> - Method in class common.core.subsystems.<a href="common/core/subsystems/VoltageSubsystemBase.html" title="class in common.core.subsystems">VoltageSubsystemBase</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="common/core/subsystems/NAR_Subsystem.html#runVoltsWidgets(java.lang.String,java.util.function.BooleanSupplier,int,int)" class="member-name-link">runVoltsWidgets(String, BooleanSupplier, int, int)</a> - Method in interface common.core.subsystems.<a href="common/core/subsystems/NAR_Subsystem.html" title="interface in common.core.subsystems">NAR_Subsystem</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="common/core/subsystems/NAR_Subsystem.html#runWidgets(java.util.function.BooleanSupplier,int,int)" class="member-name-link">runWidgets(BooleanSupplier, int, int)</a> - Method in interface common.core.subsystems.<a href="common/core/subsystems/NAR_Subsystem.html" title="interface in common.core.subsystems">NAR_Subsystem</a></dt>
 <dd>&nbsp;</dd>
 </dl>
 <h2 class="title" id="I:S">S</h2>
@@ -2498,6 +2518,8 @@ loadScripts(document, 'script');</script>
 <dt><a href="common/utility/Log.Type.html#STATE_MACHINE_SECONDARY" class="member-name-link">STATE_MACHINE_SECONDARY</a> - Enum constant in enum class common.utility.<a href="common/utility/Log.Type.html" title="enum class in common.utility">Log.Type</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="common/core/fsm/FSMSubsystemBase.html#stateEquals(S)" class="member-name-link">stateEquals(S)</a> - Method in class common.core.fsm.<a href="common/core/fsm/FSMSubsystemBase.html" title="class in common.core.fsm">FSMSubsystemBase</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="common/core/fsm/FSMSubsystemBase.html#stateEquals(S...)" class="member-name-link">stateEquals(S...)</a> - Method in class common.core.fsm.<a href="common/core/fsm/FSMSubsystemBase.html" title="class in common.core.fsm">FSMSubsystemBase</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="common/hardware/motorcontroller/NAR_Motor.MotorConfig.html#statorLimit" class="member-name-link">statorLimit</a> - Variable in class common.hardware.motorcontroller.<a href="common/hardware/motorcontroller/NAR_Motor.MotorConfig.html" title="class in common.hardware.motorcontroller">NAR_Motor.MotorConfig</a></dt>
 <dd>&nbsp;</dd>

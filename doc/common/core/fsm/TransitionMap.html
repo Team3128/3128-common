@@ -188,9 +188,9 @@ loadScripts(document, 'script');</script>
 <div class="block">Adds a transition from every state to the given state</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#addConvergingTransitions(edu.wpi.first.wpilibj2.command.Command,S,S...)" class="member-name-link">addConvergingTransitions</a><wbr>(edu.wpi.first.wpilibj2.command.Command&nbsp;command,
- <a href="TransitionMap.html" title="type parameter in TransitionMap">S</a>&nbsp;incomingState,
- <a href="TransitionMap.html" title="type parameter in TransitionMap">S</a>...&nbsp;outGoingStates)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#addConvergingTransitions(S,java.util.List,edu.wpi.first.wpilibj2.command.Command)" class="member-name-link">addConvergingTransitions</a><wbr>(<a href="TransitionMap.html" title="type parameter in TransitionMap">S</a>&nbsp;incomingState,
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="TransitionMap.html" title="type parameter in TransitionMap">S</a>&gt;&nbsp;outGoingStates,
+ edu.wpi.first.wpilibj2.command.Command&nbsp;command)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#addDivergingTransition(S)" class="member-name-link">addDivergingTransition</a><wbr>(<a href="TransitionMap.html" title="type parameter in TransitionMap">S</a>&nbsp;state)</code></div>
@@ -211,73 +211,78 @@ loadScripts(document, 'script');</script>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#addDivergingTransitions(S...)" class="member-name-link">addDivergingTransitions</a><wbr>(<a href="TransitionMap.html" title="type parameter in TransitionMap">S</a>...&nbsp;states)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#addTransition(common.core.fsm.Transition)" class="member-name-link">addTransition</a><wbr>(<a href="Transition.html" title="class in common.core.fsm">Transition</a>&lt;<a href="TransitionMap.html" title="type parameter in TransitionMap">S</a>&gt;&nbsp;transition)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#addOneToOneTransitions(java.util.List,java.util.List,java.util.function.Function)" class="member-name-link">addOneToOneTransitions</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="TransitionMap.html" title="type parameter in TransitionMap">S</a>&gt;&nbsp;onlyInputs,
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="TransitionMap.html" title="type parameter in TransitionMap">S</a>&gt;&nbsp;onlyOutputs,
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Function.html" title="class or interface in java.util.function" class="external-link">Function</a>&lt;<a href="TransitionMap.html" title="type parameter in TransitionMap">S</a>,<wbr>edu.wpi.first.wpilibj2.command.Command&gt;&nbsp;function)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#addTransition(common.core.fsm.Transition)" class="member-name-link">addTransition</a><wbr>(<a href="Transition.html" title="class in common.core.fsm">Transition</a>&lt;<a href="TransitionMap.html" title="type parameter in TransitionMap">S</a>&gt;&nbsp;transition)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Update the adjacency map to include the data for the given transition Note: This WILL NOT
  overwrite an existing Transition</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#addTransition(S,S,edu.wpi.first.wpilibj2.command.Command)" class="member-name-link">addTransition</a><wbr>(<a href="TransitionMap.html" title="type parameter in TransitionMap">S</a>&nbsp;start,
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#addTransition(S,S,edu.wpi.first.wpilibj2.command.Command)" class="member-name-link">addTransition</a><wbr>(<a href="TransitionMap.html" title="type parameter in TransitionMap">S</a>&nbsp;start,
  <a href="TransitionMap.html" title="type parameter in TransitionMap">S</a>&nbsp;end,
  edu.wpi.first.wpilibj2.command.Command&nbsp;command)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#addTransitions(common.core.fsm.Transition...)" class="member-name-link">addTransitions</a><wbr>(<a href="Transition.html" title="class in common.core.fsm">Transition</a>&lt;<a href="TransitionMap.html" title="type parameter in TransitionMap">S</a>&gt;...&nbsp;transitions)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#applyCommutativeFunction(java.util.function.Function,S...)" class="member-name-link">applyCommutativeFunction</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Function.html" title="class or interface in java.util.function" class="external-link">Function</a>&lt;<a href="TransitionMap.html" title="type parameter in TransitionMap">S</a>,<wbr>edu.wpi.first.wpilibj2.command.Command&gt;&nbsp;function,
- <a href="TransitionMap.html" title="type parameter in TransitionMap">S</a>...&nbsp;states)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#addTransitions(common.core.fsm.Transition...)" class="member-name-link">addTransitions</a><wbr>(<a href="Transition.html" title="class in common.core.fsm">Transition</a>&lt;<a href="TransitionMap.html" title="type parameter in TransitionMap">S</a>&gt;...&nbsp;transitions)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#applyDivergingFunction(java.util.function.Function,S)" class="member-name-link">applyDivergingFunction</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Function.html" title="class or interface in java.util.function" class="external-link">Function</a>&lt;<a href="TransitionMap.html" title="type parameter in TransitionMap">S</a>,<wbr>edu.wpi.first.wpilibj2.command.Command&gt;&nbsp;function,
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#applyCommutativeFunction(java.util.function.Function,java.util.List)" class="member-name-link">applyCommutativeFunction</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Function.html" title="class or interface in java.util.function" class="external-link">Function</a>&lt;<a href="TransitionMap.html" title="type parameter in TransitionMap">S</a>,<wbr>edu.wpi.first.wpilibj2.command.Command&gt;&nbsp;function,
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="TransitionMap.html" title="type parameter in TransitionMap">S</a>&gt;&nbsp;states)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#applyDivergingFunction(java.util.function.Function,S)" class="member-name-link">applyDivergingFunction</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Function.html" title="class or interface in java.util.function" class="external-link">Function</a>&lt;<a href="TransitionMap.html" title="type parameter in TransitionMap">S</a>,<wbr>edu.wpi.first.wpilibj2.command.Command&gt;&nbsp;function,
  <a href="TransitionMap.html" title="type parameter in TransitionMap">S</a>&nbsp;state)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Adds a transition from the given states to every other state</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#applyDivergingFunction(java.util.function.Function,S,S...)" class="member-name-link">applyDivergingFunction</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Function.html" title="class or interface in java.util.function" class="external-link">Function</a>&lt;<a href="TransitionMap.html" title="type parameter in TransitionMap">S</a>,<wbr>edu.wpi.first.wpilibj2.command.Command&gt;&nbsp;function,
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#applyDivergingFunction(java.util.function.Function,S,S...)" class="member-name-link">applyDivergingFunction</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Function.html" title="class or interface in java.util.function" class="external-link">Function</a>&lt;<a href="TransitionMap.html" title="type parameter in TransitionMap">S</a>,<wbr>edu.wpi.first.wpilibj2.command.Command&gt;&nbsp;function,
  <a href="TransitionMap.html" title="type parameter in TransitionMap">S</a>&nbsp;divergentState,
  <a href="TransitionMap.html" title="type parameter in TransitionMap">S</a>...&nbsp;divergeToStates)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="Transition.html" title="class in common.core.fsm">Transition</a>&lt;<a href="TransitionMap.html" title="type parameter in TransitionMap">S</a>&gt;&gt;</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getIncomingTransitions(S)" class="member-name-link">getIncomingTransitions</a><wbr>(<a href="TransitionMap.html" title="type parameter in TransitionMap">S</a>&nbsp;state)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="Transition.html" title="class in common.core.fsm">Transition</a>&lt;<a href="TransitionMap.html" title="type parameter in TransitionMap">S</a>&gt;&gt;</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getOutgoingTransitions(S)" class="member-name-link">getOutgoingTransitions</a><wbr>(<a href="TransitionMap.html" title="type parameter in TransitionMap">S</a>&nbsp;state)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getIncomingTransitions(S)" class="member-name-link">getIncomingTransitions</a><wbr>(<a href="TransitionMap.html" title="type parameter in TransitionMap">S</a>&nbsp;state)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="Transition.html" title="class in common.core.fsm">Transition</a>&lt;<a href="TransitionMap.html" title="type parameter in TransitionMap">S</a>&gt;</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getTransition(S,S)" class="member-name-link">getTransition</a><wbr>(<a href="TransitionMap.html" title="type parameter in TransitionMap">S</a>&nbsp;start,
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="Transition.html" title="class in common.core.fsm">Transition</a>&lt;<a href="TransitionMap.html" title="type parameter in TransitionMap">S</a>&gt;&gt;</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getOutgoingTransitions(S)" class="member-name-link">getOutgoingTransitions</a><wbr>(<a href="TransitionMap.html" title="type parameter in TransitionMap">S</a>&nbsp;state)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="Transition.html" title="class in common.core.fsm">Transition</a>&lt;<a href="TransitionMap.html" title="type parameter in TransitionMap">S</a>&gt;</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getTransition(S,S)" class="member-name-link">getTransition</a><wbr>(<a href="TransitionMap.html" title="type parameter in TransitionMap">S</a>&nbsp;start,
  <a href="TransitionMap.html" title="type parameter in TransitionMap">S</a>&nbsp;end)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns the Transition of the graph</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>int</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getTransitionCount()" class="member-name-link">getTransitionCount</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#isEmpty()" class="member-name-link">isEmpty</a>()</code></div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>int</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getTransitionCount()" class="member-name-link">getTransitionCount</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#removeAllTransitions()" class="member-name-link">removeAllTransitions</a>()</code></div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#isEmpty()" class="member-name-link">isEmpty</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#removeAllTransitionsFromState(S)" class="member-name-link">removeAllTransitionsFromState</a><wbr>(<a href="TransitionMap.html" title="type parameter in TransitionMap">S</a>&nbsp;start)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#removeAllTransitions()" class="member-name-link">removeAllTransitions</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#removeAllTransitionsToState(S)" class="member-name-link">removeAllTransitionsToState</a><wbr>(<a href="TransitionMap.html" title="type parameter in TransitionMap">S</a>&nbsp;end)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#removeAllTransitionsFromState(S)" class="member-name-link">removeAllTransitionsFromState</a><wbr>(<a href="TransitionMap.html" title="type parameter in TransitionMap">S</a>&nbsp;start)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#removeTransition(S,S)" class="member-name-link">removeTransition</a><wbr>(<a href="TransitionMap.html" title="type parameter in TransitionMap">S</a>&nbsp;start,
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#removeAllTransitionsToState(S)" class="member-name-link">removeAllTransitionsToState</a><wbr>(<a href="TransitionMap.html" title="type parameter in TransitionMap">S</a>&nbsp;end)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#removeTransition(S,S)" class="member-name-link">removeTransition</a><wbr>(<a href="TransitionMap.html" title="type parameter in TransitionMap">S</a>&nbsp;start,
  <a href="TransitionMap.html" title="type parameter in TransitionMap">S</a>&nbsp;end)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setTransition(common.core.fsm.Transition)" class="member-name-link">setTransition</a><wbr>(<a href="Transition.html" title="class in common.core.fsm">Transition</a>&lt;<a href="TransitionMap.html" title="type parameter in TransitionMap">S</a>&gt;&nbsp;transition)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setTransition(common.core.fsm.Transition)" class="member-name-link">setTransition</a><wbr>(<a href="Transition.html" title="class in common.core.fsm">Transition</a>&lt;<a href="TransitionMap.html" title="type parameter in TransitionMap">S</a>&gt;&nbsp;transition)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Update the adjacency map to include the data for the given transition.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#toString()" class="member-name-link">toString</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#toString()" class="member-name-link">toString</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 </div>
 </div>
 </div>
@@ -352,6 +357,14 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
+<section class="detail" id="addOneToOneTransitions(java.util.List,java.util.List,java.util.function.Function)">
+<h3>addOneToOneTransitions</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">addOneToOneTransitions</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="TransitionMap.html" title="type parameter in TransitionMap">S</a>&gt;&nbsp;onlyInputs,
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="TransitionMap.html" title="type parameter in TransitionMap">S</a>&gt;&nbsp;onlyOutputs,
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Function.html" title="class or interface in java.util.function" class="external-link">Function</a>&lt;<a href="TransitionMap.html" title="type parameter in TransitionMap">S</a>,<wbr>edu.wpi.first.wpilibj2.command.Command&gt;&nbsp;function)</span></div>
+</section>
+</li>
+<li>
 <section class="detail" id="addConvergingTransition(S,edu.wpi.first.wpilibj2.command.Command)">
 <h3 id="addConvergingTransition(java.lang.Enum,edu.wpi.first.wpilibj2.command.Command)">addConvergingTransition</h3>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">addConvergingTransition</span><wbr><span class="parameters">(<a href="TransitionMap.html" title="type parameter in TransitionMap">S</a>&nbsp;state,
@@ -383,11 +396,11 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
-<section class="detail" id="addConvergingTransitions(edu.wpi.first.wpilibj2.command.Command,S,S...)">
-<h3 id="addConvergingTransitions(edu.wpi.first.wpilibj2.command.Command,java.lang.Enum,java.lang.Enum[])">addConvergingTransitions</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">addConvergingTransitions</span><wbr><span class="parameters">(edu.wpi.first.wpilibj2.command.Command&nbsp;command,
- <a href="TransitionMap.html" title="type parameter in TransitionMap">S</a>&nbsp;incomingState,
- <a href="TransitionMap.html" title="type parameter in TransitionMap">S</a>...&nbsp;outGoingStates)</span></div>
+<section class="detail" id="addConvergingTransitions(S,java.util.List,edu.wpi.first.wpilibj2.command.Command)">
+<h3 id="addConvergingTransitions(java.lang.Enum,java.util.List,edu.wpi.first.wpilibj2.command.Command)">addConvergingTransitions</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">addConvergingTransitions</span><wbr><span class="parameters">(<a href="TransitionMap.html" title="type parameter in TransitionMap">S</a>&nbsp;incomingState,
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="TransitionMap.html" title="type parameter in TransitionMap">S</a>&gt;&nbsp;outGoingStates,
+ edu.wpi.first.wpilibj2.command.Command&nbsp;command)</span></div>
 </section>
 </li>
 <li>
@@ -548,10 +561,10 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
-<section class="detail" id="applyCommutativeFunction(java.util.function.Function,S...)">
-<h3 id="applyCommutativeFunction(java.util.function.Function,java.lang.Enum[])">applyCommutativeFunction</h3>
+<section class="detail" id="applyCommutativeFunction(java.util.function.Function,java.util.List)">
+<h3>applyCommutativeFunction</h3>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">applyCommutativeFunction</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Function.html" title="class or interface in java.util.function" class="external-link">Function</a>&lt;<a href="TransitionMap.html" title="type parameter in TransitionMap">S</a>,<wbr>edu.wpi.first.wpilibj2.command.Command&gt;&nbsp;function,
- <a href="TransitionMap.html" title="type parameter in TransitionMap">S</a>...&nbsp;states)</span></div>
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="TransitionMap.html" title="type parameter in TransitionMap">S</a>&gt;&nbsp;states)</span></div>
 </section>
 </li>
 <li>

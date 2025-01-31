@@ -112,6 +112,7 @@ public abstract class PositionSubsystemBase extends NAR_PIDSubsystem implements 
      * Stops all motors.
      */
     public void stop() {
+        disable();
         run(0);
     }
 
@@ -121,7 +122,7 @@ public abstract class PositionSubsystemBase extends NAR_PIDSubsystem implements 
      * @return Command stopping all the motors.
      */
     public Command stopCommand(){
-        return runCommand(0);
+        return runOnce(()-> stop());
     }
 
     /**
