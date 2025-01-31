@@ -35,47 +35,6 @@ public class CmdSysId extends Command {
      * @param voltageConsumer Motors of the subsystem.
      * @param velocitySupplier Velocity of the subsystem.
      * @param positionSupplier Position of the subsystem.
-     * @param angularVelocitySupplier Angular velocity of the system.
-     * @param startDelaySecs Delay before the command starts.
-     * @param rampRateVoltsPerSec Rate at which voltage increases.
-     * @param subsystems Subsystems used.
-     */
-    public CmdSysId(
-        String name,
-        Consumer<Double> voltageConsumer,
-        Supplier<Double> velocitySupplier,
-        Supplier<Double> positionSupplier,
-        Supplier<Double> angularVelocitySupplier,
-        double startDelaySecs,
-        double rampRateVoltsPerSec,
-        double wheelRadius,
-        double robotRadius,
-        double torqueConstant,
-        Subsystem... subsystems
-        ) {
-        this.data = new FFCharacterization(name);
-        this.voltageConsumer = voltageConsumer;
-        this.velocitySupplier = velocitySupplier;
-        this.positionSupplier = positionSupplier;
-        this.angularVelocitySupplier = angularVelocitySupplier;
-
-        this.startDelaySecs = startDelaySecs;
-        this.rampRateVoltsPerSec = rampRateVoltsPerSec;
-
-        this.targetPosition = Double.POSITIVE_INFINITY;
-        this.goingForward = true;
-
-        data.initMOI(wheelRadius, robotRadius, torqueConstant);
-        
-        addRequirements(subsystems);
-    }
-
-    /**
-     * Creates a new command to identify feed forward constants of the subsystem.
-     * @param name Name of the test.
-     * @param voltageConsumer Motors of the subsystem.
-     * @param velocitySupplier Velocity of the subsystem.
-     * @param positionSupplier Position of the subsystem.
      * @param startDelaySecs Delay before the command starts.
      * @param rampRateVoltsPerSec Rate at which voltage increases.
      * @param targetPosition Target position to reach.
@@ -154,7 +113,7 @@ public class CmdSysId extends Command {
     public void end(boolean interrupted) {
         setVoltage(0.0);
         timer.stop();
-        data.print();
+        data.printRegressions();
     }
 
     @Override

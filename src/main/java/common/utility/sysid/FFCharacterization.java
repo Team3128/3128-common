@@ -2,6 +2,8 @@ package common.utility.sysid;
 
 import java.util.LinkedList;
 
+import org.ejml.simple.SimpleMatrix;
+
 /**
  * Team 3128's wrapper class to store feedforward constants data.
  * @since 2024 Crescendo
@@ -10,9 +12,8 @@ import java.util.LinkedList;
 public class FFCharacterization {
 
     private final String name;
-    private final LinkedList<Double> velocityData = new LinkedList<>();
-    private final LinkedList<Double> angularVelocityData = new LinkedList<>();
     private final LinkedList<Double> voltageData = new LinkedList<>();
+    private final LinkedList<Double> velocityData = new LinkedList<>();
     private final LinkedList<Double> timeData = new LinkedList<>();
     private final LinkedList<Double> accelerationData = new LinkedList<>();
     private final LinkedList<Double> adjustedVoltageData = new LinkedList<>();
@@ -23,11 +24,6 @@ public class FFCharacterization {
     private double kS;
     private double kV;
     private double kA;
-    private double moi;
-
-    private double wheelRadius;
-    private double robotRadius;
-    private double torqueConstant;
 
 
     /**
@@ -36,12 +32,6 @@ public class FFCharacterization {
      */
     public FFCharacterization(String name) {
       this.name = name;
-    }
-
-    public void initMOI(double wheelRadius, double robotRadius, double torqueConstant){
-        this.wheelRadius = wheelRadius;
-        this.robotRadius = robotRadius;
-        this.torqueConstant = torqueConstant;
     }
 
     /**
@@ -59,24 +49,9 @@ public class FFCharacterization {
     }
 
     /**
-     * Adds the subsystem's state at a specific time.
-     * @param time Current time.
-     * @param velocity Velocity of the subsystem.
-     * @param voltage Voltage applied to the subsystem.
-     */
-    public void add(double time, double velocity, double voltage, double angularVelocity) {
-        if (Math.abs(velocity) > 1E-4) {
-          velocityData.add(Math.abs(velocity));
-          angularVelocityData.add(Math.abs(angularVelocity));
-          voltageData.add(Math.abs(voltage));
-          timeData.add(time);
-        }
-      }
-
-    /**
      * Display the feedforward constants calculated from the data.
      */
-    public void print() {
+    public void printRegressions() {
         if (velocityData.size() == 0 || voltageData.size() == 0) {
             System.out.println("Test failed");
             return;
@@ -117,8 +92,6 @@ public class FFCharacterization {
 
         kA = voltageAccelerationRegression.beta(1);
 
-        moi = calculateMOI();
-
         System.out.println("FF Characterization Results (" + name + "):");
         System.out.println(
             "\tCount=" + Integer.toString(velocityData.size()) + ""
@@ -127,34 +100,43 @@ public class FFCharacterization {
         System.out.println(String.format("\tkS=%.5f", kS));                                        //ks
         System.out.println(String.format("\tkV=%.5f", kV));                                        //kv
         System.out.println(String.format("\tkA=%.5f", kA));                                        //ka
-        System.out.println(String.format("\tM=%.5f", 0));        //R2
     }
 
-    private double calculateMOI(){
-        if(wheelRadius == 0) return 0;
-        LinkedList<Double> torques = new LinkedList<>();
-        for(int i = 0; i < velocityData.size(); i++){
-            torques.add(4 * robotRadius * torqueConstant * (velocityData.get(i) / Math.pow(wheelRadius, 2)));
+    public void printMatrix() {
+        if (velocityData.size() == 0 || voltageData.size() == 0) {
+            System.out.println("Test failed");
+            return;
         }
 
-        PolynomialRegression angularVelocityRegression = new PolynomialRegression(
-            timeData.stream().mapToDouble(Double::doubleValue).toArray(),
-            angularVelocityData.stream().mapToDouble(Double::doubleValue).toArray(),
-            4
-        );
+        double[] voltage = new double[voltageData.size()];
+        double[][] matrix = new double[velocityData.size()][3];
 
-        LinkedList<Double> angularAcceleration = new LinkedList<>();
-        angularAcceleration.addAll(
-            new PolynomialDerivative(angularVelocityRegression).evaluate(timeData)
-        );
+        voltage[0] = voltageData.get(0);
+        matrix[0][0] = 1;
+        matrix[0][1] = velocityData.get(0);
+        matrix[0][2] = 0;
 
-        PolynomialRegression angularAccelerationTorqueRegression = new PolynomialRegression(
-            angularAcceleration.stream().mapToDouble(Double::doubleValue).toArray(),
-            torques.stream().mapToDouble(Double::doubleValue).toArray(),
-            1
-        );
-        return angularAccelerationTorqueRegression.beta(1);
+        for(int i = 1; i < velocityData.size(); i++) {
+            voltage[i] = voltageData.get(i);
+            matrix[i][0] = 1;
+            matrix[i][1] = velocityData.get(i);
+            double dv = velocityData.get(i) - velocityData.get(i - 1);
+            double dt = timeData.get(i) - timeData.get(i - 1);
+            matrix[i][2] = dv / dt;
+        }
+
+        SimpleMatrix X = new SimpleMatrix(matrix);
+        SimpleMatrix V = new SimpleMatrix(voltage);
+
+        SimpleMatrix k = X.solve(V);
+
+        System.out.println(String.format("\tkS=%.5f", k.get(0)));                                        //ks
+        System.out.println(String.format("\tkV=%.5f", k.get(1)));                                        //kv
+        System.out.println(String.format("\tkA=%.5f", k.get(2)));                                        //ka
+
     }
+
+
 
     /**
      * Returns the kS value calculated by the data.
