@@ -30,10 +30,10 @@ public interface NAR_Subsystem extends Subsystem{
     public double getVolts();
 
     default void runVoltsWidgets(String tab, BooleanSupplier debug, int x, int y) {
-        final DoubleSupplier debugVoltage = NAR_Shuffleboard.debug(getName(), "Debug Volts", 0, x, y + 1);
-        NAR_Shuffleboard.addCommand(getName(), "Run Volts", either(startEnd(()-> runVolts(debugVoltage.getAsDouble()), ()-> stop()), print("DEBUG NOT ON"), debug), x, y);
-        NAR_Shuffleboard.addData(getName(), "Running", ()-> debug.getAsBoolean() && getVolts() > 0, x + 1, y);
-        NAR_Shuffleboard.addData(getName(), "Voltage", this::getVolts, x + 1, y + 1);
+        final DoubleSupplier debugVoltage = NAR_Shuffleboard.debug(getName(), "Debug Volts", 0, x+2, y -1);
+        NAR_Shuffleboard.addCommand(getName(), "Run Volts", either(startEnd(()-> runVolts(debugVoltage.getAsDouble()), ()-> stop()), print("DEBUG NOT ON"), debug), x+2, y);
+        NAR_Shuffleboard.addData(getName(), "Running", ()-> debug.getAsBoolean() && getVolts() > 0, x+1, y-1);
+        NAR_Shuffleboard.addData(getName(), "Voltage", this::getVolts, x+1, y -1);
     }
 
     default void runWidgets(BooleanSupplier debug, int x, int y) {
@@ -44,6 +44,6 @@ public interface NAR_Subsystem extends Subsystem{
     }
 
     default void resetWidget(BooleanSupplier debug, int x, int y) {
-        NAR_Shuffleboard.addCommand(getName(), "Reset", either(resetCommand(), print("DEBUG NOT ON"), debug), 4, 0);
+        NAR_Shuffleboard.addCommand(getName(), "Reset", either(resetCommand(), print("DEBUG NOT ON"), debug), x, y);
     }
 }
