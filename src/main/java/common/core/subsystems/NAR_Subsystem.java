@@ -30,17 +30,17 @@ public interface NAR_Subsystem extends Subsystem{
     public double getVolts();
 
     default void runVoltsWidgets(String tab, BooleanSupplier debug, int x, int y) {
-        final DoubleSupplier debugVoltage = NAR_Shuffleboard.debug(getName(), "Debug Volts", 0, x+2, y -1);
-        NAR_Shuffleboard.addCommand(getName(), "Run Volts", either(startEnd(()-> runVolts(debugVoltage.getAsDouble()), ()-> stop()), print("DEBUG NOT ON"), debug), x+2, y);
+        final DoubleSupplier debugVoltage = NAR_Shuffleboard.debug(getName(), "Debug Volts", 0, x+1, y -2);
+        NAR_Shuffleboard.addCommand(getName(), "Run Volts", either(startEnd(()-> runVolts(debugVoltage.getAsDouble()), ()-> stop()), print("DEBUG NOT ON"), debug), x+1, y-3);
         NAR_Shuffleboard.addData(getName(), "Running", ()-> debug.getAsBoolean() && getVolts() > 0, x+1, y-1);
         NAR_Shuffleboard.addData(getName(), "Voltage", this::getVolts, x+1, y -1);
     }
 
     default void runWidgets(BooleanSupplier debug, int x, int y) {
-        final DoubleSupplier debugPower = NAR_Shuffleboard.debug(getName(), "Debug Power", 0, x, y + 1);
-        NAR_Shuffleboard.addCommand(getName(), "Run", either(startEnd(()-> run(debugPower.getAsDouble()), ()-> stop()), print("DEBUG NOT ON"), debug), x, y).withSize(2, 1);
-        NAR_Shuffleboard.addData(getName(), "Running", ()-> debug.getAsBoolean() && getVolts() > 0, x + 1, y);
-        NAR_Shuffleboard.addData(getName(), "Power", ()-> getVolts() / 12, x + 1, y + 1);
+     //   final DoubleSupplier debugPower = NAR_Shuffleboard.debug(getName(), "Debug Power", 0, x, y + 1);
+       // NAR_Shuffleboard.addCommand(getName(), "Run", either(startEnd(()-> run(debugPower.getAsDouble()), ()-> stop()), print("DEBUG NOT ON"), debug), x+1, y).withSize(2, 1);
+        NAR_Shuffleboard.addData(getName(), "Running", ()-> debug.getAsBoolean() && getVolts() > 0, x, y);
+        //NAR_Shuffleboard.addData(getName(), "Power", ()-> getVolts() / 12, x + 1, y + 1);
     }
 
     default void resetWidget(BooleanSupplier debug, int x, int y) {

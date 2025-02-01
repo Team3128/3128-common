@@ -252,12 +252,13 @@ public abstract class PositionSubsystemBase extends NAR_PIDSubsystem implements 
     public void initShuffleboard() {
         super.initShuffleboard();
         NAR_Shuffleboard.addData(getName(), "Current", ()-> motors.get(0).getStallCurrent(), 4, 1);
-        NAR_Shuffleboard.addData(getName(), "Voltage", ()-> getVolts(), 4, 2);
+        NAR_Shuffleboard.addData(getName(), "Voltage", ()-> getVolts(), 5, 2);
         //NAR_Shuffleboard.addData(getName(), "Voltage", ()-> 5, 4, 0);
         NAR_Shuffleboard.addCommand(getName(), "Enable", either(startEnd(()-> startPID(setpoint.getAsDouble()), ()-> disable()), print("DEBUG NOT ON"), debug), 4, 0);
         FFWidgets(controller, 0, 2);
-        resetWidget (debug, 5, 0 );
-        runVoltsWidgets("Running" ,debug, 4, 3);
+        resetWidget (debug, 6, 0 );
+        runWidgets(debug,5,3);
+        runVoltsWidgets("Run Volts" ,debug, 4, 3);
     }
 
     public void FFWidgets(ControllerBase controller, int x, int y) {
@@ -265,6 +266,6 @@ public abstract class PositionSubsystemBase extends NAR_PIDSubsystem implements 
         controller.getConfig().setkV(NAR_Shuffleboard.debug(getName(), "kV", controller.getConfig().getkV(), x + 1, y));
         controller.getConfig().setkA(NAR_Shuffleboard.debug(getName(), "kA", controller.getConfig().getkA(), x + 1, y + 1));
         controller.getConfig().setkG(NAR_Shuffleboard.debug(getName(), "kG", controller.getConfig().getkG(), x, y + 1));
-        NAR_Shuffleboard.addCommand(getName(), "Characterize", this.characterization(1, 0.5), x+6, y - 2).withSize(1, 1);
+        NAR_Shuffleboard.addCommand(getName(), "Characterize", this.characterization(1, 0.5), x+6, y - 1).withSize(1, 1);
     }
 }

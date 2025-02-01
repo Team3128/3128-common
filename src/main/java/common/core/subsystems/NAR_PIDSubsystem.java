@@ -148,8 +148,8 @@ public abstract class NAR_PIDSubsystem extends SubsystemBase {
             final double measurement = controller.getMeasurement();
             final double velocity = (measurement - prevMeasurement) / updateTimer.get();
             final double acceleration = (velocity - prevVelocity) / updateTimer.get();
-            NAR_Shuffleboard.addData(getName(), "1stDerivative", velocity, 5, 1);
-            NAR_Shuffleboard.addData(getName(), "2ndDerivative", acceleration, 6, 1);
+            NAR_Shuffleboard.addData(getName(), "1stDerivative", velocity, 4, 2);
+            NAR_Shuffleboard.addData(getName(), "2ndDerivative", acceleration, 4, 3);
             prevMeasurement = measurement;
             prevVelocity = velocity;
             updateTimer.restart();
