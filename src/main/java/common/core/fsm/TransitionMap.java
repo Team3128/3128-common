@@ -5,7 +5,6 @@ import java.util.function.Function;
 import common.utility.Log;
 import edu.wpi.first.wpilibj2.command.Command;
 import static edu.wpi.first.wpilibj2.command.Commands.*;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 
 /**
  * A graph that represents transitions between states of an enum.
@@ -76,56 +75,66 @@ public class TransitionMap<S extends Enum<S>> {
         }
     }
 
-    public void addTransition(S start, S end, Runnable runnable) {}
+    public void addTransition(S start, S end, Runnable runnable) {
+        addTransition(start, end, runOnce(runnable));
+    }
 
     public void addTransition(S start, S end, Command command) {
         addTransition(new Transition<S>(start, end, command));
     }
 
-    public void addTransition(S start, S end, Function<S, Command> function){}
+    public void addTransition(S start, S end, Function<S, Command> function){
+        addTransition(start, end, function.apply(end));
+    }
 
 
 
-    public void addCorrespondenceTransitions(List<S> start, List<S> end) {}
+    public void addCorrespondenceTransitions(List<S> start, List<S> end) {
+        addCorrespondenceTransitions(start, end, none());
+    }
     
-    public void addCorrespondenceTransitions(List<S> start, List<S> end, Runnable runnable) {}
+    public void addCorrespondenceTransitions(List<S> start, List<S> end, Runnable runnable) {
+        addCorrespondenceTransitions(start, end, runOnce(runnable));
+    }
 
-    public void addCorrespondenceTransitions(List<S> start, List<S> end, Command command) {}
+    public void addCorrespondenceTransitions(List<S> start, List<S> end, Command command) {
+        addCorrespondenceTransitions(start, end, state -> {return command;});
+    }
 
     public void addCorrespondenceTransitions(List<S> start, List<S> end, Function<S, Command> function) {
         if(start.size() != end.size()) Log.info("Transition Map", "Failed to load one to one transition");
-        
-        if(start.size() <= end.size()) {
-            for(int i = 0; i < start.size(); i++) {
-                addTransition(start.get(i), end.get(i), function.apply(start.get(i)));
-            }
-        }
-        else {
-            for(int i = 0; i < end.size(); i++) {
-                addTransition(start.get(i), end.get(i), function.apply(start.get(i)));
-            } 
-        }
+        for(int i = 0; i < (start.size() <= end.size() ? start.size() : end.size()); i++) {
+            addTransition(start.get(i), end.get(i), function.apply(start.get(i)));
+        } 
     }
 
 
 
-    public void addConvergingTransition(S end) {}
+    public void addConvergingTransition(S end) {
+        addConvergingTransition(end, none());
+    }
     
     public void addConvergingTransition(S end, Runnable runnable) {
-        addConvergingTransition(end, new InstantCommand(runnable));
+        addConvergingTransition(end, runOnce(runnable));
     }
     
     public void addConvergingTransition(S end, Command command) {
-        for (S s : states) {
-            addTransition(s, end, command);
+        for (S start : states) {
+            addTransition(start, end, command);
         }
     }
 
-    public void addConvergingTransition(S end, Function<S, Command> function) {}
+    public void addConvergingTransition(S end, Function<S, Command> function) {
+        addConvergingTransition(end, function.apply(end));
+    }
 
-    public void addConvergingTransition(List<S> start, S end) {}
+    public void addConvergingTransition(List<S> start, S end) {
+        addConvergingTransition(start, end, none());
+    }
 
-    public void addConvergingTransition(List<S> start, S end, Runnable runnable) {}
+    public void addConvergingTransition(List<S> start, S end, Runnable runnable) {
+        addConvergingTransition(start, end, runOnce(runnable));
+    }
 
     public void addConvergingTransition(List<S> start, S end, Command command) {
         for (S outGoingState : start) {
@@ -133,111 +142,227 @@ public class TransitionMap<S extends Enum<S>> {
         }
     }
 
-    public void addConvergingTransition(List<S> start, S end, Function<S, Command> function) {}
+    public void addConvergingTransition(List<S> start, S end, Function<S, Command> function) {
+        addConvergingTransition(start, end, function.apply(end));
+    }
 
-    public void addConvergingTransition(List<S> end) {}
+    public void addConvergingTransition(List<S> end) {
+        addConvergingTransition(end, none());
+    }
 
-    public void addConvergingTransition(List<S> end, Runnable runnable) {}
+    public void addConvergingTransition(List<S> end, Runnable runnable) {
+        addConvergingTransition(end, runOnce(runnable));
+    }
 
-    public void addConvergingTransition(List<S> end, Command command) {}
-
-    public void addConvergingTransition(List<S> end, Function<S, Command> function) {}
-
-    public void addConvergingTransition(List<S> start, List<S> end) {}
-
-    public void addConvergingTransition(List<S> start, List<S> end, Runnable runnable) {}
-
-    public void addConvergingTransition(List<S> start, List<S> end, Command command) {}
-
-    public void addConvergingTransition(List<S> start, List<S> end, Function<S, Command> function) {}
-
-
-
-    public void addDivergingTransition(S start) {}
-
-    public void addDivergingTransition(S start, Runnable runnable) {}
-
-    public void addDivergingTransition(S start, Command command) {
-        for (S s : states) {
-            addTransition(start, s, command);
+    public void addConvergingTransition(List<S> end, Command command) {
+        for(S incomingState : end) {
+            addConvergingTransition(incomingState, command);
         }
     }
 
-    public void addDivergingTransition(S start, Function<S, Command> function) {}
+    public void addConvergingTransition(List<S> end, Function<S, Command> function) {
+        for (S incomingState : end) {
+           addConvergingTransition(incomingState, function.apply(incomingState));
+        }
+    }
 
-    public void addDivergingTransition(S start, List<S> end) {}
+    public void addConvergingTransition(List<S> start, List<S> end) {
+        addConvergingTransition(start, end, none());
+    }
 
-    public void addDivergingTransition(S start, List<S> end, Runnable runnable) {}
+    public void addConvergingTransition(List<S> start, List<S> end, Runnable runnable) {
+        addConvergingTransition(start, end, runOnce(runnable));
+    }
 
-    public void addDivergingTransition(S start, List<S> end, Command command) {}
+    public void addConvergingTransition(List<S> start, List<S> end, Command command) {
+        for(S incomingState : end) {
+            addConvergingTransition(start, incomingState, command);
+        }
+    }
+
+    public void addConvergingTransition(List<S> start, List<S> end, Function<S, Command> function) {
+        for(S incomingState : end) {
+            addConvergingTransition(start, incomingState, function.apply(incomingState));
+        }
+    }
+
+
+
+    public void addDivergingTransition(S start) {
+        addDivergingTransition(start, none());
+    }
+
+    public void addDivergingTransition(S start, Runnable runnable) {
+        addDivergingTransition(start, runOnce(runnable));
+    }
+
+    public void addDivergingTransition(S start, Command command) {
+        addDivergingTransition(start, states, command);
+    }
+
+    public void addDivergingTransition(S start, Function<S, Command> function) {
+        addDivergingTransition(start, states, function);
+    }
+
+    public void addDivergingTransition(S start, List<S> end) {
+        addDivergingTransition(start, end, none());
+    }
+
+    public void addDivergingTransition(S start, List<S> end, Runnable runnable) {
+        addDivergingTransition(start, end, runOnce(runnable));
+    }
+
+    public void addDivergingTransition(S start, List<S> end, Command command) {
+        for (S incomingState : end) {
+            addTransition(start, incomingState, command);
+        }
+    }
     
-    public void addDivergingTransitions(S start, List<S> end, Function<S, Command> function) {}
+    public void addDivergingTransition(S start, List<S> end, Function<S, Command> function) {
+        for (S incomingState : end) {
+            addTransition(start, incomingState, function.apply(incomingState));
+        }
+    }
 
-    public void addDivergingTransition(List<S> start) {}
+    public void addDivergingTransition(List<S> start) {
+        addDivergingTransition(start, none());
+    }
 
-    public void addDivergingTransition(List<S> start, Runnable runnable) {}
+    public void addDivergingTransition(List<S> start, Runnable runnable) {
+        addDivergingTransition(start, runOnce(runnable));
+    }
 
-    public void addDivergingTransition(List<S> start, Command command) {}
+    public void addDivergingTransition(List<S> start, Command command) {
+        for (S outgoingState : start) {
+            addDivergingTransition(outgoingState, command);
+        }
+    }
 
-    public void addDivergingTransition(List<S> start, Function<S, Command> function) {}
+    public void addDivergingTransition(List<S> start, Function<S, Command> function) {
+        for (S outgoingState : start) {
+            addDivergingTransition(outgoingState, function);
+        }
+    }
 
-    public void addDivergingTransition(List<S> start, List<S> end) {}
+    public void addDivergingTransition(List<S> start, List<S> end) {
+        addDivergingTransition(start, end, none());
+    }
 
-    public void addDivergingTransition(List<S> start, List<S> end, Runnable runnable) {}
+    public void addDivergingTransition(List<S> start, List<S> end, Runnable runnable) {
+        addDivergingTransition(start, end, runOnce(runnable));
+    }
 
-    public void addDivergingTransition(List<S> start, List<S> end, Command command) {}
+    public void addDivergingTransition(List<S> start, List<S> end, Command command) {
+        for (S outgoingState : start) {
+            addDivergingTransition(outgoingState, end, command);
+        }
+    }
 
-    public void addDivergingTransition(List<S> start, List<S> end, Function<S, Command> function) {}
+    public void addDivergingTransition(List<S> start, List<S> end, Function<S, Command> function) {
+        for (S outgoingState : start) {
+            addDivergingTransition(outgoingState, end, function);
+        }
+    }
 
 
 
-    public void addCommutativeTransition(S start, S end) {}
+    public void addCommutativeTransition(S start, S end) {
+        addCommutativeTransition(start, end, none());
+    }
 
-    public void addCommutativeTransition(S start, S end, Runnable runnable) {}
+    public void addCommutativeTransition(S start, S end, Runnable runnable) {
+        addCommutativeTransition(start, end, runOnce(runnable));
+    }
 
-    public void addCommutativeTransition(S start, S end, Runnable runnableForwards, Runnable runnableBackwards) {}
+    public void addCommutativeTransition(S start, S end, Runnable runnableForwards, Runnable runnableBackwards) {
+        addCommutativeTransition(start, end, runOnce(runnableForwards), runOnce(runnableBackwards));
+    }
 
-    public void addCommutativeTransition(S start, S end, Command command) {}
+    public void addCommutativeTransition(S start, S end, Command command) {
+        addCommutativeTransition(start, end, command, command);
+    }
 
-    public void addCommutativeTransition(S start, S end, Command commandForwards, Command commandBackwards) {}
+    public void addCommutativeTransition(S start, S end, Command commandForwards, Command commandBackwards) {
+        addTransition(start, end, commandForwards);
+        addTransition(end, start, commandBackwards);
+    }
 
-    public void addCommutativeTransition(S start, S end, Function<S, Command> function) {}
+    public void addCommutativeTransition(S start, S end, Function<S, Command> function) {
+        addTransition(start, end, function);
+        addTransition(end, start, function);
+    }
 
-    public void addCommutativeTransition(List<S> start, S end) {}
+    public void addCommutativeTransition(List<S> start, S end) {
+        addCommutativeTransition(start, end, none());
+    }
 
-    public void addCommutativeTransition(List<S> start, S end, Runnable runnable) {}
+    public void addCommutativeTransition(List<S> start, S end, Runnable runnable) {
+        addCommutativeTransition(start, end, runOnce(runnable));
+    }
 
-    public void addCommutativeTransition(List<S> start, S end, Runnable runnableForwards, Runnable runnableBackwards) {}
+    public void addCommutativeTransition(List<S> start, S end, Runnable runnableForwards, Runnable runnableBackwards) {
+        addCommutativeTransition(start, end, runOnce(runnableForwards), runOnce(runnableBackwards));
+    }
 
-    public void addCommutativeTransition(List<S> start, S end, Command command) {}
+    public void addCommutativeTransition(List<S> start, S end, Command command) {
+        addCommutativeTransition(start, end, command, command);
+    }
 
-    public void addCommutativeTransition(List<S> start, S end, Command commandForwards, Command commandBackwards) {}
+    public void addCommutativeTransition(List<S> start, S end, Command commandForwards, Command commandBackwards) {
+        for (S outgoingState : start) {
+            addCommutativeTransition(outgoingState, end, commandForwards, commandBackwards);
+        }
+    }
 
-    public void addCommutativeTransition(List<S> start, S end, Function<S, Command> function) {}
+    public void addCommutativeTransition(List<S> start, S end, Function<S, Command> function) {
+        addCommutativeTransition(start, end, function.apply(end));
+    }
 
-    public void addCommutativeTransition(S start, List<S> end) {}
+    public void addCommutativeTransition(S start, List<S> end) {
+        addCommutativeTransition(start, end, none());
+    }
 
-    public void addCommutativeTransition(S start, List<S> end, Runnable runnable) {}
+    public void addCommutativeTransition(S start, List<S> end, Runnable runnable) {
+        addCommutativeTransition(start, end, runOnce(runnable));
+    }
 
-    public void addCommutativeTransition(S start, List<S> end, Runnable runnableForwards, Runnable runnableBackwards) {}
+    public void addCommutativeTransition(S start, List<S> end, Runnable runnableForwards, Runnable runnableBackwards) {
+        addCommutativeTransition(start, end, runOnce(runnableForwards), runOnce(runnableBackwards));
+    }
 
-    public void addCommutativeTransition(S start, List<S> end, Command command) {}
+    public void addCommutativeTransition(S start, List<S> end, Command command) {
+        addCommutativeTransition(start, end, command, command);
+    }
 
-    public void addCommutativeTransition(S start, List<S> end, Command commandForwards, Command commandBackwards) {}
+    public void addCommutativeTransition(S start, List<S> end, Command commandForwards, Command commandBackwards) {
+        for (S incomingState : end) {
+            addCommutativeTransition(start, incomingState, commandForwards, commandBackwards);
+        }
+    }
 
-    public void addCommutativeTransition(S start, List<S> end, Function<S, Command> function) {}
+    public void addCommutativeTransition(S start, List<S> end, Function<S, Command> function) {
+        for (S incomingState : end) {
+            addCommutativeTransition(start, incomingState, function.apply(incomingState));
+        }
+    }
 
-    public void addCommutativeTransition(List<S> states) {}
+    public void addCommutativeTransition(List<S> states) {
+        addCommutativeTransition(states, none());
+    }
 
-    public void addCommutativeTransition(List<S> states, Runnable runnable) {}
+    public void addCommutativeTransition(List<S> states, Runnable runnable) {
+        addCommutativeTransition(states, runOnce(runnable));
+    }
 
-    public void addCommutativeTransition(List<S> states, Command command) {}
+    public void addCommutativeTransition(List<S> states, Command command) {
+        addCommutativeTransition(states, state -> {return command;});
+    }
 
     public void addCommutativeTransition(List<S> states, Function<S, Command> function) {
-        for(S state1 : states) {
-            for(S state2 : states) {
-                addTransition(state1, state2, function.apply(state2));
-                addTransition(state2, state1, function.apply(state1));
+        for(S incomingState : states) {
+            for(S outgoingState : states) {
+                addTransition(incomingState, outgoingState, function.apply(outgoingState));
+                addTransition(outgoingState, incomingState, function.apply(incomingState));
             }
         }
     }
