@@ -162,6 +162,8 @@ public class Camera {
          */
         Optional<Pose3d> targetPosition = aprilTags.getTagPose(lowestAmbiguityTarget.getFiducialId());
         
+        if (targetPosition.isEmpty()) return Optional.empty();
+
         cameraPose = targetPosition.get().transformBy(lowestAmbiguityTarget.getBestCameraToTarget().inverse());
         estimatedPose = cameraPose.transformBy(offset.inverse()).toPose2d();
 
@@ -169,7 +171,9 @@ public class Camera {
     }
 
     public Pose2d getGyroPose(PhotonPipelineResult result) {
-        Pose2d pose = getPose(result).get();
+        Optional<Pose2d> poseOpt = getPose(result);
+        if (poseOpt.isEmpty()) return new Pose2d();
+        Pose2d pose = poseOpt.get();
         double gyroUnconstrained = gyro.getAsDouble();
 
         Rotation2d gyroAngle = Rotation2d.fromDegrees(MathUtil.inputModulus(gyroUnconstrained, -180, 180));
