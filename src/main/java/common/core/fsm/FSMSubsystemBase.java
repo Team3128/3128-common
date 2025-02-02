@@ -10,11 +10,16 @@ import common.utility.Log;
 import common.utility.shuffleboard.NAR_Shuffleboard;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
+import edu.wpi.first.wpilibj.shuffleboard.WidgetType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public abstract class FSMSubsystemBase<S extends Enum<S>> extends SubsystemBase implements NAR_Subsystem, Sendable{
+public abstract class FSMSubsystemBase<S extends Enum<S>> extends SubsystemBase implements NAR_Subsystem{
     
     protected Transition<S> currentTransition;
     protected S currentState;
@@ -50,8 +55,36 @@ public abstract class FSMSubsystemBase<S extends Enum<S>> extends SubsystemBase 
         NAR_Shuffleboard.addData(this.getName(), "Previous State", ()-> {if(getPreviousState() != null) return getPreviousState().name(); else return "Null";}, 1, 0);
         NAR_Shuffleboard.addData(this.getName(), "Current State", ()-> {if(getState() != null) return getState().name(); else return "Null";}, 2, 0);
         NAR_Shuffleboard.addData(this.getName(), "Valid Transition", ()-> getRequestTransition() != null, 3, 0);
+        // for(S state : enumType.getEnumConstants()) {
+        //     NAR_Shuffleboard.addData(this.getName(), state.name(), ()-> stateEquals(state), (state.ordinal() % 8), state.ordinal() / 8 + 1);
+        // }
+
+        NAR_Shuffleboard.addSendable(this.getName(), "State Transitioner", this, 5,3, 2,3);//.withWidget(BuiltInWidgets.kSplitButtonChooser);
+        // int width = (enumType.getEnumConstants().length + 2) / 3;
+        // ShuffleboardLayout stateTransitioner = Shuffleboard.getTab(getName())
+        //     .getLayout("State Transitioner", BuiltInLayouts.kGrid)
+        //     .withSize(2 * width,3)
+        //     .withPosition(0, 1);
+        // int i = 0;
+        // for (S state : enumType.getEnumConstants()) {
+        //     Shuffleboard.getTab(getName()).addBoolean(state.name(), () -> stateEquals(state)).withPosition(2 * (i % width), i / width + 1)
+        //         .withWidget(BuiltInWidgets.kBooleanBox)
+        //         .withSize(1, 1)
+        //         .;
+        //     Shuffleboard.getTab(getName()).add("Set " + state.name(), runOnce(() -> setState(state))).withPosition(2 * (i % width) + 1, i / width + 1).withSize(1, 1);
+        //     Log.info("a", "" + i / width);
+        //     i++;
+        // }
+    }
+
+    @Override
+    public void initSendable(SendableBuilder builder){
+        // super.initSendable(builder);
+        builder.setSmartDashboardType("SplitButtonChooser");
         for(S state : enumType.getEnumConstants()) {
-            NAR_Shuffleboard.addData(this.getName(), state.name(), ()-> stateEquals(state), (state.ordinal() % 8), state.ordinal() / 8 + 1);
+            builder.addBooleanProperty(state.name(), ()->stateEquals(state), trans -> {if (trans) setState(state);});
+            // Log.info("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", state.name());
+            // break;
         }
     }
     
