@@ -148,8 +148,8 @@ public abstract class NAR_PIDSubsystem extends SubsystemBase {
             final double measurement = controller.getMeasurement();
             final double velocity = (measurement - prevMeasurement) / updateTimer.get();
             final double acceleration = (velocity - prevVelocity) / updateTimer.get();
-            NAR_Shuffleboard.addData(getName(), "1stDerivative", velocity, 3, 1);
-            NAR_Shuffleboard.addData(getName(), "2ndDerivative", acceleration, 3, 2);
+            NAR_Shuffleboard.addData(getName(), "1stDerivative", velocity, 5, 1);
+            NAR_Shuffleboard.addData(getName(), "2ndDerivative", acceleration, 5, 2);
             prevMeasurement = measurement;
             prevVelocity = velocity;
             updateTimer.restart();
@@ -166,18 +166,18 @@ public abstract class NAR_PIDSubsystem extends SubsystemBase {
         NAR_Shuffleboard.addData(getName(), "Setpoint", this::getSetpoint, 1, 1);
 
         debug = NAR_Shuffleboard.debugSwitch(getName(), "DEBUG", false, 2, 0);
-        setpoint = NAR_Shuffleboard.debug(getName(), "Debug_Setpoint", 0, 3,0);
-        NAR_Shuffleboard.addData(getName(), "UseOutput", controller::useOutput, 4, 3);
+        setpoint = NAR_Shuffleboard.debug(getName(), "Debug_Setpoint", 0, 2,1);
+        NAR_Shuffleboard.addData(getName(), "UseOutput", controller::useOutput, 0, 2);
 
-        NAR_Shuffleboard.addSendable(getName(), "PID_Controller", controller, 2, 1, 2, 3).withWidget(BuiltInWidgets.kPIDController);
+        NAR_Shuffleboard.addSendable(getName(), "PID_Controller", controller, 3, 1, 2, 3).withWidget(BuiltInWidgets.kPIDController);
 
         // controller.getConfig().setkS(NAR_Shuffleboard.debug(getName(), "kS", controller.getConfig().getkS(), 0, 2));
         // controller.getConfig().setkV(NAR_Shuffleboard.debug(getName(), "kV", controller.getConfig().getkV(), 1, 2));
         // controller.getConfig().setkA(NAR_Shuffleboard.debug(getName(), "kA", controller.getConfig().getkA(), 1, 3));
         // controller.getConfig().setkG(NAR_Shuffleboard.debug(getName(), "kG", controller.getConfig().getkG(), 0, 3));
 
-        NAR_Shuffleboard.addData(getName(), "Measurement Graph", controller::getMeasurement, 7, 0, 2, 2).withWidget(BuiltInWidgets.kGraph);
-        NAR_Shuffleboard.addData(getName(), "Setpoint Graph", controller::getSetpoint, 7, 0, 2, 2).withWidget(BuiltInWidgets.kGraph);
+        NAR_Shuffleboard.addData(getName(), "Measurement Graph", controller::getMeasurement, 6, 0, 2, 2).withWidget(BuiltInWidgets.kGraph);
+        NAR_Shuffleboard.addData(getName(), "Setpoint Graph", controller::getSetpoint, 8, 0, 2, 2).withWidget(BuiltInWidgets.kGraph);
     }
 
     /**
