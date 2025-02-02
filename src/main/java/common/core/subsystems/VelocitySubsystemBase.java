@@ -86,10 +86,11 @@ public abstract class VelocitySubsystemBase extends NAR_PIDSubsystem implements 
      * Stops all motors in the subsystem.
      */
     public void stop() {
+        disable();
         run(0);
     }
     public Command stopCommand(){
-        return runCommand(0);
+        return runOnce(()-> stop());
     }
 
     /**
