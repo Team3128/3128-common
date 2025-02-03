@@ -8,13 +8,11 @@ import common.core.subsystems.NAR_Subsystem;
 import common.hardware.motorcontroller.NAR_Motor.Neutral;
 import common.utility.Log;
 import common.utility.shuffleboard.NAR_Shuffleboard;
-import edu.wpi.first.util.sendable.Sendable;
-import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public abstract class FSMSubsystemBase<S extends Enum<S>> extends SubsystemBase implements NAR_Subsystem, Sendable{
+public abstract class FSMSubsystemBase<S extends Enum<S>> extends SubsystemBase implements NAR_Subsystem {
     
     protected Transition<S> currentTransition;
     protected S currentState;

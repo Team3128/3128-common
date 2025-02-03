@@ -1,12 +1,7 @@
 package common.core.swerve;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-
 import common.hardware.motorcontroller.NAR_Motor;
 import common.hardware.motorcontroller.NAR_Motor.Control;
-import common.utility.Log;
 import common.utility.narwhaldashboard.NarwhalDashboard;
 import common.utility.shuffleboard.NAR_Shuffleboard;
 import common.utility.sysid.CmdSysId;

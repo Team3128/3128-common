@@ -8,7 +8,6 @@ import common.core.misc.NAR_Robot;
 import common.utility.Log;
 import common.utility.narwhaldashboard.NarwhalDashboard;
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 
 /**

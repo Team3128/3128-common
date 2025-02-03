@@ -23,11 +23,6 @@ public class FFCharacterization {
     private double kS;
     private double kV;
     private double kA;
-    private double moi;
-
-    private double wheelRadius;
-    private double robotRadius;
-    private double torqueConstant;
 
 
     /**
@@ -36,12 +31,6 @@ public class FFCharacterization {
      */
     public FFCharacterization(String name) {
       this.name = name;
-    }
-
-    public void initMOI(double wheelRadius, double robotRadius, double torqueConstant){
-        this.wheelRadius = wheelRadius;
-        this.robotRadius = robotRadius;
-        this.torqueConstant = torqueConstant;
     }
 
     /**
@@ -117,8 +106,6 @@ public class FFCharacterization {
 
         kA = voltageAccelerationRegression.beta(1);
 
-        moi = calculateMOI();
-
         System.out.println("FF Characterization Results (" + name + "):");
         System.out.println(
             "\tCount=" + Integer.toString(velocityData.size()) + ""
@@ -128,32 +115,6 @@ public class FFCharacterization {
         System.out.println(String.format("\tkV=%.5f", kV));                                        //kv
         System.out.println(String.format("\tkA=%.5f", kA));                                        //ka
         System.out.println(String.format("\tM=%.5f", 0));        //R2
-    }
-
-    private double calculateMOI(){
-        if(wheelRadius == 0) return 0;
-        LinkedList<Double> torques = new LinkedList<>();
-        for(int i = 0; i < velocityData.size(); i++){
-            torques.add(4 * robotRadius * torqueConstant * (velocityData.get(i) / Math.pow(wheelRadius, 2)));
-        }
-
-        PolynomialRegression angularVelocityRegression = new PolynomialRegression(
-            timeData.stream().mapToDouble(Double::doubleValue).toArray(),
-            angularVelocityData.stream().mapToDouble(Double::doubleValue).toArray(),
-            4
-        );
-
-        LinkedList<Double> angularAcceleration = new LinkedList<>();
-        angularAcceleration.addAll(
-            new PolynomialDerivative(angularVelocityRegression).evaluate(timeData)
-        );
-
-        PolynomialRegression angularAccelerationTorqueRegression = new PolynomialRegression(
-            angularAcceleration.stream().mapToDouble(Double::doubleValue).toArray(),
-            torques.stream().mapToDouble(Double::doubleValue).toArray(),
-            1
-        );
-        return angularAccelerationTorqueRegression.beta(1);
     }
 
     /**

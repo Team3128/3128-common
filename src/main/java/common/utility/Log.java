@@ -1,7 +1,5 @@
 package common.utility;
 
-import static common.utility.Log.Type.STATE_MACHINE_PRIMARY;
-
 import java.util.List;
 
 import edu.wpi.first.wpilibj.DriverStation;
