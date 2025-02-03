@@ -104,7 +104,7 @@ public class TransitionMap<S extends Enum<S>> {
     public void addCorrespondenceTransitions(List<S> start, List<S> end, Function<S, Command> function) {
         if(start.size() != end.size()) Log.fatal("Transition Map", "Failed to load one to one transition");
         for(int i = 0; i < end.size(); i++) {
-            addTransition(start.get(i), end.get(i), function.apply(end.get(i)));
+            addTransition(start.get(i), end.get(i), function);
         }
     }
 
@@ -365,6 +365,22 @@ public class TransitionMap<S extends Enum<S>> {
                 addTransition(outgoingState, incomingState, function.apply(incomingState));
             }
         }
+    }
+
+    public void addMappedTransition(Map<S, S> map) {
+        addMappedTransition(map, none());
+    }
+
+    public void addMappedTransition(Map<S, S> map, Runnable runnable) {
+        addMappedTransition(map, runOnce(runnable));
+    }
+
+    public void addMappedTransition(Map<S, S> map, Command command) {
+        map.forEach((S start, S end)-> addTransition(start, end, command));
+    }
+
+    public void addMappedTransition(Map<S, S> map, Function<S, Command> function) {
+        map.forEach((S start, S end)-> addTransition(start, end, function));
     }
 
 
