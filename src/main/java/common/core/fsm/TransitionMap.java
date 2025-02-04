@@ -3,6 +3,7 @@ import java.util.*;
 import java.util.function.Function;
 
 import common.utility.Log;
+import edu.wpi.first.math.Pair;
 import edu.wpi.first.wpilibj2.command.Command;
 import static edu.wpi.first.wpilibj2.command.Commands.*;
 
@@ -367,20 +368,20 @@ public class TransitionMap<S extends Enum<S>> {
         }
     }
 
-    public void addMappedTransition(Map<S, S> map) {
+    public void addMappedTransition(List<Pair<S, S>> map) {
         addMappedTransition(map, none());
     }
 
-    public void addMappedTransition(Map<S, S> map, Runnable runnable) {
+    public void addMappedTransition(List<Pair<S, S>> map, Runnable runnable) {
         addMappedTransition(map, runOnce(runnable));
     }
 
-    public void addMappedTransition(Map<S, S> map, Command command) {
-        map.forEach((S start, S end)-> addTransition(start, end, command));
+    public void addMappedTransition(List<Pair<S, S>> map, Command command) {
+        map.forEach((Pair<S, S> pair) -> addTransition(pair.getFirst(), pair.getSecond(), command));
     }
 
-    public void addMappedTransition(Map<S, S> map, Function<S, Command> function) {
-        map.forEach((S start, S end)-> addTransition(start, end, function));
+    public void addMappedTransition(List<Pair<S, S>> map, Function<S, Command> function) {
+        map.forEach((Pair<S, S> pair) -> addTransition(pair.getFirst(), pair.getSecond(), function));
     }
 
 
