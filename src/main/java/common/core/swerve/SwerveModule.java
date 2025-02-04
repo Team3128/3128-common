@@ -122,7 +122,8 @@ public class SwerveModule {
      * @param desiredState The desired state with a velocity and angular component
      */
     private void setAngle(SwerveModuleState desiredState) {
-        Rotation2d angle = (Math.abs(desiredState.speedMetersPerSecond) <= (maxSpeed * 0.025)) ? lastAngle : desiredState.angle; //Prevent rotating module if speed is less then 1%. Prevents Jittering.
+        if(getAngleError() > 5) resetToAbsolute();  // Reset Angle motor position for Absolute Encoders if angle error is greater than 5 degrees
+        Rotation2d angle = (Math.abs(desiredState.speedMetersPerSecond) <= (maxSpeed * 0.025)) ? lastAngle : desiredState.angle; //Prevent rotating module if speed is less then 2.5%. Prevents Jittering.
         angleMotor.set(angle.getDegrees(), Control.Position);
         lastAngle = angle;
     }
@@ -210,6 +211,10 @@ public class SwerveModule {
      */
     private double getPosition() {
         return driveMotor.getPosition();
+    }
+
+    public double getAngleError() {
+        return Math.abs(getAngle().minus(getAbsoluteAngle()).getDegrees());
     }
 
     /**
