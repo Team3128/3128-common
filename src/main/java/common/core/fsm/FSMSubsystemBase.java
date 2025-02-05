@@ -28,13 +28,13 @@ public abstract class FSMSubsystemBase<S extends Enum<S>> extends SubsystemBase 
         this.enumType = enumType;
         this.transitionMap = transitionMap;
         initShuffleboard();
-        try{
-            registerTransitions();
-        } catch(Exception e) {
-            Log.divider(10);
-            Log.unusual(getName(), "Failed to load TransitionMap in constructor");
-            Log.divider(10);
-        }
+        // try{
+        //     registerTransitions();
+        // } catch(Exception e) {
+        //     Log.divider(10);
+        //     Log.unusual(getName(), "Failed to load TransitionMap in constructor");
+        //     Log.divider(10);
+        // }
     }
 
     public FSMSubsystemBase(Class<S> enumType, TransitionMap<S> transitionMap, S initalState) {
