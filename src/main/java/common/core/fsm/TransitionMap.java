@@ -384,6 +384,32 @@ public class TransitionMap<S extends Enum<S>> {
         map.forEach((Pair<S, S> pair) -> addTransition(pair.getFirst(), pair.getSecond(), function));
     }
 
+    public void addUndefinedState(S undefinedState, S exitState)  {
+        addUndefinedState(undefinedState, exitState, none());
+    }
+
+    public void addUndefinedState(S undefinedState, S exitState, Runnable runnable)  {
+        addUndefinedState(undefinedState, exitState, runOnce(runnable));
+    }
+
+    public void addUndefinedState(S undefinedState, S exitState, Runnable toUndefinedRunnable, Runnable toExitRunnable)  {
+        addUndefinedState(undefinedState, exitState, runOnce(toUndefinedRunnable), runOnce(toExitRunnable));
+    }
+
+    public void addUndefinedState(S undefinedState, S exitState, Command command)  {
+        addUndefinedState(undefinedState, exitState, command, command);
+    }
+
+    public void addUndefinedState(S undefinedState, S exitState, Command toUndefinedCommand, Command toExitCommand) {
+        addConvergingTransition(undefinedState, toUndefinedCommand);
+        addTransition(undefinedState, exitState, toExitCommand);
+    }
+
+    public void addUndefinedState(S undefinedState, S exitState, Function<S, Command> function) {
+        addConvergingTransition(undefinedState, function);
+        addTransition(undefinedState, exitState, function);
+    }
+
 
 
     @SuppressWarnings("unchecked")
