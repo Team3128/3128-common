@@ -118,6 +118,13 @@ public abstract class FSMSubsystemBase<S extends Enum<S>> extends SubsystemBase 
         return false;
     }
 
+    public boolean stateEquals(List<S> otherStates) {
+        for(S otherState : otherStates) {
+            if(stateEquals(otherState)) return true;
+        }
+        return false;
+    }
+
     public S getState() {
         return currentState;
     }

@@ -1,5 +1,7 @@
 package common.core.swerve;
 
+import java.util.List;
+
 import common.hardware.motorcontroller.NAR_Motor;
 import common.hardware.motorcontroller.NAR_Motor.Control;
 import common.utility.narwhaldashboard.NarwhalDashboard;
@@ -283,6 +285,14 @@ public abstract class SwerveBase extends SubsystemBase {
         return getPose().getRotation().minus(getDistanceTo(point).getAngle());
     }
 
+    public Pose2d nearestPose2d(List<Pose2d> poses) {
+        return getPose().nearest(poses);
+    }
+
+    public Translation2d nearestTranslation2d(List<Translation2d> translations) {
+        return getPose().getTranslation().nearest(translations);
+    }
+
     public Command identifyOffsetsCommand() {
         return runOnce(()-> {
             for(SwerveModule module : getModules()) {
@@ -290,6 +300,30 @@ public abstract class SwerveBase extends SubsystemBase {
                 System.out.println("public static final double MOD" + module.moduleNumber + "_CANCODER_OFFSET = " + rawAngle + ";");
             }
         });
+    }
+
+    public Command characterize(double startDelay, double rampRate, double targetPosition) {
+        NAR_Motor driveMotor = modules[0].getDriveMotor();
+        final double startPos = driveMotor.getPosition();
+        return new CmdSysId(
+            getName(), 
+            (volts)-> setDriveVoltage(volts), 
+            ()-> driveMotor.getVelocity(), 
+            ()-> driveMotor.getPosition(), 
+            startDelay, 
+            rampRate, 
+            startPos + targetPosition, 
+            true, 
+            this
+        );
+    }
+
+    public Command characterizeTranslation(double startDelay, double rampRate, double targetPosition) {
+        return characterize(startDelay, rampRate, targetPosition).beforeStarting(()-> zeroLock());
+    }
+
+    public Command characterizeRotation(double startDelay, double rampRate, double targetPosition) {
+        return characterize(startDelay, rampRate, targetPosition).beforeStarting(()-> oLock());
     }
 
 }
