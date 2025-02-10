@@ -348,6 +348,10 @@ public abstract class ControllerBase implements Sendable, AutoCloseable {
         }
     }
 
+    public double getError() {
+        return getMeasurement() - getSetpoint();
+    }
+
     public PIDFFConfig getConfig() {
         return this.config;
     }
