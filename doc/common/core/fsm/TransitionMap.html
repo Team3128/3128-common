@@ -375,6 +375,21 @@ loadScripts(document, 'script');</script>
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Function.html" title="class or interface in java.util.function" class="external-link">Function</a>&lt;<a href="TransitionMap.html" title="type parameter in TransitionMap">S</a>,<wbr>edu.wpi.first.wpilibj2.command.Command&gt;&nbsp;function)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#addMappedTransition(java.util.List)" class="member-name-link">addMappedTransition</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;edu.wpi.first.math.Pair&lt;<a href="TransitionMap.html" title="type parameter in TransitionMap">S</a>,<wbr><a href="TransitionMap.html" title="type parameter in TransitionMap">S</a>&gt;&gt;&nbsp;map)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#addMappedTransition(java.util.List,edu.wpi.first.wpilibj2.command.Command)" class="member-name-link">addMappedTransition</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;edu.wpi.first.math.Pair&lt;<a href="TransitionMap.html" title="type parameter in TransitionMap">S</a>,<wbr><a href="TransitionMap.html" title="type parameter in TransitionMap">S</a>&gt;&gt;&nbsp;map,
+ edu.wpi.first.wpilibj2.command.Command&nbsp;command)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#addMappedTransition(java.util.List,java.lang.Runnable)" class="member-name-link">addMappedTransition</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;edu.wpi.first.math.Pair&lt;<a href="TransitionMap.html" title="type parameter in TransitionMap">S</a>,<wbr><a href="TransitionMap.html" title="type parameter in TransitionMap">S</a>&gt;&gt;&nbsp;map,
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Runnable.html" title="class or interface in java.lang" class="external-link">Runnable</a>&nbsp;runnable)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#addMappedTransition(java.util.List,java.util.function.Function)" class="member-name-link">addMappedTransition</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;edu.wpi.first.math.Pair&lt;<a href="TransitionMap.html" title="type parameter in TransitionMap">S</a>,<wbr><a href="TransitionMap.html" title="type parameter in TransitionMap">S</a>&gt;&gt;&nbsp;map,
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Function.html" title="class or interface in java.util.function" class="external-link">Function</a>&lt;<a href="TransitionMap.html" title="type parameter in TransitionMap">S</a>,<wbr>edu.wpi.first.wpilibj2.command.Command&gt;&nbsp;function)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#addTransition(common.core.fsm.Transition)" class="member-name-link">addTransition</a><wbr>(<a href="Transition.html" title="class in common.core.fsm">Transition</a>&lt;<a href="TransitionMap.html" title="type parameter in TransitionMap">S</a>&gt;&nbsp;transition)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Update the adjacency map to include the data for the given transition Note: This WILL NOT
@@ -397,6 +412,37 @@ loadScripts(document, 'script');</script>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#addTransitions(common.core.fsm.Transition...)" class="member-name-link">addTransitions</a><wbr>(<a href="Transition.html" title="class in common.core.fsm">Transition</a>&lt;<a href="TransitionMap.html" title="type parameter in TransitionMap">S</a>&gt;...&nbsp;transitions)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#addUndefinedState(S,S)" class="member-name-link">addUndefinedState</a><wbr>(<a href="TransitionMap.html" title="type parameter in TransitionMap">S</a>&nbsp;undefinedState,
+ <a href="TransitionMap.html" title="type parameter in TransitionMap">S</a>&nbsp;exitState)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#addUndefinedState(S,S,edu.wpi.first.wpilibj2.command.Command)" class="member-name-link">addUndefinedState</a><wbr>(<a href="TransitionMap.html" title="type parameter in TransitionMap">S</a>&nbsp;undefinedState,
+ <a href="TransitionMap.html" title="type parameter in TransitionMap">S</a>&nbsp;exitState,
+ edu.wpi.first.wpilibj2.command.Command&nbsp;command)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#addUndefinedState(S,S,edu.wpi.first.wpilibj2.command.Command,edu.wpi.first.wpilibj2.command.Command)" class="member-name-link">addUndefinedState</a><wbr>(<a href="TransitionMap.html" title="type parameter in TransitionMap">S</a>&nbsp;undefinedState,
+ <a href="TransitionMap.html" title="type parameter in TransitionMap">S</a>&nbsp;exitState,
+ edu.wpi.first.wpilibj2.command.Command&nbsp;toUndefinedCommand,
+ edu.wpi.first.wpilibj2.command.Command&nbsp;toExitCommand)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#addUndefinedState(S,S,java.lang.Runnable)" class="member-name-link">addUndefinedState</a><wbr>(<a href="TransitionMap.html" title="type parameter in TransitionMap">S</a>&nbsp;undefinedState,
+ <a href="TransitionMap.html" title="type parameter in TransitionMap">S</a>&nbsp;exitState,
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Runnable.html" title="class or interface in java.lang" class="external-link">Runnable</a>&nbsp;runnable)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#addUndefinedState(S,S,java.lang.Runnable,java.lang.Runnable)" class="member-name-link">addUndefinedState</a><wbr>(<a href="TransitionMap.html" title="type parameter in TransitionMap">S</a>&nbsp;undefinedState,
+ <a href="TransitionMap.html" title="type parameter in TransitionMap">S</a>&nbsp;exitState,
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Runnable.html" title="class or interface in java.lang" class="external-link">Runnable</a>&nbsp;toUndefinedRunnable,
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Runnable.html" title="class or interface in java.lang" class="external-link">Runnable</a>&nbsp;toExitRunnable)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#addUndefinedState(S,S,java.util.function.Function)" class="member-name-link">addUndefinedState</a><wbr>(<a href="TransitionMap.html" title="type parameter in TransitionMap">S</a>&nbsp;undefinedState,
+ <a href="TransitionMap.html" title="type parameter in TransitionMap">S</a>&nbsp;exitState,
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Function.html" title="class or interface in java.util.function" class="external-link">Function</a>&lt;<a href="TransitionMap.html" title="type parameter in TransitionMap">S</a>,<wbr>edu.wpi.first.wpilibj2.command.Command&gt;&nbsp;function)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="TransitionMap.html" title="type parameter in TransitionMap">S</a></code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#fromOrdinal(int)" class="member-name-link">fromOrdinal</a><wbr>(int&nbsp;ordinal)</code></div>
@@ -959,6 +1005,82 @@ loadScripts(document, 'script');</script>
 <section class="detail" id="addCommutativeTransition(java.util.List,java.util.function.Function)">
 <h3>addCommutativeTransition</h3>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">addCommutativeTransition</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="TransitionMap.html" title="type parameter in TransitionMap">S</a>&gt;&nbsp;states,
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Function.html" title="class or interface in java.util.function" class="external-link">Function</a>&lt;<a href="TransitionMap.html" title="type parameter in TransitionMap">S</a>,<wbr>edu.wpi.first.wpilibj2.command.Command&gt;&nbsp;function)</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="addMappedTransition(java.util.List)">
+<h3>addMappedTransition</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">addMappedTransition</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;edu.wpi.first.math.Pair&lt;<a href="TransitionMap.html" title="type parameter in TransitionMap">S</a>,<wbr><a href="TransitionMap.html" title="type parameter in TransitionMap">S</a>&gt;&gt;&nbsp;map)</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="addMappedTransition(java.util.List,java.lang.Runnable)">
+<h3>addMappedTransition</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">addMappedTransition</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;edu.wpi.first.math.Pair&lt;<a href="TransitionMap.html" title="type parameter in TransitionMap">S</a>,<wbr><a href="TransitionMap.html" title="type parameter in TransitionMap">S</a>&gt;&gt;&nbsp;map,
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Runnable.html" title="class or interface in java.lang" class="external-link">Runnable</a>&nbsp;runnable)</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="addMappedTransition(java.util.List,edu.wpi.first.wpilibj2.command.Command)">
+<h3>addMappedTransition</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">addMappedTransition</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;edu.wpi.first.math.Pair&lt;<a href="TransitionMap.html" title="type parameter in TransitionMap">S</a>,<wbr><a href="TransitionMap.html" title="type parameter in TransitionMap">S</a>&gt;&gt;&nbsp;map,
+ edu.wpi.first.wpilibj2.command.Command&nbsp;command)</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="addMappedTransition(java.util.List,java.util.function.Function)">
+<h3>addMappedTransition</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">addMappedTransition</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;edu.wpi.first.math.Pair&lt;<a href="TransitionMap.html" title="type parameter in TransitionMap">S</a>,<wbr><a href="TransitionMap.html" title="type parameter in TransitionMap">S</a>&gt;&gt;&nbsp;map,
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Function.html" title="class or interface in java.util.function" class="external-link">Function</a>&lt;<a href="TransitionMap.html" title="type parameter in TransitionMap">S</a>,<wbr>edu.wpi.first.wpilibj2.command.Command&gt;&nbsp;function)</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="addUndefinedState(S,S)">
+<h3 id="addUndefinedState(java.lang.Enum,java.lang.Enum)">addUndefinedState</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">addUndefinedState</span><wbr><span class="parameters">(<a href="TransitionMap.html" title="type parameter in TransitionMap">S</a>&nbsp;undefinedState,
+ <a href="TransitionMap.html" title="type parameter in TransitionMap">S</a>&nbsp;exitState)</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="addUndefinedState(S,S,java.lang.Runnable)">
+<h3 id="addUndefinedState(java.lang.Enum,java.lang.Enum,java.lang.Runnable)">addUndefinedState</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">addUndefinedState</span><wbr><span class="parameters">(<a href="TransitionMap.html" title="type parameter in TransitionMap">S</a>&nbsp;undefinedState,
+ <a href="TransitionMap.html" title="type parameter in TransitionMap">S</a>&nbsp;exitState,
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Runnable.html" title="class or interface in java.lang" class="external-link">Runnable</a>&nbsp;runnable)</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="addUndefinedState(S,S,java.lang.Runnable,java.lang.Runnable)">
+<h3 id="addUndefinedState(java.lang.Enum,java.lang.Enum,java.lang.Runnable,java.lang.Runnable)">addUndefinedState</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">addUndefinedState</span><wbr><span class="parameters">(<a href="TransitionMap.html" title="type parameter in TransitionMap">S</a>&nbsp;undefinedState,
+ <a href="TransitionMap.html" title="type parameter in TransitionMap">S</a>&nbsp;exitState,
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Runnable.html" title="class or interface in java.lang" class="external-link">Runnable</a>&nbsp;toUndefinedRunnable,
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Runnable.html" title="class or interface in java.lang" class="external-link">Runnable</a>&nbsp;toExitRunnable)</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="addUndefinedState(S,S,edu.wpi.first.wpilibj2.command.Command)">
+<h3 id="addUndefinedState(java.lang.Enum,java.lang.Enum,edu.wpi.first.wpilibj2.command.Command)">addUndefinedState</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">addUndefinedState</span><wbr><span class="parameters">(<a href="TransitionMap.html" title="type parameter in TransitionMap">S</a>&nbsp;undefinedState,
+ <a href="TransitionMap.html" title="type parameter in TransitionMap">S</a>&nbsp;exitState,
+ edu.wpi.first.wpilibj2.command.Command&nbsp;command)</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="addUndefinedState(S,S,edu.wpi.first.wpilibj2.command.Command,edu.wpi.first.wpilibj2.command.Command)">
+<h3 id="addUndefinedState(java.lang.Enum,java.lang.Enum,edu.wpi.first.wpilibj2.command.Command,edu.wpi.first.wpilibj2.command.Command)">addUndefinedState</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">addUndefinedState</span><wbr><span class="parameters">(<a href="TransitionMap.html" title="type parameter in TransitionMap">S</a>&nbsp;undefinedState,
+ <a href="TransitionMap.html" title="type parameter in TransitionMap">S</a>&nbsp;exitState,
+ edu.wpi.first.wpilibj2.command.Command&nbsp;toUndefinedCommand,
+ edu.wpi.first.wpilibj2.command.Command&nbsp;toExitCommand)</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="addUndefinedState(S,S,java.util.function.Function)">
+<h3 id="addUndefinedState(java.lang.Enum,java.lang.Enum,java.util.function.Function)">addUndefinedState</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">addUndefinedState</span><wbr><span class="parameters">(<a href="TransitionMap.html" title="type parameter in TransitionMap">S</a>&nbsp;undefinedState,
+ <a href="TransitionMap.html" title="type parameter in TransitionMap">S</a>&nbsp;exitState,
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Function.html" title="class or interface in java.util.function" class="external-link">Function</a>&lt;<a href="TransitionMap.html" title="type parameter in TransitionMap">S</a>,<wbr>edu.wpi.first.wpilibj2.command.Command&gt;&nbsp;function)</span></div>
 </section>
 </li>

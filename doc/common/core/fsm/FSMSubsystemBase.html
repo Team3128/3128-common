@@ -83,7 +83,7 @@ loadScripts(document, 'script');</script>
 <hr>
 <div class="type-signature"><span class="modifiers">public abstract class </span><span class="element-name type-name-label">FSMSubsystemBase&lt;S extends <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Enum.html" title="class or interface in java.lang" class="external-link">Enum</a>&lt;S&gt;&gt;</span>
 <span class="extends-implements">extends edu.wpi.first.wpilibj2.command.SubsystemBase
-implements <a href="../subsystems/NAR_Subsystem.html" title="interface in common.core.subsystems">NAR_Subsystem</a>, edu.wpi.first.util.sendable.Sendable</span></div>
+implements <a href="../subsystems/NAR_Subsystem.html" title="interface in common.core.subsystems">NAR_Subsystem</a></span></div>
 </section>
 <section class="summary">
 <ul class="summary-list">
@@ -221,17 +221,20 @@ implements <a href="../subsystems/NAR_Subsystem.html" title="interface in common
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setStateCommand(S)" class="member-name-link">setStateCommand</a><wbr>(<a href="FSMSubsystemBase.html" title="type parameter in FSMSubsystemBase">S</a>&nbsp;nextState)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#stateEquals(S)" class="member-name-link">stateEquals</a><wbr>(<a href="FSMSubsystemBase.html" title="type parameter in FSMSubsystemBase">S</a>&nbsp;otherState)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#stateEquals(java.util.List)" class="member-name-link">stateEquals</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="FSMSubsystemBase.html" title="type parameter in FSMSubsystemBase">S</a>&gt;&nbsp;otherStates)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#stateEquals(S...)" class="member-name-link">stateEquals</a><wbr>(<a href="FSMSubsystemBase.html" title="type parameter in FSMSubsystemBase">S</a>...&nbsp;otherStates)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#stateEquals(S)" class="member-name-link">stateEquals</a><wbr>(<a href="FSMSubsystemBase.html" title="type parameter in FSMSubsystemBase">S</a>&nbsp;otherState)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#stop()" class="member-name-link">stop</a>()</code></div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#stateEquals(S...)" class="member-name-link">stateEquals</a><wbr>(<a href="FSMSubsystemBase.html" title="type parameter in FSMSubsystemBase">S</a>...&nbsp;otherStates)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>edu.wpi.first.wpilibj2.command.Command</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#stopCommand()" class="member-name-link">stopCommand</a>()</code></div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#stop()" class="member-name-link">stop</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>edu.wpi.first.wpilibj2.command.Command</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#stopCommand()" class="member-name-link">stopCommand</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 </div>
 </div>
 </div>
@@ -244,9 +247,6 @@ implements <a href="../subsystems/NAR_Subsystem.html" title="interface in common
 <div class="inherited-list">
 <h3 id="methods-inherited-from-class-common.core.subsystems.NAR_Subsystem">Methods inherited from interface&nbsp;common.core.subsystems.<a href="../subsystems/NAR_Subsystem.html" title="interface in common.core.subsystems">NAR_Subsystem</a></h3>
 <code><a href="../subsystems/NAR_Subsystem.html#resetWidget(java.util.function.BooleanSupplier,int,int)">resetWidget</a>, <a href="../subsystems/NAR_Subsystem.html#runVoltsWidgets(java.lang.String,java.util.function.BooleanSupplier,int,int)">runVoltsWidgets</a>, <a href="../subsystems/NAR_Subsystem.html#runWidgets(java.util.function.BooleanSupplier,int,int)">runWidgets</a></code></div>
-<div class="inherited-list">
-<h3 id="methods-inherited-from-class-edu.wpi.first.util.sendable.Sendable">Methods inherited from interface&nbsp;edu.wpi.first.util.sendable.Sendable</h3>
-<code>initSendable</code></div>
 <div class="inherited-list">
 <h3 id="methods-inherited-from-class-edu.wpi.first.wpilibj2.command.Subsystem">Methods inherited from interface&nbsp;edu.wpi.first.wpilibj2.command.Subsystem</h3>
 <code>defer, getCurrentCommand, getDefaultCommand, getName, periodic, register, removeDefaultCommand, run, runEnd, runOnce, setDefaultCommand, simulationPeriodic, startEnd, startRun</code></div>
@@ -354,6 +354,12 @@ implements <a href="../subsystems/NAR_Subsystem.html" title="interface in common
 <section class="detail" id="stateEquals(S...)">
 <h3 id="stateEquals(java.lang.Enum[])">stateEquals</h3>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">stateEquals</span><wbr><span class="parameters">(<a href="FSMSubsystemBase.html" title="type parameter in FSMSubsystemBase">S</a>...&nbsp;otherStates)</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="stateEquals(java.util.List)">
+<h3>stateEquals</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">stateEquals</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="FSMSubsystemBase.html" title="type parameter in FSMSubsystemBase">S</a>&gt;&nbsp;otherStates)</span></div>
 </section>
 </li>
 <li>

@@ -44,8 +44,9 @@ public class Camera {
     private static BiConsumer<Pose2d, Double> odometry;
     private static Supplier<Pose2d> robotPose;
 
-    private static double distanceThreshold = 5;
+    private static double maxDistanceThreshold = 5;
     private static double ambiguityThreshold = 0.5;
+    private static double minDistanceThreshold = 0.34;
 
     public static double validDist = 0.5;
     public static double overrideThreshold = 5;
@@ -96,8 +97,9 @@ public class Camera {
         Camera.robotPose = robotPose;
     }
 
-    public static void setThresholds(double distanceThreshold, double ambiguityThreshold) {
-        Camera.distanceThreshold = distanceThreshold;
+    public static void setThresholds(double minDistanceThreshold, double maxDistanceThreshold, double ambiguityThreshold) {
+        Camera.minDistanceThreshold = minDistanceThreshold;
+        Camera.maxDistanceThreshold = maxDistanceThreshold;
         Camera.ambiguityThreshold = ambiguityThreshold;
     }
 
@@ -206,7 +208,8 @@ public class Camera {
      * @return If the target is valid
      */
     public boolean isValidTarget(PhotonTrackedTarget target) {       
-        return getDistance(target) < distanceThreshold &&
+        return getDistance(target) < maxDistanceThreshold &&
+            getDistance(target) > minDistanceThreshold &&
             getPoseAmbiguity(target) < ambiguityThreshold &&
             !ignoredTags.contains(Integer.valueOf(target.getFiducialId()));
     }
