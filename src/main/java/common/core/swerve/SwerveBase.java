@@ -7,6 +7,7 @@ import common.hardware.motorcontroller.NAR_Motor.Control;
 import common.utility.narwhaldashboard.NarwhalDashboard;
 import common.utility.shuffleboard.NAR_Shuffleboard;
 import common.utility.sysid.CmdSysId;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -121,6 +122,10 @@ public abstract class SwerveBase extends SubsystemBase {
 
     public Pose2d getPose() {
         return new Pose2d(estimatedPose.getTranslation(), getGyroRotation2d());
+    }
+
+    public Translation2d getTranslation() {
+        return estimatedPose.getTranslation();
     }
 
     public Pose2d getRawEstimatedPose() {
@@ -277,12 +282,24 @@ public abstract class SwerveBase extends SubsystemBase {
         return new Pose2d(x.plus(dx), theta.plus(dtheta));
     }
 
-    public Translation2d getDistanceTo(Translation2d point) {
+    public Translation2d getDisplacementTo(Translation2d point) {
         return getPose().getTranslation().minus(point);
     }
 
-    public Rotation2d getAngleTo(Translation2d point) {
-        return getPose().getRotation().minus(getDistanceTo(point).getAngle());
+    public double getDistanceTo(Translation2d point) {
+        return Math.abs(getPose().getTranslation().getDistance(point));
+    }
+
+    public Rotation2d getAngularDisplacementTo(Translation2d point) {
+        return getPose().getRotation().minus(getDisplacementTo(point).getAngle());
+    }
+
+    public Rotation2d getAngularDisplacementTo(Rotation2d angle) {
+        return getGyroRotation2d().minus(angle);
+    }
+
+    public double getAngleTo(Rotation2d angle) {
+        return MathUtil.angleModulus(getAngularDisplacementTo(angle).getRadians());
     }
 
     public Pose2d nearestPose2d(List<Pose2d> poses) {
