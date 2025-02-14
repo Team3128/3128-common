@@ -1,10 +1,13 @@
 package common.core.swerve;
 
+import java.util.List;
+
 import common.hardware.motorcontroller.NAR_Motor;
 import common.hardware.motorcontroller.NAR_Motor.Control;
 import common.utility.narwhaldashboard.NarwhalDashboard;
 import common.utility.shuffleboard.NAR_Shuffleboard;
 import common.utility.sysid.CmdSysId;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -20,6 +23,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
+//TODO: Change all arguments to spedicfy units even when redundant
 public abstract class SwerveBase extends SubsystemBase {
 
     protected boolean chassisVelocityCorrection = true;
@@ -69,16 +73,31 @@ public abstract class SwerveBase extends SubsystemBase {
     }
 
     public void drive(Translation2d translationVel, Rotation2d rotationVel) {
+        //TODO: Double check field relative inputs
         drive(new ChassisSpeeds(translationVel.getX(), translationVel.getY(), rotationVel.getRadians()));
     }
 
+    public void driveRobotRelative(Translation2d translationVel, Rotation2d rotationVel) {
+        //TODO
+    }
+
     public void drive(Translation2d translationVel, double rotationVel) {
+        //TODO: Double check field relative inputs
         drive(new ChassisSpeeds(translationVel.getX(), translationVel.getY(), rotationVel));
+    }
+
+    public void driveRobotRelative(Translation2d translationVel, double rotationVel) {
+        // TODO
     }
 
     // forces into robot relative speeds
     public void drive(double xVel, double yVel, double omega) {
+        //TODO: Double check field relative inputs
         drive(ChassisSpeeds.fromRobotRelativeSpeeds(xVel, yVel, omega, getGyroRotation2d()));
+    }
+
+    public void driveRobotRelative(double xVel, double yVel, double omega) {
+        //TODO
     }
 
     /**
@@ -86,6 +105,7 @@ public abstract class SwerveBase extends SubsystemBase {
      * @param velocity requested 
      */
     public void drive(ChassisSpeeds velocity) {
+        //TODO: update respective classes in Swerve.java
         assign(velocity);
     }
 
@@ -94,6 +114,7 @@ public abstract class SwerveBase extends SubsystemBase {
      * @param velocity requested velocity
      */
     public void assign(ChassisSpeeds velocity) {
+        //TODO: Should only take in robot relative requests, discretize, and assign (also better name)
         if(fieldRelative) velocity = ChassisSpeeds.fromFieldRelativeSpeeds(velocity, getGyroRotation2d()); // convert to field relative if applicable
         if(chassisVelocityCorrection) velocity = ChassisSpeeds.discretize(velocity, dtConstant);
         setModuleStates(kinematics.toSwerveModuleStates(velocity.times(throttle)));
@@ -157,10 +178,12 @@ public abstract class SwerveBase extends SubsystemBase {
     }
     
     public void toggleFieldRelative() {
+        //TODO shouldn't really need this anymore just use the different methods
         fieldRelative = !fieldRelative;
     }
 
     public void setModuleStates(SwerveModuleState[] desiredStates) {
+        //TODO cosine compensation for skew reduction
         SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, maxSpeed);
         
         for (SwerveModule module : modules){
@@ -201,19 +224,12 @@ public abstract class SwerveBase extends SubsystemBase {
         modules[3].getAngleMotor().set(0, Control.Position);
     }
 
-    public Command characterize(double startDelay, double rampRate) {
-        NAR_Motor driveMotor = modules[0].getDriveMotor();
-        return new CmdSysId(
-            getName(), 
-            (volts)-> setDriveVoltage(volts), 
-            ()-> driveMotor.getVelocity(), 
-            ()-> driveMotor.getPosition(), 
-            startDelay, 
-            rampRate, 
-            10, 
-            true, 
-            this
-        );
+    public void nintyLock() {
+        //TODO
+    }
+
+    public void angleLock(double theta) {
+
     }
 
     public abstract double getYaw();
@@ -244,6 +260,7 @@ public abstract class SwerveBase extends SubsystemBase {
      * @return A ChassisSpeeds object of the current robot-relative velocity
      */
     public ChassisSpeeds getRobotVelocity() {
+        //TODO: Make sure this is robot relative
         return kinematics.toChassisSpeeds(getStates());
     }
 
@@ -267,6 +284,10 @@ public abstract class SwerveBase extends SubsystemBase {
         }
     }
 
+    public Pose2d getPredictedPose(double dt) {
+        return null; //TODO
+    }
+
     public Pose2d getPredictedPose(ChassisSpeeds velocity, double dt) {
         final Translation2d x = getPose().getTranslation();
         final Rotation2d theta = getPose().getRotation();
@@ -275,12 +296,36 @@ public abstract class SwerveBase extends SubsystemBase {
         return new Pose2d(x.plus(dx), theta.plus(dtheta));
     }
 
-    public Translation2d getDistanceTo(Translation2d point) {
+    public Translation2d getTranslation2dTo(Translation2d point) {
         return getPose().getTranslation().minus(point);
     }
 
-    public Rotation2d getAngleTo(Translation2d point) {
-        return getPose().getRotation().minus(getDistanceTo(point).getAngle());
+    public double getDistanceTo(Translation2d point) {
+        return Math.abs(getPose().getTranslation().getDistance(point));
+    }
+
+    public Rotation2d getRotation2dTo(Translation2d point) {
+        return getPose().getRotation().minus(getTranslation2dTo(point).getAngle());
+    }
+
+    public Rotation2d getRotation2dTo(Rotation2d angle) {
+        return getGyroRotation2d().minus(angle);
+    }
+
+    public double getAngleTo(Rotation2d angle) {
+        return MathUtil.angleModulus(getRotation2dTo(angle).getRadians());
+    }
+
+    public Pose2d nearestPose2d(List<Pose2d> poses) {
+        return getPose().nearest(poses);
+    }
+
+    public Translation2d nearestTranslation2d(List<Translation2d> translations) {
+        return getPose().getTranslation().nearest(translations);
+    }
+
+    public Rotation2d nearestRotation2d(List<Rotation2d> translations) {
+        return null; //TODO
     }
 
     public Command identifyOffsetsCommand() {
@@ -290,6 +335,53 @@ public abstract class SwerveBase extends SubsystemBase {
                 System.out.println("public static final double MOD" + module.moduleNumber + "_CANCODER_OFFSET = " + rawAngle + ";");
             }
         });
+    }
+
+    public Command characterize(double startDelay, double rampRate) {
+        NAR_Motor driveMotor = modules[0].getDriveMotor();
+        return new CmdSysId(
+            getName(), 
+            (volts)-> setDriveVoltage(volts), 
+            ()-> driveMotor.getVelocity(), 
+            ()-> driveMotor.getPosition(), 
+            startDelay, 
+            rampRate, 
+            10, 
+            true, 
+            this
+        );
+    }
+
+    public Command characterize(double startDelay, double rampRate, double targetPosition) {
+        NAR_Motor driveMotor = modules[0].getDriveMotor();
+        final double startPos = driveMotor.getPosition();
+        return new CmdSysId(
+            getName(), 
+            (volts)-> setDriveVoltage(volts), 
+            ()-> driveMotor.getVelocity(), 
+            ()-> driveMotor.getPosition(), 
+            startDelay, 
+            rampRate, 
+            startPos + targetPosition, 
+            true, 
+            this
+        );
+    }
+
+    public Command characterizeTranslation(double startDelay, double rampRate) {
+        return null; //TODO
+    }
+
+    public Command characterizeTranslation(double startDelay, double rampRate, double targetPosition) {
+        return characterize(startDelay, rampRate, targetPosition).beforeStarting(()-> zeroLock());
+    }
+
+    public Command characterizeRotation(double startDelay, double rampRate) {
+        return null; //TODO
+    }
+
+    public Command characterizeRotation(double startDelay, double rampRate, double targetPosition) {
+        return characterize(startDelay, rampRate, targetPosition).beforeStarting(()-> oLock());
     }
 
 }
