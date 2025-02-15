@@ -432,6 +432,10 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Returns the Feed Forward output of the controller.</div>
 </dd>
+<dt><a href="common/core/controllers/FFController.html#calculateFF(double)" class="member-name-link">calculateFF(double)</a> - Method in class common.core.controllers.<a href="common/core/controllers/FFController.html" title="class in common.core.controllers">FFController</a></dt>
+<dd>
+<div class="block">Returns the Feed Forward output of the controller.</div>
+</dd>
 <dt><a href="common/core/controllers/TrapController.html#calculateFF(double)" class="member-name-link">calculateFF(double)</a> - Method in class common.core.controllers.<a href="common/core/controllers/TrapController.html" title="class in common.core.controllers">TrapController</a></dt>
 <dd>
 <div class="block">Returns the Feed Forward output of the controller.</div>
@@ -441,6 +445,10 @@ loadScripts(document, 'script');</script>
 <div class="block">Returns the PID output of the controller.</div>
 </dd>
 <dt><a href="common/core/controllers/ControllerBase.html#calculatePID(double)" class="member-name-link">calculatePID(double)</a> - Method in class common.core.controllers.<a href="common/core/controllers/ControllerBase.html" title="class in common.core.controllers">ControllerBase</a></dt>
+<dd>
+<div class="block">Returns the PID output of the controller.</div>
+</dd>
+<dt><a href="common/core/controllers/FFController.html#calculatePID(double)" class="member-name-link">calculatePID(double)</a> - Method in class common.core.controllers.<a href="common/core/controllers/FFController.html" title="class in common.core.controllers">FFController</a></dt>
 <dd>
 <div class="block">Returns the PID output of the controller.</div>
 </dd>
@@ -603,6 +611,8 @@ loadScripts(document, 'script');</script>
 <dt><a href="common/core/controllers/Controller.html#configureFeedback(common.hardware.motorcontroller.NAR_Motor)" class="member-name-link">configureFeedback(NAR_Motor)</a> - Method in class common.core.controllers.<a href="common/core/controllers/Controller.html" title="class in common.core.controllers">Controller</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="common/core/controllers/ControllerBase.html#configureFeedback(common.hardware.motorcontroller.NAR_Motor)" class="member-name-link">configureFeedback(NAR_Motor)</a> - Method in class common.core.controllers.<a href="common/core/controllers/ControllerBase.html" title="class in common.core.controllers">ControllerBase</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="common/core/controllers/FFController.html#configureFeedback(common.hardware.motorcontroller.NAR_Motor)" class="member-name-link">configureFeedback(NAR_Motor)</a> - Method in class common.core.controllers.<a href="common/core/controllers/FFController.html" title="class in common.core.controllers">FFController</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="common/core/controllers/TrapController.html#configureFeedback(common.hardware.motorcontroller.NAR_Motor)" class="member-name-link">configureFeedback(NAR_Motor)</a> - Method in class common.core.controllers.<a href="common/core/controllers/TrapController.html" title="class in common.core.controllers">TrapController</a></dt>
 <dd>&nbsp;</dd>
@@ -872,6 +882,20 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Creates a new FFCharacterization object to store data.</div>
 </dd>
+<dt><a href="common/core/controllers/FFController.html" class="type-name-link" title="class in common.core.controllers">FFController</a> - Class in <a href="common/core/controllers/package-summary.html">common.core.controllers</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="common/core/controllers/FFController.html#%3Cinit%3E(common.core.controllers.PIDFFConfig,common.core.controllers.FFController.Type)" class="member-name-link">FFController(PIDFFConfig, FFController.Type)</a> - Constructor for class common.core.controllers.<a href="common/core/controllers/FFController.html" title="class in common.core.controllers">FFController</a></dt>
+<dd>
+<div class="block">Create a new object to control PID + FF logic for a subsystem.</div>
+</dd>
+<dt><a href="common/core/controllers/FFController.html#%3Cinit%3E(common.core.controllers.PIDFFConfig,common.core.controllers.FFController.Type,double)" class="member-name-link">FFController(PIDFFConfig, FFController.Type, double)</a> - Constructor for class common.core.controllers.<a href="common/core/controllers/FFController.html" title="class in common.core.controllers">FFController</a></dt>
+<dd>
+<div class="block">Create a new object to control PID + FF logic for a subsystem.</div>
+</dd>
+<dt><a href="common/core/controllers/FFController.Type.html" class="type-name-link" title="enum class in common.core.controllers">FFController.Type</a> - Enum Class in <a href="common/core/controllers/package-summary.html">common.core.controllers</a></dt>
+<dd>
+<div class="block">Setpoint types</div>
+</dd>
 <dt><a href="common/core/subsystems/PositionSubsystemBase.html#FFWidgets(common.core.controllers.ControllerBase,int,int)" class="member-name-link">FFWidgets(ControllerBase, int, int)</a> - Method in class common.core.subsystems.<a href="common/core/subsystems/PositionSubsystemBase.html" title="class in common.core.subsystems">PositionSubsystemBase</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="common/core/swerve/SwerveBase.html#fieldRelative" class="member-name-link">fieldRelative</a> - Variable in class common.core.swerve.<a href="common/core/swerve/SwerveBase.html" title="class in common.core.swerve">SwerveBase</a></dt>
@@ -927,7 +951,11 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Returns the angle motor</div>
 </dd>
-<dt><a href="common/core/swerve/SwerveBase.html#getAngleTo(edu.wpi.first.math.geometry.Translation2d)" class="member-name-link">getAngleTo(Translation2d)</a> - Method in class common.core.swerve.<a href="common/core/swerve/SwerveBase.html" title="class in common.core.swerve">SwerveBase</a></dt>
+<dt><a href="common/core/swerve/SwerveBase.html#getAngleTo(edu.wpi.first.math.geometry.Rotation2d)" class="member-name-link">getAngleTo(Rotation2d)</a> - Method in class common.core.swerve.<a href="common/core/swerve/SwerveBase.html" title="class in common.core.swerve">SwerveBase</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="common/core/swerve/SwerveBase.html#getAngularDisplacementTo(edu.wpi.first.math.geometry.Rotation2d)" class="member-name-link">getAngularDisplacementTo(Rotation2d)</a> - Method in class common.core.swerve.<a href="common/core/swerve/SwerveBase.html" title="class in common.core.swerve">SwerveBase</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="common/core/swerve/SwerveBase.html#getAngularDisplacementTo(edu.wpi.first.math.geometry.Translation2d)" class="member-name-link">getAngularDisplacementTo(Translation2d)</a> - Method in class common.core.swerve.<a href="common/core/swerve/SwerveBase.html" title="class in common.core.swerve">SwerveBase</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="common/hardware/motorcontroller/NAR_CANSpark.html#getAppliedOutput()" class="member-name-link">getAppliedOutput()</a> - Method in class common.hardware.motorcontroller.<a href="common/hardware/motorcontroller/NAR_CANSpark.html" title="class in common.hardware.motorcontroller">NAR_CANSpark</a></dt>
 <dd>&nbsp;</dd>
@@ -987,6 +1015,8 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Returns the list of disable conditions</div>
 </dd>
+<dt><a href="common/core/swerve/SwerveBase.html#getDisplacementTo(edu.wpi.first.math.geometry.Translation2d)" class="member-name-link">getDisplacementTo(Translation2d)</a> - Method in class common.core.swerve.<a href="common/core/swerve/SwerveBase.html" title="class in common.core.swerve">SwerveBase</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="common/hardware/camera/Camera.html#getDistance(org.photonvision.targeting.PhotonTrackedTarget)" class="member-name-link">getDistance(PhotonTrackedTarget)</a> - Method in class common.hardware.camera.<a href="common/hardware/camera/Camera.html" title="class in common.hardware.camera">Camera</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="common/core/swerve/SwerveBase.html#getDistanceTo(edu.wpi.first.math.geometry.Translation2d)" class="member-name-link">getDistanceTo(Translation2d)</a> - Method in class common.core.swerve.<a href="common/core/swerve/SwerveBase.html" title="class in common.core.swerve">SwerveBase</a></dt>
@@ -1331,7 +1361,13 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="common/core/fsm/TransitionMap.html#getTransitionCount()" class="member-name-link">getTransitionCount()</a> - Method in class common.core.fsm.<a href="common/core/fsm/TransitionMap.html" title="class in common.core.fsm">TransitionMap</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="common/core/swerve/SwerveBase.html#getTranslation()" class="member-name-link">getTranslation()</a> - Method in class common.core.swerve.<a href="common/core/swerve/SwerveBase.html" title="class in common.core.swerve">SwerveBase</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="common/core/controllers/Controller.html#getType()" class="member-name-link">getType()</a> - Method in class common.core.controllers.<a href="common/core/controllers/Controller.html" title="class in common.core.controllers">Controller</a></dt>
+<dd>
+<div class="block">Returns the type of setpoint used by the controller</div>
+</dd>
+<dt><a href="common/core/controllers/FFController.html#getType()" class="member-name-link">getType()</a> - Method in class common.core.controllers.<a href="common/core/controllers/FFController.html" title="class in common.core.controllers">FFController</a></dt>
 <dd>
 <div class="block">Returns the type of setpoint used by the controller</div>
 </dd>
@@ -2001,6 +2037,8 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="common/core/controllers/Controller.Type.html#POSITION" class="member-name-link">POSITION</a> - Enum constant in enum class common.core.controllers.<a href="common/core/controllers/Controller.Type.html" title="enum class in common.core.controllers">Controller.Type</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="common/core/controllers/FFController.Type.html#POSITION" class="member-name-link">POSITION</a> - Enum constant in enum class common.core.controllers.<a href="common/core/controllers/FFController.Type.html" title="enum class in common.core.controllers">FFController.Type</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="common/hardware/motorcontroller/NAR_CANSpark.NAR_SparkMaxConfig.html#POSITION" class="member-name-link">POSITION</a> - Enum constant in enum class common.hardware.motorcontroller.<a href="common/hardware/motorcontroller/NAR_CANSpark.NAR_SparkMaxConfig.html" title="enum class in common.hardware.motorcontroller">NAR_CANSpark.NAR_SparkMaxConfig</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="common/hardware/motorcontroller/NAR_Motor.StatusFrames.html#POSITION" class="member-name-link">POSITION</a> - Enum constant in enum class common.hardware.motorcontroller.<a href="common/hardware/motorcontroller/NAR_Motor.StatusFrames.html" title="enum class in common.hardware.motorcontroller">NAR_Motor.StatusFrames</a></dt>
@@ -2351,6 +2389,10 @@ loadScripts(document, 'script');</script>
 <div class="block">Sets the vertical deadband value for the left joystick.</div>
 </dd>
 <dt><a href="common/core/controllers/Controller.html#setMeasurementSource(common.hardware.motorcontroller.NAR_Motor)" class="member-name-link">setMeasurementSource(NAR_Motor)</a> - Method in class common.core.controllers.<a href="common/core/controllers/Controller.html" title="class in common.core.controllers">Controller</a></dt>
+<dd>
+<div class="block">Sets a motor's velocity/position as the measurement source</div>
+</dd>
+<dt><a href="common/core/controllers/FFController.html#setMeasurementSource(common.hardware.motorcontroller.NAR_Motor)" class="member-name-link">setMeasurementSource(NAR_Motor)</a> - Method in class common.core.controllers.<a href="common/core/controllers/FFController.html" title="class in common.core.controllers">FFController</a></dt>
 <dd>
 <div class="block">Sets a motor's velocity/position as the measurement source</div>
 </dd>
@@ -2843,6 +2885,10 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Returns the enum constant of this class with the specified name.</div>
 </dd>
+<dt><a href="common/core/controllers/FFController.Type.html#valueOf(java.lang.String)" class="member-name-link">valueOf(String)</a> - Static method in enum class common.core.controllers.<a href="common/core/controllers/FFController.Type.html" title="enum class in common.core.controllers">FFController.Type</a></dt>
+<dd>
+<div class="block">Returns the enum constant of this class with the specified name.</div>
+</dd>
 <dt><a href="common/hardware/input/NAR_XboxController.XboxButton.html#valueOf(java.lang.String)" class="member-name-link">valueOf(String)</a> - Static method in enum class common.hardware.input.<a href="common/hardware/input/NAR_XboxController.XboxButton.html" title="enum class in common.hardware.input">NAR_XboxController.XboxButton</a></dt>
 <dd>
 <div class="block">Returns the enum constant of this class with the specified name.</div>
@@ -2900,6 +2946,11 @@ loadScripts(document, 'script');</script>
 <div class="block">Returns the enum constant of this class with the specified name.</div>
 </dd>
 <dt><a href="common/core/controllers/Controller.Type.html#values()" class="member-name-link">values()</a> - Static method in enum class common.core.controllers.<a href="common/core/controllers/Controller.Type.html" title="enum class in common.core.controllers">Controller.Type</a></dt>
+<dd>
+<div class="block">Returns an array containing the constants of this enum class, in
+the order they are declared.</div>
+</dd>
+<dt><a href="common/core/controllers/FFController.Type.html#values()" class="member-name-link">values()</a> - Static method in enum class common.core.controllers.<a href="common/core/controllers/FFController.Type.html" title="enum class in common.core.controllers">FFController.Type</a></dt>
 <dd>
 <div class="block">Returns an array containing the constants of this enum class, in
 the order they are declared.</div>
@@ -2977,6 +3028,8 @@ the order they are declared.</div>
 <dt><a href="common/hardware/motorcontroller/NAR_Motor.Control.html#Velocity" class="member-name-link">Velocity</a> - Enum constant in enum class common.hardware.motorcontroller.<a href="common/hardware/motorcontroller/NAR_Motor.Control.html" title="enum class in common.hardware.motorcontroller">NAR_Motor.Control</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="common/core/controllers/Controller.Type.html#VELOCITY" class="member-name-link">VELOCITY</a> - Enum constant in enum class common.core.controllers.<a href="common/core/controllers/Controller.Type.html" title="enum class in common.core.controllers">Controller.Type</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="common/core/controllers/FFController.Type.html#VELOCITY" class="member-name-link">VELOCITY</a> - Enum constant in enum class common.core.controllers.<a href="common/core/controllers/FFController.Type.html" title="enum class in common.core.controllers">FFController.Type</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="common/hardware/motorcontroller/NAR_CANSpark.NAR_SparkMaxConfig.html#VELOCITY" class="member-name-link">VELOCITY</a> - Enum constant in enum class common.hardware.motorcontroller.<a href="common/hardware/motorcontroller/NAR_CANSpark.NAR_SparkMaxConfig.html" title="enum class in common.hardware.motorcontroller">NAR_CANSpark.NAR_SparkMaxConfig</a></dt>
 <dd>&nbsp;</dd>

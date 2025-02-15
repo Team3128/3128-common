@@ -113,13 +113,18 @@ public class Camera {
             if (!result.hasTargets()) {
                 return;
             }
-    
-            Pose2d estPos = getGyroPose(result);
+            
+            Optional<Pose2d> estPosOpt = getGyroPose(result);
+            if (estPosOpt.isEmpty()) return;
+            Pose2d estPos = estPosOpt.get();
     
             /*
              * Checks if the the robot has a good estimate
              */
     
+            if (estPos.minus(new Pose2d(0,0,Rotation2d.fromDegrees(0))).getTranslation().getNorm() <= 0.05)
+                return;
+
             if(!isGoodEstimate(estPos)) {
                 updateCounter++;
                 if (updateCounter <= overrideThreshold) {
@@ -130,7 +135,7 @@ public class Camera {
             else {
                 updateCounter = 0;
             } 
-            
+
             odometry.accept(estPos, result.getTimestampSeconds());
         }
     }
@@ -172,15 +177,15 @@ public class Camera {
         return Optional.of(estimatedPose);
     }
 
-    public Pose2d getGyroPose(PhotonPipelineResult result) {
+    public Optional<Pose2d> getGyroPose(PhotonPipelineResult result) {
         Optional<Pose2d> poseOpt = getPose(result);
-        if (poseOpt.isEmpty()) return new Pose2d();
+        if (poseOpt.isEmpty()) return Optional.empty();
         Pose2d pose = poseOpt.get();
         double gyroUnconstrained = gyro.getAsDouble();
 
         Rotation2d gyroAngle = Rotation2d.fromDegrees(MathUtil.inputModulus(gyroUnconstrained, -180, 180));
         Pose2d updatedPose = new Pose2d(pose.getX(), pose.getY(), gyroAngle);
-        return updatedPose;
+        return Optional.of(updatedPose);
     }
 
     /**

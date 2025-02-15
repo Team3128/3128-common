@@ -224,6 +224,7 @@ public abstract class FSMSubsystemBase<S extends Enum<S>> extends SubsystemBase 
     }
 
     public void stop() {
+        Log.info(getName(), "Disabling");
         if(currentTransition != null) currentTransition.cancel();
         mechanisms.forEach((subsystem)-> subsystem.stop());
     }

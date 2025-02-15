@@ -6,6 +6,7 @@ import java.util.function.DoubleSupplier;
 import common.core.controllers.ControllerBase;
 import common.hardware.motorcontroller.NAR_Motor;
 import common.hardware.motorcontroller.NAR_Motor.Neutral;
+import common.utility.Log;
 import common.utility.shuffleboard.NAR_Shuffleboard;
 import common.utility.sysid.CmdSysId;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
@@ -111,6 +112,7 @@ public abstract class PositionSubsystemBase extends NAR_PIDSubsystem implements 
      * Stops all motors.
      */
     public void stop() {
+        Log.info(getName(), "Disabling");
         disable();
         run(0);
     }
