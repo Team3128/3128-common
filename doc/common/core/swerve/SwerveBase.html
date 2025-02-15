@@ -154,36 +154,82 @@ loadScripts(document, 'script');</script>
  double&nbsp;timeStamp)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#assign(edu.wpi.first.math.kinematics.ChassisSpeeds)" class="member-name-link">assign</a><wbr>(edu.wpi.first.math.kinematics.ChassisSpeeds&nbsp;velocity)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Assigns the requested velocity to the swerve modules</div>
-</div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#angleLock(double)" class="member-name-link">angleLock</a><wbr>(double&nbsp;theta)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>edu.wpi.first.wpilibj2.command.Command</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#characterize(double,double)" class="member-name-link">characterize</a><wbr>(double&nbsp;startDelay,
  double&nbsp;rampRate)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#drive(double,double,double)" class="member-name-link">drive</a><wbr>(double&nbsp;xVel,
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>edu.wpi.first.wpilibj2.command.Command</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#characterize(double,double,double)" class="member-name-link">characterize</a><wbr>(double&nbsp;startDelay,
+ double&nbsp;rampRate,
+ double&nbsp;targetPosition)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>edu.wpi.first.wpilibj2.command.Command</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#characterizeRotation(double,double)" class="member-name-link">characterizeRotation</a><wbr>(double&nbsp;startDelay,
+ double&nbsp;rampRate)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>edu.wpi.first.wpilibj2.command.Command</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#characterizeRotation(double,double,double)" class="member-name-link">characterizeRotation</a><wbr>(double&nbsp;startDelay,
+ double&nbsp;rampRate,
+ double&nbsp;targetPosition)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>edu.wpi.first.wpilibj2.command.Command</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#characterizeTranslation(double,double)" class="member-name-link">characterizeTranslation</a><wbr>(double&nbsp;startDelay,
+ double&nbsp;rampRate)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>edu.wpi.first.wpilibj2.command.Command</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#characterizeTranslation(double,double,double)" class="member-name-link">characterizeTranslation</a><wbr>(double&nbsp;startDelay,
+ double&nbsp;rampRate,
+ double&nbsp;targetPosition)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#drive(double,double,double)" class="member-name-link">drive</a><wbr>(double&nbsp;xVel,
  double&nbsp;yVel,
  double&nbsp;omega)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#drive(edu.wpi.first.math.geometry.Translation2d,double)" class="member-name-link">drive</a><wbr>(edu.wpi.first.math.geometry.Translation2d&nbsp;translationVel,
- double&nbsp;rotationVel)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#drive(edu.wpi.first.math.geometry.Translation2d,edu.wpi.first.math.geometry.Rotation2d)" class="member-name-link">drive</a><wbr>(edu.wpi.first.math.geometry.Translation2d&nbsp;translationVel,
- edu.wpi.first.math.geometry.Rotation2d&nbsp;rotationVel)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#drive(edu.wpi.first.math.kinematics.ChassisSpeeds)" class="member-name-link">drive</a><wbr>(edu.wpi.first.math.kinematics.ChassisSpeeds&nbsp;velocity)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Provides user editable insulation between requests and assignments to the swerve modules</div>
+<div class="block">Arguments must be field relative</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>edu.wpi.first.math.geometry.Rotation2d</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getAngleTo(edu.wpi.first.math.geometry.Translation2d)" class="member-name-link">getAngleTo</a><wbr>(edu.wpi.first.math.geometry.Translation2d&nbsp;point)</code></div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#drive(edu.wpi.first.math.geometry.Translation2d,double)" class="member-name-link">drive</a><wbr>(edu.wpi.first.math.geometry.Translation2d&nbsp;translationVel,
+ double&nbsp;rotationVel)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Arguments must be field relative</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#drive(edu.wpi.first.math.geometry.Translation2d,edu.wpi.first.math.geometry.Rotation2d)" class="member-name-link">drive</a><wbr>(edu.wpi.first.math.geometry.Translation2d&nbsp;translationVel,
+ edu.wpi.first.math.geometry.Rotation2d&nbsp;rotationVel)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Arguments must be field relative</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#drive(edu.wpi.first.math.kinematics.ChassisSpeeds)" class="member-name-link">drive</a><wbr>(edu.wpi.first.math.kinematics.ChassisSpeeds&nbsp;velocity)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Provides user editable insulation between requests and assignments to the swerve modules (field relative)</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#driveRobotRelative(double,double,double)" class="member-name-link">driveRobotRelative</a><wbr>(double&nbsp;xVel,
+ double&nbsp;yVel,
+ double&nbsp;omega)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Arguments must be robot relative</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#driveRobotRelative(edu.wpi.first.math.geometry.Translation2d,double)" class="member-name-link">driveRobotRelative</a><wbr>(edu.wpi.first.math.geometry.Translation2d&nbsp;translationVel,
+ double&nbsp;rotationVel)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Arguments must be robot relative</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#driveRobotRelative(edu.wpi.first.math.geometry.Translation2d,edu.wpi.first.math.geometry.Rotation2d)" class="member-name-link">driveRobotRelative</a><wbr>(edu.wpi.first.math.geometry.Translation2d&nbsp;translationVel,
+ edu.wpi.first.math.geometry.Rotation2d&nbsp;rotationVel)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Arguments must be robot relative</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>double</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getAngleTo(edu.wpi.first.math.geometry.Rotation2d)" class="member-name-link">getAngleTo</a><wbr>(edu.wpi.first.math.geometry.Rotation2d&nbsp;angle)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>edu.wpi.first.math.geometry.Translation2d</code></div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>double</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getDistanceTo(edu.wpi.first.math.geometry.Translation2d)" class="member-name-link">getDistanceTo</a><wbr>(edu.wpi.first.math.geometry.Translation2d&nbsp;point)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>edu.wpi.first.math.kinematics.ChassisSpeeds</code></div>
@@ -210,25 +256,37 @@ loadScripts(document, 'script');</script>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getPositions()" class="member-name-link">getPositions</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>edu.wpi.first.math.geometry.Pose2d</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getPredictedPose(edu.wpi.first.math.kinematics.ChassisSpeeds,double)" class="member-name-link">getPredictedPose</a><wbr>(edu.wpi.first.math.kinematics.ChassisSpeeds&nbsp;velocity,
- double&nbsp;dt)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getPredictedPose(double)" class="member-name-link">getPredictedPose</a><wbr>(double&nbsp;dt)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>edu.wpi.first.math.geometry.Pose2d</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getRawEstimatedPose()" class="member-name-link">getRawEstimatedPose</a>()</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getPredictedPose(edu.wpi.first.math.kinematics.ChassisSpeeds,double)" class="member-name-link">getPredictedPose</a><wbr>(edu.wpi.first.math.kinematics.ChassisSpeeds&nbsp;velocity,
+ double&nbsp;dt)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>edu.wpi.first.math.kinematics.ChassisSpeeds</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getRobotVelocity()" class="member-name-link">getRobotVelocity</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>edu.wpi.first.math.geometry.Pose2d</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getRawEstimatedPose()" class="member-name-link">getRawEstimatedPose</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>edu.wpi.first.math.kinematics.ChassisSpeeds</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getRobotVelocity()" class="member-name-link">getRobotVelocity</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Gets the current robot-relative velocity (x, y and omega) of the robot</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>abstract double</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#getRoll()" class="member-name-link">getRoll</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">&nbsp;</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>double</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getSpeed()" class="member-name-link">getSpeed</a>()</code></div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>abstract double</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#getRoll()" class="member-name-link">getRoll</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>edu.wpi.first.math.geometry.Rotation2d</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getRotation2dTo(edu.wpi.first.math.geometry.Rotation2d)" class="member-name-link">getRotation2dTo</a><wbr>(edu.wpi.first.math.geometry.Rotation2d&nbsp;angle)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>edu.wpi.first.math.geometry.Rotation2d</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getRotation2dTo(edu.wpi.first.math.geometry.Translation2d)" class="member-name-link">getRotation2dTo</a><wbr>(edu.wpi.first.math.geometry.Translation2d&nbsp;point)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>edu.wpi.first.math.kinematics.SwerveModuleState[]</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getStates()" class="member-name-link">getStates</a>()</code></div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>double</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getSpeed()" class="member-name-link">getSpeed</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>edu.wpi.first.math.kinematics.SwerveModuleState[]</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getStates()" class="member-name-link">getStates</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>edu.wpi.first.math.geometry.Translation2d</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getTranslation2dTo(edu.wpi.first.math.geometry.Translation2d)" class="member-name-link">getTranslation2dTo</a><wbr>(edu.wpi.first.math.geometry.Translation2d&nbsp;point)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>abstract double</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#getYaw()" class="member-name-link">getYaw</a>()</code></div>
@@ -241,6 +299,18 @@ loadScripts(document, 'script');</script>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#initStateCheck()" class="member-name-link">initStateCheck</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>edu.wpi.first.math.geometry.Pose2d</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#nearestPose2d(java.util.List)" class="member-name-link">nearestPose2d</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;edu.wpi.first.math.geometry.Pose2d&gt;&nbsp;poses)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>edu.wpi.first.math.geometry.Rotation2d</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#nearestRotation2d(java.util.List)" class="member-name-link">nearestRotation2d</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;edu.wpi.first.math.geometry.Rotation2d&gt;&nbsp;translations)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>edu.wpi.first.math.geometry.Translation2d</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#nearestTranslation2d(java.util.List)" class="member-name-link">nearestTranslation2d</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;edu.wpi.first.math.geometry.Translation2d&gt;&nbsp;translations)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#nintyLock()" class="member-name-link">nintyLock</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#oLock()" class="member-name-link">oLock</a>()</code></div>
@@ -388,6 +458,25 @@ loadScripts(document, 'script');</script>
 <h3>drive</h3>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">drive</span><wbr><span class="parameters">(edu.wpi.first.math.geometry.Translation2d&nbsp;translationVel,
  edu.wpi.first.math.geometry.Rotation2d&nbsp;rotationVel)</span></div>
+<div class="block">Arguments must be field relative</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>translationVel</code> - in meters per second</dd>
+<dd><code>rotationVel</code> - in radians per second</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="driveRobotRelative(edu.wpi.first.math.geometry.Translation2d,edu.wpi.first.math.geometry.Rotation2d)">
+<h3>driveRobotRelative</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">driveRobotRelative</span><wbr><span class="parameters">(edu.wpi.first.math.geometry.Translation2d&nbsp;translationVel,
+ edu.wpi.first.math.geometry.Rotation2d&nbsp;rotationVel)</span></div>
+<div class="block">Arguments must be robot relative</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>translationVel</code> - in meters per second</dd>
+<dd><code>rotationVel</code> - in radians per second</dd>
+</dl>
 </section>
 </li>
 <li>
@@ -395,6 +484,25 @@ loadScripts(document, 'script');</script>
 <h3>drive</h3>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">drive</span><wbr><span class="parameters">(edu.wpi.first.math.geometry.Translation2d&nbsp;translationVel,
  double&nbsp;rotationVel)</span></div>
+<div class="block">Arguments must be field relative</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>translationVel</code> - in meters per second</dd>
+<dd><code>rotationVel</code> - in radians per second</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="driveRobotRelative(edu.wpi.first.math.geometry.Translation2d,double)">
+<h3>driveRobotRelative</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">driveRobotRelative</span><wbr><span class="parameters">(edu.wpi.first.math.geometry.Translation2d&nbsp;translationVel,
+ double&nbsp;rotationVel)</span></div>
+<div class="block">Arguments must be robot relative</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>translationVel</code> - in meters per second</dd>
+<dd><code>rotationVel</code> - in radians per second</dd>
+</dl>
 </section>
 </li>
 <li>
@@ -403,27 +511,38 @@ loadScripts(document, 'script');</script>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">drive</span><wbr><span class="parameters">(double&nbsp;xVel,
  double&nbsp;yVel,
  double&nbsp;omega)</span></div>
+<div class="block">Arguments must be field relative</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>xVel</code> - in meters per second</dd>
+<dd><code>yVel</code> - in meters per second</dd>
+<dd><code>omega</code> - in radians per second</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="driveRobotRelative(double,double,double)">
+<h3>driveRobotRelative</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">driveRobotRelative</span><wbr><span class="parameters">(double&nbsp;xVel,
+ double&nbsp;yVel,
+ double&nbsp;omega)</span></div>
+<div class="block">Arguments must be robot relative</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>xVel</code> - in meters per second</dd>
+<dd><code>yVel</code> - in meters per second</dd>
+<dd><code>omega</code> - in radians per second</dd>
+</dl>
 </section>
 </li>
 <li>
 <section class="detail" id="drive(edu.wpi.first.math.kinematics.ChassisSpeeds)">
 <h3>drive</h3>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">drive</span><wbr><span class="parameters">(edu.wpi.first.math.kinematics.ChassisSpeeds&nbsp;velocity)</span></div>
-<div class="block">Provides user editable insulation between requests and assignments to the swerve modules</div>
+<div class="block">Provides user editable insulation between requests and assignments to the swerve modules (field relative)</div>
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>velocity</code> - requested</dd>
-</dl>
-</section>
-</li>
-<li>
-<section class="detail" id="assign(edu.wpi.first.math.kinematics.ChassisSpeeds)">
-<h3>assign</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">assign</span><wbr><span class="parameters">(edu.wpi.first.math.kinematics.ChassisSpeeds&nbsp;velocity)</span></div>
-<div class="block">Assigns the requested velocity to the swerve modules</div>
-<dl class="notes">
-<dt>Parameters:</dt>
-<dd><code>velocity</code> - requested velocity</dd>
 </dl>
 </section>
 </li>
@@ -531,10 +650,15 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
-<section class="detail" id="characterize(double,double)">
-<h3>characterize</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">edu.wpi.first.wpilibj2.command.Command</span>&nbsp;<span class="element-name">characterize</span><wbr><span class="parameters">(double&nbsp;startDelay,
- double&nbsp;rampRate)</span></div>
+<section class="detail" id="nintyLock()">
+<h3>nintyLock</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">nintyLock</span>()</div>
+</section>
+</li>
+<li>
+<section class="detail" id="angleLock(double)">
+<h3>angleLock</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">angleLock</span><wbr><span class="parameters">(double&nbsp;theta)</span></div>
 </section>
 </li>
 <li>
@@ -614,6 +738,12 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
+<section class="detail" id="getPredictedPose(double)">
+<h3>getPredictedPose</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">edu.wpi.first.math.geometry.Pose2d</span>&nbsp;<span class="element-name">getPredictedPose</span><wbr><span class="parameters">(double&nbsp;dt)</span></div>
+</section>
+</li>
+<li>
 <section class="detail" id="getPredictedPose(edu.wpi.first.math.kinematics.ChassisSpeeds,double)">
 <h3>getPredictedPose</h3>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">edu.wpi.first.math.geometry.Pose2d</span>&nbsp;<span class="element-name">getPredictedPose</span><wbr><span class="parameters">(edu.wpi.first.math.kinematics.ChassisSpeeds&nbsp;velocity,
@@ -621,21 +751,102 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
-<section class="detail" id="getDistanceTo(edu.wpi.first.math.geometry.Translation2d)">
-<h3>getDistanceTo</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">edu.wpi.first.math.geometry.Translation2d</span>&nbsp;<span class="element-name">getDistanceTo</span><wbr><span class="parameters">(edu.wpi.first.math.geometry.Translation2d&nbsp;point)</span></div>
+<section class="detail" id="getTranslation2dTo(edu.wpi.first.math.geometry.Translation2d)">
+<h3>getTranslation2dTo</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">edu.wpi.first.math.geometry.Translation2d</span>&nbsp;<span class="element-name">getTranslation2dTo</span><wbr><span class="parameters">(edu.wpi.first.math.geometry.Translation2d&nbsp;point)</span></div>
 </section>
 </li>
 <li>
-<section class="detail" id="getAngleTo(edu.wpi.first.math.geometry.Translation2d)">
+<section class="detail" id="getDistanceTo(edu.wpi.first.math.geometry.Translation2d)">
+<h3>getDistanceTo</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">double</span>&nbsp;<span class="element-name">getDistanceTo</span><wbr><span class="parameters">(edu.wpi.first.math.geometry.Translation2d&nbsp;point)</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="getRotation2dTo(edu.wpi.first.math.geometry.Translation2d)">
+<h3>getRotation2dTo</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">edu.wpi.first.math.geometry.Rotation2d</span>&nbsp;<span class="element-name">getRotation2dTo</span><wbr><span class="parameters">(edu.wpi.first.math.geometry.Translation2d&nbsp;point)</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="getRotation2dTo(edu.wpi.first.math.geometry.Rotation2d)">
+<h3>getRotation2dTo</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">edu.wpi.first.math.geometry.Rotation2d</span>&nbsp;<span class="element-name">getRotation2dTo</span><wbr><span class="parameters">(edu.wpi.first.math.geometry.Rotation2d&nbsp;angle)</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="getAngleTo(edu.wpi.first.math.geometry.Rotation2d)">
 <h3>getAngleTo</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">edu.wpi.first.math.geometry.Rotation2d</span>&nbsp;<span class="element-name">getAngleTo</span><wbr><span class="parameters">(edu.wpi.first.math.geometry.Translation2d&nbsp;point)</span></div>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">double</span>&nbsp;<span class="element-name">getAngleTo</span><wbr><span class="parameters">(edu.wpi.first.math.geometry.Rotation2d&nbsp;angle)</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="nearestPose2d(java.util.List)">
+<h3>nearestPose2d</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">edu.wpi.first.math.geometry.Pose2d</span>&nbsp;<span class="element-name">nearestPose2d</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;edu.wpi.first.math.geometry.Pose2d&gt;&nbsp;poses)</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="nearestTranslation2d(java.util.List)">
+<h3>nearestTranslation2d</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">edu.wpi.first.math.geometry.Translation2d</span>&nbsp;<span class="element-name">nearestTranslation2d</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;edu.wpi.first.math.geometry.Translation2d&gt;&nbsp;translations)</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="nearestRotation2d(java.util.List)">
+<h3>nearestRotation2d</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">edu.wpi.first.math.geometry.Rotation2d</span>&nbsp;<span class="element-name">nearestRotation2d</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;edu.wpi.first.math.geometry.Rotation2d&gt;&nbsp;translations)</span></div>
 </section>
 </li>
 <li>
 <section class="detail" id="identifyOffsetsCommand()">
 <h3>identifyOffsetsCommand</h3>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">edu.wpi.first.wpilibj2.command.Command</span>&nbsp;<span class="element-name">identifyOffsetsCommand</span>()</div>
+</section>
+</li>
+<li>
+<section class="detail" id="characterize(double,double)">
+<h3>characterize</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">edu.wpi.first.wpilibj2.command.Command</span>&nbsp;<span class="element-name">characterize</span><wbr><span class="parameters">(double&nbsp;startDelay,
+ double&nbsp;rampRate)</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="characterize(double,double,double)">
+<h3>characterize</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">edu.wpi.first.wpilibj2.command.Command</span>&nbsp;<span class="element-name">characterize</span><wbr><span class="parameters">(double&nbsp;startDelay,
+ double&nbsp;rampRate,
+ double&nbsp;targetPosition)</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="characterizeTranslation(double,double)">
+<h3>characterizeTranslation</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">edu.wpi.first.wpilibj2.command.Command</span>&nbsp;<span class="element-name">characterizeTranslation</span><wbr><span class="parameters">(double&nbsp;startDelay,
+ double&nbsp;rampRate)</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="characterizeTranslation(double,double,double)">
+<h3>characterizeTranslation</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">edu.wpi.first.wpilibj2.command.Command</span>&nbsp;<span class="element-name">characterizeTranslation</span><wbr><span class="parameters">(double&nbsp;startDelay,
+ double&nbsp;rampRate,
+ double&nbsp;targetPosition)</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="characterizeRotation(double,double)">
+<h3>characterizeRotation</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">edu.wpi.first.wpilibj2.command.Command</span>&nbsp;<span class="element-name">characterizeRotation</span><wbr><span class="parameters">(double&nbsp;startDelay,
+ double&nbsp;rampRate)</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="characterizeRotation(double,double,double)">
+<h3>characterizeRotation</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">edu.wpi.first.wpilibj2.command.Command</span>&nbsp;<span class="element-name">characterizeRotation</span><wbr><span class="parameters">(double&nbsp;startDelay,
+ double&nbsp;rampRate,
+ double&nbsp;targetPosition)</span></div>
 </section>
 </li>
 </ul>

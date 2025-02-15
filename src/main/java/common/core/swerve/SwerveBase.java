@@ -71,41 +71,65 @@ public abstract class SwerveBase extends SubsystemBase {
         NAR_Shuffleboard.addCommand("Swerve", "Reset Gyro", runOnce(()-> resetGyro(0)), 7, 2);
         NAR_Shuffleboard.addCommand("Swerve", "Identify Offsets", identifyOffsetsCommand(), 7, 3);
     }
-
+    /**
+     * Arguments must be field relative
+     * @param translationVel in meters per second
+     * @param rotationVel in radians per second
+     */
     public void drive(Translation2d translationVel, Rotation2d rotationVel) {
-        //TODO: Double check field relative inputs
         drive(new ChassisSpeeds(translationVel.getX(), translationVel.getY(), rotationVel.getRadians()));
     }
 
+    /**
+     * Arguments must be robot relative
+     * @param translationVel in meters per second
+     * @param rotationVel in radians per second
+     */
     public void driveRobotRelative(Translation2d translationVel, Rotation2d rotationVel) {
-        //TODO
+        drive(ChassisSpeeds.fromRobotRelativeSpeeds(translationVel.getX(), translationVel.getY(), rotationVel.getRadians(), getGyroRotation2d()));
     }
-
+    /**
+     * Arguments must be field relative
+     * @param translationVel in meters per second
+     * @param rotationVel in radians per second
+     */
     public void drive(Translation2d translationVel, double rotationVel) {
-        //TODO: Double check field relative inputs
         drive(new ChassisSpeeds(translationVel.getX(), translationVel.getY(), rotationVel));
     }
-
+    /**
+     * Arguments must be robot relative
+     * @param translationVel in meters per second
+     * @param rotationVel in radians per second
+     */
     public void driveRobotRelative(Translation2d translationVel, double rotationVel) {
-        // TODO
-    }
-
-    // forces into robot relative speeds
-    public void drive(double xVel, double yVel, double omega) {
-        //TODO: Double check field relative inputs
-        drive(ChassisSpeeds.fromRobotRelativeSpeeds(xVel, yVel, omega, getGyroRotation2d()));
-    }
-
-    public void driveRobotRelative(double xVel, double yVel, double omega) {
-        //TODO
+        drive(ChassisSpeeds.fromRobotRelativeSpeeds(translationVel.getX(), translationVel.getY(), rotationVel, getGyroRotation2d()));
     }
 
     /**
-     * Provides user editable insulation between requests and assignments to the swerve modules
+     * Arguments must be field relative
+     * @param xVel in meters per second
+     * @param yVel in meters per second
+     * @param omega in radians per second
+     */
+    public void drive(double xVel, double yVel, double omega) {
+        drive(new ChassisSpeeds(xVel, yVel, omega));
+    }
+
+    /**
+     * Arguments must be robot relative
+     * @param xVel in meters per second
+     * @param yVel in meters per second
+     * @param omega in radians per second
+     */
+    public void driveRobotRelative(double xVel, double yVel, double omega) {
+        drive(ChassisSpeeds.fromRobotRelativeSpeeds(xVel, yVel, omega, getGyroRotation2d()));
+    }
+
+    /**
+     * Provides user editable insulation between requests and assignments to the swerve modules (field relative)
      * @param velocity requested 
      */
     public void drive(ChassisSpeeds velocity) {
-        //TODO: update respective classes in Swerve.java
         assign(velocity);
     }
 
@@ -113,8 +137,7 @@ public abstract class SwerveBase extends SubsystemBase {
      * Assigns the requested velocity to the swerve modules
      * @param velocity requested velocity
      */
-    public void assign(ChassisSpeeds velocity) {
-        //TODO: Should only take in robot relative requests, discretize, and assign (also better name)
+    private void assign(ChassisSpeeds velocity) {
         if(fieldRelative) velocity = ChassisSpeeds.fromFieldRelativeSpeeds(velocity, getGyroRotation2d()); // convert to field relative if applicable
         if(chassisVelocityCorrection) velocity = ChassisSpeeds.discretize(velocity, dtConstant);
         setModuleStates(kinematics.toSwerveModuleStates(velocity.times(throttle)));
