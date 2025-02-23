@@ -27,7 +27,7 @@ public abstract class FSMSubsystemBase<S extends Enum<S>> extends SubsystemBase 
     public FSMSubsystemBase(Class<S> enumType, TransitionMap<S> transitionMap) {
         this.enumType = enumType;
         this.transitionMap = transitionMap;
-        initShuffleboard();
+        // initShuffleboard();
         // try{
         //     registerTransitions();
         // } catch(Exception e) {

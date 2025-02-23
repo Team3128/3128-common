@@ -86,7 +86,7 @@ public class Camera {
 
         cameras.add(this);
 
-        initShuffleboard();
+        // initShuffleboard();
         hasSeenTag = false;
     }
         
