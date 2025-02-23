@@ -128,9 +128,9 @@ public class NarwhalDashboard extends WebSocketServer implements AutoCloseable {
      * 
      * @param names - The human-readable name of the autonomous program
      */
-    public void addAutos(List<String> names) {
-        autoPrograms.addAll(names);
-        addInit("auto", names);
+    public void addAutos(String... names) {
+        autoPrograms.addAll(Arrays.asList(names));
+        addInit("auto", Arrays.asList((Object[]) names));
     }
 
     /** 
