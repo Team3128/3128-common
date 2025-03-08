@@ -167,6 +167,14 @@ public abstract class SwerveBase extends SubsystemBase {
         fieldRelative = !fieldRelative;
     }
 
+    public void setThrottle(double throttle) {
+        this.throttle = throttle;
+    }
+
+    public double getThrottle() {
+        return this.throttle;
+    }
+
     public void setModuleStates(SwerveModuleState[] desiredStates) {
         SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, maxSpeed);
         
@@ -201,11 +209,9 @@ public abstract class SwerveBase extends SubsystemBase {
         modules[3].getAngleMotor().set(-45, Control.Position);
     }
 
-    public void zeroLock() {
-        modules[0].getAngleMotor().set(0, Control.Position);
-        modules[1].getAngleMotor().set(0, Control.Position);
-        modules[2].getAngleMotor().set(0, Control.Position);
-        modules[3].getAngleMotor().set(0, Control.Position);
+    public void angleLock(double degrees) {
+        for(SwerveModule module : getModules())
+            module.getAngleMotor().set(degrees, Control.Position);
     }
 
     public Command characterize(double startDelay, double rampRate) {
@@ -282,7 +288,7 @@ public abstract class SwerveBase extends SubsystemBase {
         return new Pose2d(x.plus(dx), theta.plus(dtheta));
     }
 
-    public Translation2d getDisplacementTo(Translation2d point) {
+    public Translation2d getTranslation2dTo(Translation2d point) {
         return getPose().getTranslation().minus(point);
     }
 
@@ -290,16 +296,16 @@ public abstract class SwerveBase extends SubsystemBase {
         return Math.abs(getPose().getTranslation().getDistance(point));
     }
 
-    public Rotation2d getAngularDisplacementTo(Translation2d point) {
-        return getPose().getRotation().minus(getDisplacementTo(point).getAngle());
+    public Rotation2d getRotation2dTo(Translation2d point) {
+        return getPose().getRotation().minus(getTranslation2dTo(point).getAngle());
     }
 
-    public Rotation2d getAngularDisplacementTo(Rotation2d angle) {
+    public Rotation2d getRotation2dTo(Rotation2d angle) {
         return getGyroRotation2d().minus(angle);
     }
 
     public double getAngleTo(Rotation2d angle) {
-        return MathUtil.angleModulus(getAngularDisplacementTo(angle).getRadians());
+        return MathUtil.angleModulus(getRotation2dTo(angle).getRadians());
     }
 
     public Pose2d nearestPose2d(List<Pose2d> poses) {
@@ -336,7 +342,7 @@ public abstract class SwerveBase extends SubsystemBase {
     }
 
     public Command characterizeTranslation(double startDelay, double rampRate, double targetPosition) {
-        return characterize(startDelay, rampRate, targetPosition).beforeStarting(()-> zeroLock());
+        return characterize(startDelay, rampRate, targetPosition).beforeStarting(()-> angleLock(0));
     }
 
     public Command characterizeRotation(double startDelay, double rampRate, double targetPosition) {
