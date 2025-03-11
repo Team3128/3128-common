@@ -1,6 +1,7 @@
 package common.core.swerve;
 
 import java.util.List;
+import java.util.function.DoubleSupplier;
 
 import common.hardware.motorcontroller.NAR_Motor;
 import common.hardware.motorcontroller.NAR_Motor.Control;
@@ -28,7 +29,7 @@ public abstract class SwerveBase extends SubsystemBase {
     protected boolean chassisVelocityCorrection = true;
     public boolean fieldRelative = true;
     protected double dtConstant = 0.009;
-    public double throttle = 1;
+    private DoubleSupplier throttle = ()-> 0.3;
 
     protected final SwerveDriveKinematics kinematics;
     protected SwerveDrivePoseEstimator odometry;
@@ -99,7 +100,7 @@ public abstract class SwerveBase extends SubsystemBase {
     public void assign(ChassisSpeeds velocity) {
         if(fieldRelative) velocity = ChassisSpeeds.fromFieldRelativeSpeeds(velocity, getGyroRotation2d()); // convert to field relative if applicable
         if(chassisVelocityCorrection) velocity = ChassisSpeeds.discretize(velocity, dtConstant);
-        setModuleStates(kinematics.toSwerveModuleStates(velocity.times(throttle)));
+        setModuleStates(kinematics.toSwerveModuleStates(velocity.times(throttle.getAsDouble())));
     }
 
     public void stop() {
@@ -168,11 +169,11 @@ public abstract class SwerveBase extends SubsystemBase {
     }
 
     public void setThrottle(double throttle) {
-        this.throttle = throttle;
+        this.throttle = ()-> throttle;
     }
 
     public double getThrottle() {
-        return this.throttle;
+        return this.throttle.getAsDouble();
     }
 
     public void setModuleStates(SwerveModuleState[] desiredStates) {
@@ -207,6 +208,13 @@ public abstract class SwerveBase extends SubsystemBase {
         modules[1].getAngleMotor().set(45, Control.Position);
         modules[2].getAngleMotor().set(-135, Control.Position);
         modules[3].getAngleMotor().set(-45, Control.Position);
+    }
+
+    public void zeroLock() {
+        modules[0].getAngleMotor().set(0, Control.Position);
+        modules[1].getAngleMotor().set(0, Control.Position);
+        modules[2].getAngleMotor().set(0, Control.Position);
+        modules[3].getAngleMotor().set(0, Control.Position);
     }
 
     public void angleLock(double degrees) {

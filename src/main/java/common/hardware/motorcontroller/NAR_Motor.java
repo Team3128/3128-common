@@ -138,9 +138,11 @@ public abstract class NAR_Motor implements AutoCloseable {
     private double prevFeedForward = 0;
     private double minInput;
     private double maxInput;
+    private double relativePosition = 0;
     private boolean isContinuous = false;
     protected double unitConversionFactor = 1;
     protected double timeConversionFactor = 1;
+    
 
     public NAR_Motor(int id){
         this.id = id;
@@ -313,6 +315,10 @@ public abstract class NAR_Motor implements AutoCloseable {
      */
     protected abstract void setPosition(double rotations, double feedForward);
 
+    public void resetRelativePosition() {
+        this.relativePosition = getPosition();
+    }
+
     /**
      * Resets the motor position
      * @param rotations Number of rotations
@@ -344,6 +350,10 @@ public abstract class NAR_Motor implements AutoCloseable {
     public double getPosition() {
         final double position = getRawPosition() * unitConversionFactor;
         return convertInput(position);
+    }
+
+    public double getRelativePosition() {
+        return getPosition() - this.relativePosition;
     }
 
     /**
