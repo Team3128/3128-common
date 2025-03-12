@@ -29,7 +29,7 @@ public abstract class SwerveBase extends SubsystemBase {
     protected boolean chassisVelocityCorrection = true;
     public boolean fieldRelative = true;
     protected double dtConstant = 0.009;
-    private DoubleSupplier throttle = ()-> 0.3;
+    private double throttle = 1;
 
     protected final SwerveDriveKinematics kinematics;
     protected SwerveDrivePoseEstimator odometry;
@@ -66,6 +66,7 @@ public abstract class SwerveBase extends SubsystemBase {
         NAR_Shuffleboard.addData("Swerve", "Pose", ()-> estimatedPose.toString(), 3, 0, 4, 1);
         NAR_Shuffleboard.addData("Swerve", "Robot Velocity", ()-> getRobotVelocity().toString(), 3, 1, 4, 1);
         NAR_Shuffleboard.addData("Swerve", "Velocity", ()-> getSpeed(), 3, 3, 1, 1);
+        NAR_Shuffleboard.addData("Swerve", "Angular Velocity", () -> getRobotVelocity().omegaRadiansPerSecond, 5, 3);
         NAR_Shuffleboard.addData("Swerve", "Field Velocity", ()-> getFieldVelocity().toString(), 3, 2, 4, 1);
         NAR_Shuffleboard.addData("Swerve", "Gyro", ()-> getYaw(), 7, 0, 2, 2).withWidget("Gyro");
         NAR_Shuffleboard.addCommand("Swerve", "Reset Gyro", runOnce(()-> resetGyro(0)), 7, 2);
@@ -100,7 +101,7 @@ public abstract class SwerveBase extends SubsystemBase {
     public void assign(ChassisSpeeds velocity) {
         if(fieldRelative) velocity = ChassisSpeeds.fromFieldRelativeSpeeds(velocity, getGyroRotation2d()); // convert to field relative if applicable
         if(chassisVelocityCorrection) velocity = ChassisSpeeds.discretize(velocity, dtConstant);
-        setModuleStates(kinematics.toSwerveModuleStates(velocity.times(throttle.getAsDouble())));
+        setModuleStates(kinematics.toSwerveModuleStates(velocity.times(throttle)));
     }
 
     public void stop() {
@@ -169,11 +170,11 @@ public abstract class SwerveBase extends SubsystemBase {
     }
 
     public void setThrottle(double throttle) {
-        this.throttle = ()-> throttle;
+        this.throttle = throttle;
     }
 
     public double getThrottle() {
-        return this.throttle.getAsDouble();
+        return throttle;
     }
 
     public void setModuleStates(SwerveModuleState[] desiredStates) {
@@ -282,11 +283,11 @@ public abstract class SwerveBase extends SubsystemBase {
         return modules[moduleNumber];
     }
 
-    public void initStateCheck() {
-        for (final SwerveModule module : modules) {
-            NarwhalDashboard.getInstance().checkState("Module" + module.moduleNumber, ()-> module.getRunningState());
-        }
-    }
+    // public void initStateCheck() {
+    //     for (final SwerveModule module : modules) {
+    //         NarwhalDashboard.getInstance().checkState("Module" + module.moduleNumber, ()-> module.getRunningState());
+    //     }
+    // }
 
     public Pose2d getPredictedPose(ChassisSpeeds velocity, double dt) {
         final Translation2d x = getPose().getTranslation();
