@@ -8,6 +8,7 @@ import com.revrobotics.spark.SparkMax;
 
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkLowLevel.PeriodicFrame;
+import com.ctre.phoenix6.hardware.TalonFX;
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.REVLibError;
 import com.revrobotics.RelativeEncoder;
@@ -124,12 +125,23 @@ public class NAR_CANSpark extends NAR_Motor {
 	 */
     public NAR_CANSpark(int deviceNumber, ControllerType controllerType, MotorType motorType, EncoderType encoderType, PIDFFConfig PIDconfig) {
 		super(deviceNumber);
-        motor = controllerType == ControllerType.CAN_SPARK_MAX ? new SparkMax(deviceNumber, motorType) : new SparkFlex(deviceNumber, motorType);
+        Timer timer = new Timer();
+        timer.restart();
+		motor = controllerType == ControllerType.CAN_SPARK_MAX ? new SparkMax(deviceNumber, motorType) : new SparkFlex(deviceNumber, motorType);
+        timer.stop();
+        Log.info("Spark ID " + deviceNumber + " Creation", timer.get());
+		
+		timer.restart();
 		config = controllerType == ControllerType.CAN_SPARK_MAX ? new SparkMaxConfig() : new SparkFlexConfig();
-		motor.setCANMaxRetries(0);
-		configSpark(()-> motor.clearFaults());
 		motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
 		configSpark(()-> motor.setCANTimeout(canSparkMaxTimeout));
+		configSpark(()-> motor.clearFaults());
+		timer.stop();
+        Log.info("Spark ID " + deviceNumber + " Config", timer.get());
+
+
+		motor.setCANMaxRetries(0);
+		configSpark(()-> motor.clearFaults());
 		enableVoltageCompensation(12.0);
 		setStatorLimit(motorType == MotorType.kBrushless ? NEO_STATOR_CurrentLimit : NEO_STATOR_550CurrentLimit);
 		setSupplyLimit(motorType == MotorType.kBrushless ? NEO_SUPPLY_CurrentLimit : NEO_SUPPLY_550CurrentLimit);

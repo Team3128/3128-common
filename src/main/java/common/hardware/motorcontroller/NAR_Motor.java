@@ -146,7 +146,6 @@ public abstract class NAR_Motor implements AutoCloseable {
 
     public NAR_Motor(int id){
         this.id = id;
-        
     }
 
     /**

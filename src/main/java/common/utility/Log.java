@@ -3,6 +3,7 @@ package common.utility;
 import java.util.List;
 
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 
 /**
  * @since Rapid React 2022
@@ -118,6 +119,18 @@ public class Log {
 	 */
 	public static void info(String category, String message) {
 		log("Info", category, message);
+	}
+
+	public static void info(String category, double data) {
+		log("Info", category, Double.toString(data));
+	}
+
+	public static void profile(String category, Runnable toRun) {
+		Timer timer = new Timer();
+		timer.restart();
+		toRun.run();
+		timer.stop();
+		info(category, timer.get());
 	}
 
 	/**

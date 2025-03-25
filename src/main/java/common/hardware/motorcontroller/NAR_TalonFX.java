@@ -25,6 +25,7 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Temperature;
+import edu.wpi.first.wpilibj.Timer;
 
 import java.util.function.Supplier;
 
@@ -55,7 +56,11 @@ public class NAR_TalonFX extends NAR_Motor {
 
     public NAR_TalonFX(int deviceNumber, String canbus, PIDFFConfig pidConfig) {
         super(deviceNumber);
+        Timer timer = new Timer();
+        timer.restart();
         motor = new TalonFX(deviceNumber, canbus);
+        timer.stop();
+        Log.info("Talon ID " + deviceNumber + " Creation", timer.get());
 
         appliedOutput = motor.getDutyCycle();
         stallCurrent = motor.getStatorCurrent();
@@ -65,7 +70,7 @@ public class NAR_TalonFX extends NAR_Motor {
 
         enableVoltageCompensation(12);
         setCurrentLimit(NEO_STATOR_CurrentLimit, NEO_SUPPLY_CurrentLimit);
-        configPID(pidConfig);
+        Log.profile("Talon ID " + deviceNumber + " Config", ()-> configPID(pidConfig));
     }
 
     public NAR_TalonFX(int deviceNumber, String canbus) {
