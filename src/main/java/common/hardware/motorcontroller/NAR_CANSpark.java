@@ -8,7 +8,9 @@ import com.revrobotics.spark.SparkMax;
 
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkLowLevel.PeriodicFrame;
+import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.jni.CANBusJNI;
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.REVLibError;
 import com.revrobotics.RelativeEncoder;
@@ -86,7 +88,6 @@ public class NAR_CANSpark extends NAR_Motor {
 			this.status6 = status6;
 		}
 	}
-
 	/**
 	 * Type of encoder used
 	 */

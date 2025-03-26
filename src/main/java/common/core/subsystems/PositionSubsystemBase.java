@@ -42,8 +42,8 @@ public abstract class PositionSubsystemBase extends NAR_PIDSubsystem implements 
         
         this.motors = List.of(motors);
 
-        Log.profile(getName(), ()-> configMotors());
-        Log.profile(getName(), ()->configController());
+        Log.profile(getName() + " Motors", ()-> configMotors());
+        Log.profile(getName() + " Controller", ()->configController());
     }
 
     /**
