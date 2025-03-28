@@ -134,7 +134,6 @@ public class NAR_CANSpark extends NAR_Motor {
 		
 		timer.restart();
 		config = controllerType == ControllerType.CAN_SPARK_MAX ? new SparkMaxConfig() : new SparkFlexConfig();
-		motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
 		configSpark(()-> motor.setCANTimeout(canSparkMaxTimeout));
 		configSpark(()-> motor.clearFaults());
 		timer.stop();
@@ -143,9 +142,9 @@ public class NAR_CANSpark extends NAR_Motor {
 
 		motor.setCANMaxRetries(0);
 		configSpark(()-> motor.clearFaults());
-		enableVoltageCompensation(12.0);
-		setStatorLimit(motorType == MotorType.kBrushless ? NEO_STATOR_CurrentLimit : NEO_STATOR_550CurrentLimit);
-		setSupplyLimit(motorType == MotorType.kBrushless ? NEO_SUPPLY_CurrentLimit : NEO_SUPPLY_550CurrentLimit);
+		enableVoltageCompensationNoApply(12.0);
+		setStatorLimitNoApply(motorType == MotorType.kBrushless ? NEO_STATOR_CurrentLimit : NEO_STATOR_550CurrentLimit);
+		setSupplyLimitNoApply(motorType == MotorType.kBrushless ? NEO_SUPPLY_CurrentLimit : NEO_SUPPLY_550CurrentLimit);
 
 		this.encoderType = encoderType;
 
@@ -161,7 +160,7 @@ public class NAR_CANSpark extends NAR_Motor {
 		}
 
 		controller = motor.getClosedLoopController();
-		configPID(PIDconfig);
+		configePIDNoApply(PIDconfig);
 		configure();
 		instances.add(this);
     }
@@ -237,6 +236,11 @@ public class NAR_CANSpark extends NAR_Motor {
 
 	@Override
 	public void configPID(PIDFFConfig config) {
+		configePIDNoApply(config);
+		configure();
+	}
+
+	public void configePIDNoApply(PIDFFConfig config) {
 		this.kP = config.kP;
 		this.kI = config.kI;
 		this.kD = config.kD;
@@ -245,7 +249,6 @@ public class NAR_CANSpark extends NAR_Motor {
 		.p(kP)
 		.i(kI)
 		.d(kD);
-		configure();
 	}
 
 	/**
@@ -264,8 +267,12 @@ public class NAR_CANSpark extends NAR_Motor {
 	 */
 	@Override
 	public void setStatorLimit(int limit) {
-		config.smartCurrentLimit(limit);
+		setStatorLimitNoApply(limit);
 		configure();
+	}
+
+	public void setStatorLimitNoApply(int limit) {
+		config.smartCurrentLimit(limit);
 	}
 
 	/**
@@ -290,8 +297,12 @@ public class NAR_CANSpark extends NAR_Motor {
    */
 	@Override
 	public void setSupplyLimit(int limit) {
-		config.secondaryCurrentLimit(limit);
+		setSupplyLimitNoApply(limit);
 		configure();
+	}
+
+	public void setSupplyLimitNoApply(int limit) {
+		config.secondaryCurrentLimit(limit);
 	}
 
     /**
@@ -312,8 +323,12 @@ public class NAR_CANSpark extends NAR_Motor {
 	 * @param periodMs Period in ms for the given frame.
 	 */
 	public void setPeriodicFramePeriod(PeriodicFrame frame, int periodMs) {
-		config.signals.primaryEncoderPositionPeriodMs(periodMs);
+		setPeriodicFramePeriodNoApply(frame, periodMs);
 		configure();
+	}
+
+	public void setPeriodicFramePeriodNoApply(PeriodicFrame frame, int periodMs) {
+		config.signals.primaryEncoderPositionPeriodMs(periodMs);
 	}
 
 	/**
@@ -376,8 +391,12 @@ public class NAR_CANSpark extends NAR_Motor {
 	 * @param invert Whether or not to invert motor output
      */
 	public void follow(NAR_CANSpark leader, boolean invert) {
-		config.follow(motor);
+		followNoApply(leader, invert);
 		configure();
+	}
+
+	public void followNoApply(NAR_CANSpark leader, boolean invert) {
+		config.follow(leader.motor, invert);
 	}
 
 	@Override
@@ -391,8 +410,12 @@ public class NAR_CANSpark extends NAR_Motor {
 
 	@Override
 	public void setInverted(boolean inverted) {
-		config.inverted(inverted);
+		setInvertedNoApply(inverted);
 		configure();
+	}
+
+	public void setInvertedNoApply(boolean inverted) {
+		config.inverted(inverted);
 	}
 
     @Override
@@ -448,20 +471,32 @@ public class NAR_CANSpark extends NAR_Motor {
 
 	@Override
 	public void enableVoltageCompensation(double volts) {
-		config.voltageCompensation(volts);
+		enableVoltageCompensationNoApply(volts);
 		configure();
+	}
+
+	public void enableVoltageCompensationNoApply(double volts) {
+		config.voltageCompensation(volts);
 	}
 
 	@Override
 	public void setBrakeMode() {
-		config.idleMode(IdleMode.kBrake);
+		setBrakeModeNoApply();
 		configure();
+	}
+
+	public void setBrakeModeNoApply() {
+		config.idleMode(IdleMode.kBrake);
 	}
 
 	@Override
 	public void setCoastMode() {
-		config.idleMode(IdleMode.kCoast);
+		setCoastModeNoApply();
 		configure();
+	}
+
+	public void setCoastModeNoApply() {
+		config.idleMode(IdleMode.kCoast);
 	}
 
 	@Override
