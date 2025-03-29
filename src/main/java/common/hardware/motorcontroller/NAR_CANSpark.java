@@ -473,10 +473,10 @@ public class NAR_CANSpark extends NAR_Motor {
         return encoderType == EncoderType.Relative ? relativeEncoder.getVelocity() : absoluteEncoder.getVelocity();
     }
 
-	@Override
-	public double getTemperature() {
-		return motor.getMotorTemperature();
-	}
+	// @Override
+	// public double getTemperature() {
+	// 	return motor.getMotorTemperature();
+	// }
 
 	@Override
 	public void enableVoltageCompensation(double volts) {

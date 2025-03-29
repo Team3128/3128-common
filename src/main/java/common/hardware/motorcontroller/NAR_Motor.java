@@ -8,6 +8,7 @@ import common.core.misc.NAR_Robot;
 import common.utility.Log;
 import common.utility.narwhaldashboard.NarwhalDashboard;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 
 /**
@@ -210,13 +211,18 @@ public abstract class NAR_Motor implements AutoCloseable {
      * @param config Motor settings.
      */
     public void configMotor(MotorConfig config) {
+        double startTime = Timer.getTimestamp();
         setUnitConversionFactor(config.distanceFactor);
         setTimeConversionFactor(config.timeFactor);
+        Log.info("setConversions", Timer.getTimestamp() - startTime);
+        startTime = Timer.getTimestamp();
         setInvertedNoApply(config.inverted);
         setStatorLimitNoApply(config.statorLimit);
         setSupplyLimitNoApply(config.supplyLimit);
         enableVoltageCompensationNoApply(config.voltageCompensation);
         setNeutralModeNoApply(config.mode);
+        Log.info("setConfigs", Timer.getTimestamp() - startTime);
+        startTime = Timer.getTimestamp();
         switch(config.statusFrames) {
             case DEFAULT:
                 setDefaultStatusFrames();
@@ -231,8 +237,12 @@ public abstract class NAR_Motor implements AutoCloseable {
                 setFollowerStatusFrames();
                 break;
         }
+        Log.info("setStatusFrames", Timer.getTimestamp() - startTime);
+        startTime = Timer.getTimestamp();
 
         apply();
+        Log.info("applyConfigs", Timer.getTimestamp() - startTime);
+        startTime = Timer.getTimestamp();
 
         Log.debug(Log.Type.MOTOR, "Motor (" + this.id + ")", config.toString());
     }
@@ -387,7 +397,7 @@ public abstract class NAR_Motor implements AutoCloseable {
      * Returns the Motor's temperature in celsius.
      * @return The temperature in celsius.
      */
-    public abstract double getTemperature();
+    // public abstract double getTemperature();
 
     /**
      * Sets a motor's output based on the leader's
