@@ -216,7 +216,7 @@ public abstract class NAR_Motor implements AutoCloseable {
         setStatorLimitNoApply(config.statorLimit);
         setSupplyLimitNoApply(config.supplyLimit);
         enableVoltageCompensationNoApply(config.voltageCompensation);
-        setNeutralMode(config.mode);
+        setNeutralModeNoApply(config.mode);
         switch(config.statusFrames) {
             case DEFAULT:
                 setDefaultStatusFrames();
@@ -231,6 +231,8 @@ public abstract class NAR_Motor implements AutoCloseable {
                 setFollowerStatusFrames();
                 break;
         }
+
+        apply();
 
         Log.debug(Log.Type.MOTOR, "Motor (" + this.id + ")", config.toString());
     }
