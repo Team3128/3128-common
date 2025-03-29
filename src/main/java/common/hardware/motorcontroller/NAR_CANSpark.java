@@ -346,13 +346,14 @@ public class NAR_CANSpark extends NAR_Motor {
 	 * function to set to team 3128's preset rates.
 	 */
 	public void setStatusFrames(NAR_SparkMaxConfig config) {
-		setPeriodicFramePeriod(PeriodicFrame.kStatus0, config.status0);
-		setPeriodicFramePeriod(PeriodicFrame.kStatus1, config.status1);
-		setPeriodicFramePeriod(PeriodicFrame.kStatus2, config.status2);
-		setPeriodicFramePeriod(PeriodicFrame.kStatus3, config.status3);
-		setPeriodicFramePeriod(PeriodicFrame.kStatus4, config.status4);
-		setPeriodicFramePeriod(PeriodicFrame.kStatus5, config.status5);
-		setPeriodicFramePeriod(PeriodicFrame.kStatus6, config.status6);
+		setPeriodicFramePeriodNoApply(PeriodicFrame.kStatus0, config.status0);
+		setPeriodicFramePeriodNoApply(PeriodicFrame.kStatus1, config.status1);
+		setPeriodicFramePeriodNoApply(PeriodicFrame.kStatus2, config.status2);
+		setPeriodicFramePeriodNoApply(PeriodicFrame.kStatus3, config.status3);
+		setPeriodicFramePeriodNoApply(PeriodicFrame.kStatus4, config.status4);
+		setPeriodicFramePeriodNoApply(PeriodicFrame.kStatus5, config.status5);
+		setPeriodicFramePeriodNoApply(PeriodicFrame.kStatus6, config.status6);
+		apply();
 	}
 
 	@Override
