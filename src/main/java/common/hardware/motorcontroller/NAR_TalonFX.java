@@ -73,7 +73,7 @@ public class NAR_TalonFX extends NAR_Motor {
 
         enableVoltageCompensationNoApply(12);
         setCurrentLimitNoApply(NEO_STATOR_CurrentLimit, NEO_SUPPLY_CurrentLimit);
-        applyAll();
+        apply();
         Log.profile("Talon ID " + deviceNumber + " Config", ()-> configPID(pidConfig));
     }
 
@@ -103,7 +103,8 @@ public class NAR_TalonFX extends NAR_Motor {
 		Log.info("Motors", "Failed to configure Talon FX " + motor.getDeviceID());
 	}
 
-    public void applyAll() {
+    @Override
+    public void apply() {
         configTalonFX(() -> motor.getConfigurator().apply(configs));
     }
 
@@ -113,6 +114,7 @@ public class NAR_TalonFX extends NAR_Motor {
         configTalonFX(()-> motor.getConfigurator().apply(configs.Slot0));
     }
 
+    @Override
     public void configPIDNoApply(PIDFFConfig config) {
         configs.Slot0.kP = config.kP;
         configs.Slot0.kI = config.kI;
@@ -125,6 +127,7 @@ public class NAR_TalonFX extends NAR_Motor {
         configTalonFX(()-> motor.getConfigurator().apply(configs.MotorOutput));
     }
 
+    @Override
     public void setInvertedNoApply(boolean inverted) {
         configs.MotorOutput.Inverted = inverted ? InvertedValue.Clockwise_Positive : InvertedValue.CounterClockwise_Positive;
     }
@@ -189,6 +192,7 @@ public class NAR_TalonFX extends NAR_Motor {
         configTalonFX(()-> motor.getConfigurator().apply(configs.MotorOutput));
     }
 
+    @Override
     protected void setBrakeModeNoApply() {
         configs.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     }
@@ -199,6 +203,7 @@ public class NAR_TalonFX extends NAR_Motor {
         configTalonFX(()-> motor.getConfigurator().apply(configs.MotorOutput));
     }
 
+    @Override
     protected void setCoastModeNoApply() {
         configs.MotorOutput.NeutralMode = NeutralModeValue.Coast;
     }
@@ -209,6 +214,7 @@ public class NAR_TalonFX extends NAR_Motor {
         configTalonFX(()-> motor.getConfigurator().apply(configs.Voltage));
     }
 
+    @Override
     public void enableVoltageCompensationNoApply(double volts) {
         configs.Voltage.PeakForwardVoltage = volts;
         configs.Voltage.PeakReverseVoltage = volts;
@@ -220,6 +226,7 @@ public class NAR_TalonFX extends NAR_Motor {
         configTalonFX(()-> motor.getConfigurator().apply(configs.CurrentLimits));
     }
 
+    @Override
     public void setStatorLimitNoApply(int limit) {
         configs.CurrentLimits.StatorCurrentLimit = limit;
         configs.CurrentLimits.StatorCurrentLimitEnable = true;
@@ -231,6 +238,7 @@ public class NAR_TalonFX extends NAR_Motor {
         configTalonFX(()-> motor.getConfigurator().apply(configs.CurrentLimits));
     }
 
+    @Override
     public void setSupplyLimitNoApply(int limit) {
         configs.CurrentLimits.SupplyCurrentLimit = limit;
         configs.CurrentLimits.SupplyCurrentLimitEnable = true;

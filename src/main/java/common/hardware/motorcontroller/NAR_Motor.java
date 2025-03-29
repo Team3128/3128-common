@@ -212,10 +212,10 @@ public abstract class NAR_Motor implements AutoCloseable {
     public void configMotor(MotorConfig config) {
         setUnitConversionFactor(config.distanceFactor);
         setTimeConversionFactor(config.timeFactor);
-        setInverted(config.inverted);
-        setStatorLimit(config.statorLimit);
-        setSupplyLimit(config.supplyLimit);
-        enableVoltageCompensation(config.voltageCompensation);
+        setInvertedNoApply(config.inverted);
+        setStatorLimitNoApply(config.statorLimit);
+        setSupplyLimitNoApply(config.supplyLimit);
+        enableVoltageCompensationNoApply(config.voltageCompensation);
         setNeutralMode(config.mode);
         switch(config.statusFrames) {
             case DEFAULT:
@@ -235,11 +235,15 @@ public abstract class NAR_Motor implements AutoCloseable {
         Log.debug(Log.Type.MOTOR, "Motor (" + this.id + ")", config.toString());
     }
 
+    public abstract void apply();
+
     /**
 	 * Set the PID values for the controller.
 	 * @param config PIDFFConfig containing kP, kI, and kD values.
 	 */
 	public abstract void configPID(PIDFFConfig config);
+
+    public abstract void configPIDNoApply(PIDFFConfig config);
 
     /**
      * Wraps a measurement value to the min and max input
@@ -293,6 +297,8 @@ public abstract class NAR_Motor implements AutoCloseable {
      * @param inverted Inverts the motor
      */
     public abstract void setInverted(boolean inverted);
+
+    public abstract void setInvertedNoApply(boolean inverted);
 
     /**
      * Sets motor output power
@@ -420,15 +426,31 @@ public abstract class NAR_Motor implements AutoCloseable {
         followers.forEach(follower -> follower.setNeutralMode(mode));
     }
 
+    public void setNeutralModeNoApply(Neutral mode) {
+        switch (mode) {
+            case BRAKE:
+                setBrakeModeNoApply();
+                break;
+            case COAST:
+                setCoastModeNoApply();
+                break;
+        }
+        followers.forEach(follower -> follower.setNeutralModeNoApply(mode));
+    }
+
     /**
      * Sets the motor in brake mode
      */
     protected abstract void setBrakeMode();
 
+    protected abstract void setBrakeModeNoApply();
+
     /**
      * Sets the motor in coast mode
      */
     protected abstract void setCoastMode();
+
+    protected abstract void setCoastModeNoApply();
 
     /**
      * Sets voltage compensation, keeps output consistent when battery is above x volts
@@ -436,17 +458,23 @@ public abstract class NAR_Motor implements AutoCloseable {
      */
     public abstract void enableVoltageCompensation(double volts);
 
+    public abstract void enableVoltageCompensationNoApply(double volts);
+
     /**
 	 * Sets the stator limit in Amps.
 	 * @param limit The current limit in Amps.
 	 */
     public abstract void setStatorLimit(int limit);
 
+    public abstract void setStatorLimitNoApply(int limit);
+
     /**
 	 * Sets the supply limit in Amps.
 	 * @param limit The current limit in Amps.
 	 */
     public abstract void setSupplyLimit(int limit);
+
+    public abstract void setSupplyLimitNoApply(int limit);
 
     /**
 	 * Returns motor and motor controller functionality.

@@ -160,7 +160,7 @@ public class NAR_CANSpark extends NAR_Motor {
 		}
 
 		controller = motor.getClosedLoopController();
-		configePIDNoApply(PIDconfig);
+		configPIDNoApply(PIDconfig);
 		configure();
 		instances.add(this);
     }
@@ -230,17 +230,23 @@ public class NAR_CANSpark extends NAR_Motor {
 		Log.info("Motors", "Failed to configure Spark Max " + motor.getDeviceId());
 	}
 
+	@Override
+	public void apply() {
+		configure();
+	}
+
 	public void configure() {
 		motor.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
 	}
 
 	@Override
 	public void configPID(PIDFFConfig config) {
-		configePIDNoApply(config);
+		configPIDNoApply(config);
 		configure();
 	}
 
-	public void configePIDNoApply(PIDFFConfig config) {
+	@Override
+	public void configPIDNoApply(PIDFFConfig config) {
 		this.kP = config.kP;
 		this.kI = config.kI;
 		this.kD = config.kD;
@@ -271,6 +277,7 @@ public class NAR_CANSpark extends NAR_Motor {
 		configure();
 	}
 
+	@Override
 	public void setStatorLimitNoApply(int limit) {
 		config.smartCurrentLimit(limit);
 	}
@@ -301,6 +308,7 @@ public class NAR_CANSpark extends NAR_Motor {
 		configure();
 	}
 
+	@Override
 	public void setSupplyLimitNoApply(int limit) {
 		config.secondaryCurrentLimit(limit);
 	}
@@ -414,6 +422,7 @@ public class NAR_CANSpark extends NAR_Motor {
 		configure();
 	}
 
+	@Override
 	public void setInvertedNoApply(boolean inverted) {
 		config.inverted(inverted);
 	}
@@ -475,6 +484,7 @@ public class NAR_CANSpark extends NAR_Motor {
 		configure();
 	}
 
+	@Override
 	public void enableVoltageCompensationNoApply(double volts) {
 		config.voltageCompensation(volts);
 	}
@@ -485,6 +495,7 @@ public class NAR_CANSpark extends NAR_Motor {
 		configure();
 	}
 
+	@Override
 	public void setBrakeModeNoApply() {
 		config.idleMode(IdleMode.kBrake);
 	}
@@ -495,6 +506,7 @@ public class NAR_CANSpark extends NAR_Motor {
 		configure();
 	}
 
+	@Override
 	public void setCoastModeNoApply() {
 		config.idleMode(IdleMode.kCoast);
 	}
