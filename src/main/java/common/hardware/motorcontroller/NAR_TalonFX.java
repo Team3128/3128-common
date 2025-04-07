@@ -74,7 +74,7 @@ public class NAR_TalonFX extends NAR_Motor {
         enableVoltageCompensationNoApply(12);
         setCurrentLimitNoApply(NEO_STATOR_CurrentLimit, NEO_SUPPLY_CurrentLimit);
         apply();
-        Log.profile("Talon ID " + deviceNumber + " Config", ()-> configPID(pidConfig));
+        configPID(pidConfig);
     }
 
     public NAR_TalonFX(int deviceNumber, String canbus) {
