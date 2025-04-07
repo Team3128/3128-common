@@ -126,18 +126,11 @@ public class NAR_CANSpark extends NAR_Motor {
 	 */
     public NAR_CANSpark(int deviceNumber, ControllerType controllerType, MotorType motorType, EncoderType encoderType, PIDFFConfig PIDconfig) {
 		super(deviceNumber);
-        Timer timer = new Timer();
-        timer.restart();
 		motor = controllerType == ControllerType.CAN_SPARK_MAX ? new SparkMax(deviceNumber, motorType) : new SparkFlex(deviceNumber, motorType);
-        timer.stop();
-        Log.info("Spark ID " + deviceNumber + " Creation", timer.get());
 		
-		timer.restart();
 		config = controllerType == ControllerType.CAN_SPARK_MAX ? new SparkMaxConfig() : new SparkFlexConfig();
 		configSpark(()-> motor.setCANTimeout(canSparkMaxTimeout));
 		configSpark(()-> motor.clearFaults());
-		timer.stop();
-        Log.info("Spark ID " + deviceNumber + " Config", timer.get());
 
 
 		motor.setCANMaxRetries(0);
@@ -474,10 +467,10 @@ public class NAR_CANSpark extends NAR_Motor {
         return encoderType == EncoderType.Relative ? relativeEncoder.getVelocity() : absoluteEncoder.getVelocity();
     }
 
-	// @Override
-	// public double getTemperature() {
-	// 	return motor.getMotorTemperature();
-	// }
+	@Override
+	public double getTemperature() {
+		return motor.getMotorTemperature();
+	}
 
 	@Override
 	public void enableVoltageCompensation(double volts) {

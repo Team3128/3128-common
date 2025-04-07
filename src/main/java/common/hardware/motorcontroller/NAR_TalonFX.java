@@ -55,7 +55,7 @@ public class NAR_TalonFX extends NAR_Motor {
     private final StatusSignal<Current> stallCurrent;
     private final StatusSignal<Angle> position;
     private final StatusSignal<AngularVelocity> velocity;
-    // private final StatusSignal<Temperature> temperature;
+    private final StatusSignal<Temperature> temperature;
 
     public NAR_TalonFX(int deviceNumber, String canbus, PIDFFConfig pidConfig) {
         super(deviceNumber);
@@ -69,7 +69,7 @@ public class NAR_TalonFX extends NAR_Motor {
         stallCurrent = motor.getStatorCurrent();
         position = motor.getPosition();
         velocity = motor.getVelocity();
-        // temperature = motor.getDeviceTemp();
+        temperature = motor.getDeviceTemp();
 
         enableVoltageCompensationNoApply(12);
         setCurrentLimitNoApply(NEO_STATOR_CurrentLimit, NEO_SUPPLY_CurrentLimit);
@@ -181,10 +181,10 @@ public class NAR_TalonFX extends NAR_Motor {
         return velocity.refresh().getValue().in(Units.RotationsPerSecond) * 60.0;
     }
 
-    // @Override
-    // public double getTemperature() {
-    //     return temperature.refresh().getValue().in(Units.Celsius);
-    // }
+    @Override
+    public double getTemperature() {
+        return temperature.refresh().getValue().in(Units.Celsius);
+    }
 
     @Override
     protected void setBrakeMode() {
@@ -262,7 +262,7 @@ public class NAR_TalonFX extends NAR_Motor {
         configTalonFX(()-> stallCurrent.setUpdateFrequency(HIGH_PRIORITY_FREQ));
         configTalonFX(()-> velocity.setUpdateFrequency(HIGH_PRIORITY_FREQ));
         configTalonFX(()-> position.setUpdateFrequency(HIGH_PRIORITY_FREQ));
-        // configTalonFX(()-> temperature.setUpdateFrequency(HIGH_PRIORITY_FREQ));
+        configTalonFX(()-> temperature.setUpdateFrequency(HIGH_PRIORITY_FREQ));
         configTalonFX(()->  motor.optimizeBusUtilization());
     }
     
