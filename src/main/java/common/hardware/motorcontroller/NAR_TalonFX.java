@@ -9,6 +9,7 @@ import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.VoltageConfigs;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
@@ -25,6 +26,7 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Temperature;
+import edu.wpi.first.wpilibj.Timer;
 
 import java.util.function.Supplier;
 
@@ -43,28 +45,35 @@ public class NAR_TalonFX extends NAR_Motor {
 
     private final TalonFX motor;
 
-    private final CurrentLimitsConfigs currentLimitsConfigs = new CurrentLimitsConfigs();
-    private final VoltageConfigs voltageConfigs = new VoltageConfigs();
-    private final MotorOutputConfigs motorOutputConfigs = new MotorOutputConfigs();
+    // private final CurrentLimitsConfigs currentLimitsConfigs = new CurrentLimitsConfigs();
+    // private final VoltageConfigs voltageConfigs = new VoltageConfigs();
+    // private final MotorOutputConfigs motorOutputConfigs = new MotorOutputConfigs();
+    // private final Slot0Configs slot0Configs = new Slot0Configs();
+    TalonFXConfiguration configs = new TalonFXConfiguration();
 
     private final StatusSignal<Double> appliedOutput;
     private final StatusSignal<Current> stallCurrent;
     private final StatusSignal<Angle> position;
     private final StatusSignal<AngularVelocity> velocity;
-    private final StatusSignal<Temperature> temperature;
+    // private final StatusSignal<Temperature> temperature;
 
     public NAR_TalonFX(int deviceNumber, String canbus, PIDFFConfig pidConfig) {
         super(deviceNumber);
+        Timer timer = new Timer();
+        timer.restart();
         motor = new TalonFX(deviceNumber, canbus);
+        timer.stop();
+        Log.info("Talon ID " + deviceNumber + " Creation", timer.get());
 
         appliedOutput = motor.getDutyCycle();
         stallCurrent = motor.getStatorCurrent();
         position = motor.getPosition();
         velocity = motor.getVelocity();
-        temperature = motor.getDeviceTemp();
+        // temperature = motor.getDeviceTemp();
 
-        enableVoltageCompensation(12);
-        setCurrentLimit(NEO_STATOR_CurrentLimit, NEO_SUPPLY_CurrentLimit);
+        enableVoltageCompensationNoApply(12);
+        setCurrentLimitNoApply(NEO_STATOR_CurrentLimit, NEO_SUPPLY_CurrentLimit);
+        apply();
         configPID(pidConfig);
     }
 
@@ -95,22 +104,32 @@ public class NAR_TalonFX extends NAR_Motor {
 	}
 
     @Override
+    public void apply() {
+        configTalonFX(() -> motor.getConfigurator().apply(configs));
+    }
+
+    @Override
     public void configPID(PIDFFConfig config) {
-        var PID0 = new Slot0Configs();
-        PID0.kP = config.kP;
-        PID0.kI = config.kI;
-        PID0.kD = config.kD;
-        // PID0.kS = config.kS;
-        // PID0.kV = config.kV;
-        // PID0.kA = config.kA;
-        // PID0.kG = config.kG;
-        configTalonFX(()-> motor.getConfigurator().apply(PID0));
+        configPIDNoApply(config);
+        configTalonFX(()-> motor.getConfigurator().apply(configs.Slot0));
+    }
+
+    @Override
+    public void configPIDNoApply(PIDFFConfig config) {
+        configs.Slot0.kP = config.kP;
+        configs.Slot0.kI = config.kI;
+        configs.Slot0.kD = config.kD;
     }
 
     @Override
     public void setInverted(boolean inverted) {
-        motorOutputConfigs.Inverted = inverted ? InvertedValue.Clockwise_Positive : InvertedValue.CounterClockwise_Positive;
-        configTalonFX(()-> motor.getConfigurator().apply(motorOutputConfigs));
+        setInvertedNoApply(inverted);
+        configTalonFX(()-> motor.getConfigurator().apply(configs.MotorOutput));
+    }
+
+    @Override
+    public void setInvertedNoApply(boolean inverted) {
+        configs.MotorOutput.Inverted = inverted ? InvertedValue.Clockwise_Positive : InvertedValue.CounterClockwise_Positive;
     }
 
     @Override
@@ -162,50 +181,79 @@ public class NAR_TalonFX extends NAR_Motor {
         return velocity.refresh().getValue().in(Units.RotationsPerSecond) * 60.0;
     }
 
-    @Override
-    public double getTemperature() {
-        return temperature.refresh().getValue().in(Units.Celsius);
-    }
+    // @Override
+    // public double getTemperature() {
+    //     return temperature.refresh().getValue().in(Units.Celsius);
+    // }
 
     @Override
     protected void setBrakeMode() {
-       motorOutputConfigs.NeutralMode = NeutralModeValue.Brake;
-       configTalonFX(()-> motor.getConfigurator().apply(motorOutputConfigs));
+        setBrakeModeNoApply();
+        configTalonFX(()-> motor.getConfigurator().apply(configs.MotorOutput));
+    }
+
+    @Override
+    protected void setBrakeModeNoApply() {
+        configs.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     }
 
     @Override
     protected void setCoastMode() {
-        motorOutputConfigs.NeutralMode = NeutralModeValue.Coast;
-        configTalonFX(()-> motor.getConfigurator().apply(motorOutputConfigs));
+        setCoastModeNoApply();
+        configTalonFX(()-> motor.getConfigurator().apply(configs.MotorOutput));
+    }
+
+    @Override
+    protected void setCoastModeNoApply() {
+        configs.MotorOutput.NeutralMode = NeutralModeValue.Coast;
     }
 
     @Override
     public void enableVoltageCompensation(double volts) {
-        voltageConfigs.PeakForwardVoltage = volts;
-        voltageConfigs.PeakReverseVoltage = volts;
-        configTalonFX(()-> motor.getConfigurator().apply(voltageConfigs));
+        enableVoltageCompensationNoApply(volts);
+        configTalonFX(()-> motor.getConfigurator().apply(configs.Voltage));
+    }
+
+    @Override
+    public void enableVoltageCompensationNoApply(double volts) {
+        configs.Voltage.PeakForwardVoltage = volts;
+        configs.Voltage.PeakReverseVoltage = volts;
     }
 
     @Override
     public void setStatorLimit(int limit) {
-        currentLimitsConfigs.StatorCurrentLimit = limit;
-        currentLimitsConfigs.StatorCurrentLimitEnable = true;
-        configTalonFX(()-> motor.getConfigurator().apply(currentLimitsConfigs));
+        setStatorLimitNoApply(limit);
+        configTalonFX(()-> motor.getConfigurator().apply(configs.CurrentLimits));
+    }
+
+    @Override
+    public void setStatorLimitNoApply(int limit) {
+        configs.CurrentLimits.StatorCurrentLimit = limit;
+        configs.CurrentLimits.StatorCurrentLimitEnable = true;
     }
 
     @Override
     public void setSupplyLimit(int limit) {
-        currentLimitsConfigs.SupplyCurrentLimit = limit;
-        currentLimitsConfigs.SupplyCurrentLimitEnable = true;
-        configTalonFX(()-> motor.getConfigurator().apply(currentLimitsConfigs));
+        setSupplyLimitNoApply(limit);
+        configTalonFX(()-> motor.getConfigurator().apply(configs.CurrentLimits));
+    }
+
+    @Override
+    public void setSupplyLimitNoApply(int limit) {
+        configs.CurrentLimits.SupplyCurrentLimit = limit;
+        configs.CurrentLimits.SupplyCurrentLimitEnable = true;
     }
 
     public void setCurrentLimit(int statorLimit, int supplyLimit) {
-        currentLimitsConfigs.StatorCurrentLimit = statorLimit;
-        currentLimitsConfigs.StatorCurrentLimitEnable = true;
-        currentLimitsConfigs.SupplyCurrentLimit = supplyLimit;
-        currentLimitsConfigs.SupplyCurrentLimitEnable = true;
-        configTalonFX(()-> motor.getConfigurator().apply(currentLimitsConfigs));
+        setCurrentLimitNoApply(statorLimit, supplyLimit);
+        configTalonFX(()-> motor.getConfigurator().apply(configs.CurrentLimits));
+    }
+
+    public void setCurrentLimitNoApply(int statorLimit, int supplyLimit) {
+        configs.CurrentLimits.StatorCurrentLimit = statorLimit;
+        configs.CurrentLimits.StatorCurrentLimitEnable = true;
+        configs.CurrentLimits.SupplyCurrentLimit = supplyLimit;
+        configs.CurrentLimits.SupplyCurrentLimitEnable = true;
     }
 
     @Override
@@ -214,7 +262,7 @@ public class NAR_TalonFX extends NAR_Motor {
         configTalonFX(()-> stallCurrent.setUpdateFrequency(HIGH_PRIORITY_FREQ));
         configTalonFX(()-> velocity.setUpdateFrequency(HIGH_PRIORITY_FREQ));
         configTalonFX(()-> position.setUpdateFrequency(HIGH_PRIORITY_FREQ));
-        configTalonFX(()-> temperature.setUpdateFrequency(HIGH_PRIORITY_FREQ));
+        // configTalonFX(()-> temperature.setUpdateFrequency(HIGH_PRIORITY_FREQ));
         configTalonFX(()->  motor.optimizeBusUtilization());
     }
     

@@ -166,16 +166,22 @@ implements <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base
 <div class="table-header col-first">Modifier and Type</div>
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#configMotor(common.hardware.motorcontroller.NAR_Motor.MotorConfig)" class="member-name-link">configMotor</a><wbr>(<a href="NAR_Motor.MotorConfig.html" title="class in common.hardware.motorcontroller">NAR_Motor.MotorConfig</a>&nbsp;config)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>abstract void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#apply()" class="member-name-link">apply</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#configMotor(common.hardware.motorcontroller.NAR_Motor.MotorConfig)" class="member-name-link">configMotor</a><wbr>(<a href="NAR_Motor.MotorConfig.html" title="class in common.hardware.motorcontroller">NAR_Motor.MotorConfig</a>&nbsp;config)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Configures all major motor settings.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>abstract void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#configPID(common.core.controllers.PIDFFConfig)" class="member-name-link">configPID</a><wbr>(<a href="../../core/controllers/PIDFFConfig.html" title="class in common.core.controllers">PIDFFConfig</a>&nbsp;config)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>abstract void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#configPID(common.core.controllers.PIDFFConfig)" class="member-name-link">configPID</a><wbr>(<a href="../../core/controllers/PIDFFConfig.html" title="class in common.core.controllers">PIDFFConfig</a>&nbsp;config)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Set the PID values for the controller.</div>
 </div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>abstract void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#configPIDNoApply(common.core.controllers.PIDFFConfig)" class="member-name-link">configPIDNoApply</a><wbr>(<a href="../../core/controllers/PIDFFConfig.html" title="class in common.core.controllers">PIDFFConfig</a>&nbsp;config)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">&nbsp;</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#enableContinuousInput(double,double)" class="member-name-link">enableContinuousInput</a><wbr>(double&nbsp;minInput,
  double&nbsp;maxInput)</code></div>
@@ -187,59 +193,57 @@ implements <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Sets voltage compensation, keeps output consistent when battery is above x volts</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#follow(common.hardware.motorcontroller.NAR_Motor)" class="member-name-link">follow</a><wbr>(<a href="NAR_Motor.html" title="class in common.hardware.motorcontroller">NAR_Motor</a>&nbsp;leader)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Sets a motor's output based on the leader's</div>
-</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>abstract void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#enableVoltageCompensationNoApply(double)" class="member-name-link">enableVoltageCompensationNoApply</a><wbr>(double&nbsp;volts)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">&nbsp;</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#follow(common.hardware.motorcontroller.NAR_Motor,common.hardware.motorcontroller.NAR_Motor.MotorConfig)" class="member-name-link">follow</a><wbr>(<a href="NAR_Motor.html" title="class in common.hardware.motorcontroller">NAR_Motor</a>&nbsp;leader,
- <a href="NAR_Motor.MotorConfig.html" title="class in common.hardware.motorcontroller">NAR_Motor.MotorConfig</a>&nbsp;config)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#follow(common.hardware.motorcontroller.NAR_Motor)" class="member-name-link">follow</a><wbr>(<a href="NAR_Motor.html" title="class in common.hardware.motorcontroller">NAR_Motor</a>&nbsp;leader)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Sets a motor's output based on the leader's</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>abstract double</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#getAppliedOutput()" class="member-name-link">getAppliedOutput</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#follow(common.hardware.motorcontroller.NAR_Motor,common.hardware.motorcontroller.NAR_Motor.MotorConfig)" class="member-name-link">follow</a><wbr>(<a href="NAR_Motor.html" title="class in common.hardware.motorcontroller">NAR_Motor</a>&nbsp;leader,
+ <a href="NAR_Motor.MotorConfig.html" title="class in common.hardware.motorcontroller">NAR_Motor.MotorConfig</a>&nbsp;config)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Sets a motor's output based on the leader's</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>abstract double</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#getAppliedOutput()" class="member-name-link">getAppliedOutput</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Gets the motors current output</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>abstract <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#getMotor()" class="member-name-link">getMotor</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>abstract <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#getMotor()" class="member-name-link">getMotor</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Returns the motor object controlling the motion</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>double</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getPosition()" class="member-name-link">getPosition</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>double</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getPosition()" class="member-name-link">getPosition</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns the current motor position, default unit - rotations</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>protected abstract double</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#getRawPosition()" class="member-name-link">getRawPosition</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>protected abstract double</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#getRawPosition()" class="member-name-link">getRawPosition</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Returns the motor position in rotations</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>protected abstract double</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#getRawVelocity()" class="member-name-link">getRawVelocity</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>protected abstract double</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#getRawVelocity()" class="member-name-link">getRawVelocity</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Returns the current motor velocity in RPM</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>double</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getRelativePosition()" class="member-name-link">getRelativePosition</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>abstract double</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#getStallCurrent()" class="member-name-link">getStallCurrent</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>double</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getRelativePosition()" class="member-name-link">getRelativePosition</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>abstract double</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#getStallCurrent()" class="member-name-link">getStallCurrent</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Returns the current going to the motor, increasing values means the motor is stalling</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>abstract <a href="../../utility/narwhaldashboard/NarwhalDashboard.State.html" title="enum class in common.utility.narwhaldashboard">NarwhalDashboard.State</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#getState()" class="member-name-link">getState</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
-<div class="block">Returns motor and motor controller functionality.</div>
-</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>abstract double</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#getTemperature()" class="member-name-link">getTemperature</a>()</code></div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>abstract <a href="../../utility/narwhaldashboard/NarwhalDashboard.State.html" title="enum class in common.utility.narwhaldashboard">NarwhalDashboard.State</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#getState()" class="member-name-link">getState</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
-<div class="block">Returns the Motor's temperature in celsius.</div>
+<div class="block">Returns motor and motor controller functionality.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>abstract double</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#getTorque()" class="member-name-link">getTorque</a>()</code></div>
@@ -288,10 +292,16 @@ implements <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base
 <div class="block">Sets the motor in brake mode</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>protected abstract void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#setCoastMode()" class="member-name-link">setCoastMode</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#setBrakeModeNoApply()" class="member-name-link">setBrakeModeNoApply</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>protected abstract void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#setCoastMode()" class="member-name-link">setCoastMode</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Sets the motor in coast mode</div>
 </div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>protected abstract void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#setCoastModeNoApply()" class="member-name-link">setCoastModeNoApply</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">&nbsp;</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>abstract void</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#setDefaultStatusFrames()" class="member-name-link">setDefaultStatusFrames</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
@@ -307,12 +317,18 @@ implements <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Sets the motor inverted</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setNeutralMode(common.hardware.motorcontroller.NAR_Motor.Neutral)" class="member-name-link">setNeutralMode</a><wbr>(<a href="NAR_Motor.Neutral.html" title="enum class in common.hardware.motorcontroller">NAR_Motor.Neutral</a>&nbsp;mode)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>abstract void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#setInvertedNoApply(boolean)" class="member-name-link">setInvertedNoApply</a><wbr>(boolean&nbsp;inverted)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setNeutralMode(common.hardware.motorcontroller.NAR_Motor.Neutral)" class="member-name-link">setNeutralMode</a><wbr>(<a href="NAR_Motor.Neutral.html" title="enum class in common.hardware.motorcontroller">NAR_Motor.Neutral</a>&nbsp;mode)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Sets the motor's idle mode, its behavior when no voltage is applied
  Followers will follow the leader's idle mode</div>
 </div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setNeutralModeNoApply(common.hardware.motorcontroller.NAR_Motor.Neutral)" class="member-name-link">setNeutralModeNoApply</a><wbr>(<a href="NAR_Motor.Neutral.html" title="enum class in common.hardware.motorcontroller">NAR_Motor.Neutral</a>&nbsp;mode)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>protected abstract void</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#setPercentOutput(double)" class="member-name-link">setPercentOutput</a><wbr>(double&nbsp;speed)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
@@ -335,10 +351,16 @@ implements <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base
 <div class="block">Sets the stator limit in Amps.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>abstract void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#setSupplyLimit(int)" class="member-name-link">setSupplyLimit</a><wbr>(int&nbsp;limit)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#setStatorLimitNoApply(int)" class="member-name-link">setStatorLimitNoApply</a><wbr>(int&nbsp;limit)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>abstract void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#setSupplyLimit(int)" class="member-name-link">setSupplyLimit</a><wbr>(int&nbsp;limit)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Sets the supply limit in Amps.</div>
 </div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>abstract void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#setSupplyLimitNoApply(int)" class="member-name-link">setSupplyLimitNoApply</a><wbr>(int&nbsp;limit)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">&nbsp;</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setTimeConversionFactor(double)" class="member-name-link">setTimeConversionFactor</a><wbr>(double&nbsp;conversionFactor)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
@@ -481,6 +503,12 @@ implements <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base
 </section>
 </li>
 <li>
+<section class="detail" id="apply()">
+<h3>apply</h3>
+<div class="member-signature"><span class="modifiers">public abstract</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">apply</span>()</div>
+</section>
+</li>
+<li>
 <section class="detail" id="configPID(common.core.controllers.PIDFFConfig)">
 <h3>configPID</h3>
 <div class="member-signature"><span class="modifiers">public abstract</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">configPID</span><wbr><span class="parameters">(<a href="../../core/controllers/PIDFFConfig.html" title="class in common.core.controllers">PIDFFConfig</a>&nbsp;config)</span></div>
@@ -489,6 +517,12 @@ implements <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base
 <dt>Parameters:</dt>
 <dd><code>config</code> - PIDFFConfig containing kP, kI, and kD values.</dd>
 </dl>
+</section>
+</li>
+<li>
+<section class="detail" id="configPIDNoApply(common.core.controllers.PIDFFConfig)">
+<h3>configPIDNoApply</h3>
+<div class="member-signature"><span class="modifiers">public abstract</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">configPIDNoApply</span><wbr><span class="parameters">(<a href="../../core/controllers/PIDFFConfig.html" title="class in common.core.controllers">PIDFFConfig</a>&nbsp;config)</span></div>
 </section>
 </li>
 <li>
@@ -549,6 +583,12 @@ implements <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base
 <dt>Parameters:</dt>
 <dd><code>inverted</code> - Inverts the motor</dd>
 </dl>
+</section>
+</li>
+<li>
+<section class="detail" id="setInvertedNoApply(boolean)">
+<h3>setInvertedNoApply</h3>
+<div class="member-signature"><span class="modifiers">public abstract</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">setInvertedNoApply</span><wbr><span class="parameters">(boolean&nbsp;inverted)</span></div>
 </section>
 </li>
 <li>
@@ -688,17 +728,6 @@ implements <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base
 </section>
 </li>
 <li>
-<section class="detail" id="getTemperature()">
-<h3>getTemperature</h3>
-<div class="member-signature"><span class="modifiers">public abstract</span>&nbsp;<span class="return-type">double</span>&nbsp;<span class="element-name">getTemperature</span>()</div>
-<div class="block">Returns the Motor's temperature in celsius.</div>
-<dl class="notes">
-<dt>Returns:</dt>
-<dd>The temperature in celsius.</dd>
-</dl>
-</section>
-</li>
-<li>
 <section class="detail" id="follow(common.hardware.motorcontroller.NAR_Motor)">
 <h3>follow</h3>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">follow</span><wbr><span class="parameters">(<a href="NAR_Motor.html" title="class in common.hardware.motorcontroller">NAR_Motor</a>&nbsp;leader)</span></div>
@@ -735,6 +764,12 @@ implements <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base
 </section>
 </li>
 <li>
+<section class="detail" id="setNeutralModeNoApply(common.hardware.motorcontroller.NAR_Motor.Neutral)">
+<h3>setNeutralModeNoApply</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">setNeutralModeNoApply</span><wbr><span class="parameters">(<a href="NAR_Motor.Neutral.html" title="enum class in common.hardware.motorcontroller">NAR_Motor.Neutral</a>&nbsp;mode)</span></div>
+</section>
+</li>
+<li>
 <section class="detail" id="setBrakeMode()">
 <h3>setBrakeMode</h3>
 <div class="member-signature"><span class="modifiers">protected abstract</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">setBrakeMode</span>()</div>
@@ -742,10 +777,22 @@ implements <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base
 </section>
 </li>
 <li>
+<section class="detail" id="setBrakeModeNoApply()">
+<h3>setBrakeModeNoApply</h3>
+<div class="member-signature"><span class="modifiers">protected abstract</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">setBrakeModeNoApply</span>()</div>
+</section>
+</li>
+<li>
 <section class="detail" id="setCoastMode()">
 <h3>setCoastMode</h3>
 <div class="member-signature"><span class="modifiers">protected abstract</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">setCoastMode</span>()</div>
 <div class="block">Sets the motor in coast mode</div>
+</section>
+</li>
+<li>
+<section class="detail" id="setCoastModeNoApply()">
+<h3>setCoastModeNoApply</h3>
+<div class="member-signature"><span class="modifiers">protected abstract</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">setCoastModeNoApply</span>()</div>
 </section>
 </li>
 <li>
@@ -760,6 +807,12 @@ implements <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base
 </section>
 </li>
 <li>
+<section class="detail" id="enableVoltageCompensationNoApply(double)">
+<h3>enableVoltageCompensationNoApply</h3>
+<div class="member-signature"><span class="modifiers">public abstract</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">enableVoltageCompensationNoApply</span><wbr><span class="parameters">(double&nbsp;volts)</span></div>
+</section>
+</li>
+<li>
 <section class="detail" id="setStatorLimit(int)">
 <h3>setStatorLimit</h3>
 <div class="member-signature"><span class="modifiers">public abstract</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">setStatorLimit</span><wbr><span class="parameters">(int&nbsp;limit)</span></div>
@@ -771,6 +824,12 @@ implements <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base
 </section>
 </li>
 <li>
+<section class="detail" id="setStatorLimitNoApply(int)">
+<h3>setStatorLimitNoApply</h3>
+<div class="member-signature"><span class="modifiers">public abstract</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">setStatorLimitNoApply</span><wbr><span class="parameters">(int&nbsp;limit)</span></div>
+</section>
+</li>
+<li>
 <section class="detail" id="setSupplyLimit(int)">
 <h3>setSupplyLimit</h3>
 <div class="member-signature"><span class="modifiers">public abstract</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">setSupplyLimit</span><wbr><span class="parameters">(int&nbsp;limit)</span></div>
@@ -779,6 +838,12 @@ implements <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base
 <dt>Parameters:</dt>
 <dd><code>limit</code> - The current limit in Amps.</dd>
 </dl>
+</section>
+</li>
+<li>
+<section class="detail" id="setSupplyLimitNoApply(int)">
+<h3>setSupplyLimitNoApply</h3>
+<div class="member-signature"><span class="modifiers">public abstract</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">setSupplyLimitNoApply</span><wbr><span class="parameters">(int&nbsp;limit)</span></div>
 </section>
 </li>
 <li>

@@ -8,6 +8,7 @@ import common.core.misc.NAR_Robot;
 import common.utility.Log;
 import common.utility.narwhaldashboard.NarwhalDashboard;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 
 /**
@@ -146,7 +147,6 @@ public abstract class NAR_Motor implements AutoCloseable {
 
     public NAR_Motor(int id){
         this.id = id;
-        
     }
 
     /**
@@ -211,13 +211,18 @@ public abstract class NAR_Motor implements AutoCloseable {
      * @param config Motor settings.
      */
     public void configMotor(MotorConfig config) {
+        double startTime = Timer.getTimestamp();
         setUnitConversionFactor(config.distanceFactor);
         setTimeConversionFactor(config.timeFactor);
-        setInverted(config.inverted);
-        setStatorLimit(config.statorLimit);
-        setSupplyLimit(config.supplyLimit);
-        enableVoltageCompensation(config.voltageCompensation);
-        setNeutralMode(config.mode);
+        Log.info("setConversions", Timer.getTimestamp() - startTime);
+        startTime = Timer.getTimestamp();
+        setInvertedNoApply(config.inverted);
+        setStatorLimitNoApply(config.statorLimit);
+        setSupplyLimitNoApply(config.supplyLimit);
+        enableVoltageCompensationNoApply(config.voltageCompensation);
+        setNeutralModeNoApply(config.mode);
+        Log.info("setConfigs", Timer.getTimestamp() - startTime);
+        startTime = Timer.getTimestamp();
         switch(config.statusFrames) {
             case DEFAULT:
                 setDefaultStatusFrames();
@@ -232,15 +237,25 @@ public abstract class NAR_Motor implements AutoCloseable {
                 setFollowerStatusFrames();
                 break;
         }
+        Log.info("setStatusFrames", Timer.getTimestamp() - startTime);
+        startTime = Timer.getTimestamp();
+
+        apply();
+        Log.info("applyConfigs", Timer.getTimestamp() - startTime);
+        startTime = Timer.getTimestamp();
 
         Log.debug(Log.Type.MOTOR, "Motor (" + this.id + ")", config.toString());
     }
+
+    public abstract void apply();
 
     /**
 	 * Set the PID values for the controller.
 	 * @param config PIDFFConfig containing kP, kI, and kD values.
 	 */
 	public abstract void configPID(PIDFFConfig config);
+
+    public abstract void configPIDNoApply(PIDFFConfig config);
 
     /**
      * Wraps a measurement value to the min and max input
@@ -294,6 +309,8 @@ public abstract class NAR_Motor implements AutoCloseable {
      * @param inverted Inverts the motor
      */
     public abstract void setInverted(boolean inverted);
+
+    public abstract void setInvertedNoApply(boolean inverted);
 
     /**
      * Sets motor output power
@@ -380,7 +397,7 @@ public abstract class NAR_Motor implements AutoCloseable {
      * Returns the Motor's temperature in celsius.
      * @return The temperature in celsius.
      */
-    public abstract double getTemperature();
+    // public abstract double getTemperature();
 
     /**
      * Sets a motor's output based on the leader's
@@ -421,15 +438,31 @@ public abstract class NAR_Motor implements AutoCloseable {
         followers.forEach(follower -> follower.setNeutralMode(mode));
     }
 
+    public void setNeutralModeNoApply(Neutral mode) {
+        switch (mode) {
+            case BRAKE:
+                setBrakeModeNoApply();
+                break;
+            case COAST:
+                setCoastModeNoApply();
+                break;
+        }
+        followers.forEach(follower -> follower.setNeutralModeNoApply(mode));
+    }
+
     /**
      * Sets the motor in brake mode
      */
     protected abstract void setBrakeMode();
 
+    protected abstract void setBrakeModeNoApply();
+
     /**
      * Sets the motor in coast mode
      */
     protected abstract void setCoastMode();
+
+    protected abstract void setCoastModeNoApply();
 
     /**
      * Sets voltage compensation, keeps output consistent when battery is above x volts
@@ -437,17 +470,23 @@ public abstract class NAR_Motor implements AutoCloseable {
      */
     public abstract void enableVoltageCompensation(double volts);
 
+    public abstract void enableVoltageCompensationNoApply(double volts);
+
     /**
 	 * Sets the stator limit in Amps.
 	 * @param limit The current limit in Amps.
 	 */
     public abstract void setStatorLimit(int limit);
 
+    public abstract void setStatorLimitNoApply(int limit);
+
     /**
 	 * Sets the supply limit in Amps.
 	 * @param limit The current limit in Amps.
 	 */
     public abstract void setSupplyLimit(int limit);
+
+    public abstract void setSupplyLimitNoApply(int limit);
 
     /**
 	 * Returns motor and motor controller functionality.
