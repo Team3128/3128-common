@@ -135,9 +135,9 @@ public class NAR_CANSpark extends NAR_Motor {
 
 		motor.setCANMaxRetries(0);
 		configSpark(()-> motor.clearFaults());
-		enableVoltageCompensationNoApply(12.0);
-		setStatorLimitNoApply(motorType == MotorType.kBrushless ? NEO_STATOR_CurrentLimit : NEO_STATOR_550CurrentLimit);
-		setSupplyLimitNoApply(motorType == MotorType.kBrushless ? NEO_SUPPLY_CurrentLimit : NEO_SUPPLY_550CurrentLimit);
+		enableVoltageCompensation(12.0, false);
+		setStatorLimit(motorType == MotorType.kBrushless ? NEO_STATOR_CurrentLimit : NEO_STATOR_550CurrentLimit, false);
+		setSupplyLimit(motorType == MotorType.kBrushless ? NEO_SUPPLY_CurrentLimit : NEO_SUPPLY_550CurrentLimit, false);
 
 		this.encoderType = encoderType;
 
@@ -153,7 +153,7 @@ public class NAR_CANSpark extends NAR_Motor {
 		}
 
 		controller = motor.getClosedLoopController();
-		configPIDNoApply(PIDconfig);
+		configPID(PIDconfig, false);
 		configure();
 		instances.add(this);
     }
@@ -233,13 +233,7 @@ public class NAR_CANSpark extends NAR_Motor {
 	}
 
 	@Override
-	public void configPID(PIDFFConfig config) {
-		configPIDNoApply(config);
-		configure();
-	}
-
-	@Override
-	public void configPIDNoApply(PIDFFConfig config) {
+	public void configPID(PIDFFConfig config, boolean apply) {
 		this.kP = config.kP;
 		this.kI = config.kI;
 		this.kD = config.kD;
@@ -248,6 +242,8 @@ public class NAR_CANSpark extends NAR_Motor {
 		.p(kP)
 		.i(kI)
 		.d(kD);
+
+		if (apply) configure();
 	}
 
 	/**
@@ -265,15 +261,11 @@ public class NAR_CANSpark extends NAR_Motor {
 	 * @param limit The current limit in Amps.
 	 */
 	@Override
-	public void setStatorLimit(int limit) {
-		setStatorLimitNoApply(limit);
-		configure();
+	public void setStatorLimit(int limit, boolean apply) {
+		config.smartCurrentLimit(limit);
+		if (apply) configure();
 	}
 
-	@Override
-	public void setStatorLimitNoApply(int limit) {
-		config.smartCurrentLimit(limit);
-	}
 
 	/**
    * Sets the secondary current limit in Amps.
@@ -296,14 +288,9 @@ public class NAR_CANSpark extends NAR_Motor {
    * @param limit The current limit in Amps.
    */
 	@Override
-	public void setSupplyLimit(int limit) {
-		setSupplyLimitNoApply(limit);
-		configure();
-	}
-
-	@Override
-	public void setSupplyLimitNoApply(int limit) {
+	public void setSupplyLimit(int limit, boolean apply) {
 		config.secondaryCurrentLimit(limit);
+		if (apply) configure();
 	}
 
     /**
@@ -323,13 +310,9 @@ public class NAR_CANSpark extends NAR_Motor {
 	 * @param frame Which type of {@link PeriodicFrame} to change the period of
 	 * @param periodMs Period in ms for the given frame.
 	 */
-	public void setPeriodicFramePeriod(PeriodicFrame frame, int periodMs) {
-		setPeriodicFramePeriodNoApply(frame, periodMs);
-		configure();
-	}
-
-	public void setPeriodicFramePeriodNoApply(PeriodicFrame frame, int periodMs) {
+	public void setPeriodicFramePeriod(PeriodicFrame frame, int periodMs, boolean apply) {
 		config.signals.primaryEncoderPositionPeriodMs(periodMs);
+		if (apply) configure();
 	}
 
 	/**
@@ -339,13 +322,13 @@ public class NAR_CANSpark extends NAR_Motor {
 	 * function to set to team 3128's preset rates.
 	 */
 	public void setStatusFrames(NAR_SparkMaxConfig config) {
-		setPeriodicFramePeriodNoApply(PeriodicFrame.kStatus0, config.status0);
-		setPeriodicFramePeriodNoApply(PeriodicFrame.kStatus1, config.status1);
-		setPeriodicFramePeriodNoApply(PeriodicFrame.kStatus2, config.status2);
-		setPeriodicFramePeriodNoApply(PeriodicFrame.kStatus3, config.status3);
-		setPeriodicFramePeriodNoApply(PeriodicFrame.kStatus4, config.status4);
-		setPeriodicFramePeriodNoApply(PeriodicFrame.kStatus5, config.status5);
-		setPeriodicFramePeriodNoApply(PeriodicFrame.kStatus6, config.status6);
+		setPeriodicFramePeriod(PeriodicFrame.kStatus0, config.status0, false);
+		setPeriodicFramePeriod(PeriodicFrame.kStatus1, config.status1, false);
+		setPeriodicFramePeriod(PeriodicFrame.kStatus2, config.status2, false);
+		setPeriodicFramePeriod(PeriodicFrame.kStatus3, config.status3, false);
+		setPeriodicFramePeriod(PeriodicFrame.kStatus4, config.status4, false);
+		setPeriodicFramePeriod(PeriodicFrame.kStatus5, config.status5, false);
+		setPeriodicFramePeriod(PeriodicFrame.kStatus6, config.status6, false);
 		apply();
 	}
 
@@ -392,13 +375,9 @@ public class NAR_CANSpark extends NAR_Motor {
      * @param leader The motor to follow
 	 * @param invert Whether or not to invert motor output
      */
-	public void follow(NAR_CANSpark leader, boolean invert) {
-		followNoApply(leader, invert);
-		configure();
-	}
-
-	public void followNoApply(NAR_CANSpark leader, boolean invert) {
+	public void follow(NAR_CANSpark leader, boolean invert, boolean apply) {
 		config.follow(leader.motor, invert);
+		if (apply) configure();
 	}
 
 	@Override
@@ -411,14 +390,9 @@ public class NAR_CANSpark extends NAR_Motor {
 	}
 
 	@Override
-	public void setInverted(boolean inverted) {
-		setInvertedNoApply(inverted);
-		configure();
-	}
-
-	@Override
-	public void setInvertedNoApply(boolean inverted) {
+	public void setInverted(boolean inverted, boolean apply) {
 		config.inverted(inverted);
+		if (apply) configure();
 	}
 
     @Override
@@ -473,36 +447,21 @@ public class NAR_CANSpark extends NAR_Motor {
 	}
 
 	@Override
-	public void enableVoltageCompensation(double volts) {
-		enableVoltageCompensationNoApply(volts);
-		configure();
-	}
-
-	@Override
-	public void enableVoltageCompensationNoApply(double volts) {
+	public void enableVoltageCompensation(double volts, boolean apply) {
 		config.voltageCompensation(volts);
+		if (apply) configure();
 	}
 
 	@Override
-	public void setBrakeMode() {
-		setBrakeModeNoApply();
-		configure();
-	}
-
-	@Override
-	public void setBrakeModeNoApply() {
+	public void setBrakeMode(boolean apply) {
 		config.idleMode(IdleMode.kBrake);
+		if (apply) configure();
 	}
 
 	@Override
-	public void setCoastMode() {
-		setCoastModeNoApply();
-		configure();
-	}
-
-	@Override
-	public void setCoastModeNoApply() {
+	public void setCoastMode(boolean apply) {
 		config.idleMode(IdleMode.kCoast);
+		if (apply) configure();
 	}
 
 	@Override

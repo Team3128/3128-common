@@ -212,11 +212,11 @@ public abstract class NAR_Motor implements AutoCloseable {
     public void configMotor(MotorConfig config) {
         setUnitConversionFactor(config.distanceFactor);
         setTimeConversionFactor(config.timeFactor);
-        setInvertedNoApply(config.inverted);
-        setStatorLimitNoApply(config.statorLimit);
-        setSupplyLimitNoApply(config.supplyLimit);
-        enableVoltageCompensationNoApply(config.voltageCompensation);
-        setNeutralModeNoApply(config.mode);
+        setInverted(config.inverted, false);
+        setStatorLimit(config.statorLimit, false);
+        setSupplyLimit(config.supplyLimit, false);
+        enableVoltageCompensation(config.voltageCompensation, false);
+        setNeutralMode(config.mode, false);
         switch(config.statusFrames) {
             case DEFAULT:
                 setDefaultStatusFrames();
@@ -243,9 +243,7 @@ public abstract class NAR_Motor implements AutoCloseable {
 	 * Set the PID values for the controller.
 	 * @param config PIDFFConfig containing kP, kI, and kD values.
 	 */
-	public abstract void configPID(PIDFFConfig config);
-
-    public abstract void configPIDNoApply(PIDFFConfig config);
+	public abstract void configPID(PIDFFConfig config, boolean apply);
 
     /**
      * Wraps a measurement value to the min and max input
@@ -298,9 +296,7 @@ public abstract class NAR_Motor implements AutoCloseable {
      * Sets the motor inverted
      * @param inverted Inverts the motor
      */
-    public abstract void setInverted(boolean inverted);
-
-    public abstract void setInvertedNoApply(boolean inverted);
+    public abstract void setInverted(boolean inverted, boolean apply);
 
     /**
      * Sets motor output power
@@ -416,67 +412,45 @@ public abstract class NAR_Motor implements AutoCloseable {
      * Followers will follow the leader's idle mode
      * @param mode Type of idle mode
      */
-    public void setNeutralMode(Neutral mode) {
+    public void setNeutralMode(Neutral mode, boolean apply) {
         switch(mode) {
             case BRAKE:
-                setBrakeMode();
+                setBrakeMode(apply);
                 break;
             case COAST:
-                setCoastMode();
+                setCoastMode(apply);
                 break;
         }
-        followers.forEach(follower -> follower.setNeutralMode(mode));
-    }
-
-    public void setNeutralModeNoApply(Neutral mode) {
-        switch (mode) {
-            case BRAKE:
-                setBrakeModeNoApply();
-                break;
-            case COAST:
-                setCoastModeNoApply();
-                break;
-        }
-        followers.forEach(follower -> follower.setNeutralModeNoApply(mode));
+        followers.forEach(follower -> follower.setNeutralMode(mode, apply));
     }
 
     /**
      * Sets the motor in brake mode
      */
-    protected abstract void setBrakeMode();
-
-    protected abstract void setBrakeModeNoApply();
+    protected abstract void setBrakeMode(boolean apply);
 
     /**
      * Sets the motor in coast mode
      */
-    protected abstract void setCoastMode();
-
-    protected abstract void setCoastModeNoApply();
+    protected abstract void setCoastMode(boolean apply);
 
     /**
      * Sets voltage compensation, keeps output consistent when battery is above x volts
      * @param volts The max volts the motor goes too
      */
-    public abstract void enableVoltageCompensation(double volts);
-
-    public abstract void enableVoltageCompensationNoApply(double volts);
+    public abstract void enableVoltageCompensation(double volts, boolean apply);
 
     /**
 	 * Sets the stator limit in Amps.
 	 * @param limit The current limit in Amps.
 	 */
-    public abstract void setStatorLimit(int limit);
-
-    public abstract void setStatorLimitNoApply(int limit);
+    public abstract void setStatorLimit(int limit, boolean apply);
 
     /**
 	 * Sets the supply limit in Amps.
 	 * @param limit The current limit in Amps.
 	 */
-    public abstract void setSupplyLimit(int limit);
-
-    public abstract void setSupplyLimitNoApply(int limit);
+    public abstract void setSupplyLimit(int limit, boolean apply);
 
     /**
 	 * Returns motor and motor controller functionality.
