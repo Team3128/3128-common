@@ -1,4 +1,4 @@
-package frc.common3128.core.misc;
+package common.core.misc;
 
 import java.util.PriorityQueue;
 

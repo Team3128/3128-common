@@ -1,9 +1,10 @@
-package frc.common3128.core.controllers;
+package common.core.controllers;
 
 import java.util.LinkedList;
 import java.util.function.DoubleConsumer;
 import java.util.function.DoubleSupplier;
-import frc.common3128.hardware.motorcontroller.NAR_Motor;
+import common.hardware.motorcontroller.NAR_Motor;
+import common.utility.shuffleboard.NAR_Shuffleboard;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
@@ -11,7 +12,6 @@ import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
-import frc.common3128.utility.shuffleboard.NAR_Shuffleboard;
 
 /**
  * Team 3128's abstract controller class.

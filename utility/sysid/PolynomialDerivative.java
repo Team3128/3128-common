@@ -1,4 +1,4 @@
-package frc.common3128.utility.sysid;
+package common.utility.sysid;
 
 import java.util.ArrayList;
 import java.util.List;

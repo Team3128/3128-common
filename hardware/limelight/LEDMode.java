@@ -1,4 +1,4 @@
-package frc.common3128.hardware.limelight;
+package common.hardware.limelight;
 
 public enum LEDMode {
     ON(3), OFF(1), BLINK(2);

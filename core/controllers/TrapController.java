@@ -1,9 +1,9 @@
-package frc.common3128.core.controllers;
+package common.core.controllers;
 
 import java.util.function.DoubleSupplier;
 
-import frc.common3128.hardware.motorcontroller.NAR_Motor;
-import frc.common3128.utility.narwhaldashboard.NarwhalDashboard;
+import common.hardware.motorcontroller.NAR_Motor;
+import common.utility.narwhaldashboard.NarwhalDashboard;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;

@@ -1,12 +1,12 @@
-package frc.common3128.hardware.motorcontroller;
+package common.hardware.motorcontroller;
 
 import java.util.HashSet;
 import java.util.LinkedList;
 
-import frc.common3128.core.controllers.PIDFFConfig;
-import frc.common3128.core.misc.NAR_Robot;
-import frc.common3128.utility.Log;
-import frc.common3128.utility.narwhaldashboard.NarwhalDashboard;
+import common.core.controllers.PIDFFConfig;
+import common.core.misc.NAR_Robot;
+import common.utility.Log;
+import common.utility.narwhaldashboard.NarwhalDashboard;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 

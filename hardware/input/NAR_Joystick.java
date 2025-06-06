@@ -1,4 +1,4 @@
-package frc.common3128.hardware.input;
+package common.hardware.input;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.Joystick;

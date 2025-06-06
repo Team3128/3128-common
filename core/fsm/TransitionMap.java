@@ -1,8 +1,8 @@
-package frc.common3128.core.fsm;
+package common.core.fsm;
 import java.util.*;
 import java.util.function.Function;
 
-import frc.common3128.utility.Log;
+import common.utility.Log;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.wpilibj2.command.Command;
 import static edu.wpi.first.wpilibj2.command.Commands.*;

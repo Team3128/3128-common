@@ -1,4 +1,4 @@
-package frc.common3128.utility.narwhaldashboard;
+package common.utility.narwhaldashboard;
 
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
@@ -15,8 +15,8 @@ import org.java_websocket.server.WebSocketServer;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
-import frc.common3128.core.misc.NAR_Robot;
-import frc.common3128.utility.Log;
+import common.core.misc.NAR_Robot;
+import common.utility.Log;
 import edu.wpi.first.util.function.BooleanConsumer;
 
 /**

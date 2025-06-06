@@ -1,10 +1,10 @@
-package frc.common3128.hardware.input;
+package common.hardware.input;
 
 import java.util.HashMap;
 
+import common.utility.shuffleboard.NAR_Shuffleboard;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.common3128.utility.shuffleboard.NAR_Shuffleboard;
 
 /**
  * Wrapper for the WPILib XboxController class.

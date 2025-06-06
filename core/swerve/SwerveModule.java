@@ -1,4 +1,4 @@
-package frc.common3128.core.swerve;
+package common.core.swerve;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
@@ -11,13 +11,13 @@ import edu.wpi.first.units.measure.Angle;
 import com.ctre.phoenix6.configs.MagnetSensorConfigs;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
-import frc.common3128.core.controllers.PIDFFConfig;
-import frc.common3128.core.swerve.SwerveModuleConfig.SwerveEncoderConfig;
-import frc.common3128.core.swerve.SwerveModuleConfig.SwerveMotorConfig;
-import frc.common3128.hardware.motorcontroller.NAR_Motor;
-import frc.common3128.hardware.motorcontroller.NAR_Motor.Control;
-import frc.common3128.hardware.motorcontroller.NAR_Motor.Neutral;
-import frc.common3128.utility.narwhaldashboard.NarwhalDashboard.State;
+import common.core.controllers.PIDFFConfig;
+import common.core.swerve.SwerveModuleConfig.SwerveEncoderConfig;
+import common.core.swerve.SwerveModuleConfig.SwerveMotorConfig;
+import common.hardware.motorcontroller.NAR_Motor;
+import common.hardware.motorcontroller.NAR_Motor.Control;
+import common.hardware.motorcontroller.NAR_Motor.Neutral;
+import common.utility.narwhaldashboard.NarwhalDashboard.State;
 
 import java.util.function.Supplier;
 

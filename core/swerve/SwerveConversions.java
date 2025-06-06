@@ -1,4 +1,4 @@
-package frc.common3128.core.swerve;
+package common.core.swerve;
 
 /**
  * Team 3128's conversion class for Swerve

@@ -1,8 +1,8 @@
-package frc.common3128.hardware.motorcontroller;
+package common.hardware.motorcontroller;
 
-import static frc.common3128.hardware.motorcontroller.MotorControllerConstants.HIGH_PRIORITY_FREQ;
-import static frc.common3128.hardware.motorcontroller.MotorControllerConstants.NEO_STATOR_CurrentLimit;
-import static frc.common3128.hardware.motorcontroller.MotorControllerConstants.NEO_SUPPLY_CurrentLimit;
+import static common.hardware.motorcontroller.MotorControllerConstants.HIGH_PRIORITY_FREQ;
+import static common.hardware.motorcontroller.MotorControllerConstants.NEO_STATOR_CurrentLimit;
+import static common.hardware.motorcontroller.MotorControllerConstants.NEO_SUPPLY_CurrentLimit;
 
 import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.StatusSignal;
@@ -17,9 +17,9 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
-import frc.common3128.core.controllers.PIDFFConfig;
-import frc.common3128.utility.Log;
-import frc.common3128.utility.narwhaldashboard.NarwhalDashboard;
+import common.core.controllers.PIDFFConfig;
+import common.utility.Log;
+import common.utility.narwhaldashboard.NarwhalDashboard;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Angle;

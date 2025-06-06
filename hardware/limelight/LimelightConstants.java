@@ -1,4 +1,4 @@
-package frc.common3128.hardware.limelight;
+package common.hardware.limelight;
 
 public class LimelightConstants {
     public static final String[] VALUE_KEYS = { "tx", "ty", "ts", "ta", "thor", "tvert", "tshort", "tlong", "tv" };

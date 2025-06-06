@@ -1,4 +1,4 @@
-package frc.common3128.core.fsm;
+package common.core.fsm;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;

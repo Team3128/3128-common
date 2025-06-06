@@ -1,17 +1,16 @@
-package frc.common3128.core.subsystems;
+package common.core.subsystems;
 
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.DoubleSupplier;
-import frc.common3128.core.controllers.ControllerBase;
-import frc.common3128.hardware.motorcontroller.NAR_Motor;
-import frc.common3128.hardware.motorcontroller.NAR_Motor.Neutral;
-import frc.common3128.utility.Log;
-import frc.common3128.utility.sysid.CmdSysId;
+import common.core.controllers.ControllerBase;
+import common.hardware.motorcontroller.NAR_Motor;
+import common.hardware.motorcontroller.NAR_Motor.Neutral;
+import common.utility.Log;
+import common.utility.shuffleboard.NAR_Shuffleboard;
+import common.utility.sysid.CmdSysId;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.common3128.utility.shuffleboard.NAR_Shuffleboard;
-
 import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 import static edu.wpi.first.wpilibj2.command.Commands.*;
 

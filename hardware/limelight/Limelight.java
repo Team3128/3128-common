@@ -1,4 +1,4 @@
-package frc.common3128.hardware.limelight;
+package common.hardware.limelight;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;

@@ -1,4 +1,4 @@
-package frc.common3128.utility.sysid;
+package common.utility.sysid;
 
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -6,7 +6,7 @@ import edu.wpi.first.wpilibj2.command.Subsystem;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import frc.common3128.utility.Log;
+import common.utility.Log;
 
 /**
  * Team 3128's command to identify feed forward constants.
