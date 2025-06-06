@@ -1,13 +1,12 @@
-package common.core.swerve;
+package frc.common3128.core.swerve;
 
 import java.util.List;
 import java.util.function.DoubleSupplier;
 
-import common.hardware.motorcontroller.NAR_Motor;
-import common.hardware.motorcontroller.NAR_Motor.Control;
-import common.utility.narwhaldashboard.NarwhalDashboard;
-import common.utility.shuffleboard.NAR_Shuffleboard;
-import common.utility.sysid.CmdSysId;
+import frc.common3128.hardware.motorcontroller.NAR_Motor;
+import frc.common3128.hardware.motorcontroller.NAR_Motor.Control;
+import frc.common3128.utility.narwhaldashboard.NarwhalDashboard;
+import frc.common3128.utility.sysid.CmdSysId;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
@@ -23,6 +22,7 @@ import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.common3128.utility.shuffleboard.NAR_Shuffleboard;
 
 public abstract class SwerveBase extends SubsystemBase {
 

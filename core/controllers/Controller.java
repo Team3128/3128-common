@@ -1,6 +1,6 @@
-package common.core.controllers;
+package frc.common3128.core.controllers;
 
-import common.hardware.motorcontroller.NAR_Motor;
+import frc.common3128.hardware.motorcontroller.NAR_Motor;
 import edu.wpi.first.math.controller.PIDController;
 /**
  * Team 3128's streamlined {@link PIDController} class.

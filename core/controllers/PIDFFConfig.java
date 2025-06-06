@@ -1,4 +1,4 @@
-package common.core.controllers;
+package frc.common3128.core.controllers;
 
 import java.util.function.DoubleSupplier;
 

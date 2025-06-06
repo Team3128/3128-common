@@ -1,10 +1,10 @@
-package common.core.swerve;
+package frc.common3128.core.swerve;
 
 import com.ctre.phoenix6.hardware.CANcoder;
 
-import common.core.controllers.PIDFFConfig;
-import common.hardware.motorcontroller.NAR_Motor;
-import common.hardware.motorcontroller.NAR_Motor.MotorConfig;
+import frc.common3128.core.controllers.PIDFFConfig;
+import frc.common3128.hardware.motorcontroller.NAR_Motor;
+import frc.common3128.hardware.motorcontroller.NAR_Motor.MotorConfig;
 
 /**
  * Swerve Module configuration class which is used to configure {@link SwerveModule}.

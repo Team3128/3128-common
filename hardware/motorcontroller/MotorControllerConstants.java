@@ -1,4 +1,4 @@
-package common.hardware.motorcontroller;
+package frc.common3128.hardware.motorcontroller;
 
 /**
  * Constants for motor control / conversion. Should not be changed.

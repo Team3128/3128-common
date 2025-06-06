@@ -1,4 +1,4 @@
-package common.hardware.camera;
+package frc.common3128.hardware.camera;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -12,9 +12,8 @@ import org.photonvision.PhotonCamera;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
-import common.hardware.camera.Camera;
-import common.utility.Log;
-import common.utility.shuffleboard.NAR_Shuffleboard;
+import frc.common3128.hardware.camera.Camera;
+import frc.common3128.utility.Log;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -22,6 +21,7 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
+import frc.common3128.utility.shuffleboard.NAR_Shuffleboard;
 
 /**
  * Team 3128's class to control the robot's cameras and vision processing.

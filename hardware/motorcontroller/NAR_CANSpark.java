@@ -1,4 +1,4 @@
-package common.hardware.motorcontroller;
+package frc.common3128.hardware.motorcontroller;
 
 import java.util.LinkedList;
 
@@ -26,16 +26,16 @@ import com.revrobotics.spark.SparkBase.Faults;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 
-import common.core.controllers.PIDFFConfig;
-import common.utility.Log;
-import common.utility.narwhaldashboard.NarwhalDashboard.State;
+import frc.common3128.core.controllers.PIDFFConfig;
+import frc.common3128.utility.Log;
+import frc.common3128.utility.narwhaldashboard.NarwhalDashboard.State;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
 
 import java.util.function.Supplier;
 
-import static common.hardware.motorcontroller.MotorControllerConstants.*;
+import static frc.common3128.hardware.motorcontroller.MotorControllerConstants.*;
 
 /**
  * Team 3128's streamlined {@link SparkBase} class.

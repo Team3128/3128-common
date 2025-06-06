@@ -1,4 +1,4 @@
-package common.core.subsystems;
+package frc.common3128.core.subsystems;
 
 import static edu.wpi.first.wpilibj2.command.Commands.waitSeconds;
 
@@ -8,16 +8,16 @@ import java.util.function.BooleanSupplier;
 import java.util.function.DoubleConsumer;
 import java.util.function.DoubleSupplier;
 
-import common.core.controllers.ControllerBase;
-import common.hardware.motorcontroller.NAR_Motor;
-import common.utility.Log;
-import common.utility.shuffleboard.NAR_Shuffleboard;
-import common.utility.tester.Tester;
-import common.utility.tester.Tester.SystemsTest;
+import frc.common3128.core.controllers.ControllerBase;
+import frc.common3128.hardware.motorcontroller.NAR_Motor;
+import frc.common3128.utility.Log;
+import frc.common3128.utility.tester.Tester;
+import frc.common3128.utility.tester.Tester.SystemsTest;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj2.command.PIDSubsystem;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.common3128.utility.shuffleboard.NAR_Shuffleboard;
 
 /**
  * A subsystem based off of {@link PIDSubsystem} 

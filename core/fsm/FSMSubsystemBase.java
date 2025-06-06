@@ -1,16 +1,16 @@
-package common.core.fsm;
+package frc.common3128.core.fsm;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Consumer;
 
-import common.core.subsystems.NAR_Subsystem;
-import common.hardware.motorcontroller.NAR_Motor.Neutral;
-import common.utility.Log;
-import common.utility.shuffleboard.NAR_Shuffleboard;
+import frc.common3128.core.subsystems.NAR_Subsystem;
+import frc.common3128.hardware.motorcontroller.NAR_Motor.Neutral;
+import frc.common3128.utility.Log;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.common3128.utility.shuffleboard.NAR_Shuffleboard;
 
 public abstract class FSMSubsystemBase<S extends Enum<S>> extends SubsystemBase implements NAR_Subsystem {
     

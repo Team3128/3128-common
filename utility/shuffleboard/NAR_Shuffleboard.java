@@ -1,4 +1,4 @@
-package common.utility.shuffleboard;
+package frc.common3128.utility.shuffleboard;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -9,7 +9,7 @@ import java.util.function.Supplier;
 
 import com.ctre.phoenix.sensors.WPI_PigeonIMU;
 
-import common.core.misc.NAR_Robot;
+import frc.common3128.core.misc.NAR_Robot;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.networktables.NetworkTableValue;

@@ -1,11 +1,11 @@
-package common.core.commands;
+package frc.common3128.core.commands;
 
 import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
 import java.util.function.DoubleSupplier;
 import java.util.function.DoubleConsumer;
 
-import common.core.controllers.ControllerBase;
+import frc.common3128.core.controllers.ControllerBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 

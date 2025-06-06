@@ -1,4 +1,4 @@
-package common.hardware.camera;
+package frc.common3128.hardware.camera;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;

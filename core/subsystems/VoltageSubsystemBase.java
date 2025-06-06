@@ -1,10 +1,10 @@
-package common.core.subsystems;
+package frc.common3128.core.subsystems;
 
 import java.util.List;
 import java.util.function.Consumer;
 
-import common.hardware.motorcontroller.NAR_Motor;
-import common.hardware.motorcontroller.NAR_Motor.Neutral;
+import frc.common3128.hardware.motorcontroller.NAR_Motor;
+import frc.common3128.hardware.motorcontroller.NAR_Motor.Neutral;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
