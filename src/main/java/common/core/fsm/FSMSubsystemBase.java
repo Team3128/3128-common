@@ -20,6 +20,7 @@ public abstract class FSMSubsystemBase<S extends Enum<S>> extends SubsystemBase 
     protected S previousState;
 
     private final TransitionMap<S> transitionMap;
+    private final Transition<S> blankTransition = new Transition<S>(null, null, Commands.none());
     private final Class<S> enumType;
 
     protected List<NAR_Subsystem> mechanisms = new LinkedList<NAR_Subsystem>();
@@ -53,7 +54,7 @@ public abstract class FSMSubsystemBase<S extends Enum<S>> extends SubsystemBase 
         }
     }
     
-    public void setState(S nextState) {
+    public Command setState(S nextState) {
         if(transitionMap.isEmpty()) {
             registerTransitions();
             Log.debug(Log.Type.STATE_MACHINE_PRIMARY, getName(), "Registering Transitions");
@@ -61,44 +62,23 @@ public abstract class FSMSubsystemBase<S extends Enum<S>> extends SubsystemBase 
 
         if(nextState == null) {
             Log.recoverable(getName(), "Null state requested");
-            return;
+            return Commands.none();
         }
 
-        Log.debug(Log.Type.STATE_MACHINE_PRIMARY, getName(), "Robot attempting to set state. FROM: " + currentState.name() + "  TO: " + nextState.name());
-        Transition<S> transition = transitionMap.getTransition(getState(), nextState);
-        
-        // if not the same state
-        if(!stateEquals(nextState)) requestTransition = transition;
-        else {
-            Log.debug(Log.Type.STATE_MACHINE_SECONDARY, getName(), "Invalid Transition: Requested state already reached");
-            return;
-        }
-
-        // if invalid trnasition
-        if(transition == null) {
-            Log.unusual(getName(), "Invalid Transition: Requested transition null");
-            return;
-        }
-
-        Log.debug(Log.Type.STATE_MACHINE_SECONDARY, getName(), "Valid Transition: " + transition);
-
-
-        // if not transitioning
-        if(isTransitioning()) {
-            Log.debug(Log.Type.STATE_MACHINE_SECONDARY, getName(), "Canceling current transition...");
-            currentTransition.cancel();
-        }
-
-        Log.debug(Log.Type.STATE_MACHINE_SECONDARY, getName(), "Scheduling transition...");
-        currentTransition = transition;
-        currentTransition.getCommand().schedule();
-        previousState = currentState;
-        currentState = nextState;
-        return;
+        return Commands.runOnce(() -> {
+            Transition<S> transition = transitionMap.getTransition(getState(), nextState);
+            if (transition == null) {
+                currentTransition = blankTransition;
+                return;
+            }
+            currentTransition = transition;
+            previousState = currentState;
+            currentState = nextState;
+        }).andThen(currentTransition.getCommand()).onlyIf(() -> !stateEquals(nextState));
     }
 
     public Command setStateCommand(S nextState) {
-        return Commands.runOnce(()-> setState(nextState));
+        return setState(nextState);
     }
 
     public boolean stateEquals(S otherState) {
