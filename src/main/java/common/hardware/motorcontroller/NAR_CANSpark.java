@@ -383,7 +383,7 @@ public class NAR_CANSpark extends NAR_Motor {
 	@Override
 	public void follow(NAR_Motor leader) {
 		if (leader instanceof NAR_CANSpark) {
-			follow((NAR_CANSpark) leader, false);
+			follow((NAR_CANSpark) leader, false, true);
 			return;
 		}
 		super.follow(leader);

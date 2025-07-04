@@ -92,7 +92,7 @@ public class SwerveModule {
      */
     private void configAngleMotor(){
         angleMotor.configMotor(angleConfig.motorConfig);
-        angleMotor.configPID(angleConfig.pidffConfig);
+        angleMotor.configPID(angleConfig.pidffConfig, true);
         angleMotor.enableContinuousInput(-180, 180);
         resetToAbsolute();
     }
@@ -102,7 +102,7 @@ public class SwerveModule {
      */
     private void configDriveMotor(){        
         driveMotor.configMotor(driveConfig.motorConfig);
-        driveMotor.configPID(driveConfig.pidffConfig);
+        driveMotor.configPID(driveConfig.pidffConfig, true);
         driveMotor.resetPosition(0);
     }
 
@@ -217,8 +217,8 @@ public class SwerveModule {
      * @param isBrake True for brake mode, false for coast
      */
     public void setBrakeMode(boolean isBrake) {
-        driveMotor.setNeutralMode(isBrake ? Neutral.BRAKE : Neutral.COAST);
-        angleMotor.setNeutralMode(isBrake ? Neutral.BRAKE : Neutral.COAST);
+        driveMotor.setNeutralMode(isBrake ? Neutral.BRAKE : Neutral.COAST, true);
+        angleMotor.setNeutralMode(isBrake ? Neutral.BRAKE : Neutral.COAST, true);
     }
 
     /**

@@ -193,7 +193,7 @@ public abstract class PositionSubsystemBase extends NAR_PIDSubsystem implements 
      * @param mode The neutral mode to set to.
      */
     public void setNeutralMode(Neutral mode) {
-        apply(motor -> motor.setNeutralMode(mode));
+        apply(motor -> motor.setNeutralMode(mode, true));
     }
 
     /**

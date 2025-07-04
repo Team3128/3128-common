@@ -93,7 +93,7 @@ public abstract class VoltageSubsystemBase extends SubsystemBase implements NAR_
     }
 
     public void setNeutralMode(Neutral mode) {
-        motors.forEach(motor -> motor.setNeutralMode(mode));
+        motors.forEach(motor -> motor.setNeutralMode(mode, true));
     }
 
     public double getPosition() {
