@@ -154,7 +154,7 @@ public class NAR_CANSpark extends NAR_Motor {
 
 		controller = motor.getClosedLoopController();
 		configPIDNoApply(PIDconfig);
-		configure();
+		// configure();
 		instances.add(this);
     }
 
