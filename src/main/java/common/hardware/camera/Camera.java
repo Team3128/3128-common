@@ -29,7 +29,24 @@ import edu.wpi.first.math.geometry.Transform3d;
  * @since 2024 Crescendo
  * @author Audrey Zheng
  */
+
 public class Camera {
+
+    class CameraResult {
+        public double ambiguity;
+        public Pose2d pose;
+        public double timestamp;
+
+        public CameraResult(double ambiguity, Pose2d pose, double timestamp) {
+            this.ambiguity = ambiguity;
+            this.pose = pose;
+            this.timestamp = timestamp;
+        }
+
+        public CameraResult(double ambiguity) {
+            this.ambiguity = ambiguity;
+        }
+    }
 
     public PhotonCamera camera;
 
@@ -103,19 +120,34 @@ public class Camera {
         this.ambiguityThreshold = ambiguityThreshold;
     }
 
-    public void update() {
-        if (isDisabled) return;
+    public double lowestAmbiguityInResult(PhotonPipelineResult result) {
+        double lowestAmbiguityScore = 10;
+
+        if (!result.hasTargets()) return 100000;
+
+        for (PhotonTrackedTarget target : result.targets) {
+            if (isValidTarget(target) && getPoseAmbiguity(target) < lowestAmbiguityScore && getPoseAmbiguity(target) != -1) {
+                lowestAmbiguityScore = getPoseAmbiguity(target);
+            }
+        }
+
+        return lowestAmbiguityScore;
+    }
+
+    public CameraResult update() {
+        CameraResult cameraResult = new CameraResult(100);
+        if (isDisabled) return cameraResult;
         hasSeenTag = false;
         // result = camera.getLatestResult();
         resultList = camera.getAllUnreadResults();
 
         for (PhotonPipelineResult result : resultList) {
             if (!result.hasTargets()) {
-                return;
+                return cameraResult; 
             }
             
             Optional<Pose2d> estPosOpt = getGyroPose(result);
-            if (estPosOpt.isEmpty()) return;
+            if (estPosOpt.isEmpty()) return cameraResult;
             Pose2d estPos = estPosOpt.get();
     
             /*
@@ -123,21 +155,25 @@ public class Camera {
              */
     
             if (estPos.minus(new Pose2d(0,0,Rotation2d.fromDegrees(0))).getTranslation().getNorm() <= 0.05)
-                return;
-
+                return cameraResult;
+            
+            
             if(!isGoodEstimate(estPos)) {
                 updateCounter++;
                 if (updateCounter <= overrideThreshold) {
                     hasSeenTag = false; 
-                    return;
+                    return cameraResult;
                 }
-            }
-            else {
+            } else {
                 updateCounter = 0;
             } 
 
-            odometry.accept(estPos, result.getTimestampSeconds());
+            //odometry.accept(estPos, result.getTimestampSeconds());
+            cameraResult = new CameraResult(lowestAmbiguityInResult(result), estPos, result.getTimestampSeconds());
+            return cameraResult;
         }
+
+        return cameraResult;
     }
 
 
@@ -233,8 +269,24 @@ public class Camera {
     }
 
     public static void updateAll() {
+        double bestPoseAmbiguity = Double.POSITIVE_INFINITY;
+        double bestTimestamp = 0;
+        Pose2d bestPose = null;
+
+        //search for target with least ambiguous pose
         for (final Camera camera : cameras) {
-            camera.update();
+            CameraResult cameraResult = camera.update();
+
+            if (cameraResult.ambiguity < bestPoseAmbiguity) {
+                bestPoseAmbiguity = cameraResult.ambiguity;
+                bestPose = cameraResult.pose;
+                bestTimestamp = cameraResult.timestamp;
+            }
+        }
+
+        //enter best pose into odometry
+        if (bestPose != null) {
+            odometry.accept(bestPose, bestTimestamp);
         }
     }
 
