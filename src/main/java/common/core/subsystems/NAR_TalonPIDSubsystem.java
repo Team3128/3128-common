@@ -15,26 +15,25 @@ import common.hardware.motorcontroller.NAR_Motor;
 import common.hardware.motorcontroller.NAR_TalonFX;
 import common.utility.Log;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.Commands.*;
 
-public class NAR_MotionMagicSubsystemBase extends NAR_PIDSubsystem {
+public class NAR_TalonPIDSubsystem extends NAR_PIDSubsystem {
     enum Type {
         POSITION,
         VELOCITY;
     }
     
-    private NAR_TalonFX kraken;
-    private MotionMagicVoltage m_request;
+    protected NAR_TalonFX kraken;
     private TalonFXConfiguration talonFXConfigs;
     private Slot0Configs slot0Configs;
 
-    private double maxVelocity;
-    private double maxAcceleration;
+    protected double maxVelocity;
+    protected double maxAcceleration;
 
 
-    private Type type;
-    private PIDFFConfig config;
-    private TalonFX motor;
+    protected Type type;
+    protected PIDFFConfig config;
+    protected TalonFX motor;
 
     /**
      * Creates a base controller object to control motion.
@@ -42,7 +41,7 @@ public class NAR_MotionMagicSubsystemBase extends NAR_PIDSubsystem {
      * @param config PIDFFConfig object containing PID and Feedforward constants.
      * @param period The controller's update rate in seconds. Must be non-zero and positive.
      */
-    public NAR_MotionMagicSubsystemBase(PIDFFConfig config, NAR_TalonFX motor, double maxVelocity, double maxAcceleration) {
+    public NAR_TalonPIDSubsystem(PIDFFConfig config, NAR_TalonFX motor, double maxVelocity, double maxAcceleration) {
         super(new Controller(config, Controller.Type.POSITION));
         this.talonFXConfigs = new TalonFXConfiguration();
 
@@ -50,8 +49,6 @@ public class NAR_MotionMagicSubsystemBase extends NAR_PIDSubsystem {
 
         this.maxVelocity = maxVelocity;
         this.maxAcceleration = maxAcceleration;
-
-        this.m_request = new MotionMagicVoltage(0);
 
         this.type = Type.POSITION;
 
@@ -92,7 +89,7 @@ public class NAR_MotionMagicSubsystemBase extends NAR_PIDSubsystem {
      * @return Command setting the power to the motors.
      */
     public Command runCommand(double power) {
-        return Commands.runOnce(() -> run(power));
+        return runOnce(() -> run(power));
     }
 
     /**
@@ -111,26 +108,6 @@ public class NAR_MotionMagicSubsystemBase extends NAR_PIDSubsystem {
      */
     public Command stopCommand(){
         return runOnce(()-> stop());
-    }
-
-    /**
-     * Sets controller setpoint and enables controller.
-     * 
-     * @param setpoint Setpoint the pivot goes to.
-     * @return Command setting pivot setpoint.
-     */
-    public Command pidTo(double setpoint) {
-        return runOnce(() -> motor.setControl(m_request.withPosition(setpoint)));
-    }
-
-    /**
-     * Sets controller setpoint and enables controller.
-     * 
-     * @param setpoint Setpoint the pivot goes to.
-     * @return Command setting pivot setpoint.
-     */
-    public Command pidTo(DoubleSupplier setpoint) {
-        return runOnce(()-> pidTo(setpoint.getAsDouble()));
     }
 
     /**
