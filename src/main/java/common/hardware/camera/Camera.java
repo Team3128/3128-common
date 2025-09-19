@@ -38,6 +38,10 @@ public class Camera {
     private PhotonPipelineResult result = new PhotonPipelineResult();
     private List<PhotonPipelineResult> resultList = new ArrayList<PhotonPipelineResult>();
 
+    private static final double YAW_INTERPOLATION_ALPHA = 0.5;
+    private double lastYaw;
+    private boolean hasLastYaw;
+
     
     private static DoubleSupplier gyro;
     private static AprilTagFieldLayout aprilTags;
@@ -110,6 +114,7 @@ public class Camera {
         resultList = camera.getAllUnreadResults();
 
         for (PhotonPipelineResult result : resultList) {
+            this.result = result;
             if (!result.hasTargets()) {
                 return;
             }
@@ -230,6 +235,53 @@ public class Camera {
 
     public double getGyroAngle() {
         return gyro.getAsDouble();
+    }
+
+    public double getYaw() {
+        List<PhotonPipelineResult> unreadResults = camera.getAllUnreadResults();
+        double measuredYaw = Double.NaN;
+
+        if (!unreadResults.isEmpty()) {
+            PhotonPipelineResult latestWithTarget = null;
+            double yawAccumulator = 0.0;
+            int yawSamples = 0;
+
+            for (PhotonPipelineResult pipelineResult : unreadResults) {
+                if (!pipelineResult.hasTargets()) {
+                    continue;
+                }
+
+                PhotonTrackedTarget target = pipelineResult.getBestTarget();
+                if (target == null) {
+                    continue;
+                }
+
+                yawAccumulator += target.getYaw();
+                yawSamples++;
+                latestWithTarget = pipelineResult;
+            }
+
+            if (yawSamples > 0 && latestWithTarget != null) {
+                measuredYaw = yawAccumulator / yawSamples;
+                result = latestWithTarget;
+            }
+        } else if (result != null && result.hasTargets()) {
+            PhotonTrackedTarget target = result.getBestTarget();
+            if (target != null) {
+                measuredYaw = target.getYaw();
+            }
+        }
+
+        if (!Double.isNaN(measuredYaw)) {
+            double interpolatedYaw = hasLastYaw
+                ? MathUtil.interpolate(lastYaw, measuredYaw, YAW_INTERPOLATION_ALPHA)
+                : measuredYaw;
+            lastYaw = interpolatedYaw;
+            hasLastYaw = true;
+            return interpolatedYaw;
+        }
+
+        return hasLastYaw ? lastYaw : 0.0;
     }
 
     public static void updateAll() {
