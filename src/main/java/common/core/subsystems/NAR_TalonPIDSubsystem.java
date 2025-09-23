@@ -34,6 +34,7 @@ public class NAR_TalonPIDSubsystem extends NAR_PIDSubsystem {
     protected Type type;
     protected PIDFFConfig config;
     protected TalonFX motor;
+    protected MotionMagicVoltage m_request;
 
     /**
      * Creates a base controller object to control motion.
@@ -55,6 +56,8 @@ public class NAR_TalonPIDSubsystem extends NAR_PIDSubsystem {
         this.config = config;
 
         this.motor = motor.getMotor();
+
+        this.m_request = new MotionMagicVoltage(0);
 
         configMotors();
     }
@@ -134,4 +137,16 @@ public class NAR_TalonPIDSubsystem extends NAR_PIDSubsystem {
     public double getVelocity() {
         return motor.getRotorVelocity().getValueAsDouble();
     }
+    public Command pidTo(double setpoint) {
+        return runOnce(() -> motor.setControl(m_request.withPosition(setpoint)));
+    }
+
+    /**
+     * Sets controller setpoint and enables controller.
+     * 
+     * @param setpoint Setpoint the pivot goes to.
+     * @return Command setting pivot setpoint.
+     */
+  
+
 }

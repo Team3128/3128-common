@@ -30,9 +30,9 @@ public class TalonPositionSubsystemBase extends NAR_TalonPIDSubsystem implements
      * @param setpoint Setpoint the pivot goes to.
      * @return Command setting pivot setpoint.
      */
-    public Command pidTo(double setpoint) {
-        return runOnce(() -> motor.setControl(m_request.withPosition(setpoint)));
-    }
+    // public Command pidTo(double setpoint) {
+    //     return runOnce(() -> motor.setControl(m_request.withPosition(setpoint)));
+    // }
 
     /**
      * Sets controller setpoint and enables controller.
@@ -40,9 +40,9 @@ public class TalonPositionSubsystemBase extends NAR_TalonPIDSubsystem implements
      * @param setpoint Setpoint the pivot goes to.
      * @return Command setting pivot setpoint.
      */
-    public Command pidTo(DoubleSupplier setpoint) {
-        return runOnce(()-> pidTo(setpoint.getAsDouble()));
-    }
+    // public Command pidTo(DoubleSupplier setpoint) {
+    //     return runOnce(()-> pidTo(setpoint.getAsDouble()));
+    // }
 
     /**
      * Sets voltage to motors.
