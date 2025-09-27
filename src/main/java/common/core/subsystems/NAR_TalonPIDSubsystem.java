@@ -40,7 +40,6 @@ public class NAR_TalonPIDSubsystem extends NAR_PIDSubsystem {
      * Creates a base controller object to control motion.
      * <p>Sets kP, kI, kD, kS, kV, kA, kG, constraints, period values.
      * @param config PIDFFConfig object containing PID and Feedforward constants.
-     * @param period The controller's update rate in seconds. Must be non-zero and positive.
      */
     public NAR_TalonPIDSubsystem(PIDFFConfig config, NAR_TalonFX motor, double maxVelocity, double maxAcceleration) {
         super(new Controller(config, Controller.Type.POSITION));
@@ -140,13 +139,4 @@ public class NAR_TalonPIDSubsystem extends NAR_PIDSubsystem {
     public Command pidTo(double setpoint) {
         return runOnce(() -> motor.setControl(m_request.withPosition(setpoint)));
     }
-
-    /**
-     * Sets controller setpoint and enables controller.
-     * 
-     * @param setpoint Setpoint the pivot goes to.
-     * @return Command setting pivot setpoint.
-     */
-  
-
 }
