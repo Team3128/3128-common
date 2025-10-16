@@ -102,12 +102,7 @@ public abstract class FSMSubsystemBase<S extends Enum<S>> extends SubsystemBase 
     }
 
     public boolean stateEquals(S otherState) {
-        if(currentState == null) return false;
-        if(otherState == null) {
-            Log.recoverable(getName(), "Null state passed");
-            return false;
-        }
-        return currentState.name().equals(otherState.name()) && !isTransitioning();
+        return getState() == otherState;
     }
 
     @SuppressWarnings("unchecked")
