@@ -52,6 +52,11 @@ public abstract class FSMSubsystemBase<S extends Enum<S>> extends SubsystemBase 
             NAR_Shuffleboard.addData(this.getName(), state.name(), ()-> stateEquals(state), (state.ordinal() % 8), state.ordinal() / 8 + 1);
         }
     }
+
+    public void overrideState(S nextState) {
+        previousState = currentState;
+        currentState = nextState;
+    }
     
     public void setState(S nextState) {
         if(transitionMap.isEmpty()) {
@@ -68,14 +73,10 @@ public abstract class FSMSubsystemBase<S extends Enum<S>> extends SubsystemBase 
         Transition<S> transition = transitionMap.getTransition(getState(), nextState);
         
         // if not the same state
-        if(!stateEquals(nextState)) requestTransition = transition;
-        else {
-            Log.debug(Log.Type.STATE_MACHINE_SECONDARY, getName(), "Invalid Transition: Requested state already reached");
-            return;
-        }
+        requestTransition = transition;
 
         // if invalid trnasition
-        if(transition == null) {
+        if(transition == null || transition.getCommand() == null) {
             Log.unusual(getName(), "Invalid Transition: Requested transition null");
             return;
         }

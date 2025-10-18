@@ -276,6 +276,7 @@ public class NAR_TalonFX extends NAR_Motor {
 	@Override
 	public void setVelocityStatusFrames() {
         configTalonFX(()-> velocity.setUpdateFrequency(HIGH_PRIORITY_FREQ));
+        configTalonFX(()-> stallCurrent.setUpdateFrequency(HIGH_PRIORITY_FREQ));
         configTalonFX(()-> motor.optimizeBusUtilization());
 	}
 
