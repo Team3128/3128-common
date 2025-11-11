@@ -2,6 +2,7 @@ package common.core.subsystems;
 
 import java.util.function.DoubleSupplier;
 
+import com.ctre.phoenix6.controls.MotionMagicVelocityDutyCycle;
 import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
 
 import common.core.controllers.ControllerBase;
@@ -14,14 +15,14 @@ import edu.wpi.first.wpilibj2.command.Commands;
 
 public class TalonVelocitySubsystemBase extends NAR_TalonPIDSubsystem implements NAR_Subsystem {
     protected NAR_TalonFX narTalon;
-    protected MotionMagicVelocityVoltage m_request;
+    protected MotionMagicVelocityDutyCycle m_request;
 
 
     public TalonVelocitySubsystemBase(PIDFFConfig config, NAR_TalonFX motor, double cruiseVelocity, double acceleration) {
         super(config, motor, cruiseVelocity, acceleration);
 
         this.narTalon = motor;
-        m_request = new MotionMagicVelocityVoltage(0);
+        m_request = new MotionMagicVelocityDutyCycle(0);
     }
 
     public Command toVelocity(double velocity) {
