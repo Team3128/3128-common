@@ -2,6 +2,7 @@ package common.core.subsystems;
 
 import java.util.function.DoubleSupplier;
 
+import com.ctre.phoenix6.controls.MotionMagicDutyCycle;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 
 import common.core.controllers.ControllerBase;
@@ -14,13 +15,13 @@ import edu.wpi.first.wpilibj2.command.Commands;
 
 public class TalonPositionSubsystemBase extends NAR_TalonPIDSubsystem implements NAR_Subsystem {
     protected NAR_TalonFX narTalon;
-    protected MotionMagicVoltage m_request;
+    protected MotionMagicDutyCycle m_request;
 
     public TalonPositionSubsystemBase(PIDFFConfig config, NAR_TalonFX motor, double cruiseVelocity, double acceleration) {
         super(config, motor, cruiseVelocity, acceleration);
 
         this.narTalon = motor;
-        this.m_request = new MotionMagicVoltage(0);
+        this.m_request = new MotionMagicDutyCycle(0);
 
     }
 
@@ -30,9 +31,9 @@ public class TalonPositionSubsystemBase extends NAR_TalonPIDSubsystem implements
      * @param setpoint Setpoint the pivot goes to.
      * @return Command setting pivot setpoint.
      */
-    // public Command pidTo(double setpoint) {
-    //     return runOnce(() -> motor.setControl(m_request.withPosition(setpoint)));
-    // }
+    public Command pidTo(double setpoint) {
+        return runOnce(() -> motor.setControl(m_request.withPosition(setpoint)));
+    }
 
     /**
      * Sets controller setpoint and enables controller.
@@ -40,9 +41,9 @@ public class TalonPositionSubsystemBase extends NAR_TalonPIDSubsystem implements
      * @param setpoint Setpoint the pivot goes to.
      * @return Command setting pivot setpoint.
      */
-    // public Command pidTo(DoubleSupplier setpoint) {
-    //     return runOnce(()-> pidTo(setpoint.getAsDouble()));
-    // }
+    public Command pidTo(DoubleSupplier setpoint) {
+        return runOnce(()-> pidTo(setpoint.getAsDouble()));
+    }
 
     /**
      * Sets voltage to motors.

@@ -5,6 +5,7 @@ import java.util.function.DoubleSupplier;
 
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.MotionMagicDutyCycle;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 
@@ -34,7 +35,7 @@ public class NAR_TalonPIDSubsystem extends NAR_PIDSubsystem {
     protected Type type;
     protected PIDFFConfig config;
     protected TalonFX motor;
-    protected MotionMagicVoltage m_request;
+    protected MotionMagicDutyCycle m_request;
 
     /**
      * Creates a base controller object to control motion.
@@ -56,7 +57,7 @@ public class NAR_TalonPIDSubsystem extends NAR_PIDSubsystem {
 
         this.motor = motor.getMotor();
 
-        this.m_request = new MotionMagicVoltage(0);
+        this.m_request = new MotionMagicDutyCycle(0);
 
         configMotors();
     }
