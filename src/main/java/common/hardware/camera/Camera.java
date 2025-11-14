@@ -16,6 +16,7 @@ import common.hardware.camera.Camera;
 import common.utility.Log;
 import common.utility.shuffleboard.NAR_Shuffleboard;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -44,7 +45,7 @@ public class Camera {
 
     
     private static DoubleSupplier gyro;
-    private static AprilTagFieldLayout aprilTags;
+    private static AprilTagFieldLayout aprilTags = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark);;
     private static BiConsumer<Pose2d, Double> odometry;
     private static Supplier<Pose2d> robotPose;
 
@@ -97,7 +98,12 @@ public class Camera {
     public static void setResources(DoubleSupplier gyro, BiConsumer<Pose2d, Double> odometry, AprilTagFieldLayout aprilTags, Supplier<Pose2d> robotPose) {
         Camera.gyro = gyro;
         Camera.odometry = odometry;
-        Camera.aprilTags = aprilTags;
+        Camera.robotPose = robotPose;
+    }
+
+    public static void setResources(DoubleSupplier gyro, BiConsumer<Pose2d, Double> odometry, Supplier<Pose2d> robotPose) {
+        Camera.gyro = gyro;
+        Camera.odometry = odometry;
         Camera.robotPose = robotPose;
     }
 
