@@ -8,7 +8,10 @@ import java.util.function.BiConsumer;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
+import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
+import org.photonvision.PhotonPoseEstimator;
+import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
@@ -16,6 +19,7 @@ import common.hardware.camera.Camera;
 import common.utility.Log;
 import common.utility.shuffleboard.NAR_Shuffleboard;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -32,32 +36,15 @@ import edu.wpi.first.math.geometry.Transform3d;
 
 public class Camera {
 
-    class CameraResult {
-        public double ambiguity;
-        public Pose2d pose;
-        public double timestamp;
-
-        public CameraResult(double ambiguity, Pose2d pose, double timestamp) {
-            this.ambiguity = ambiguity;
-            this.pose = pose;
-            this.timestamp = timestamp;
-        }
-
-        public CameraResult(double ambiguity) {
-            this.ambiguity = ambiguity;
-        }
-    }
-
     public PhotonCamera camera;
 
     public static final LinkedList<Camera> cameras = new LinkedList<Camera>();
 
     private PhotonPipelineResult result = new PhotonPipelineResult();
     private List<PhotonPipelineResult> resultList = new ArrayList<PhotonPipelineResult>();
-
     
     private static DoubleSupplier gyro;
-    private static AprilTagFieldLayout aprilTags;
+    private static AprilTagFieldLayout aprilTags = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);;
     private static BiConsumer<Pose2d, Double> odometry;
     private static Supplier<Pose2d> robotPose;
 
@@ -65,7 +52,7 @@ public class Camera {
     private double ambiguityThreshold = 0.5;
     private double minDistanceThreshold = 0.34;
 
-    public static double validDist = 0.5;
+    public static double validDist = 0.5; //meters
     public static double overrideThreshold = 5;
     public static int updateCounter = 0;
 
@@ -79,6 +66,8 @@ public class Camera {
     public boolean isDisabled = false;
 
     public Transform3d offset;
+
+    public PhotonPoseEstimator poseEstimator;
 
     public double gyroAngle;
 
@@ -99,6 +88,8 @@ public class Camera {
             .rotateBy(new Rotation3d(0.0,0.0,yawOffset))
         );
 
+        this.poseEstimator = new PhotonPoseEstimator(aprilTags, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, offset);
+
         camera = new PhotonCamera(name);
 
         cameras.add(this);
@@ -107,10 +98,9 @@ public class Camera {
         hasSeenTag = false;
     }
         
-    public static void setResources(DoubleSupplier gyro, BiConsumer<Pose2d, Double> odometry, AprilTagFieldLayout aprilTags, Supplier<Pose2d> robotPose) {
+    public static void setResources(DoubleSupplier gyro, BiConsumer<Pose2d, Double> odometry, Supplier<Pose2d> robotPose) {
         Camera.gyro = gyro;
         Camera.odometry = odometry;
-        Camera.aprilTags = aprilTags;
         Camera.robotPose = robotPose;
     }
 
@@ -134,46 +124,58 @@ public class Camera {
         return lowestAmbiguityScore;
     }
 
-    public CameraResult update() {
-        CameraResult cameraResult = new CameraResult(100);
-        if (isDisabled) return cameraResult;
-        hasSeenTag = false;
-        // result = camera.getLatestResult();
-        resultList = camera.getAllUnreadResults();
+    public double averageAmbiguityInResult(PhotonPipelineResult result) {
+        double totalAmbiguity = 0;
+        double numberOfTargets = 0;
 
-        for (PhotonPipelineResult result : resultList) {
-            if (!result.hasTargets()) {
-                return cameraResult; 
-            }
-            
-            Optional<Pose2d> estPosOpt = getGyroPose(result);
-            if (estPosOpt.isEmpty()) return cameraResult;
-            Pose2d estPos = estPosOpt.get();
-    
-            /*
-             * Checks if the the robot has a good estimate
-             */
-    
-            if (estPos.minus(new Pose2d(0,0,Rotation2d.fromDegrees(0))).getTranslation().getNorm() <= 0.05)
-                return cameraResult;
-            
-            
-            if(!isGoodEstimate(estPos)) {
-                updateCounter++;
-                if (updateCounter <= overrideThreshold) {
-                    hasSeenTag = false; 
-                    return cameraResult;
+        if (!result.hasTargets()) return 100000;
+
+        for (PhotonTrackedTarget target : result.targets) {
+            if (isValidTarget(target) && getPoseAmbiguity(target) != -1) {
+                if (getPoseAmbiguity(target) > ambiguityThreshold) {
+                    totalAmbiguity += getPoseAmbiguity(target);
+                    numberOfTargets += 1;
                 }
-            } else {
-                updateCounter = 0;
-            } 
-
-            //odometry.accept(estPos, result.getTimestampSeconds());
-            cameraResult = new CameraResult(lowestAmbiguityInResult(result), estPos, result.getTimestampSeconds());
-            return cameraResult;
+            }
         }
 
-        return cameraResult;
+        return totalAmbiguity/numberOfTargets;
+    }
+
+    public void update() {
+        if (isDisabled) return;
+        hasSeenTag = false;
+        resultList = camera.getAllUnreadResults();
+
+        Optional<EstimatedRobotPose> visionEst = Optional.empty();
+        
+        for (PhotonPipelineResult result : resultList) {
+            visionEst = poseEstimator.update(result);
+        
+            visionEst.ifPresent(
+                Pose -> {
+                Pose2d estPos = Pose.estimatedPose.toPose2d();
+                if(!isGoodEstimate(estPos)) { //checks if the estimated pose is within a valid distance from the robot pose :)
+                    odometry.accept(estPos, result.getTimestampSeconds());
+                } 
+            });
+        }
+
+        //old stuff
+        // for (PhotonPipelineResult result : resultList) {
+        //     if (!result.hasTargets()) {
+                
+        //     }
+            
+        //     // Optional<Pose2d> estPosOpt = getGyroPose(result);
+        //     // if (estPosOpt.isEmpty()) return cameraResult;
+        //     // Pose2d estPos = estPosOpt.get();
+
+            
+    
+        //     // if (estPos.minus(new Pose2d(0,0,Rotation2d.fromDegrees(0))).getTranslation().getNorm() <= 0.05)
+        //     //     return cameraResult;
+        // }
     }
 
 
@@ -269,24 +271,9 @@ public class Camera {
     }
 
     public static void updateAll() {
-        double bestPoseAmbiguity = Double.POSITIVE_INFINITY;
-        double bestTimestamp = 0;
-        Pose2d bestPose = null;
-
-        //search for target with least ambiguous pose
+        //all cameras are updated no matter what :)
         for (final Camera camera : cameras) {
-            CameraResult cameraResult = camera.update();
-
-            if (cameraResult.ambiguity < bestPoseAmbiguity) {
-                bestPoseAmbiguity = cameraResult.ambiguity;
-                bestPose = cameraResult.pose;
-                bestTimestamp = cameraResult.timestamp;
-            }
-        }
-
-        //enter best pose into odometry
-        if (bestPose != null) {
-            odometry.accept(bestPose, bestTimestamp);
+            camera.update();
         }
     }
 
