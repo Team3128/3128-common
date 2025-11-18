@@ -18,6 +18,7 @@ import org.photonvision.targeting.PhotonTrackedTarget;
 import common.hardware.camera.Camera;
 import common.utility.Log;
 import common.utility.shuffleboard.NAR_Shuffleboard;
+import edu.wpi.first.apriltag.AprilTag;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.MathUtil;
@@ -44,7 +45,7 @@ public class Camera {
     private List<PhotonPipelineResult> resultList = new ArrayList<PhotonPipelineResult>();
     
     private static DoubleSupplier gyro;
-    private static AprilTagFieldLayout aprilTags = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);;
+    private static AprilTagFieldLayout aprilTags;
     private static BiConsumer<Pose2d, Double> odometry;
     private static Supplier<Pose2d> robotPose;
 
@@ -98,10 +99,11 @@ public class Camera {
         hasSeenTag = false;
     }
         
-    public static void setResources(DoubleSupplier gyro, BiConsumer<Pose2d, Double> odometry, Supplier<Pose2d> robotPose) {
+    public static void setResources(DoubleSupplier gyro, BiConsumer<Pose2d, Double> odometry, Supplier<Pose2d> robotPose, AprilTagFieldLayout aprilTags) {
         Camera.gyro = gyro;
         Camera.odometry = odometry;
         Camera.robotPose = robotPose;
+        Camera.aprilTags = aprilTags;
     }
 
     public void setThresholds(double minDistanceThreshold, double maxDistanceThreshold, double ambiguityThreshold) {
