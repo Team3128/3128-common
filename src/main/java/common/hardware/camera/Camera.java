@@ -98,10 +98,11 @@ public class Camera {
         hasSeenTag = false;
     }
         
-    public static void setResources(DoubleSupplier gyro, BiConsumer<Pose2d, Double> odometry, Supplier<Pose2d> robotPose) {
+    public static void setResources(DoubleSupplier gyro, BiConsumer<Pose2d, Double> odometry, Supplier<Pose2d> robotPose, AprilTagFieldLayout aprilTags) {
         Camera.gyro = gyro;
         Camera.odometry = odometry;
         Camera.robotPose = robotPose;
+        Camera.aprilTags = aprilTags;
     }
 
     public void setThresholds(double minDistanceThreshold, double maxDistanceThreshold, double ambiguityThreshold) {
@@ -122,24 +123,6 @@ public class Camera {
         }
 
         return lowestAmbiguityScore;
-    }
-
-    public double averageAmbiguityInResult(PhotonPipelineResult result) {
-        double totalAmbiguity = 0;
-        double numberOfTargets = 0;
-
-        if (!result.hasTargets()) return 100000;
-
-        for (PhotonTrackedTarget target : result.targets) {
-            if (isValidTarget(target) && getPoseAmbiguity(target) != -1) {
-                if (getPoseAmbiguity(target) > ambiguityThreshold) {
-                    totalAmbiguity += getPoseAmbiguity(target);
-                    numberOfTargets += 1;
-                }
-            }
-        }
-
-        return totalAmbiguity/numberOfTargets;
     }
 
     public void update() {
@@ -185,34 +168,36 @@ public class Camera {
      * @return The estimated robot pose
      */
     public Optional<Pose2d> getPose(PhotonPipelineResult result) {
-        double lowestAmbiguityScore = 10;
-        PhotonTrackedTarget lowestAmbiguityTarget = null;
-
-        if (!result.hasTargets()) return Optional.empty();
-
-        /*
-         * Find the target with the lowest ambiguity score 
-         */
-        for (PhotonTrackedTarget target : result.targets) {
-            if (isValidTarget(target) && getPoseAmbiguity(target) < lowestAmbiguityScore && getPoseAmbiguity(target) != -1) {
-                lowestAmbiguityScore = getPoseAmbiguity(target);
-                lowestAmbiguityTarget = target;
-                hasSeenTag = tags.contains(target.getFiducialId()); 
-            }
-        }
-
-        if (lowestAmbiguityTarget == null) return Optional.empty();
-        /*
-         * Finds the pose of the lowest ambiguity target and uses the gyro to determine the estimated pose
-         */
-        Optional<Pose3d> targetPosition = aprilTags.getTagPose(lowestAmbiguityTarget.getFiducialId());
-        
-        if (targetPosition.isEmpty()) return Optional.empty();
-
-        cameraPose = targetPosition.get().transformBy(lowestAmbiguityTarget.getBestCameraToTarget().inverse());
-        estimatedPose = cameraPose.transformBy(offset.inverse()).toPose2d();
-
         return Optional.of(estimatedPose);
+
+        // double lowestAmbiguityScore = 10;
+        // PhotonTrackedTarget lowestAmbiguityTarget = null;
+
+        // if (!result.hasTargets()) return Optional.empty();
+
+        // /*
+        //  * Find the target with the lowest ambiguity score 
+        //  */
+        // for (PhotonTrackedTarget target : result.targets) {
+        //     if (isValidTarget(target) && getPoseAmbiguity(target) < lowestAmbiguityScore && getPoseAmbiguity(target) != -1) {
+        //         lowestAmbiguityScore = getPoseAmbiguity(target);
+        //         lowestAmbiguityTarget = target;
+        //         hasSeenTag = tags.contains(target.getFiducialId()); 
+        //     }
+        // }
+
+        // if (lowestAmbiguityTarget == null) return Optional.empty();
+        // /*
+        //  * Finds the pose of the lowest ambiguity target and uses the gyro to determine the estimated pose
+        //  */
+        // Optional<Pose3d> targetPosition = aprilTags.getTagPose(lowestAmbiguityTarget.getFiducialId());
+        
+        // if (targetPosition.isEmpty()) return Optional.empty();
+
+        // cameraPose = targetPosition.get().transformBy(lowestAmbiguityTarget.getBestCameraToTarget().inverse());
+        // estimatedPose = cameraPose.transformBy(offset.inverse()).toPose2d();
+
+        // return Optional.of(estimatedPose);
     }
 
     public Optional<Pose2d> getGyroPose(PhotonPipelineResult result) {
