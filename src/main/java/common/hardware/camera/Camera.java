@@ -112,20 +112,6 @@ public class Camera {
         this.ambiguityThreshold = ambiguityThreshold;
     }
 
-    public double lowestAmbiguityInResult(PhotonPipelineResult result) {
-        double lowestAmbiguityScore = 10;
-
-        if (!result.hasTargets()) return 100000;
-
-        for (PhotonTrackedTarget target : result.targets) {
-            if (isValidTarget(target) && getPoseAmbiguity(target) < lowestAmbiguityScore && getPoseAmbiguity(target) != -1) {
-                lowestAmbiguityScore = getPoseAmbiguity(target);
-            }
-        }
-
-        return lowestAmbiguityScore;
-    }
-
     public void update() {
         if (isDisabled) return;
         hasSeenTag = false;
@@ -144,72 +130,6 @@ public class Camera {
                 } 
             });
         }
-
-        //old stuff
-        // for (PhotonPipelineResult result : resultList) {
-        //     if (!result.hasTargets()) {
-                
-        //     }
-            
-        //     // Optional<Pose2d> estPosOpt = getGyroPose(result);
-        //     // if (estPosOpt.isEmpty()) return cameraResult;
-        //     // Pose2d estPos = estPosOpt.get();
-
-            
-    
-        //     // if (estPos.minus(new Pose2d(0,0,Rotation2d.fromDegrees(0))).getTranslation().getNorm() <= 0.05)
-        //     //     return cameraResult;
-        // }
-    }
-
-
-    /**
-     * Gets the latest camera updates
-     * @param result Latest result from the camera
-     * @return The estimated robot pose
-     */
-    public Optional<Pose2d> getPose(PhotonPipelineResult result) {
-        return Optional.of(estimatedPose);
-
-        // double lowestAmbiguityScore = 10;
-        // PhotonTrackedTarget lowestAmbiguityTarget = null;
-
-        // if (!result.hasTargets()) return Optional.empty();
-
-        // /*
-        //  * Find the target with the lowest ambiguity score 
-        //  */
-        // for (PhotonTrackedTarget target : result.targets) {
-        //     if (isValidTarget(target) && getPoseAmbiguity(target) < lowestAmbiguityScore && getPoseAmbiguity(target) != -1) {
-        //         lowestAmbiguityScore = getPoseAmbiguity(target);
-        //         lowestAmbiguityTarget = target;
-        //         hasSeenTag = tags.contains(target.getFiducialId()); 
-        //     }
-        // }
-
-        // if (lowestAmbiguityTarget == null) return Optional.empty();
-        // /*
-        //  * Finds the pose of the lowest ambiguity target and uses the gyro to determine the estimated pose
-        //  */
-        // Optional<Pose3d> targetPosition = aprilTags.getTagPose(lowestAmbiguityTarget.getFiducialId());
-        
-        // if (targetPosition.isEmpty()) return Optional.empty();
-
-        // cameraPose = targetPosition.get().transformBy(lowestAmbiguityTarget.getBestCameraToTarget().inverse());
-        // estimatedPose = cameraPose.transformBy(offset.inverse()).toPose2d();
-
-        // return Optional.of(estimatedPose);
-    }
-
-    public Optional<Pose2d> getGyroPose(PhotonPipelineResult result) {
-        Optional<Pose2d> poseOpt = getPose(result);
-        if (poseOpt.isEmpty()) return Optional.empty();
-        Pose2d pose = poseOpt.get();
-        double gyroUnconstrained = gyro.getAsDouble();
-
-        Rotation2d gyroAngle = Rotation2d.fromDegrees(MathUtil.inputModulus(gyroUnconstrained, -180, 180));
-        Pose2d updatedPose = new Pose2d(pose.getX(), pose.getY(), gyroAngle);
-        return Optional.of(updatedPose);
     }
 
     /**
@@ -251,10 +171,6 @@ public class Camera {
     public double getPoseAmbiguity(PhotonTrackedTarget target) {
         return target.getPoseAmbiguity();
     } 
-
-    public double getGyroAngle() {
-        return gyro.getAsDouble();
-    }
 
     public static void updateAll() {
         //all cameras are updated no matter what :)
