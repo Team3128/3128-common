@@ -95,11 +95,11 @@ public class Camera {
 
         cameras.add(this);
 
-        // initShuffleboard();
+        initShuffleboard();
         hasSeenTag = false;
     }
         
-    public static void setResources(DoubleSupplier gyro, BiConsumer<Pose2d, Double> odometry, Supplier<Pose2d> robotPose, AprilTagFieldLayout aprilTags) {
+    public static void setResources(DoubleSupplier gyro, BiConsumer<Pose2d, Double> odometry, Supplier<Pose2d> robotPose,AprilTagFieldLayout aprilTags) {
         Camera.gyro = gyro;
         Camera.odometry = odometry;
         Camera.robotPose = robotPose;
@@ -291,11 +291,13 @@ public class Camera {
     }
 
     public void initShuffleboard() {
-        NAR_Shuffleboard.addData(camera.getName(), "WithinDist", () -> withinDist, 0, 2, 3, 1);
-        NAR_Shuffleboard.addData(camera.getName(), "Estimated Pose", () -> estimatedPose.toString(), 0, 0, 3, 1);
+        NAR_Shuffleboard.addData(camera.getName(), "WithinDist", () -> withinDist, 2, 2, 1, 1);
+        NAR_Shuffleboard.addData(camera.getName(), "Estimated Pose X", () -> estimatedPose.getX(), 0, 0, 2, 1);
+        NAR_Shuffleboard.addData(camera.getName(), "Estimated Pose Y", () -> estimatedPose.getY(), 0, 1, 2, 1);
+        NAR_Shuffleboard.addData(camera.getName(), "camera pose X", () -> cameraPose.getX(), 2, 0, 2, 1);
+        NAR_Shuffleboard.addData(camera.getName(), "camera pose Y", () -> cameraPose.getY(), 2, 1, 2, 1);
+        NAR_Shuffleboard.addData(camera.getName(), "dist", () -> distance, 0, 2, 1, 1);
         NAR_Shuffleboard.addData(camera.getName(), "Has target", () -> result.hasTargets(), 1, 2, 1, 1);
-        NAR_Shuffleboard.addData(camera.getName(), "camera pose", () -> cameraPose.toString(), 0, 1, 3, 1);
-        NAR_Shuffleboard.addData(camera.getName(), "dist", () -> distance, 2, 2, 1, 1);
 
     }
 }
