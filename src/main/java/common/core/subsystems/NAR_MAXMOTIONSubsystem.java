@@ -3,6 +3,7 @@ package common.core.subsystems;
 import common.core.controllers.ControllerBase;
 import common.core.controllers.PIDFFConfig;
 import common.hardware.motorcontroller.NAR_CANSpark;
+import common.hardware.motorcontroller.NAR_Motor.Neutral;
 import common.utility.Log;
 import edu.wpi.first.wpilibj2.command.Command;
 
@@ -20,12 +21,13 @@ import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.config.MAXMotionConfig;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.MAXMotionConfig.MAXMotionPositionMode;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import common.core.controllers.Controller;
 
-public class NAR_MAXMOTIONSubsystem extends NAR_PIDSubsystem {
+public class NAR_MAXMOTIONSubsystem extends NAR_PIDSubsystem implements NAR_Subsystem{
     protected SparkFlex motor;
-    private RelativeEncoder m_encoder;
+    private RelativeEncoder encoder;
     protected SparkClosedLoopController controller;
 
     private SparkFlexConfig flexConfig;
@@ -36,7 +38,7 @@ public class NAR_MAXMOTIONSubsystem extends NAR_PIDSubsystem {
         super(new Controller(config, Controller.Type.POSITION));
 
         this.motor = (SparkFlex) m_motor.getMotor();
-        this.m_encoder = motor.getEncoder();
+        this.encoder = motor.getEncoder();
         this.controller = motor.getClosedLoopController();
         
         this.flexConfig = new SparkFlexConfig();
@@ -93,7 +95,7 @@ public class NAR_MAXMOTIONSubsystem extends NAR_PIDSubsystem {
      * Resets measurement position to controller position minimum.
      */
     public void reset() {
-        m_encoder.setPosition(0);
+        encoder.setPosition(0);
     }
 
     /**
@@ -102,7 +104,7 @@ public class NAR_MAXMOTIONSubsystem extends NAR_PIDSubsystem {
      * @return The position of the first motor.
      */
     public double getPosition() {
-        return m_encoder.getPosition();
+        return encoder.getPosition();
     }
 
     /**
@@ -111,7 +113,7 @@ public class NAR_MAXMOTIONSubsystem extends NAR_PIDSubsystem {
      * @return The velocity of the first motor.
      */
     public double getVelocity() {
-        return m_encoder.getVelocity();
+        return encoder.getVelocity();
     }
 
     /**
@@ -152,5 +154,44 @@ public class NAR_MAXMOTIONSubsystem extends NAR_PIDSubsystem {
      */
     public Command velocityTo(DoubleSupplier velocity) {
         return velocityTo(velocity.getAsDouble());
+    }
+
+
+    @Override
+    public Command resetCommand() {
+        return runOnce(() -> reset());
+    }
+
+
+    @Override
+    public void runVolts(double volts) {
+        motor.setVoltage(volts);
+    }
+
+
+    @Override
+    public Command runVoltsCommand(double volts) {
+        return runOnce(() -> runVolts(volts));
+    }
+
+
+    @Override
+    public void setNeutralMode(Neutral mode) {
+        switch (mode) {
+            case BRAKE:
+                flexConfig.idleMode(IdleMode.kBrake);
+                break;
+            case COAST:
+                flexConfig.idleMode(IdleMode.kCoast);
+                break;
+        }
+
+        motor.configure(flexConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
+    }
+
+
+    @Override
+    public double getVolts() {
+        return motor.getBusVoltage();
     }
 }
