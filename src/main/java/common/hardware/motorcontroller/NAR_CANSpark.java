@@ -23,8 +23,8 @@ import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.SparkBase.Faults;
-import com.revrobotics.spark.SparkBase.PersistMode;
-import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.PersistMode;
+import com.revrobotics.ResetMode;
 
 import common.core.controllers.PIDFFConfig;
 import common.utility.Log;
@@ -423,17 +423,17 @@ public class NAR_CANSpark extends NAR_Motor {
 
     @Override
     public void setPercentOutput(double speed) {
-        controller.setReference(speed, ControlType.kDutyCycle);
+        controller.setSetpoint(speed, ControlType.kDutyCycle);
     }
 
     @Override
     public void setVelocity(double rpm, double feedForward) {
-        controller.setReference(rpm, ControlType.kVelocity, ClosedLoopSlot.kSlot0, feedForward);
+        controller.setSetpoint(rpm, ControlType.kVelocity, ClosedLoopSlot.kSlot0, feedForward);
     }
 
     @Override
     public void setPosition(double rotations, double feedForward) {
-        controller.setReference(rotations, ControlType.kPosition, ClosedLoopSlot.kSlot0, feedForward);
+        controller.setSetpoint(rotations, ControlType.kPosition, ClosedLoopSlot.kSlot0, feedForward);
     }
 
     @Override

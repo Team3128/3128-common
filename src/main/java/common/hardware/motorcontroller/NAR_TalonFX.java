@@ -4,6 +4,7 @@ import static common.hardware.motorcontroller.MotorControllerConstants.HIGH_PRIO
 import static common.hardware.motorcontroller.MotorControllerConstants.NEO_STATOR_CurrentLimit;
 import static common.hardware.motorcontroller.MotorControllerConstants.NEO_SUPPLY_CurrentLimit;
 
+import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
@@ -45,6 +46,8 @@ public class NAR_TalonFX extends NAR_Motor {
 
     private final TalonFX motor;
 
+    private final CANBus canBus;
+
     // private final CurrentLimitsConfigs currentLimitsConfigs = new CurrentLimitsConfigs();
     // private final VoltageConfigs voltageConfigs = new VoltageConfigs();
     // private final MotorOutputConfigs motorOutputConfigs = new MotorOutputConfigs();
@@ -57,11 +60,12 @@ public class NAR_TalonFX extends NAR_Motor {
     private final StatusSignal<AngularVelocity> velocity;
     private final StatusSignal<Temperature> temperature;
 
-    public NAR_TalonFX(int deviceNumber, String canbus, PIDFFConfig pidConfig) {
+    public NAR_TalonFX(int deviceNumber, String canbusStr, PIDFFConfig pidConfig) {
         super(deviceNumber);
         Timer timer = new Timer();
         timer.restart();
-        motor = new TalonFX(deviceNumber, canbus);
+        canBus = new CANBus(canbusStr);
+        motor = new TalonFX(deviceNumber, canBus);
         timer.stop();
         Log.info("Talon ID " + deviceNumber + " Creation", timer.get());
 

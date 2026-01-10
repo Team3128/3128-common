@@ -8,6 +8,7 @@ import common.utility.Log;
 import common.utility.narwhaldashboard.NarwhalDashboard;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 
 /**
@@ -96,7 +97,7 @@ public class Tester {
             passTimer = new Timer();
             NarwhalDashboard.getInstance().addUpdate(name, ()-> state.toString());
             NarwhalDashboard.getInstance().addButton(name, (boolean pressed) -> {
-                if (pressed) this.schedule();
+                if (pressed) CommandScheduler.getInstance().schedule(this);
             });
         }
 
@@ -133,7 +134,7 @@ public class Tester {
             else {
                 final SystemsTest initialTest = systemsTests.get(0);
                 initialTest.testState = TestState.RUNNING;
-                initialTest.schedule();
+                CommandScheduler.getInstance().schedule(initialTest);
             }
         }
 
@@ -144,7 +145,7 @@ public class Tester {
                 passTimer.stop();
                 passTimer.reset();
                 state = TestState.RUNNING;
-                testToSchedule.schedule();
+                CommandScheduler.getInstance().schedule(testToSchedule);
                 testToSchedule = null;
             }
 
@@ -255,6 +256,6 @@ public class Tester {
      * @param name Name of the test or system.
      */
     public void runTest(String name) {
-        systemTests.get(name).schedule();
+        CommandScheduler.getInstance().schedule(systemTests.get(name));
     }
 }

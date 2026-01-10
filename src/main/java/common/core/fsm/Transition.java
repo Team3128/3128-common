@@ -1,6 +1,7 @@
 package common.core.fsm;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 
 public class Transition<T extends Enum<T>> {
@@ -52,7 +53,7 @@ public class Transition<T extends Enum<T>> {
     }
 
     public void execute() {
-        command.schedule();
+        CommandScheduler.getInstance().schedule(command);
     }
 
     public boolean isScheduled() {

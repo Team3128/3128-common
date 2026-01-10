@@ -1,6 +1,5 @@
 package common.core.subsystems;
 
-import java.util.function.Consumer;
 import java.util.function.DoubleSupplier;
 
 import com.ctre.phoenix6.configs.Slot0Configs;
@@ -9,9 +8,7 @@ import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 
 import common.core.controllers.Controller;
-import common.core.controllers.ControllerBase;
 import common.core.controllers.PIDFFConfig;
-import common.hardware.motorcontroller.NAR_Motor;
 import common.hardware.motorcontroller.NAR_TalonFX;
 import common.utility.Log;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -23,7 +20,6 @@ public class NAR_MotionMagicSubsystemBase extends NAR_PIDSubsystem {
         VELOCITY;
     }
     
-    private NAR_TalonFX kraken;
     private MotionMagicVoltage m_request;
     private TalonFXConfiguration talonFXConfigs;
     private Slot0Configs slot0Configs;
@@ -40,7 +36,6 @@ public class NAR_MotionMagicSubsystemBase extends NAR_PIDSubsystem {
      * Creates a base controller object to control motion.
      * <p>Sets kP, kI, kD, kS, kV, kA, kG, constraints, period values.
      * @param config PIDFFConfig object containing PID and Feedforward constants.
-     * @param period The controller's update rate in seconds. Must be non-zero and positive.
      */
     public NAR_MotionMagicSubsystemBase(PIDFFConfig config, NAR_TalonFX motor, double maxVelocity, double maxAcceleration) {
         super(new Controller(config, Controller.Type.POSITION));
