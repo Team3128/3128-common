@@ -428,12 +428,12 @@ public class NAR_CANSpark extends NAR_Motor {
 
     @Override
     public void setVelocity(double rpm, double feedForward) {
-        controller.setReference(rpm, ControlType.kMAXMotionVelocityControl, ClosedLoopSlot.kSlot0, feedForward);
+        controller.setReference(rpm, ControlType.kPosition, ClosedLoopSlot.kSlot0, feedForward);
     }
 
     @Override
     public void setPosition(double rotations, double feedForward) {
-        controller.setReference(rotations, ControlType.kMAXMotionPositionControl, ClosedLoopSlot.kSlot0, feedForward);
+        controller.setReference(rotations, ControlType.kVelocity, ClosedLoopSlot.kSlot0, feedForward);
     }
 
     @Override
