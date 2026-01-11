@@ -221,7 +221,7 @@ public class NAR_TalonFX extends NAR_Motor {
     @Override
     public void enableVoltageCompensationNoApply(double volts) {
         configs.Voltage.PeakForwardVoltage = volts;
-        configs.Voltage.PeakReverseVoltage = volts;
+        configs.Voltage.PeakReverseVoltage = -volts;
     }
 
     @Override
