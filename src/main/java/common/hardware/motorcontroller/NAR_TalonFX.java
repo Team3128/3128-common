@@ -143,7 +143,7 @@ public class NAR_TalonFX extends NAR_Motor {
 
     @Override
     protected void setVelocity(double rpm, double feedForward) {
-        var velocitySetpoint = new VelocityVoltage(rpm);
+        var velocitySetpoint = new VelocityVoltage(rpm / 60);
         velocitySetpoint.FeedForward = feedForward;
         motor.setControl(velocitySetpoint);
     }
