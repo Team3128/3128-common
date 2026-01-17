@@ -125,9 +125,10 @@ public class Camera {
             visionEst.ifPresent(
                 Pose -> {
                 Pose2d estPos = Pose.estimatedPose.toPose2d();
-                if(!isGoodEstimate(estPos)) { //checks if the estimated pose is within a valid distance from the robot pose :)
+                this.estimatedPose = estPos;
+                // if(isGoodEstimate(estPos)) { //checks if the estimated pose is within a valid distance from the robot pose :)
                     odometry.accept(estPos, result.getTimestampSeconds());
-                } 
+                // } 
             });
         }
     }
