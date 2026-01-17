@@ -1,6 +1,5 @@
 package common.core.subsystems;
 
-import common.core.controllers.ControllerBase;
 import common.core.controllers.PIDFFConfig;
 import common.hardware.motorcontroller.NAR_CANSpark;
 import common.hardware.motorcontroller.NAR_Motor.Neutral;
@@ -11,16 +10,10 @@ import java.util.function.DoubleSupplier;
 
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.ClosedLoopSlot;
-import com.revrobotics.spark.SparkAbsoluteEncoder;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
-import com.revrobotics.spark.SparkRelativeEncoder;
 import com.revrobotics.spark.SparkBase.ControlType;
-import com.revrobotics.spark.SparkBase.PersistMode;
-import com.revrobotics.spark.SparkBase.ResetMode;
-import com.revrobotics.spark.config.MAXMotionConfig;
 import com.revrobotics.spark.config.SparkFlexConfig;
-import com.revrobotics.spark.config.MAXMotionConfig.MAXMotionPositionMode;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import common.core.controllers.Controller;
@@ -42,13 +35,13 @@ public class NAR_MAXMOTIONSubsystem extends NAR_PIDSubsystem implements NAR_Subs
         this.controller = motor.getClosedLoopController();
         
         this.flexConfig = new SparkFlexConfig();
-        flexConfig.closedLoop.maxMotion.maxVelocity(maxVelocity);
+        flexConfig.closedLoop.maxMotion.cruiseVelocity(maxVelocity);
         flexConfig.closedLoop.maxMotion.maxAcceleration(maxAcceleration);
         flexConfig.closedLoop.p(config.kP, ClosedLoopSlot.kSlot0);
         flexConfig.closedLoop.i(config.kI, ClosedLoopSlot.kSlot0);
         flexConfig.closedLoop.d(config.kD, ClosedLoopSlot.kSlot0);
 
-        motor.configure(flexConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
+        motor.configure(flexConfig, com.revrobotics.ResetMode.kNoResetSafeParameters, com.revrobotics.PersistMode.kNoPersistParameters);
         
         feedforward = () -> {return (config.kS.getAsDouble() + config.kA.getAsDouble() + config.kV.getAsDouble() + config.kG_Function.getAsDouble());};
     }
@@ -122,8 +115,9 @@ public class NAR_MAXMOTIONSubsystem extends NAR_PIDSubsystem implements NAR_Subs
      * 
      * @param setpoint position to go to in rotations 
      */
-    public Command pidTo(double setpoint) {
-        return runOnce(() -> controller.setReference(setpoint, ControlType.kMAXMotionPositionControl, ClosedLoopSlot.kSlot0, feedforward.getAsDouble()));
+    public void pidTo(double setpoint) {
+        Log.info("maxmotion", setpoint);
+        controller.setSetpoint(setpoint, ControlType.kMAXMotionPositionControl, ClosedLoopSlot.kSlot0);
     }
 
     /**
@@ -132,8 +126,8 @@ public class NAR_MAXMOTIONSubsystem extends NAR_PIDSubsystem implements NAR_Subs
      * 
      * @param setpoint position to go to in rotations 
      */
-    public Command pidTo(DoubleSupplier setpoint) {
-        return pidTo(setpoint.getAsDouble());
+    public void pidTo(DoubleSupplier setpoint) {
+        pidTo(setpoint.getAsDouble());
     }
 
     /**
@@ -143,7 +137,7 @@ public class NAR_MAXMOTIONSubsystem extends NAR_PIDSubsystem implements NAR_Subs
      * @param velocity velocity to get to in rotations per second 
      */
     public Command velocityTo(double velocity) {
-        return runOnce(() -> controller.setReference(velocity, ControlType.kMAXMotionVelocityControl, ClosedLoopSlot.kSlot0, feedforward.getAsDouble()));
+        return runOnce(() -> controller.setSetpoint(velocity, ControlType.kMAXMotionVelocityControl, ClosedLoopSlot.kSlot0, feedforward.getAsDouble()));
     }
 
     /**
@@ -186,7 +180,7 @@ public class NAR_MAXMOTIONSubsystem extends NAR_PIDSubsystem implements NAR_Subs
                 break;
         }
 
-        motor.configure(flexConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
+        motor.configure(flexConfig, com.revrobotics.ResetMode.kNoResetSafeParameters, com.revrobotics.PersistMode.kNoPersistParameters);
     }
 
 
