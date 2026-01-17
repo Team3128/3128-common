@@ -59,8 +59,6 @@ public class Camera {
 
     private boolean hasSeenTag;
 
-    private static boolean firstUpdate = true;
-
     public Pose2d estimatedPose = new Pose2d();
 
     private static ArrayList<Integer> tags = new ArrayList<Integer>();
@@ -128,11 +126,9 @@ public class Camera {
                 Pose -> {
                 Pose2d estPos = Pose.estimatedPose.toPose2d();
                 this.estimatedPose = estPos;
-
-                //checks if the estimated pose is within a valid distance from the robot pose :)
-                if (firstUpdate || isGoodEstimate(estPos)) {
+                // if(isGoodEstimate(estPos)) { //checks if the estimated pose is within a valid distance from the robot pose :)
                     odometry.accept(estPos, result.getTimestampSeconds());
-                }
+                // } 
             });
         }
     }
@@ -181,10 +177,6 @@ public class Camera {
         //all cameras are updated no matter what :)
         for (final Camera camera : cameras) {
             camera.update();
-        }
-        
-        if (firstUpdate) {
-            firstUpdate = false;
         }
     }
 
