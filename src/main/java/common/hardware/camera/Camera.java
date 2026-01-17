@@ -130,9 +130,11 @@ public class Camera {
                 this.estimatedPose = estPos;
 
                 //checks if the estimated pose is within a valid distance from the robot pose :)
-                if (firstUpdate || isGoodEstimate(estPos)) {
-                    odometry.accept(estPos, result.getTimestampSeconds());
+                if (!firstUpdate && !isGoodEstimate(estPos)) {
+                    Log.unusual("Camera", "Detected outlier. Pose from camera is too far away from current estimated pose.")
                 }
+
+                odometry.accept(estPos, result.getTimestampSeconds());
             });
         }
     }
