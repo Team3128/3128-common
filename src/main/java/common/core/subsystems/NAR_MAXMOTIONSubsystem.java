@@ -20,7 +20,6 @@ import common.core.controllers.Controller;
 
 public class NAR_MAXMOTIONSubsystem extends NAR_PIDSubsystem implements NAR_Subsystem{
     protected SparkFlex motor;
-    private RelativeEncoder encoder;
     protected SparkClosedLoopController controller;
 
     private SparkFlexConfig flexConfig;
@@ -31,7 +30,6 @@ public class NAR_MAXMOTIONSubsystem extends NAR_PIDSubsystem implements NAR_Subs
         super(new Controller(config, Controller.Type.POSITION));
 
         this.motor = (SparkFlex) m_motor.getMotor();
-        this.encoder = motor.getEncoder();
         this.controller = motor.getClosedLoopController();
         
         this.flexConfig = new SparkFlexConfig();
@@ -88,25 +86,21 @@ public class NAR_MAXMOTIONSubsystem extends NAR_PIDSubsystem implements NAR_Subs
      * Resets measurement position to controller position minimum.
      */
     public void reset() {
-        encoder.setPosition(0);
+        
     }
 
     /**
-     * Get the position of the mechanism relative to its reset.
-     * 
-     * @return The position of the first motor.
+     * Returns the position of the motor
      */
     public double getPosition() {
-        return encoder.getPosition();
+        return motor.getEncoder().getPosition();
     }
 
     /**
-     * Get the velocity of the mechanism.
-     * 
-     * @return The velocity of the first motor.
+     * Returns the velocity of the motor
      */
     public double getVelocity() {
-        return encoder.getVelocity();
+        return motor.getEncoder().getVelocity();
     }
 
     /**
