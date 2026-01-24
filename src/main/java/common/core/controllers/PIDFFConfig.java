@@ -84,6 +84,16 @@ public class PIDFFConfig {
      * Sets the static gain.
      * @param kS The constant power required to overcome static friction as a double.
      */
+    public void change(PIDFFConfig config){
+        this.kP = config.kP;
+        this.kI = config.kI;
+        this.kD = config.kD;
+        this.kS = config.kS;
+        this.kG = config.kG;
+        this.kA = config.kA;
+        this.kV = config.kV;
+    }
+
     public void setkS(double kS) {
         setkS(()-> kS);
     }
