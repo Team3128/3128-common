@@ -6,7 +6,6 @@ import java.util.function.BiConsumer;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
-import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -19,14 +18,17 @@ public class Camera2 {
 
     public Camera2(String cameraName, Transform3d robotToCam, AprilTagFieldLayout tagLayout, BiConsumer<Pose2d, Double> estConsumer) {
         camera = new PhotonCamera(cameraName);
-        poseEstimator = new PhotonPoseEstimator(tagLayout, PoseStrategy.AVERAGE_BEST_TARGETS, robotToCam);
+        poseEstimator = new PhotonPoseEstimator(tagLayout, robotToCam);
         this.estConsumer = estConsumer;
     }
 
     public void periodic() {
         Optional<EstimatedRobotPose> curEst = Optional.empty();
         for (var result : camera.getAllUnreadResults()) {
-            curEst = poseEstimator.update(result);
+            curEst = poseEstimator.estimateCoprocMultiTagPose(result);
+            if (curEst.isEmpty()) {
+                curEst = poseEstimator.estimateLowestAmbiguityPose(result);
+            }
             curEst.ifPresent(
                 est -> {
                     estConsumer.accept(est.estimatedPose.toPose2d(), est.timestampSeconds);
