@@ -37,4 +37,9 @@ public class BBController extends ControllerBase {
             return 0;
         }
     }
+
+    @Override
+    public boolean atSetpoint() {
+        return bbController.atSetpoint();
+    }
 }
