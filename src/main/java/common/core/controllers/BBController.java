@@ -9,6 +9,7 @@ public class BBController extends ControllerBase {
 
     public BBController(PIDFFConfig config, double period) {
         super(config, period);
+        bbController = new BangBangController();
     }
 
     public BBController(PIDFFConfig config) {
