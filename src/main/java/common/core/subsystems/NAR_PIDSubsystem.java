@@ -291,7 +291,7 @@ public abstract class NAR_PIDSubsystem extends SubsystemBase {
      * Called when the measurement of the controller violates the constraints
      */
     public void onConstraintViolation() {
-        Log.unusual(getName(), "Controller Measurement Violated Input Constraints");
+        // Log.unusual(getName(), "Controller Measurement Violated Input Constraints");
     }
 
     /**
