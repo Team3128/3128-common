@@ -17,7 +17,7 @@ public class Camera2 {
     private final PhotonPoseEstimator poseEstimator;
     private final BiConsumer<Pose2d, Double> estConsumer;
     private boolean enabled = true;
-    private double ambiguityThreshold = 0.2;
+    private double minDistThreshold = 0, maxDistThreshold = 100, ambiguityThreshold = 0.2;
 
     public Camera2(String cameraName, Transform3d robotToCam, AprilTagFieldLayout tagLayout, BiConsumer<Pose2d, Double> estConsumer) {
         camera = new PhotonCamera(cameraName);
@@ -35,9 +35,11 @@ public class Camera2 {
         Optional<EstimatedRobotPose> curEst = Optional.empty();
         for (var result : camera.getAllUnreadResults()) {
             for (int i = 0; i < result.targets.size(); i++) {
-                if (result.targets.get(i).poseAmbiguity > ambiguityThreshold) {
-                    result.targets.remove(i);
-                    i--;
+                if (result.targets.get(i).poseAmbiguity > ambiguityThreshold ||
+                    result.targets.get(i).bestCameraToTarget.getTranslation().getNorm() < minDistThreshold ||
+                    result.targets.get(i).bestCameraToTarget.getTranslation().getNorm() > maxDistThreshold) {
+                        result.targets.remove(i);
+                        i--;
                 }
             }
             curEst = poseEstimator.estimateCoprocMultiTagPose(result);
@@ -65,7 +67,9 @@ public class Camera2 {
     //     this.maxDistThreshold = maxDistThreshold;
     // }
 
-    public void setAmbiguityThreshold(double ambiguityThreshold) {
+    public void setThresholds(double minDistThreshold, double maxDistThreshold, double ambiguityThreshold) {
+        this.minDistThreshold = minDistThreshold;
         this.ambiguityThreshold = ambiguityThreshold;
+        this.maxDistThreshold = maxDistThreshold;
     }
 }
