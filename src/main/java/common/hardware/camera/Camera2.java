@@ -7,6 +7,7 @@ import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
 
+import common.utility.shuffleboard.NAR_Shuffleboard;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Transform3d;
@@ -15,16 +16,30 @@ public class Camera2 {
     private final PhotonCamera camera;
     private final PhotonPoseEstimator poseEstimator;
     private final BiConsumer<Pose2d, Double> estConsumer;
+    private boolean enabled = true;
+    private double ambiguityThreshold = 0.2;
 
     public Camera2(String cameraName, Transform3d robotToCam, AprilTagFieldLayout tagLayout, BiConsumer<Pose2d, Double> estConsumer) {
         camera = new PhotonCamera(cameraName);
         poseEstimator = new PhotonPoseEstimator(tagLayout, robotToCam);
         this.estConsumer = estConsumer;
+        initShuffleboard();
+    }
+
+    public void initShuffleboard() {
+        NAR_Shuffleboard.addData(camera.getName(), "Enabled", () -> enabled, 0, 0);
     }
 
     public void periodic() {
+        if (!enabled) return;
         Optional<EstimatedRobotPose> curEst = Optional.empty();
         for (var result : camera.getAllUnreadResults()) {
+            for (int i = 0; i < result.targets.size(); i++) {
+                if (result.targets.get(i).poseAmbiguity > ambiguityThreshold) {
+                    result.targets.remove(i);
+                    i--;
+                }
+            }
             curEst = poseEstimator.estimateCoprocMultiTagPose(result);
             if (curEst.isEmpty()) {
                 curEst = poseEstimator.estimateLowestAmbiguityPose(result);
@@ -35,5 +50,22 @@ public class Camera2 {
                 }
             );
         }
+    }
+
+    public void enable() {
+        enabled = true;
+    }
+
+    public void disable() {
+        enabled = false;
+    }
+
+    // public void setThresholds(double minDistThreshold, double maxDistThreshold) {
+    //     this.minDistThreshold = minDistThreshold;
+    //     this.maxDistThreshold = maxDistThreshold;
+    // }
+
+    public void setAmbiguityThreshold(double ambiguityThreshold) {
+        this.ambiguityThreshold = ambiguityThreshold;
     }
 }

@@ -225,6 +225,6 @@ public class Camera {
         NAR_Shuffleboard.addData(camera.getName(), "camera pose Y", () -> cameraPose.getY(), 2, 1, 2, 1);
         NAR_Shuffleboard.addData(camera.getName(), "dist", () -> distance, 0, 2, 1, 1);
         NAR_Shuffleboard.addData(camera.getName(), "Has target", () -> result.hasTargets(), 1, 2, 1, 1);
-
+        NAR_Shuffleboard.addData(camera.getName(), "Enabled", () -> !isDisabled, 3, 2);
     }
 }
