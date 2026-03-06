@@ -67,7 +67,7 @@ public class NAR_TalonFX extends NAR_Motor {
         canBus = new CANBus(canbusStr);
         motor = new TalonFX(deviceNumber, canBus);
         timer.stop();
-        Log.info("Talon ID " + deviceNumber + " Creation", timer.get());
+        // Log.info("Talon ID " + deviceNumber + " Creation", timer.get());
 
         appliedOutput = motor.getDutyCycle();
         stallCurrent = motor.getStatorCurrent();
