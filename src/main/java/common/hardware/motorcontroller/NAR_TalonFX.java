@@ -11,7 +11,9 @@ import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.VoltageConfigs;
+import com.ctre.phoenix6.controls.PositionTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.PositionVoltage;
+import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
@@ -139,14 +141,14 @@ public class NAR_TalonFX extends NAR_Motor {
 
     @Override
     protected void setVelocity(double rpm, double feedForward) {
-        var velocitySetpoint = new VelocityVoltage(rpm);
+        var velocitySetpoint = new VelocityTorqueCurrentFOC(rpm);
         velocitySetpoint.FeedForward = feedForward;
         motor.setControl(velocitySetpoint);
     }
 
     @Override
     protected void setPosition(double rotations, double feedForward) {
-        var positionSetpoint = new PositionVoltage(rotations);
+        var positionSetpoint = new PositionTorqueCurrentFOC(rotations);
         positionSetpoint.FeedForward = feedForward;
         motor.setControl(positionSetpoint);
     }
