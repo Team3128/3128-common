@@ -13,6 +13,7 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.VoltageConfigs;
 import com.ctre.phoenix6.controls.PositionTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.PositionVoltage;
+import com.ctre.phoenix6.controls.TorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -123,6 +124,13 @@ public class NAR_TalonFX extends NAR_Motor {
         configs.Slot0.kD = config.kD;
     }
 
+    public void configFF(PIDFFConfig config){
+        configs.Slot0.kA = config.kA.getAsDouble();
+        configs.Slot0.kG = config.kG.getAsDouble();
+        configs.Slot0.kS = config.kS.getAsDouble();
+        configs.Slot0.kV = config.kV.getAsDouble();
+    }
+
     @Override
     public void setInverted(boolean inverted) {
         setInvertedNoApply(inverted);
@@ -141,6 +149,12 @@ public class NAR_TalonFX extends NAR_Motor {
 
     @Override
     protected void setVelocity(double rpm, double feedForward) {
+        var velocitySetpoint = new VelocityVoltage(rpm);
+        velocitySetpoint.FeedForward = feedForward;
+        motor.setControl(velocitySetpoint);
+    }
+
+    public void setVelocityFOC(double rpm, double feedForward) {
         var velocitySetpoint = new VelocityTorqueCurrentFOC(rpm);
         velocitySetpoint.FeedForward = feedForward;
         motor.setControl(velocitySetpoint);
@@ -148,9 +162,20 @@ public class NAR_TalonFX extends NAR_Motor {
 
     @Override
     protected void setPosition(double rotations, double feedForward) {
+        var positionSetpoint = new PositionVoltage(rotations);
+        positionSetpoint.FeedForward = feedForward;
+        motor.setControl(positionSetpoint);
+    }
+
+    public void setPositionFOC(double rotations, double feedForward) {
         var positionSetpoint = new PositionTorqueCurrentFOC(rotations);
         positionSetpoint.FeedForward = feedForward;
         motor.setControl(positionSetpoint);
+    }
+
+    public void setCurrent(double current, double feedForward) {
+        var currentSetpoint = new TorqueCurrentFOC(current);
+        motor.setControl(currentSetpoint);
     }
 
     @Override
