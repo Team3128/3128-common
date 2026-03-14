@@ -14,6 +14,7 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.VoltageConfigs;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -141,6 +142,12 @@ public class NAR_TalonFX extends NAR_Motor {
         motor.set(speed);
     }
 
+    public void setVoltageFOC(double voltage) {
+        var voltageSetpoint = new VoltageOut(voltage)
+            .withEnableFOC(true);
+        motor.setControl(voltageSetpoint);
+    }
+
     @Override
     protected void setVelocity(double rpm, double feedForward) {
         var velocitySetpoint = new VelocityVoltage(rpm / 60);
@@ -148,10 +155,24 @@ public class NAR_TalonFX extends NAR_Motor {
         motor.setControl(velocitySetpoint);
     }
 
+    public void setVelocityFOC(double rpm, double feedforward) {
+        var velocitySetpoint = new VelocityVoltage(rpm / 60)
+            .withEnableFOC(true)
+            .withFeedForward(feedforward);
+        motor.setControl(velocitySetpoint);
+    }
+
     @Override
     protected void setPosition(double rotations, double feedForward) {
         var positionSetpoint = new PositionVoltage(rotations);
         positionSetpoint.FeedForward = feedForward;
+        motor.setControl(positionSetpoint);
+    }
+
+    public void setPositionFOC(double rotations, double feedforward) {
+        var positionSetpoint = new PositionVoltage(rotations)
+            .withEnableFOC(true)
+            .withFeedForward(feedforward);
         motor.setControl(positionSetpoint);
     }
 
