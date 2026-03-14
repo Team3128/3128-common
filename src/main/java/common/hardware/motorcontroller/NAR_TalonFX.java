@@ -13,6 +13,8 @@ import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.VoltageConfigs;
 import com.ctre.phoenix6.controls.PositionVoltage;
+import com.ctre.phoenix6.controls.TorqueCurrentFOC;
+import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
@@ -118,6 +120,13 @@ public class NAR_TalonFX extends NAR_Motor {
         configTalonFX(()-> motor.getConfigurator().apply(configs.Slot0));
     }
 
+    public void configFF(PIDFFConfig config) {
+        configs.Slot0.kS = config.kS.getAsDouble();
+        configs.Slot0.kV = config.kV.getAsDouble();
+        configs.Slot0.kA = config.kA.getAsDouble();
+        configTalonFX(()-> motor.getConfigurator().apply(configs.Slot0));
+    }
+
     @Override
     public void configPIDNoApply(PIDFFConfig config) {
         configs.Slot0.kP = config.kP;
@@ -141,10 +150,21 @@ public class NAR_TalonFX extends NAR_Motor {
         motor.set(speed);
     }
 
+    public void setCurrent(double current) {
+        var currentSetpoint = new TorqueCurrentFOC(current);
+        motor.setControl(currentSetpoint);
+    }
+
     @Override
     protected void setVelocity(double rpm, double feedForward) {
         var velocitySetpoint = new VelocityVoltage(rpm / 60);
         velocitySetpoint.FeedForward = feedForward;
+        motor.setControl(velocitySetpoint);
+    }
+
+    public void setVelocityFOC(double velocity, double feedforward) {
+        var velocitySetpoint = new VelocityTorqueCurrentFOC(velocity / unitConversionFactor * timeConversionFactor / 60);
+        velocitySetpoint.FeedForward = feedforward;
         motor.setControl(velocitySetpoint);
     }
 

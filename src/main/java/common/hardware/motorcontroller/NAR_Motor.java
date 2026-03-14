@@ -359,6 +359,10 @@ public abstract class NAR_Motor implements AutoCloseable {
         return convertInput(position);
     }
 
+    public double getPositionRot() {
+        return getRawPosition();
+    }
+
     public double getRelativePosition() {
         return getPosition() - this.relativePosition;
     }
@@ -369,6 +373,10 @@ public abstract class NAR_Motor implements AutoCloseable {
      */
     public double getVelocity() {
         return getRawVelocity() * unitConversionFactor / timeConversionFactor;
+    }
+
+    public double getVelocityRot() {
+        return getRawVelocity() / 60.0;
     }
 
     /**

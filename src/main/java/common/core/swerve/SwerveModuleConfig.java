@@ -4,6 +4,7 @@ import com.ctre.phoenix6.hardware.CANcoder;
 
 import common.core.controllers.PIDFFConfig;
 import common.hardware.motorcontroller.NAR_Motor;
+import common.hardware.motorcontroller.NAR_TalonFX;
 import common.hardware.motorcontroller.NAR_Motor.MotorConfig;
 
 /**
@@ -20,6 +21,7 @@ public class SwerveModuleConfig {
             this.motor = motor;
             this.motorConfig = motorConfig;
             this.pidffConfig = pidffConfig;
+            ((NAR_TalonFX) motor).configFF(pidffConfig);
         }
     }
 
