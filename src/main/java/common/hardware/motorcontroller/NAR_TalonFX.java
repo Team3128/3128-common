@@ -162,6 +162,10 @@ public class NAR_TalonFX extends NAR_Motor {
         motor.setControl(velocitySetpoint);
     }
 
+    public void setVelocityFOC2(double setpoint, double feedforward) {
+        setVelocityFOC(setpoint / unitConversionFactor * timeConversionFactor, feedforward);
+    }
+
     @Override
     protected void setPosition(double rotations, double feedForward) {
         var positionSetpoint = new PositionVoltage(rotations);
