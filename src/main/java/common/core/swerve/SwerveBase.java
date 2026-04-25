@@ -99,9 +99,10 @@ public abstract class SwerveBase extends SubsystemBase {
      * @param velocity requested velocity
      */
     public void assign(ChassisSpeeds velocity) {
+        velocity = new ChassisSpeeds(velocity.vxMetersPerSecond * throttle, velocity.vyMetersPerSecond * throttle, velocity.omegaRadiansPerSecond);
         if(fieldRelative) velocity = ChassisSpeeds.fromFieldRelativeSpeeds(velocity, getGyroRotation2d()); // convert to field relative if applicable
         if(chassisVelocityCorrection) velocity = ChassisSpeeds.discretize(velocity, dtConstant);
-        setModuleStates(kinematics.toSwerveModuleStates(velocity.times(throttle)));
+        setModuleStates(kinematics.toSwerveModuleStates(velocity/*.times(throttle)*/));
     }
 
     public void stop() {
