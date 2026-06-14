@@ -7,7 +7,8 @@ import common.hardware.motorcontroller.NAR_Motor;
 import common.hardware.motorcontroller.NAR_Motor.Control;
 import common.utility.narwhaldashboard.NarwhalDashboard;
 import common.utility.shuffleboard.NAR_Shuffleboard;
-import common.utility.sysid.CmdSysId;
+import common.utility.sysID.NAR_SysIdCommand;
+// import common.utility.sysid.CmdSysId;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
@@ -23,6 +24,7 @@ import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import static edu.wpi.first.units.Units.*;
 
 public abstract class SwerveBase extends SubsystemBase {
 
@@ -223,21 +225,6 @@ public abstract class SwerveBase extends SubsystemBase {
             module.getAngleMotor().set(degrees, Control.Position);
     }
 
-    public Command characterize(double startDelay, double rampRate) {
-        NAR_Motor driveMotor = modules[0].getDriveMotor();
-        return new CmdSysId(
-            getName(), 
-            (volts)-> setDriveVoltage(volts), 
-            ()-> driveMotor.getVelocity(), 
-            ()-> driveMotor.getPosition(), 
-            startDelay, 
-            rampRate, 
-            10, 
-            true, 
-            this
-        );
-    }
-
     public abstract double getYaw();
 
     public abstract double getPitch();
@@ -334,21 +321,36 @@ public abstract class SwerveBase extends SubsystemBase {
         });
     }
 
-    public Command characterize(double startDelay, double rampRate, double targetPosition) {
-        NAR_Motor driveMotor = modules[0].getDriveMotor();
-        final double startPos = driveMotor.getPosition();
-        return new CmdSysId(
-            getName(), 
-            (volts)-> setDriveVoltage(volts), 
-            ()-> driveMotor.getVelocity(), 
-            ()-> driveMotor.getPosition(), 
-            startDelay, 
-            rampRate, 
-            startPos + targetPosition, 
-            true, 
-            this
-        );
+    public Command characterize(double rampRate, double stepVoltage, double targetPosition) {
+        NAR_SysIdCommand characterize = new NAR_SysIdCommand(rampRate, stepVoltage, (v) -> setDriveVoltage(v.in(Volts)), this, modules[0].getDriveMotor());
+        return characterize.runSysId();
+        // NAR_Motor driveMotor = modules[0].getDriveMotor();
+        // final double startPos = driveMotor.getPosition();
+        // SysIdRoutine driveRoutine = new SysIdRoutine(
+        //     new SysIdRoutine.Config(Volts.of(rampRate).per(Second), Volts.of(stepVoltage), null),
+        //     new SysIdRoutine.Mechanism((v) -> setDriveVoltage(v.in(Volts)), null, this));
+        // return sequence(
+        //     driveRoutine.quasistatic(SysIdRoutine.Direction.kForward),
+        //     driveRoutine.quasistatic(SysIdRoutine.Direction.kReverse),
+        //     driveRoutine.dynamic(SysIdRoutine.Direction.kForward),
+        //     driveRoutine.dynamic(SysIdRoutine.Direction.kReverse)
+        // );
     }
+
+    // public Command characterize(double startDelay, double rampRate) {
+    //     NAR_Motor driveMotor = modules[0].getDriveMotor();
+    //     return new CmdSysId(
+    //         getName(), 
+    //         (volts)-> setDriveVoltage(volts), 
+    //         ()-> driveMotor.getVelocity(), 
+    //         ()-> driveMotor.getPosition(), 
+    //         startDelay, 
+    //         rampRate, 
+    //         10, 
+    //         true, 
+    //         this
+    //     );
+    // }
 
     public Command characterizeTranslation(double startDelay, double rampRate, double targetPosition) {
         return characterize(startDelay, rampRate, targetPosition).beforeStarting(()-> angleLock(0));
