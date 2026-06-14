@@ -6,9 +6,10 @@ import java.util.function.DoubleSupplier;
 import common.core.controllers.ControllerBase;
 import common.hardware.motorcontroller.NAR_Motor;
 import common.hardware.motorcontroller.NAR_Motor.Neutral;
-import common.utility.sysid.CmdSysId;
+import common.utility.sysid.NAR_SysIdCommand;
 import edu.wpi.first.wpilibj2.command.Command;
 import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
+import static edu.wpi.first.units.Units.Volts;
 
 /**
  * Team 3128's Velocity Subsystem Base.
@@ -156,21 +157,10 @@ public abstract class VelocitySubsystemBase extends NAR_PIDSubsystem implements 
         return motors.get(0).getVelocity();
     }
 
-    public Command characterization(double startDelaySecs, double rampRateVoltsPerSec) {
-        return characterization(startDelaySecs, rampRateVoltsPerSec, controller.getInputRange()[0], controller.getInputRange()[1]);
-    }
+   public Command characterization(double rampRate, double stepVoltage) {
+       NAR_SysIdCommand characterize = new NAR_SysIdCommand(rampRate, stepVoltage, (v) -> runVolts(v.in(Volts)), this, motors.get(0));
+       return characterize.runSysId();
+   }
 
-    public Command characterization(double startDelaySecs, double rampRateVoltsPerSec, double startPosition, double endPosition) {
-        return new CmdSysId(
-            getName(), 
-            this::runVolts, 
-            this::getVelocity, 
-            this::getPosition, 
-            startDelaySecs,
-            rampRateVoltsPerSec,
-            controller.getInputRange()[1], 
-            true, 
-            this
-        ).beforeStarting(resetCommand());
-    }
+
 }
