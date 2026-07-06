@@ -22,7 +22,7 @@ import static edu.wpi.first.wpilibj2.command.Commands.*;
 
 public class MechanismBase extends SubsystemBase {
 
-    protected final ControllerBase controller;
+    protected ControllerBase controller;
     protected NAR_Motor[] motors;
     private double safetyThresh;
     private Timer safetyTimer = new Timer();
@@ -30,7 +30,9 @@ public class MechanismBase extends SubsystemBase {
     protected BooleanSupplier debug;
     protected DoubleSupplier setpoint;
 
-    protected List<MechanismBase> instances = new ArrayList<>();
+    protected static List<MechanismBase> instances = new ArrayList<>();
+
+    public MechanismBase() {}
 
     public MechanismBase(ControllerBase controller, MotorConfig m_config, NAR_Motor... motors) {
         this.controller = controller;
@@ -52,14 +54,24 @@ public class MechanismBase extends SubsystemBase {
         this(null, m_config, motors);
     }
 
-    public <T> T getInstance(Class<T> type) {
+    /**
+     * This is an extendable implementation of the singleton pattern<br><br>
+     * 
+     * When getting a mechanism instance whose class name is [CLASS_NAME], use the following code:<br>
+     * <strong>[CLASS_NAME] mechanism = [CLASS_NAME].getInstance([CLASS_NAME].class);</strong><br>
+     * 
+     * @param type [MECHANISM_CLASS_NAME].class
+     * @return a singleton instance of the mechanism
+     */
+    public static <T extends MechanismBase> T getInstance(Class<T> type) {
         for (MechanismBase instance : instances) {
             if (type.isInstance(instance)) {
                 return type.cast(instance);
             }
         }
-        instances.add(this);
-        return type.cast(this);
+        MechanismBase instance = type.cast(new MechanismBase());
+        instances.add(instance);
+        return type.cast(instance);
     }
 
     @Override
