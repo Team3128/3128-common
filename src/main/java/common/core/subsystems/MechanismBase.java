@@ -268,7 +268,7 @@ public class MechanismBase extends SubsystemBase {
        return characterize.runSysId();
     }
 
-        public void initShuffleboard() {
+    public void initShuffleboard() {
         NAR_Shuffleboard.addData(getName(), "Enabled", this::isEnabled, 0, 0);
         NAR_Shuffleboard.addData(getName(), "AtSetpoint", this::atSetpoint, 1, 0);
         NAR_Shuffleboard.addData(getName(), "Measurement", controller != null ? controller::getMeasurement : this::getVolts, 0, 1);
@@ -297,7 +297,7 @@ public class MechanismBase extends SubsystemBase {
         NAR_Shuffleboard.addData(getName(), "Voltage", this::getVolts, x + 4, y + 3);
     }
 
-    public void FFWidgets(ControllerBase controller, int x, int y) {
+    private void FFWidgets(ControllerBase controller, int x, int y) {
         controller.getConfig().setkS(NAR_Shuffleboard.debug(getName(), "kS", controller.getConfig().getkS(), x, y+2));
         controller.getConfig().setkV(NAR_Shuffleboard.debug(getName(), "kV", controller.getConfig().getkV(), x + 1, y+2));
         controller.getConfig().setkA(NAR_Shuffleboard.debug(getName(), "kA", controller.getConfig().getkA(), x + 1, y + 3));
