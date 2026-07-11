@@ -6,6 +6,7 @@ import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
 import common.core.controllers.ControllerBase;
+import common.core.controllers.PositionController;
 import common.hardware.motorcontroller.NAR_Motor;
 import common.hardware.motorcontroller.NAR_Motor.MotorConfig;
 import common.utility.Log;
@@ -42,8 +43,8 @@ public class MechanismBase extends SubsystemBase {
         requireNonNullParam(motors, "motors", "MechanismBase");
 
         if (controller != null) {
-            controller.configureFeedback(motors[0]);
-            for (int i = 1; i < motors.length; i++) {
+            controller.setMeasurementSource(motors[0]);
+            for (int i = 0; i < motors.length; i++) {
                 controller.addMotor(motors[i]);
                 motors[i].configMotor(m_config);
             }
@@ -225,7 +226,7 @@ public class MechanismBase extends SubsystemBase {
      */
     public void reset() {
         for (NAR_Motor motor : motors) {
-            motor.resetPosition(controller.getInputRange()[0]);
+            motor.resetPosition(((PositionController) controller).getInputRange()[0]);
         }
     }
 

@@ -94,6 +94,18 @@ public class PIDFFConfig {
         this.kV = config.kV;
     }
 
+    public void setkP(double kP) {
+        this.kP = kP;
+    }
+
+    public void setkI(double kI) {
+        this.kI= kI;
+    }
+
+    public void setkD(double kD) {
+        this.kD = kD;
+    }
+
     public void setkS(double kS) {
         setkS(()-> kS);
     }
@@ -155,6 +167,18 @@ public class PIDFFConfig {
         this.kG_Function = kG_Function;
     }
 
+    public double getkP() {
+        return kP;
+    }
+
+    public double getkI() {
+        return kI;
+    }
+
+    public double getkD() {
+        return kD;
+    }
+
     /**
      * Returns static gain.
      * @return returns kS as a double.
@@ -189,5 +213,9 @@ public class PIDFFConfig {
 
     public DoubleSupplier getkG_Function() {
         return kG_Function;
+    }
+
+    public double getFF() {
+        return getkS() + getkV() + getkA() + getkG();
     }
 }
