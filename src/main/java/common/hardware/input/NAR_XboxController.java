@@ -152,7 +152,7 @@ public class NAR_XboxController extends XboxController {
      */
     @Override
     public double getLeftY() {
-        return Math.abs(super.getLeftY()) > leftYDeadband ? -super.getLeftY() : 0;
+        return Math.abs(super.getLeftY()) > leftYDeadband ? super.getLeftY() : 0;
     }
 
     /**
