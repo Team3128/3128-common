@@ -21,7 +21,7 @@ import static edu.wpi.first.units.Units.Volts;
 import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 import static edu.wpi.first.wpilibj2.command.Commands.*;
 
-public class MechanismBase extends SubsystemBase {
+public abstract class MechanismBase extends SubsystemBase {
 
     protected ControllerBase controller;
     protected NAR_Motor[] motors;
@@ -32,8 +32,6 @@ public class MechanismBase extends SubsystemBase {
     protected DoubleSupplier setpoint;
 
     protected static List<MechanismBase> instances = new ArrayList<>();
-
-    public MechanismBase() {}
 
     public MechanismBase(ControllerBase controller, MotorConfig m_config, NAR_Motor... motors) {
         this.controller = controller;
@@ -70,8 +68,15 @@ public class MechanismBase extends SubsystemBase {
                 return type.cast(instance);
             }
         }
-        MechanismBase instance = type.cast(new MechanismBase());
-        instances.add(instance);
+
+        MechanismBase instance;
+        try {
+            instance = type.getDeclaredConstructor().newInstance();
+            instances.add(instance);
+        } catch (ReflectiveOperationException e) {
+            throw new RuntimeException("Failed to instantiate " + type.getName(), e);
+        }
+        
         return type.cast(instance);
     }
 
