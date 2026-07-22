@@ -27,6 +27,7 @@ public abstract class MechanismBase extends SubsystemBase {
     protected NAR_Motor[] motors;
     private double safetyThresh;
     private Timer safetyTimer = new Timer();
+    private MotorConfig config;
 
     protected BooleanSupplier debug;
     protected DoubleSupplier setpoint;
@@ -35,6 +36,7 @@ public abstract class MechanismBase extends SubsystemBase {
 
     public MechanismBase(ControllerBase controller, MotorConfig m_config, NAR_Motor... motors) {
         this.controller = controller;
+        this.config = m_config;
         this.motors = motors;
         this.safetyThresh = 5;
 
@@ -47,6 +49,10 @@ public abstract class MechanismBase extends SubsystemBase {
                 motors[i].configMotor(m_config);
             }
         }
+    }
+
+    public void invertMotor(int motorIndex){
+        motors[motorIndex].setInverted(!config.inverted);
     }
 
     public MechanismBase(MotorConfig m_config, NAR_Motor... motors) {
