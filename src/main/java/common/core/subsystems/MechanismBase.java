@@ -107,6 +107,15 @@ public abstract class MechanismBase extends SubsystemBase {
     }
 
     /**
+     * Returns the MotorConfig object controlling the subsystem
+     *
+     * @return The MotorConfig
+     */
+    public MotorConfig getMotorConfig() {
+        return config;
+    }
+
+    /**
      * Sets the safetyThreshold to disable PID if setpoint is not reached
      * @param timeSeconds The time in seconds for the safety threshold
      */

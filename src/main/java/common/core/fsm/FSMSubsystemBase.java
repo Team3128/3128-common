@@ -4,7 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Consumer;
 
-import common.core.subsystems.NAR_Subsystem;
+import common.core.subsystems.MechanismBase;
 import common.hardware.motorcontroller.NAR_Motor.Neutral;
 import common.utility.Log;
 import common.utility.shuffleboard.NAR_Shuffleboard;
@@ -13,7 +13,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public abstract class FSMSubsystemBase<S extends Enum<S>> extends SubsystemBase implements NAR_Subsystem {
+public abstract class FSMSubsystemBase<S extends Enum<S>> extends SubsystemBase {
     
     protected Transition<S> currentTransition;
     protected S currentState;
@@ -23,19 +23,11 @@ public abstract class FSMSubsystemBase<S extends Enum<S>> extends SubsystemBase 
     private final TransitionMap<S> transitionMap;
     private final Class<S> enumType;
 
-    protected List<NAR_Subsystem> mechanisms = new LinkedList<NAR_Subsystem>();
+    protected List<MechanismBase> mechanisms = new LinkedList<MechanismBase>();
 
     public FSMSubsystemBase(Class<S> enumType, TransitionMap<S> transitionMap) {
         this.enumType = enumType;
         this.transitionMap = transitionMap;
-        // initShuffleboard();
-        // try{
-        //     registerTransitions();
-        // } catch(Exception e) {
-        //     Log.divider(10);
-        //     Log.unusual(getName(), "Failed to load TransitionMap in constructor");
-        //     Log.divider(10);
-        // }
     }
 
     public FSMSubsystemBase(Class<S> enumType, TransitionMap<S> transitionMap, S initalState) {
@@ -43,7 +35,6 @@ public abstract class FSMSubsystemBase<S extends Enum<S>> extends SubsystemBase 
         this.currentState = initalState;
     }
 
-    @Override
     public void initShuffleboard() {
         NAR_Shuffleboard.addData(this.getName(), "Transition Count", ()-> transitionMap.getTransitionCount(), 0, 0);
         NAR_Shuffleboard.addData(this.getName(), "Previous State", ()-> {if(getPreviousState() != null) return getPreviousState().name(); else return "Null";}, 1, 0);
@@ -107,21 +98,6 @@ public abstract class FSMSubsystemBase<S extends Enum<S>> extends SubsystemBase 
         return getState() == otherState;
     }
 
-    @SuppressWarnings("unchecked")
-    public boolean stateEquals(S... otherStates) {
-        for(S otherState : otherStates) {
-            if(stateEquals(otherState)) return true;
-        }
-        return false;
-    }
-
-    public boolean stateEquals(List<S> otherStates) {
-        for(S otherState : otherStates) {
-            if(stateEquals(otherState)) return true;
-        }
-        return false;
-    }
-
     public S getState() {
         return currentState;
     }
@@ -143,37 +119,15 @@ public abstract class FSMSubsystemBase<S extends Enum<S>> extends SubsystemBase 
         return currentTransition.isFinished();
     }
 
-    /**
-     * Update the adjacency map to include the data for the given transition Note: This WILL NOT
-     * overwrite an existing Transition
-     *
-     * @param transition The transition to add to the graph
-     */
-    public void addTransition(Transition<S> transition) {
-        transitionMap.addTransition(transition);
-    }
-
-    public void addTransition(S start, S end, Command command) {
-        addTransition(new Transition<S>(start, end, command));
-    }
-
     public abstract void registerTransitions();
 
-    public void addMechanisms(NAR_Subsystem... mechanisms) {
+    public void addMechanisms(MechanismBase... mechanisms) {
         this.mechanisms = List.of(mechanisms);
-    }
-
-    public void apply(Consumer<NAR_Subsystem> action) {
-        mechanisms.forEach(action);
-    }
-
-    public Command applyCommand(Consumer<NAR_Subsystem> action) {
-        return runOnce(()-> apply(action));
     }
 
     public void reset() {
         stop();
-        for(NAR_Subsystem subsystem : mechanisms) {
+        for(MechanismBase subsystem : mechanisms) {
             subsystem.reset();
         }
     }
@@ -182,42 +136,17 @@ public abstract class FSMSubsystemBase<S extends Enum<S>> extends SubsystemBase 
         return runOnce(()-> reset()).beforeStarting(()-> Log.debug(Log.Type.STATE_MACHINE_SECONDARY, getName(), "Commanded to reset"));
     }
 
-    public List<NAR_Subsystem> getMechanisms() {
+    public List<MechanismBase> getMechanisms() {
         return mechanisms;
     }
 
-    public NAR_Subsystem getMechanism(String name) {
-        for(NAR_Subsystem subsystem : mechanisms) {
+    public MechanismBase getMechanism(String name) {
+        for(MechanismBase subsystem : mechanisms) {
             if(subsystem.getName().equals(name)) {
                 return subsystem;
             }
         }
         return null;
-    }
-
-    public void setNeutralMode(Neutral mode) {
-        Log.debug(getName(), "Neutral Mode set to " + mode.name());
-        getMechanisms().forEach(subsystem -> subsystem.setNeutralMode(mode));
-    }
-
-    public void run(double power) {
-        mechanisms.forEach(subsystem-> subsystem.run(power));
-    }
-
-    public Command runCommand(double power) {
-        return runOnce(()-> run(power)).beforeStarting(()-> Log.debug(Log.Type.STATE_MACHINE_SECONDARY, getName(), "Set to run at " + power + " power"));
-    }
-
-    public void runVolts(double volts) {
-        mechanisms.forEach((subsystem)-> subsystem.runVolts(volts));
-    }
-
-    public Command runVoltsCommand(double volts) {
-        return runOnce(()-> runVolts(volts)).beforeStarting(()-> Log.debug(Log.Type.STATE_MACHINE_SECONDARY, getName(), "Set to run at " + volts + " volts"));
-    }
-
-    public double getVolts() {
-        return mechanisms.get(0).getVolts();
     }
 
     public void stop() {
