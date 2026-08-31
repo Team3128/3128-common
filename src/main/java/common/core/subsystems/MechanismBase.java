@@ -137,7 +137,7 @@ public abstract class MechanismBase extends SubsystemBase {
      *
      * @param setpoint the setpoint for the subsystem
      */
-    public void goTo(double setpoint) {
+    public void setSetpoint(double setpoint) {
         if (controller != null) {
             enable();
             controller.setSetpoint((debug != null && debug.getAsBoolean()) ? this.setpoint.getAsDouble() : setpoint);
@@ -147,8 +147,8 @@ public abstract class MechanismBase extends SubsystemBase {
     }
         
 
-    public Command goToCommand(double setpoint) {
-        return runOnce(() -> goTo(setpoint));
+    public Command setSetpointCommand(double setpoint) {
+        return runOnce(() -> setSetpoint(setpoint));
     }
 
     /**
@@ -307,7 +307,7 @@ public abstract class MechanismBase extends SubsystemBase {
             runVoltsWidgets("running", debug, 1, 0);
         }
 
-        NAR_Shuffleboard.addCommand(getName(), "Enable", either(startEnd(()-> goTo(setpoint.getAsDouble()), ()-> disable()), print("DEBUG NOT ON"), debug), 4, 0);
+        NAR_Shuffleboard.addCommand(getName(), "Enable", either(startEnd(()-> setSetpoint(setpoint.getAsDouble()), ()-> disable()), print("DEBUG NOT ON"), debug), 4, 0);
         NAR_Shuffleboard.addCommand(getName(), "Reset", either(resetCommand(), print("DEBUG NOT ON"), debug), 3, 0);
     }
 

@@ -27,7 +27,7 @@ public class PositionController extends ControllerBase implements AutoCloseable 
 
     @Override
     public void setSetpoint(double setpoint) {
-        controller.setSetpoint(Math.clamp(setpoint, inputRange[0], inputRange[1]));
+        controller.setSetpoint(Math.max(inputRange[0], Math.min(setpoint, inputRange[1])));
     }
 
     @Override
