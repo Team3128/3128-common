@@ -91,7 +91,10 @@ public abstract class MechanismBase extends SubsystemBase {
         if (controller != null && controller.isEnabled()) {
             controller.useOutput();
             if (safetyTimer.hasElapsed(safetyThresh)) onSafetyTimeout();
-            if (atSetpoint()) safetyTimer.restart();
+            if (atSetpoint()) {
+                safetyTimer.restart();
+                NAR_Shuffleboard.addData(getName(), "AtSetpoint", true, 1, 0);
+            }
         }
 
         NAR_Shuffleboard.addData(getName(), "Velocity", motors[0].getVelocity(), 5, 1);
@@ -141,6 +144,9 @@ public abstract class MechanismBase extends SubsystemBase {
         if (controller != null) {
             enable();
             controller.setSetpoint((debug != null && debug.getAsBoolean()) ? this.setpoint.getAsDouble() : setpoint);
+            NAR_Shuffleboard.addData(getName(), "Setpoint", setpoint, 1, 1);
+            NAR_Shuffleboard.addData(getName(), "Setpoint Graph", setpoint, 8, 0, 2, 2).withWidget(BuiltInWidgets.kGraph);
+            NAR_Shuffleboard.addData(getName(), "AtSetpoint", false, 1, 0);
         } else {
             runVolts((debug != null && debug.getAsBoolean()) ? this.setpoint.getAsDouble() : setpoint);
         }
