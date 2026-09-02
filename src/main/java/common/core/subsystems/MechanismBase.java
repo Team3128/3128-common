@@ -41,13 +41,10 @@ public abstract class MechanismBase extends SubsystemBase {
         this.safetyThresh = 5;
 
         requireNonNullParam(motors, "motors", "MechanismBase");
-
-        if (controller != null) {
-            controller.setMeasurementSource(motors[0]);
-            for (int i = 0; i < motors.length; i++) {
-                controller.addMotor(motors[i]);
-                motors[i].configMotor(m_config);
-            }
+        controller.setMeasurementSource(motors[0]);
+        for (int i = 0; i < motors.length; i++) {
+            controller.addMotor(motors[i]);
+            motors[i].configMotor(m_config);
         }
     }
 
@@ -88,16 +85,19 @@ public abstract class MechanismBase extends SubsystemBase {
 
     @Override
     public void periodic() {
-        if (controller != null && controller.isEnabled()) {
+        if (controller.isEnabled()) {
             controller.useOutput();
             if (safetyTimer.hasElapsed(safetyThresh)) onSafetyTimeout();
             if (atSetpoint()) {
                 safetyTimer.restart();
                 NAR_Shuffleboard.addData(getName(), "AtSetpoint", true, 1, 0);
+                disable();
             }
         }
 
         NAR_Shuffleboard.addData(getName(), "Velocity", motors[0].getVelocity(), 5, 1);
+        NAR_Shuffleboard.addData(getName(), "Setpoint", setpoint, 1, 1);
+        NAR_Shuffleboard.addData(getName(), "Setpoint Graph", setpoint, 8, 0, 2, 2).withWidget(BuiltInWidgets.kGraph);
     }
 
     /**
@@ -141,15 +141,9 @@ public abstract class MechanismBase extends SubsystemBase {
      * @param setpoint the setpoint for the subsystem
      */
     public void setSetpoint(double setpoint) {
-        if (controller != null) {
-            enable();
-            controller.setSetpoint((debug != null && debug.getAsBoolean()) ? this.setpoint.getAsDouble() : setpoint);
-            NAR_Shuffleboard.addData(getName(), "Setpoint", setpoint, 1, 1);
-            NAR_Shuffleboard.addData(getName(), "Setpoint Graph", setpoint, 8, 0, 2, 2).withWidget(BuiltInWidgets.kGraph);
-            NAR_Shuffleboard.addData(getName(), "AtSetpoint", false, 1, 0);
-        } else {
-            runVolts((debug != null && debug.getAsBoolean()) ? this.setpoint.getAsDouble() : setpoint);
-        }
+        enable();
+        controller.setSetpoint((debug != null && debug.getAsBoolean()) ? this.setpoint.getAsDouble() : setpoint);
+        NAR_Shuffleboard.addData(getName(), "AtSetpoint", false, 1, 0);
     }
         
 
@@ -298,20 +292,19 @@ public abstract class MechanismBase extends SubsystemBase {
     public void initShuffleboard() {
         NAR_Shuffleboard.addData(getName(), "Enabled", this::isEnabled, 0, 0);
         NAR_Shuffleboard.addData(getName(), "AtSetpoint", this::atSetpoint, 1, 0);
-        NAR_Shuffleboard.addData(getName(), "Measurement", controller != null ? controller::getMeasurement : this::getVolts, 0, 1);
+        NAR_Shuffleboard.addData(getName(), "Measurement", controller::getMeasurement, 0, 1);
         NAR_Shuffleboard.addData(getName(), "Setpoint", this::getSetpoint, 1, 1);
 
         debug = NAR_Shuffleboard.debugSwitch(getName(), "DEBUG", false, 2, 0);
         setpoint = NAR_Shuffleboard.debug(getName(), "Debug_Setpoint", 0, 2,1);
 
-        NAR_Shuffleboard.addData(getName(), "Measurement Graph", controller != null ? controller::getMeasurement : this::getVolts, 6, 0, 2, 2).withWidget(BuiltInWidgets.kGraph);
+        NAR_Shuffleboard.addData(getName(), "Measurement Graph", controller::getMeasurement, 6, 0, 2, 2).withWidget(BuiltInWidgets.kGraph);
         NAR_Shuffleboard.addData(getName(), "Setpoint Graph", this::getSetpoint, 8, 0, 2, 2).withWidget(BuiltInWidgets.kGraph);
 
-        if (controller != null) {
-            NAR_Shuffleboard.addSendable(getName(), "PID_Controller", controller, 3, 1, 2, 3).withWidget(BuiltInWidgets.kPIDController);
-            FFWidgets(controller,1,0);
-            runVoltsWidgets("running", debug, 1, 0);
-        }
+        NAR_Shuffleboard.addSendable(getName(), "PID_Controller", controller, 3, 1, 2, 3).withWidget(BuiltInWidgets.kPIDController);
+        FFWidgets(controller,1,0);
+        runVoltsWidgets("running", debug, 1, 0);
+
 
         NAR_Shuffleboard.addCommand(getName(), "Enable", either(startEnd(()-> setSetpoint(setpoint.getAsDouble()), ()-> disable()), print("DEBUG NOT ON"), debug), 4, 0);
         NAR_Shuffleboard.addCommand(getName(), "Reset", either(resetCommand(), print("DEBUG NOT ON"), debug), 3, 0);

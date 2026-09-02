@@ -13,7 +13,7 @@ import java.util.function.DoubleSupplier;
 
 public abstract class ControllerBase implements Sendable {
 
-    private final List<NAR_Motor> motors = new ArrayList<NAR_Motor>();
+    protected final List<NAR_Motor> motors = new ArrayList<NAR_Motor>();
     protected final PIDFFConfig config;
     protected double tolerance;
 
