@@ -18,6 +18,8 @@ public class PositionSSController<N extends Num> extends ControllerBase {
     public NAR_Motor motor;
     public LinearSystemLoop<N2, N1, N2> loop;
     public double[] inputRange;
+    public LinearQuadraticRegulator<N2, N1, N2> controller;
+    public boolean is_continuous = false;
     
     public PositionSSController(PIDFFConfig config, Vector<N2> stateSTD, Vector<N2> measurementSTD, Vector<N2> qelms, Vector<N1> relms, double tolerance, double[] inputRange) {
         super(config, tolerance);
@@ -25,7 +27,7 @@ public class PositionSSController<N extends Num> extends ControllerBase {
 
         LinearSystem<N2, N1, N2> system = LinearSystemId.identifyPositionSystem(config.getkV(), config.getkA());
         KalmanFilter<N2, N1, N2> observer = new KalmanFilter<N2, N1, N2>(Nat.N2(), Nat.N2(), system, stateSTD, measurementSTD, 0.020);
-        LinearQuadraticRegulator<N2, N1, N2> controller = new LinearQuadraticRegulator<N2, N1, N2>(system, qelms, relms, 0.020);
+        controller = new LinearQuadraticRegulator<N2, N1, N2>(system, qelms, relms, 0.020);
         this.loop = new LinearSystemLoop<>(system, controller, observer, 12.0, 0.020);
     }
 
@@ -37,7 +39,20 @@ public class PositionSSController<N extends Num> extends ControllerBase {
     @Override
     public void useOutput() {
         if (isEnabled() && atSetpoint()) disable();
-        this.loop.correct(VecBuilder.fill(getMeasurement(), getVelocity()));
+        double measurement = getMeasurement();
+        if (is_continuous) {
+            double setpoint = this.loop.getNextR(0);
+            double range = inputRange[1] - inputRange[0];
+            if (Math.abs(setpoint - measurement) > range / 2) {
+                if (setpoint > measurement) {
+                    measurement += range;
+                } else {
+                    measurement -= range;
+                }
+            }
+        }
+
+        this.loop.correct(VecBuilder.fill(measurement, getVelocity()));
         this.loop.predict(0.020);
         final double output = MathUtil.clamp(this.loop.getU(0), -12, 12);
         for (NAR_Motor motor : getMotors()) {
@@ -74,6 +89,9 @@ public class PositionSSController<N extends Num> extends ControllerBase {
     }
 
     //TODO: enableContinuousInput for position controller
+    public void enableContinuousInput() {
+        is_continuous = true;
+    }
 
     @Override
     public void reset() {

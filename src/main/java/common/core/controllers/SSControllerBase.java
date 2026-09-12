@@ -103,8 +103,6 @@ public abstract class SSControllerBase<N extends Num> implements Sendable {
         public void close() {
             
         }
-
-        public void enableContinuousInput
     }
 
 
