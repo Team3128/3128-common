@@ -1,8 +1,7 @@
 package common.core.controllers;
-
 import common.hardware.motorcontroller.NAR_Motor;
 import edu.wpi.first.math.controller.PIDController;
-
+import edu.wpi.first.math.MathUtil;
 public class PositionController extends ControllerBase implements AutoCloseable {
 
     private PIDController controller;
@@ -27,7 +26,7 @@ public class PositionController extends ControllerBase implements AutoCloseable 
 
     @Override
     public void setSetpoint(double setpoint) {
-        controller.setSetpoint(Math.clamp(setpoint, inputRange[0], inputRange[1]));
+        controller.setSetpoint(MathUtil.clamp(setpoint, inputRange[0], inputRange[1]));
     }
 
     @Override

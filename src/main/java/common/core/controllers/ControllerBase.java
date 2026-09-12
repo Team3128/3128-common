@@ -1,6 +1,4 @@
 package common.core.controllers;
-
-import common.core.controllers.PositionSSController.SSConfig;
 import common.hardware.motorcontroller.NAR_Motor;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.util.sendable.Sendable;
@@ -16,7 +14,6 @@ public abstract class ControllerBase implements Sendable {
 
     private final List<NAR_Motor> motors = new ArrayList<NAR_Motor>();
     protected PIDFFConfig config;
-    protected SSConfig ssConfig;
     protected double tolerance;
 
     public double setpoint;
@@ -31,9 +28,8 @@ public abstract class ControllerBase implements Sendable {
         requireNonNullParam(config, "config", "Controller");
     }
 
-    public ControllerBase(SSConfig ssConfig, double tolerance) {
-        this.ssConfig = ssConfig;
-        this.tolerance = tolerance;
+    public List<NAR_Motor> getMotors() {
+        return motors;
     }
 
     public void addMotor(NAR_Motor motor) {
