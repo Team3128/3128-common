@@ -6,6 +6,8 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.swerve.SwerveDrivetrain;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
+import common.utility.shuffleboard.NAR_Shuffleboard;
+
 //not really sure how ctre sysid works so going to leave these out for now
 //import com.ctre.phoenix6.swerve.SwerveRequest.SysIdSwerveRotation;
 //import com.ctre.phoenix6.swerve.SwerveRequest.SysIdSwerveTranslation;
@@ -19,6 +21,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 
@@ -30,8 +33,7 @@ public abstract class SwerveBase extends SubsystemBase {
     private double throttle = 1.0;
 
 
-    protected final SwerveDrivetrain<TalonFX, TalonFX, ?> drivetrain;
-
+protected final CTRESwerveDrivetrain drivetrain;
 
     //requests change values everytime drive() happens
 
@@ -47,17 +49,168 @@ public abstract class SwerveBase extends SubsystemBase {
     protected final SwerveRequest.PointWheelsAt pointWheelsRequest =
         new SwerveRequest.PointWheelsAt();
 
-    public SwerveBase(
-        SwerveDrivetrain<TalonFX, TalonFX, ?> drivetrain
-    ) {
-        this.drivetrain = drivetrain;
-    }
+public SwerveBase(CTRESwerveDrivetrain drivetrain) {
+    this.drivetrain = drivetrain;
+}
 
 
     public void initShuffleboard() {
+    NAR_Shuffleboard.addData(
+        "Swerve",
+        "CANcoder 0",
+        () -> drivetrain.getModule(0)
+            .getEncoder()
+            .getAbsolutePosition()
+            .getValue()
+            .in(edu.wpi.first.units.Units.Degrees),
+        0, 0
+    );
 
-        //add stuff here, ctre SwerveDriveState has all the drivetrain data so need to figure out how to get that
-    }
+    NAR_Shuffleboard.addData(
+        "Swerve",
+        "CANcoder 1",
+        () -> drivetrain.getModule(1)
+            .getEncoder()
+            .getAbsolutePosition()
+            .getValue()
+            .in(edu.wpi.first.units.Units.Degrees),
+        0, 1
+    );
+
+    NAR_Shuffleboard.addData(
+        "Swerve",
+        "CANcoder 2",
+        () -> drivetrain.getModule(2)
+            .getEncoder()
+            .getAbsolutePosition()
+            .getValue()
+            .in(edu.wpi.first.units.Units.Degrees),
+        0, 2
+    );
+
+    NAR_Shuffleboard.addData(
+        "Swerve",
+        "CANcoder 3",
+        () -> drivetrain.getModule(3)
+            .getEncoder()
+            .getAbsolutePosition()
+            .getValue()
+            .in(edu.wpi.first.units.Units.Degrees),
+        0, 3
+    );
+
+    NAR_Shuffleboard.addData(
+        "Swerve",
+        "Angle Motor 0",
+        () -> drivetrain.getState().ModuleStates[0].angle.getDegrees(),
+        1, 0
+    );
+
+    NAR_Shuffleboard.addData(
+        "Swerve",
+        "Angle Motor 1",
+        () -> drivetrain.getState().ModuleStates[1].angle.getDegrees(),
+        1, 1
+    );
+
+    NAR_Shuffleboard.addData(
+        "Swerve",
+        "Angle Motor 2",
+        () -> drivetrain.getState().ModuleStates[2].angle.getDegrees(),
+        1, 2
+    );
+
+    NAR_Shuffleboard.addData(
+        "Swerve",
+        "Angle Motor 3",
+        () -> drivetrain.getState().ModuleStates[3].angle.getDegrees(),
+        1, 3
+    );
+
+    NAR_Shuffleboard.addData(
+        "Swerve",
+        "Drive Motor 0",
+        () -> drivetrain.getState().ModuleStates[0].speedMetersPerSecond,
+        2, 0
+    );
+
+    NAR_Shuffleboard.addData(
+        "Swerve",
+        "Drive Motor 1",
+        () -> drivetrain.getState().ModuleStates[1].speedMetersPerSecond,
+        2, 1
+    );
+
+    NAR_Shuffleboard.addData(
+        "Swerve",
+        "Drive Motor 2",
+        () -> drivetrain.getState().ModuleStates[2].speedMetersPerSecond,
+        2, 2
+    );
+
+    NAR_Shuffleboard.addData(
+        "Swerve",
+        "Drive Motor 3",
+        () -> drivetrain.getState().ModuleStates[3].speedMetersPerSecond,
+        2, 3
+    );
+
+    NAR_Shuffleboard.addData(
+        "Swerve",
+        "Pose",
+        () -> getPose().toString(),
+        3, 0, 4, 1
+    );
+
+    NAR_Shuffleboard.addData(
+        "Swerve",
+        "Robot Velocity",
+        () -> getRobotVelocity().toString(),
+        3, 1, 4, 1
+    );
+
+    NAR_Shuffleboard.addData(
+        "Swerve",
+        "Velocity",
+        () -> getSpeed(),
+        3, 3
+    );
+
+    NAR_Shuffleboard.addData(
+        "Swerve",
+        "Angular Velocity",
+        () -> getRobotVelocity().omegaRadiansPerSecond,
+        5, 3
+    );
+
+    NAR_Shuffleboard.addData(
+        "Swerve",
+        "Field Velocity",
+        () -> getFieldVelocity().toString(),
+        3, 2, 4, 1
+    );
+
+    NAR_Shuffleboard.addData(
+        "Swerve",
+        "Gyro",
+        () -> getYaw(),
+        7, 0, 2, 2
+    ).withWidget("Gyro");
+
+    NAR_Shuffleboard.addCommand(
+        "Swerve",
+        "Reset Gyro",
+        runOnce(() -> resetGyro(0)),
+        7, 2
+    );
+
+    NAR_Shuffleboard.addCommand(
+        "Swerve",
+        "Identify Offsets",
+        identifyOffsetsCommand(),
+        7, 3
+    );
+}
 
     public void drive(Translation2d translationVel, Rotation2d rotationVel) {
         drive(new ChassisSpeeds(
@@ -321,4 +474,16 @@ public abstract class SwerveBase extends SubsystemBase {
     ) {
         return getPose().getTranslation().nearest(translations);
     }
+    public Command identifyOffsetsCommand() {
+    return runOnce(() -> {
+        double[] angles = drivetrain.getRawCancoderAngles();
+
+        for (int i = 0; i < angles.length; i++) {
+            System.out.println(
+                "public static final double MOD" + i +
+                "_CANCODER_OFFSET = " + angles[i] + ";"
+            );
+        }
+    });
+}
 }

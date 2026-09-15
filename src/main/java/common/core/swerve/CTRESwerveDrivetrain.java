@@ -223,4 +223,31 @@ public CTRESwerveDrivetrain() {
         BACK_RIGHT
     );
 }
+public double[] getRawCancoderAngles() {
+    return new double[] {
+        getModule(0)
+            .getEncoder()
+            .getAbsolutePosition()
+            .getValue()
+            .in(Units.Degrees),
+
+        getModule(1)
+            .getEncoder()
+            .getAbsolutePosition()
+            .getValue()
+            .in(Units.Degrees),
+
+        getModule(2)
+            .getEncoder()
+            .getAbsolutePosition()
+            .getValue()
+            .in(Units.Degrees),
+
+        getModule(3)
+            .getEncoder()
+            .getAbsolutePosition()
+            .getValue()
+            .in(Units.Degrees)
+    };
+}
 }
