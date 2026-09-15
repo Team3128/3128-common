@@ -79,7 +79,7 @@ public class CTRESwerveDrivetrain
 
 
 //replaces old constants, ctre swerve module factory handles these separately from NAR_motor configs
-    private static final boolean STEER_MOTOR_INVERTED = true;
+    private static final boolean STEER_MOTOR_INVERTED = false;
     private static final boolean ENCODER_INVERTED = false;
 
   
