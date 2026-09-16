@@ -7,81 +7,50 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.swerve.SwerveDrivetrain;
 import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants.ClosedLoopOutputType;
-import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.swerve.SwerveModuleConstantsFactory;
 
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 
+/**
+ * CTRE-generated-style swerve drivetrain hardcoded for SDS Mk5n modules specifically - the gear
+ * ratios, wheel radius, and coupling ratio below are Mk5n numbers, not generic swerve values.
+ * We're expecting to run Mk5n for the next 3-4 years, so this being Mk5n-specific is intentional;
+ * if/when we switch modules, these constants (and MODULE_FACTORY's wiring of them) need to be
+ * revisited for whatever module replaces it.
+ */
 public class CTRESwerveDrivetrain
         extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> {
 
-//drivetrain constants
+// CAN IDs, the Pigeon ID/bus, and CANcoder offsets are specific to this year's robot wiring and
+// calibration, not to the module hardware itself, so they're passed in by the robot project
+// instead of being hardcoded here.
+    public record ModuleHardware(int driveId, int steerId, int encoderId, Angle encoderOffset) {}
 
-    private static final int PIGEON_ID = 9;
-    private static final String CAN_BUS = "drivetrain";
+    // Mk5n drive gear ratio options (see class doc above)
+    // public: this is the single source of truth for the robot's physical drivetrain layout -
+    // referenced by frc.team3128.Constants for PathPlanner's fallback RobotConfig instead of
+    // keeping a second, easily-stale copy of these numbers in the robot project
+    public static final double DRIVE_GEAR_RATIO_R1 = 7.03;
+    public static final double DRIVE_GEAR_RATIO_R2 = 6.03;
+    public static final double DRIVE_GEAR_RATIO_R3 = 5.27;
+    public static final double DRIVE_GEAR_RATIO = DRIVE_GEAR_RATIO_R2;
 
-    // SDS Mk5n drive gear ratio options
-    private static final double DRIVE_GEAR_RATIO_R1 = 7.03;
-    private static final double DRIVE_GEAR_RATIO_R2 = 6.03;
-    private static final double DRIVE_GEAR_RATIO_R3 = 5.27;
-    private static final double DRIVE_GEAR_RATIO = DRIVE_GEAR_RATIO_R2;
+    public static final double STEER_GEAR_RATIO = 287.0 / 11.0;
 
-    private static final double STEER_GEAR_RATIO = 287.0 / 11.0;
-
-    private static final Distance WHEEL_RADIUS =
+    public static final Distance WHEEL_RADIUS =
         Units.Meters.of(0.0508);
 
 
 // TODO: add SDS MK5 coupling gear ratio here, ctre defines this as drive rotations / azimuth rotations maybe ask henry
     private static final double COUPLING_GEAR_RATIO = 3.375;
 
-    private static final Distance WHEEL_BASE =
+    public static final Distance WHEEL_BASE =
         Units.Inches.of(20.75);
 
-    private static final Distance TRACK_WIDTH =
+    public static final Distance TRACK_WIDTH =
         Units.Inches.of(20.75);
-
-
-// IDs
-
-    // Front Left
-    private static final int FL_DRIVE_ID = 1;
-    private static final int FL_STEER_ID = 2;
-    private static final int FL_ENCODER_ID = 10;
-
-    // Front Right
-    private static final int FR_DRIVE_ID = 3;
-    private static final int FR_STEER_ID = 4;
-    private static final int FR_ENCODER_ID = 11;
-
-    // Back Left
-    private static final int BL_DRIVE_ID = 5;
-    private static final int BL_STEER_ID = 6;
-    private static final int BL_ENCODER_ID = 12;
-
-    // Back Right
-    private static final int BR_DRIVE_ID = 7;
-    private static final int BR_STEER_ID = 8;
-    private static final int BR_ENCODER_ID = 13;
-
-
-//put cancoder offsets here, just put them as zero for now
-
-    private static final Angle FL_ENCODER_OFFSET =
-        Units.Degrees.of(97.55859375);
-
-    private static final Angle FR_ENCODER_OFFSET =
-        Units.Degrees.of(7.91015625-180);
-
-    private static final Angle BL_ENCODER_OFFSET =
-        Units.Degrees.of(-18.896484375);
-
-    private static final Angle BR_ENCODER_OFFSET =
-        Units.Degrees.of(-47.63671875);
-
-
 
 
 //replaces old constants, ctre swerve module factory handles these separately from NAR_motor configs
@@ -89,8 +58,10 @@ public class CTRESwerveDrivetrain
     private static final boolean ENCODER_INVERTED = false;
 
   
-// replaces DRIVE_MOTOR_INVERTED = false for old constants, need to check if this should be true or false
-    private static final boolean INVERT_LEFT_SIDE = false;
+// modules are all mounted with the bevel gear on the same side (not mirrored L/R), so every
+// drive motor needs the same invert - a positive command should always spin all four wheels
+// the same way, unlike a mirrored/tank-style mount which needs opposite signs per side
+    private static final boolean DRIVE_MOTOR_INVERTED = false;
 
 
 //motor config
@@ -115,11 +86,15 @@ public class CTRESwerveDrivetrain
             .withKV(2.5725)
             .withKA(0.56562);
 
+    // kP=0.5 with Voltage closed-loop output only produced 0.5V per full rotation of error,
+    // far too little to overcome the ~26:1 steer gearbox's static friction - modules never turned.
+    // 100/0.5 matches the gain CTRE's own generated swerve template uses for this exact
+    // Voltage + CANcoder feedback setup.
     private static final com.ctre.phoenix6.configs.Slot0Configs STEER_GAINS =
         new com.ctre.phoenix6.configs.Slot0Configs()
-            .withKP(0.5)
+            .withKP(100.0)
             .withKI(0.0)
-            .withKD(0.0);
+            .withKD(0.5);
 
 //pin explicitly instead of relying on the library default, matching CTRE's generated swerve template
     private static final ClosedLoopOutputType DRIVE_CLOSED_LOOP_OUTPUT = ClosedLoopOutputType.Voltage;
@@ -147,92 +122,65 @@ public class CTRESwerveDrivetrain
             .withDriveMotorInitialConfigs(DRIVE_CONFIG)
             .withSteerMotorInitialConfigs(STEER_CONFIG);
 
-//drivetrain constants
-
-    private static final SwerveDrivetrainConstants DRIVETRAIN_CONSTANTS =
-        new SwerveDrivetrainConstants()
-            .withCANBusName(CAN_BUS)
-            .withPigeon2Id(PIGEON_ID);
-
-
-//module constants
-
-    private static final SwerveModuleConstants<
-            TalonFXConfiguration,
-            TalonFXConfiguration,
-            CANcoderConfiguration> FRONT_LEFT =
-        MODULE_FACTORY.createModuleConstants(
-            FL_STEER_ID,
-            FL_DRIVE_ID,
-            FL_ENCODER_ID,
-            FL_ENCODER_OFFSET,
-            WHEEL_BASE.div(2),
-            TRACK_WIDTH.div(2),
-            INVERT_LEFT_SIDE,
-            STEER_MOTOR_INVERTED,
-            ENCODER_INVERTED
-        );
-
-    private static final SwerveModuleConstants<
-            TalonFXConfiguration,
-            TalonFXConfiguration,
-            CANcoderConfiguration> FRONT_RIGHT =
-        MODULE_FACTORY.createModuleConstants(
-            FR_STEER_ID,
-            FR_DRIVE_ID,
-            FR_ENCODER_ID,
-            FR_ENCODER_OFFSET,
-            WHEEL_BASE.div(2),
-            TRACK_WIDTH.div(-2),
-            !INVERT_LEFT_SIDE,
-            STEER_MOTOR_INVERTED,
-            ENCODER_INVERTED
-        );
-
-    private static final SwerveModuleConstants<
-            TalonFXConfiguration,
-            TalonFXConfiguration,
-            CANcoderConfiguration> BACK_LEFT =
-        MODULE_FACTORY.createModuleConstants(
-            BL_STEER_ID,
-            BL_DRIVE_ID,
-            BL_ENCODER_ID,
-            BL_ENCODER_OFFSET,
-            WHEEL_BASE.div(-2),
-            TRACK_WIDTH.div(2),
-            INVERT_LEFT_SIDE,
-            STEER_MOTOR_INVERTED,
-            ENCODER_INVERTED
-        );
-
-    private static final SwerveModuleConstants<
-            TalonFXConfiguration,
-            TalonFXConfiguration,
-            CANcoderConfiguration> BACK_RIGHT =
-        MODULE_FACTORY.createModuleConstants(
-            BR_STEER_ID,
-            BR_DRIVE_ID,
-            BR_ENCODER_ID,
-            BR_ENCODER_OFFSET,
-            WHEEL_BASE.div(-2),
-            TRACK_WIDTH.div(-2),
-            !INVERT_LEFT_SIDE,
-            STEER_MOTOR_INVERTED,
-            ENCODER_INVERTED
-        );
-
-
 //constructor
-public CTRESwerveDrivetrain() {
+public CTRESwerveDrivetrain(
+        int pigeonId,
+        String canBus,
+        ModuleHardware frontLeft,
+        ModuleHardware frontRight,
+        ModuleHardware backLeft,
+        ModuleHardware backRight) {
     super(
         TalonFX::new,
         TalonFX::new,
         CANcoder::new,
-        DRIVETRAIN_CONSTANTS,
-        FRONT_LEFT,
-        FRONT_RIGHT,
-        BACK_LEFT,
-        BACK_RIGHT
+        new SwerveDrivetrainConstants()
+            .withCANBusName(canBus)
+            .withPigeon2Id(pigeonId),
+        MODULE_FACTORY.createModuleConstants(
+            frontLeft.steerId(),
+            frontLeft.driveId(),
+            frontLeft.encoderId(),
+            frontLeft.encoderOffset(),
+            WHEEL_BASE.div(2),
+            TRACK_WIDTH.div(2),
+            DRIVE_MOTOR_INVERTED,
+            STEER_MOTOR_INVERTED,
+            ENCODER_INVERTED
+        ),
+        MODULE_FACTORY.createModuleConstants(
+            frontRight.steerId(),
+            frontRight.driveId(),
+            frontRight.encoderId(),
+            frontRight.encoderOffset(),
+            WHEEL_BASE.div(2),
+            TRACK_WIDTH.div(-2),
+            DRIVE_MOTOR_INVERTED,
+            STEER_MOTOR_INVERTED,
+            ENCODER_INVERTED
+        ),
+        MODULE_FACTORY.createModuleConstants(
+            backLeft.steerId(),
+            backLeft.driveId(),
+            backLeft.encoderId(),
+            backLeft.encoderOffset(),
+            WHEEL_BASE.div(-2),
+            TRACK_WIDTH.div(2),
+            DRIVE_MOTOR_INVERTED,
+            STEER_MOTOR_INVERTED,
+            ENCODER_INVERTED
+        ),
+        MODULE_FACTORY.createModuleConstants(
+            backRight.steerId(),
+            backRight.driveId(),
+            backRight.encoderId(),
+            backRight.encoderOffset(),
+            WHEEL_BASE.div(-2),
+            TRACK_WIDTH.div(-2),
+            DRIVE_MOTOR_INVERTED,
+            STEER_MOTOR_INVERTED,
+            ENCODER_INVERTED
+        )
     );
 }
 public double[] getRawCancoderAngles() {

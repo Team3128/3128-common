@@ -188,3 +188,7 @@ compile_commands.json
 
 # Javadoc documentation
 doc/
+
+# Local diff/patch scratch files
+*.diff
+*.patch
