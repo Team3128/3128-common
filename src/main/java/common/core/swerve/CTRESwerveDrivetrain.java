@@ -6,7 +6,7 @@ import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.swerve.SwerveDrivetrain;
 import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
-import com.ctre.phoenix6.signals.ClosedLoopOutputType;
+import com.ctre.phoenix6.swerve.SwerveModuleConstants.ClosedLoopOutputType;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.swerve.SwerveModuleConstantsFactory;
 
@@ -70,16 +70,16 @@ public class CTRESwerveDrivetrain
 //put cancoder offsets here, just put them as zero for now
 
     private static final Angle FL_ENCODER_OFFSET =
-        Units.Degrees.of(163.125);
+        Units.Degrees.of(97.55859375);
 
     private static final Angle FR_ENCODER_OFFSET =
-        Units.Degrees.of(6.328125);
+        Units.Degrees.of(7.91015625-180);
 
     private static final Angle BL_ENCODER_OFFSET =
-        Units.Degrees.of(165.8496093749999);
+        Units.Degrees.of(-18.896484375);
 
     private static final Angle BR_ENCODER_OFFSET =
-        Units.Degrees.of(-36.56250000000001);
+        Units.Degrees.of(-47.63671875);
 
 
 
