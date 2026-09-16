@@ -29,7 +29,7 @@ public class CTRESwerveDrivetrain
 
 
 // TODO: add SDS MK5 coupling gear ratio here, ctre defines this as drive rotations / azimuth rotations maybe ask henry
-    private static final double COUPLING_GEAR_RATIO = 0.0;
+    private static final double COUPLING_GEAR_RATIO = 3.375;
 
     private static final Distance WHEEL_BASE =
         Units.Inches.of(20.75);
@@ -64,22 +64,22 @@ public class CTRESwerveDrivetrain
 //put cancoder offsets here, just put them as zero for now
 
     private static final Angle FL_ENCODER_OFFSET =
-        Units.Degrees.of(0);
+        Units.Degrees.of(163.125);
 
     private static final Angle FR_ENCODER_OFFSET =
-        Units.Degrees.of(0);
+        Units.Degrees.of(6.328125);
 
     private static final Angle BL_ENCODER_OFFSET =
-        Units.Degrees.of(0);
+        Units.Degrees.of(165.8496093749999);
 
     private static final Angle BR_ENCODER_OFFSET =
-        Units.Degrees.of(0);
+        Units.Degrees.of(-36.56250000000001);
 
 
 
 
 //replaces old constants, ctre swerve module factory handles these separately from NAR_motor configs
-    private static final boolean STEER_MOTOR_INVERTED = false;
+    private static final boolean STEER_MOTOR_INVERTED = true;
     private static final boolean ENCODER_INVERTED = false;
 
   
@@ -111,7 +111,7 @@ public class CTRESwerveDrivetrain
 
     private static final com.ctre.phoenix6.configs.Slot0Configs STEER_GAINS =
         new com.ctre.phoenix6.configs.Slot0Configs()
-            .withKP(4.5)
+            .withKP(0.5)
             .withKI(0.0)
             .withKD(0.0);
 

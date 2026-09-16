@@ -142,11 +142,11 @@ public class NAR_TalonFX extends NAR_Motor {
         motor.set(speed);
     }
 
-    public void setVoltageFOC(double voltage) {
-        var voltageSetpoint = new VoltageOut(voltage)
-            .withEnableFOC(true);
-        motor.setControl(voltageSetpoint);
-    }
+    // public void setVoltageFOC(double voltage) {
+    //     var voltageSetpoint = new VoltageOut(voltage)
+    //         .withEnableFOC(true);
+    //     motor.setControl(voltageSetpoint);
+    // }
 
     @Override
     protected void setVelocity(double rpm, double feedForward) {
@@ -155,16 +155,16 @@ public class NAR_TalonFX extends NAR_Motor {
         motor.setControl(velocitySetpoint);
     }
 
-    public void setVelocityFOC(double rpm, double feedforward) {
-        var velocitySetpoint = new VelocityVoltage(rpm / 60)
-            .withEnableFOC(true)
-            .withFeedForward(feedforward);
-        motor.setControl(velocitySetpoint);
-    }
+    // public void setVelocityFOC(double rpm, double feedforward) {
+    //     var velocitySetpoint = new VelocityVoltage(rpm / 60)
+    //         .withEnableFOC(true)
+    //         .withFeedForward(feedforward);
+    //     motor.setControl(velocitySetpoint);
+    // }
 
-    public void setVelocityFOC2(double setpoint, double feedforward) {
-        setVelocityFOC(setpoint / unitConversionFactor * timeConversionFactor, feedforward);
-    }
+    // public void setVelocityFOC2(double setpoint, double feedforward) {
+    //     setVelocityFOC(setpoint / unitConversionFactor * timeConversionFactor, feedforward);
+    // }
 
     @Override
     protected void setPosition(double rotations, double feedForward) {

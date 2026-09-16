@@ -22,6 +22,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 
@@ -33,7 +34,7 @@ public abstract class SwerveBase extends SubsystemBase {
     private double throttle = 1.0;
 
 
-protected final CTRESwerveDrivetrain drivetrain;
+public final CTRESwerveDrivetrain drivetrain;
 
     //requests change values everytime drive() happens
 
@@ -48,6 +49,10 @@ protected final CTRESwerveDrivetrain drivetrain;
 
     protected final SwerveRequest.PointWheelsAt pointWheelsRequest =
         new SwerveRequest.PointWheelsAt();
+
+    protected final SwerveRequest.Idle idleRequest = 
+        new SwerveRequest.Idle();
+ 
 
 public SwerveBase(CTRESwerveDrivetrain drivetrain) {
     this.drivetrain = drivetrain;
@@ -475,7 +480,7 @@ public SwerveBase(CTRESwerveDrivetrain drivetrain) {
         return getPose().getTranslation().nearest(translations);
     }
     public Command identifyOffsetsCommand() {
-    return runOnce(() -> {
+    return Commands.runOnce(() -> {
         double[] angles = drivetrain.getRawCancoderAngles();
 
         for (int i = 0; i < angles.length; i++) {
