@@ -55,7 +55,22 @@ public final CTRESwerveDrivetrain drivetrain;
  
 
 public SwerveBase(CTRESwerveDrivetrain drivetrain) {
+    this(drivetrain, 0, 0);
+}
+
+//maxTranslationSpeed (m/s) and maxRotationRate (rad/s) are used to set the FieldCentric/RobotCentric
+//request deadbands to 10% of max, matching CTRE's generated swerve template. Without this, the
+//closed-loop drive controller has zero tolerance around a 0 setpoint and will chase tiny residual
+//noise (CAN latency, coupling ratio coupling, sensor quantization), causing the drive wheels to
+//pulse/twitch with no controller input.
+public SwerveBase(CTRESwerveDrivetrain drivetrain, double maxTranslationSpeed, double maxRotationRate) {
     this.drivetrain = drivetrain;
+    fieldCentricRequest
+        .withDeadband(maxTranslationSpeed * 0.1)
+        .withRotationalDeadband(maxRotationRate * 0.1);
+    robotCentricRequest
+        .withDeadband(maxTranslationSpeed * 0.1)
+        .withRotationalDeadband(maxRotationRate * 0.1);
 }
 
 

@@ -6,6 +6,7 @@ import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.swerve.SwerveDrivetrain;
 import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
+import com.ctre.phoenix6.signals.ClosedLoopOutputType;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.swerve.SwerveModuleConstantsFactory;
 
@@ -21,7 +22,12 @@ public class CTRESwerveDrivetrain
     private static final int PIGEON_ID = 9;
     private static final String CAN_BUS = "drivetrain";
 
-    private static final double DRIVE_GEAR_RATIO = 6.03;
+    // SDS Mk5n drive gear ratio options
+    private static final double DRIVE_GEAR_RATIO_R1 = 7.03;
+    private static final double DRIVE_GEAR_RATIO_R2 = 6.03;
+    private static final double DRIVE_GEAR_RATIO_R3 = 5.27;
+    private static final double DRIVE_GEAR_RATIO = DRIVE_GEAR_RATIO_R2;
+
     private static final double STEER_GEAR_RATIO = 287.0 / 11.0;
 
     private static final Distance WHEEL_RADIUS =
@@ -115,6 +121,10 @@ public class CTRESwerveDrivetrain
             .withKI(0.0)
             .withKD(0.0);
 
+//pin explicitly instead of relying on the library default, matching CTRE's generated swerve template
+    private static final ClosedLoopOutputType DRIVE_CLOSED_LOOP_OUTPUT = ClosedLoopOutputType.Voltage;
+    private static final ClosedLoopOutputType STEER_CLOSED_LOOP_OUTPUT = ClosedLoopOutputType.Voltage;
+
 
 //module factory
 
@@ -132,6 +142,8 @@ public class CTRESwerveDrivetrain
             .withWheelRadius(WHEEL_RADIUS)
             .withDriveMotorGains(DRIVE_GAINS)
             .withSteerMotorGains(STEER_GAINS)
+            .withDriveMotorClosedLoopOutput(DRIVE_CLOSED_LOOP_OUTPUT)
+            .withSteerMotorClosedLoopOutput(STEER_CLOSED_LOOP_OUTPUT)
             .withDriveMotorInitialConfigs(DRIVE_CONFIG)
             .withSteerMotorInitialConfigs(STEER_CONFIG);
 
