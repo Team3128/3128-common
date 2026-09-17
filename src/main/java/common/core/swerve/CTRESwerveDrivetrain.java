@@ -1,6 +1,7 @@
 package common.core.swerve;
 
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
+import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -28,23 +29,37 @@ public class CTRESwerveDrivetrain
 // instead of being hardcoded here.
     public record ModuleHardware(int driveId, int steerId, int encoderId, Angle encoderOffset) {}
 
-    // Mk5n drive gear ratio options (see class doc above)
+    // Mk5n drive gear ratio options (see class doc above), derived from actual gear tooth counts
+    // instead of hardcoded decimals, so the coupling ratio below can't drift out of sync with
+    // whichever drive ratio is selected. Structure and tooth counts per team 2910's 2026 code,
+    // which runs this same module: only the drive pinion tooth count differs between R1/R2/R3 -
+    // the coupling ring gear and the two downstream drive stages are shared.
+    private static final double COUPLING_RING_GEAR_TEETH = 54.0;
+    private static final double DRIVE_STAGE_2_RATIO = 25.0 / 32.0;
+    private static final double DRIVE_STAGE_3_RATIO = 30.0 / 15.0;
+
+    private static final double DRIVE_PINION_TEETH_R1 = 12.0;
+    private static final double DRIVE_PINION_TEETH_R2 = 14.0;
+    private static final double DRIVE_PINION_TEETH_R3 = 16.0;
+
     // public: this is the single source of truth for the robot's physical drivetrain layout -
     // referenced by frc.team3128.Constants for PathPlanner's fallback RobotConfig instead of
     // keeping a second, easily-stale copy of these numbers in the robot project
-    public static final double DRIVE_GEAR_RATIO_R1 = 7.03;
-    public static final double DRIVE_GEAR_RATIO_R2 = 6.03;
-    public static final double DRIVE_GEAR_RATIO_R3 = 5.27;
+    public static final double COUPLING_GEAR_RATIO_R1 = COUPLING_RING_GEAR_TEETH / DRIVE_PINION_TEETH_R1;
+    public static final double COUPLING_GEAR_RATIO_R2 = COUPLING_RING_GEAR_TEETH / DRIVE_PINION_TEETH_R2;
+    public static final double COUPLING_GEAR_RATIO_R3 = COUPLING_RING_GEAR_TEETH / DRIVE_PINION_TEETH_R3;
+
+    public static final double DRIVE_GEAR_RATIO_R1 = COUPLING_GEAR_RATIO_R1 * DRIVE_STAGE_2_RATIO * DRIVE_STAGE_3_RATIO;
+    public static final double DRIVE_GEAR_RATIO_R2 = COUPLING_GEAR_RATIO_R2 * DRIVE_STAGE_2_RATIO * DRIVE_STAGE_3_RATIO;
+    public static final double DRIVE_GEAR_RATIO_R3 = COUPLING_GEAR_RATIO_R3 * DRIVE_STAGE_2_RATIO * DRIVE_STAGE_3_RATIO;
+
     public static final double DRIVE_GEAR_RATIO = DRIVE_GEAR_RATIO_R2;
+    private static final double COUPLING_GEAR_RATIO = COUPLING_GEAR_RATIO_R2;
 
     public static final double STEER_GEAR_RATIO = 287.0 / 11.0;
 
     public static final Distance WHEEL_RADIUS =
         Units.Meters.of(0.0508);
-
-
-// TODO: add SDS MK5 coupling gear ratio here, ctre defines this as drive rotations / azimuth rotations maybe ask henry
-    private static final double COUPLING_GEAR_RATIO = 3.375;
 
     public static final Distance WHEEL_BASE =
         Units.Inches.of(20.75);
@@ -77,21 +92,13 @@ public class CTRESwerveDrivetrain
 
 //closed loop gains
 
-    private static final com.ctre.phoenix6.configs.Slot0Configs DRIVE_GAINS =
-        new com.ctre.phoenix6.configs.Slot0Configs()
-            .withKP(0.005)
-            .withKI(0.0)
-            .withKD(0.0)
-            .withKS(0.065026)
-            .withKV(2.5725)
-            .withKA(0.56562);
 
     // kP=0.5 with Voltage closed-loop output only produced 0.5V per full rotation of error,
     // far too little to overcome the ~26:1 steer gearbox's static friction - modules never turned.
     // 100/0.5 matches the gain CTRE's own generated swerve template uses for this exact
     // Voltage + CANcoder feedback setup.
-    private static final com.ctre.phoenix6.configs.Slot0Configs STEER_GAINS =
-        new com.ctre.phoenix6.configs.Slot0Configs()
+    private static final Slot0Configs STEER_GAINS =
+        new Slot0Configs()
             .withKP(100.0)
             .withKI(0.0)
             .withKD(0.5);
@@ -115,7 +122,6 @@ public class CTRESwerveDrivetrain
             .withSteerMotorGearRatio(STEER_GEAR_RATIO)
             .withCouplingGearRatio(COUPLING_GEAR_RATIO)
             .withWheelRadius(WHEEL_RADIUS)
-            .withDriveMotorGains(DRIVE_GAINS)
             .withSteerMotorGains(STEER_GAINS)
             .withDriveMotorClosedLoopOutput(DRIVE_CLOSED_LOOP_OUTPUT)
             .withSteerMotorClosedLoopOutput(STEER_CLOSED_LOOP_OUTPUT)
@@ -126,6 +132,7 @@ public class CTRESwerveDrivetrain
 public CTRESwerveDrivetrain(
         int pigeonId,
         String canBus,
+        Slot0Configs driveGains,
         ModuleHardware frontLeft,
         ModuleHardware frontRight,
         ModuleHardware backLeft,
@@ -137,7 +144,7 @@ public CTRESwerveDrivetrain(
         new SwerveDrivetrainConstants()
             .withCANBusName(canBus)
             .withPigeon2Id(pigeonId),
-        MODULE_FACTORY.createModuleConstants(
+        MODULE_FACTORY.withDriveMotorGains(driveGains).createModuleConstants(
             frontLeft.steerId(),
             frontLeft.driveId(),
             frontLeft.encoderId(),
@@ -148,7 +155,7 @@ public CTRESwerveDrivetrain(
             STEER_MOTOR_INVERTED,
             ENCODER_INVERTED
         ),
-        MODULE_FACTORY.createModuleConstants(
+        MODULE_FACTORY.withDriveMotorGains(driveGains).createModuleConstants(
             frontRight.steerId(),
             frontRight.driveId(),
             frontRight.encoderId(),
@@ -159,7 +166,7 @@ public CTRESwerveDrivetrain(
             STEER_MOTOR_INVERTED,
             ENCODER_INVERTED
         ),
-        MODULE_FACTORY.createModuleConstants(
+        MODULE_FACTORY.withDriveMotorGains(driveGains).createModuleConstants(
             backLeft.steerId(),
             backLeft.driveId(),
             backLeft.encoderId(),
@@ -170,7 +177,7 @@ public CTRESwerveDrivetrain(
             STEER_MOTOR_INVERTED,
             ENCODER_INVERTED
         ),
-        MODULE_FACTORY.createModuleConstants(
+        MODULE_FACTORY.withDriveMotorGains(driveGains).createModuleConstants(
             backRight.steerId(),
             backRight.driveId(),
             backRight.encoderId(),
