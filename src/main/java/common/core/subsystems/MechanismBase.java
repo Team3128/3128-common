@@ -3,15 +3,17 @@ package common.core.subsystems;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BooleanSupplier;
+import java.util.function.DoubleBinaryOperator;
 import java.util.function.DoubleSupplier;
 
-import common.core.controllers.ControllerBase;
-import common.core.controllers.PositionController;
+import common.core.controllers.PIDFFConfig;
 import common.hardware.motorcontroller.NAR_Motor;
 import common.hardware.motorcontroller.NAR_Motor.MotorConfig;
 import common.utility.Log;
 import common.utility.shuffleboard.NAR_Shuffleboard;
 import common.utility.sysid.NAR_SysIdCommand;
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -21,47 +23,100 @@ import static edu.wpi.first.units.Units.Volts;
 import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 import static edu.wpi.first.wpilibj2.command.Commands.*;
 
+/**
+ * Base class for a PID-controlled mechanism.
+ *
+ * <p>This class does not define its own controller type. Instead it drives a plain
+ * WPILib controller (e.g. {@link edu.wpi.first.math.controller.PIDController},
+ * {@link edu.wpi.first.math.controller.ProfiledPIDController},
+ * {@link edu.wpi.first.math.controller.BangBangController}) directly: those classes are
+ * pure {@code (measurement, setpoint) -> output} calculators and know nothing about
+ * motors, so {@code MechanismBase} is the one responsible for reading the measurement,
+ * calling the controller, adding feedforward, and applying the result to its motors.
+ *
+ * <p>Feedforward (kS/kV/kA/kG) is not part of the injected controller either, since
+ * WPILib's feedforward classes don't support the dynamic kG use this team needs (e.g. a
+ * pivot's gravity gain varying with angle). Subclasses instead override
+ * {@link #calculateFeedforward(double)} to combine {@link PIDFFConfig} with whatever
+ * shape of feedforward their mechanism needs.
+ */
 public abstract class MechanismBase extends SubsystemBase {
 
-    protected ControllerBase controller;
-    protected NAR_Motor[] motors;
-    private double safetyThresh;
-    private Timer safetyTimer = new Timer();
-    private MotorConfig config;
+    protected final NAR_Motor[] motors;
+    protected final PIDFFConfig gains;
+
+    /** Computes controller output from (measurement, setpoint), e.g. {@code pid::calculate}. */
+    private final DoubleBinaryOperator feedback;
+    private final DoubleSupplier measurement;
+    private final double tolerance;
+
+    private double setpointValue;
+    private boolean enabled = false;
+
+    private double safetyThresh = 5;
+    private final Timer safetyTimer = new Timer();
+    private MotorConfig motorConfig;
 
     protected BooleanSupplier debug;
-    protected DoubleSupplier setpoint;
+    protected DoubleSupplier debugSetpoint;
 
     protected static List<MechanismBase> instances = new ArrayList<>();
 
-    public MechanismBase(ControllerBase controller, MotorConfig m_config, NAR_Motor... motors) {
-        this.controller = controller;
-        this.config = m_config;
-        this.motors = motors;
-        this.safetyThresh = 5;
-
+    /**
+     * @param gains Feedforward gains; also handed to {@link #calculateFeedforward(double)}.
+     * @param feedback The WPILib controller's {@code calculate(measurement, setpoint)} method reference.
+     * @param measurement Supplies the mechanism's current measurement, e.g. {@code leader::getPosition}.
+     * @param tolerance Error tolerance for {@link #atSetpoint()}.
+     * @param motorConfig Hardware configuration applied to every motor.
+     * @param motors The motor(s) driven by this mechanism. Output is applied to all of them.
+     */
+    public MechanismBase(PIDFFConfig gains, DoubleBinaryOperator feedback, DoubleSupplier measurement,
+                          double tolerance, MotorConfig motorConfig, NAR_Motor... motors) {
         requireNonNullParam(motors, "motors", "MechanismBase");
-        controller.setMeasurementSource(motors[0]);
-        for (int i = 0; i < motors.length; i++) {
-            controller.addMotor(motors[i]);
-            motors[i].configMotor(m_config);
+        requireNonNullParam(gains, "gains", "MechanismBase");
+
+        this.gains = gains;
+        this.feedback = feedback;
+        this.measurement = measurement;
+        this.tolerance = tolerance;
+        this.motorConfig = motorConfig;
+        this.motors = motors;
+
+        for (NAR_Motor motor : motors) {
+            motor.configMotor(motorConfig);
         }
     }
 
-    public void invertMotor(int motorIndex){
-        motors[motorIndex].setInverted(!config.inverted);
+    /**
+     * Creates an open-loop-only mechanism, with no PID/feedforward loop.
+     * {@link #enable()}/{@link #setSetpoint(double)} are unavailable; use {@link #run(double)}
+     * or {@link #runVolts(double)} directly.
+     */
+    public MechanismBase(MotorConfig motorConfig, NAR_Motor... motors) {
+        this(new PIDFFConfig(), null, null, 0, motorConfig, motors);
     }
 
-    public MechanismBase(MotorConfig m_config, NAR_Motor... motors) {
-        this(null, m_config, motors);
+    public void invertMotor(int motorIndex) {
+        motors[motorIndex].setInverted(!motorConfig.inverted);
+    }
+
+    /**
+     * Combines the controller's PID output with this mechanism's feedforward.
+     * Default is no feedforward; override to add e.g. {@code gains.positionFF(pidOutput, atSetpoint())}
+     * or {@code gains.velocityFF(getSetpoint(), pidOutput, atSetpoint())}.
+     *
+     * @param pidOutput The output of {@code feedback} this cycle.
+     */
+    protected double calculateFeedforward(double pidOutput) {
+        return 0;
     }
 
     /**
      * This is an extendable implementation of the singleton pattern<br><br>
-     * 
+     *
      * When getting a mechanism instance whose class name is [CLASS_NAME], use the following code:<br>
      * <strong>[CLASS_NAME] mechanism = [CLASS_NAME].getInstance([CLASS_NAME].class);</strong><br>
-     * 
+     *
      * @param type [MECHANISM_CLASS_NAME].class
      * @return a singleton instance of the mechanism
      */
@@ -79,14 +134,19 @@ public abstract class MechanismBase extends SubsystemBase {
         } catch (ReflectiveOperationException e) {
             throw new RuntimeException("Failed to instantiate " + type.getName(), e);
         }
-        
+
         return type.cast(instance);
     }
 
     @Override
     public void periodic() {
-        if (controller.isEnabled()) {
-            controller.useOutput();
+        if (enabled) {
+            final double pidOutput = feedback.applyAsDouble(measurement.getAsDouble(), setpointValue);
+            final double output = MathUtil.clamp(pidOutput + calculateFeedforward(pidOutput), -12, 12);
+            for (NAR_Motor motor : motors) {
+                motor.setVolts(output);
+            }
+
             if (safetyTimer.hasElapsed(safetyThresh)) onSafetyTimeout();
             if (atSetpoint()) {
                 safetyTimer.restart();
@@ -96,17 +156,8 @@ public abstract class MechanismBase extends SubsystemBase {
         }
 
         NAR_Shuffleboard.addData(getName(), "Velocity", motors[0].getVelocity(), 5, 1);
-        NAR_Shuffleboard.addData(getName(), "Setpoint", setpoint, 1, 1);
-        NAR_Shuffleboard.addData(getName(), "Setpoint Graph", setpoint, 8, 0, 2, 2).withWidget(BuiltInWidgets.kGraph);
-    }
-
-    /**
-     * Returns the Controller object controlling the subsystem
-     *
-     * @return The Controller
-     */
-    public ControllerBase getController() {
-        return controller;
+        NAR_Shuffleboard.addData(getName(), "Setpoint", debugSetpoint::getAsDouble, 1, 1);
+        NAR_Shuffleboard.addData(getName(), "Setpoint Graph", debugSetpoint::getAsDouble, 8, 0, 2, 2).withWidget(BuiltInWidgets.kGraph);
     }
 
     /**
@@ -115,7 +166,7 @@ public abstract class MechanismBase extends SubsystemBase {
      * @return The MotorConfig
      */
     public MotorConfig getMotorConfig() {
-        return config;
+        return motorConfig;
     }
 
     /**
@@ -142,10 +193,9 @@ public abstract class MechanismBase extends SubsystemBase {
      */
     public void setSetpoint(double setpoint) {
         enable();
-        controller.setSetpoint((debug != null && debug.getAsBoolean()) ? this.setpoint.getAsDouble() : setpoint);
+        setpointValue = (debug != null && debug.getAsBoolean()) ? debugSetpoint.getAsDouble() : setpoint;
         NAR_Shuffleboard.addData(getName(), "AtSetpoint", false, 1, 0);
     }
-        
 
     public Command setSetpointCommand(double setpoint) {
         return runOnce(() -> setSetpoint(setpoint));
@@ -157,7 +207,7 @@ public abstract class MechanismBase extends SubsystemBase {
      * @return The current setpoint
      */
     public double getSetpoint() {
-        return controller.getSetpoint();
+        return setpointValue;
     }
 
     /**
@@ -166,20 +216,20 @@ public abstract class MechanismBase extends SubsystemBase {
      * @return If subsystem is at setpoint
      */
     public boolean atSetpoint() {
-        return controller.atSetpoint();
+        return Math.abs(measurement.getAsDouble() - setpointValue) < tolerance;
     }
 
-    /** Enables the PID control. Resets the controller. */
+    /** Enables the PID control. */
     public void enable() {
-        controller.enable();
+        requireNonNullParam(feedback, "feedback", "MechanismBase.enable");
+        enabled = true;
         safetyTimer.restart();
-        controller.reset();
         Log.debug(Log.Type.CONTROLLER, getName(), "Enabled PID");
     }
 
     /** Disables the PID control. Sets output to zero. */
     public void disable() {
-        controller.disable();
+        enabled = false;
         Log.debug(Log.Type.CONTROLLER, getName(), "Disabled PID");
     }
 
@@ -189,12 +239,12 @@ public abstract class MechanismBase extends SubsystemBase {
      * @return Whether the controller is enabled.
      */
     public boolean isEnabled() {
-        return controller.isEnabled();
+        return enabled;
     }
 
     /**
      * Sets power to motors.
-     * 
+     *
      * @param power The power to set the motors to between -1 and 1.
      */
     public void run(double power) {
@@ -205,7 +255,7 @@ public abstract class MechanismBase extends SubsystemBase {
 
     /**
      * Sets power to motors.
-     * 
+     *
      * @param power The power to set the motors to between -1 and 1.
      * @return Command to run power
      */
@@ -215,7 +265,7 @@ public abstract class MechanismBase extends SubsystemBase {
 
     /**
      * Sets voltage to motors.
-     * 
+     *
      * @param volts The voltage to set the motors to.
      */
     public void runVolts(double volts) {
@@ -226,7 +276,7 @@ public abstract class MechanismBase extends SubsystemBase {
 
     /**
      * Sets voltage to motors.
-     * 
+     *
      * @param volts The voltage to set the motors to.
      */
     public Command runVoltsCommand(double volts) {
@@ -242,24 +292,24 @@ public abstract class MechanismBase extends SubsystemBase {
     }
 
     /**
-     * Resets measurement position to controller position minimum.
+     * Resets every motor's position to {@code position}.
      */
-    public void reset() {
+    public void reset(double position) {
         for (NAR_Motor motor : motors) {
-            motor.resetPosition(((PositionController) controller).getInputRange()[0]);
+            motor.resetPosition(position);
         }
     }
 
     /**
-     * Resets measurement position to controller position minimum.
+     * Resets every motor's position to {@code position}.
      */
-    public Command resetCommand() {
-        return runOnce(() -> reset());
+    public Command resetCommand(double position) {
+        return runOnce(() -> reset(position));
     }
 
     /**
      * Get the position of the mechanism relative to its reset.
-     * 
+     *
      * @return The position of the first motor.
      */
     public double getPosition() {
@@ -268,7 +318,7 @@ public abstract class MechanismBase extends SubsystemBase {
 
     /**
      * Get the velocity of the mechanism.
-     * 
+     *
      * @return The velocity of the first motor.
      */
     public double getVelocity() {
@@ -277,7 +327,7 @@ public abstract class MechanismBase extends SubsystemBase {
 
     /**
      * Get the volts applied to the mechanism
-     * 
+     *
      * @return The volts applied to the first motor.
      */
     public double getVolts() {
@@ -289,40 +339,44 @@ public abstract class MechanismBase extends SubsystemBase {
        return characterize.runSysId();
     }
 
+    /**
+     * Adds the underlying WPILib controller's own Shuffleboard widget (it already implements
+     * {@link Sendable}), e.g. {@code addControllerWidget(pid)}.
+     */
+    protected void addControllerWidget(Sendable controller, int x, int y, int width, int height) {
+        NAR_Shuffleboard.addSendable(getName(), "PID_Controller", controller, x, y, width, height).withWidget(BuiltInWidgets.kPIDController);
+    }
+
     public void initShuffleboard() {
         NAR_Shuffleboard.addData(getName(), "Enabled", this::isEnabled, 0, 0);
         NAR_Shuffleboard.addData(getName(), "AtSetpoint", this::atSetpoint, 1, 0);
-        NAR_Shuffleboard.addData(getName(), "Measurement", controller::getMeasurement, 0, 1);
+        NAR_Shuffleboard.addData(getName(), "Measurement", measurement::getAsDouble, 0, 1);
         NAR_Shuffleboard.addData(getName(), "Setpoint", this::getSetpoint, 1, 1);
 
         debug = NAR_Shuffleboard.debugSwitch(getName(), "DEBUG", false, 2, 0);
-        setpoint = NAR_Shuffleboard.debug(getName(), "Debug_Setpoint", 0, 2,1);
+        debugSetpoint = NAR_Shuffleboard.debug(getName(), "Debug_Setpoint", 0, 2, 1);
 
-        NAR_Shuffleboard.addData(getName(), "Measurement Graph", controller::getMeasurement, 6, 0, 2, 2).withWidget(BuiltInWidgets.kGraph);
+        NAR_Shuffleboard.addData(getName(), "Measurement Graph", measurement::getAsDouble, 6, 0, 2, 2).withWidget(BuiltInWidgets.kGraph);
         NAR_Shuffleboard.addData(getName(), "Setpoint Graph", this::getSetpoint, 8, 0, 2, 2).withWidget(BuiltInWidgets.kGraph);
 
-        NAR_Shuffleboard.addSendable(getName(), "PID_Controller", controller, 3, 1, 2, 3).withWidget(BuiltInWidgets.kPIDController);
-        FFWidgets(controller,1,0);
-        runVoltsWidgets("running", debug, 1, 0);
+        FFWidgets(1, 0);
+        runVoltsWidgets(debug, 1, 0);
 
-
-        NAR_Shuffleboard.addCommand(getName(), "Enable", either(startEnd(()-> setSetpoint(setpoint.getAsDouble()), ()-> disable()), print("DEBUG NOT ON"), debug), 4, 0);
-        NAR_Shuffleboard.addCommand(getName(), "Reset", either(resetCommand(), print("DEBUG NOT ON"), debug), 3, 0);
+        NAR_Shuffleboard.addCommand(getName(), "Enable", either(startEnd(() -> setSetpoint(debugSetpoint.getAsDouble()), this::disable), print("DEBUG NOT ON"), debug), 4, 0);
     }
 
-    private void runVoltsWidgets(String tab, BooleanSupplier debug, int x, int y) {
-        final DoubleSupplier debugVoltage = NAR_Shuffleboard.debug(getName(), "Debug Volts", 0, x+6, y + 3);
-        NAR_Shuffleboard.addCommand(getName(), "Run Volts", either(startEnd(()-> runVolts(debugVoltage.getAsDouble()), ()-> stop()), print("DEBUG NOT ON"), debug), x+7, y+3);
-        NAR_Shuffleboard.addData(getName(), "Running", () -> debug.getAsBoolean() && getVolts() > 0, x + 5, y+3);
+    private void runVoltsWidgets(BooleanSupplier debug, int x, int y) {
+        final DoubleSupplier debugVoltage = NAR_Shuffleboard.debug(getName(), "Debug Volts", 0, x + 6, y + 3);
+        NAR_Shuffleboard.addCommand(getName(), "Run Volts", either(startEnd(() -> runVolts(debugVoltage.getAsDouble()), this::stop), print("DEBUG NOT ON"), debug), x + 7, y + 3);
+        NAR_Shuffleboard.addData(getName(), "Running", () -> debug.getAsBoolean() && getVolts() > 0, x + 5, y + 3);
         NAR_Shuffleboard.addData(getName(), "Voltage", this::getVolts, x + 4, y + 3);
     }
 
-    private void FFWidgets(ControllerBase controller, int x, int y) {
-        controller.getConfig().setkS(NAR_Shuffleboard.debug(getName(), "kS", controller.getConfig().getkS(), x, y+2));
-        controller.getConfig().setkV(NAR_Shuffleboard.debug(getName(), "kV", controller.getConfig().getkV(), x + 1, y+2));
-        controller.getConfig().setkA(NAR_Shuffleboard.debug(getName(), "kA", controller.getConfig().getkA(), x + 1, y + 3));
-        controller.getConfig().setkG(NAR_Shuffleboard.debug(getName(), "kG", controller.getConfig().getkG(), x, y + 3));
-        NAR_Shuffleboard.addCommand(getName(), "Characterize", this.characterization(1, 0.5), x-1, y+3).withSize(1, 1);
+    private void FFWidgets(int x, int y) {
+        gains.setkS(NAR_Shuffleboard.debug(getName(), "kS", gains.getkS(), x, y + 2));
+        gains.setkV(NAR_Shuffleboard.debug(getName(), "kV", gains.getkV(), x + 1, y + 2));
+        gains.setkA(NAR_Shuffleboard.debug(getName(), "kA", gains.getkA(), x + 1, y + 3));
+        gains.setkG(NAR_Shuffleboard.debug(getName(), "kG", gains.getkG(), x, y + 3));
+        NAR_Shuffleboard.addCommand(getName(), "Characterize", characterization(1, 0.5), x - 1, y + 3).withSize(1, 1);
     }
-
 }
