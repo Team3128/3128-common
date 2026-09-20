@@ -52,6 +52,7 @@ public abstract class MechanismBase extends SubsystemBase {
     private final DoubleConsumer resetController;
     private final DoubleSupplier measurement;
     private final double tolerance;
+    private final double resetPosition;
 
     private double setpointValue;
     private boolean enabled = false;
@@ -74,11 +75,13 @@ public abstract class MechanismBase extends SubsystemBase {
      *                        {@code ProfiledPIDController}, or {@code m -> {}} for a {@code BangBangController}.
      * @param measurement Supplies the mechanism's current measurement, e.g. {@code leader::getPosition}.
      * @param tolerance Error tolerance for {@link #atSetpoint()}.
+     * @param resetPosition Position the motors are reset to by {@link #reset()}, e.g. the mechanism's home position.
      * @param motorConfig Hardware configuration applied to every motor.
      * @param motors The motor(s) driven by this mechanism. Output is applied to all of them.
      */
     public MechanismBase(PIDFFConfig gains, DoubleBinaryOperator feedback, DoubleConsumer resetController,
-                          DoubleSupplier measurement, double tolerance, MotorConfig motorConfig, NAR_Motor... motors) {
+                          DoubleSupplier measurement, double tolerance, double resetPosition,
+                          MotorConfig motorConfig, NAR_Motor... motors) {
         requireNonNullParam(motors, "motors", "MechanismBase");
         requireNonNullParam(gains, "gains", "MechanismBase");
         if (motors.length == 0) {
@@ -93,6 +96,7 @@ public abstract class MechanismBase extends SubsystemBase {
         this.resetController = resetController;
         this.measurement = measurement;
         this.tolerance = tolerance;
+        this.resetPosition = resetPosition;
         this.motorConfig = motorConfig;
         this.motors = motors;
 
@@ -108,7 +112,7 @@ public abstract class MechanismBase extends SubsystemBase {
      * The measurement defaults to the first motor's position so Shuffleboard widgets still work.
      */
     public MechanismBase(MotorConfig motorConfig, NAR_Motor... motors) {
-        this(new PIDFFConfig(), null, null, () -> motors[0].getPosition(), 0, motorConfig, motors);
+        this(new PIDFFConfig(), null, null, () -> motors[0].getPosition(), 0, 0, motorConfig, motors);
     }
 
     public void invertMotor(int motorIndex) {
@@ -303,6 +307,20 @@ public abstract class MechanismBase extends SubsystemBase {
     public void stop() {
         disable();
         run(0);
+    }
+
+    /**
+     * Resets every motor's position to the {@code resetPosition} given at construction.
+     */
+    public void reset() {
+        reset(resetPosition);
+    }
+
+    /**
+     * Resets every motor's position to the {@code resetPosition} given at construction.
+     */
+    public Command resetCommand() {
+        return runOnce(this::reset);
     }
 
     /**
