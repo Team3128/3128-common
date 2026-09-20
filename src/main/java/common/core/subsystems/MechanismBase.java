@@ -171,8 +171,6 @@ public abstract class MechanismBase extends SubsystemBase {
         }
 
         NAR_Shuffleboard.addData(getName(), "Velocity", motors[0].getVelocity(), 5, 1);
-        NAR_Shuffleboard.addData(getName(), "Setpoint", debugSetpoint::getAsDouble, 1, 1);
-        NAR_Shuffleboard.addData(getName(), "Setpoint Graph", debugSetpoint::getAsDouble, 8, 0, 2, 2).withWidget(BuiltInWidgets.kGraph);
     }
 
     /**
