@@ -1,7 +1,5 @@
 package common.core.subsystems;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleBinaryOperator;
 import java.util.function.DoubleConsumer;
@@ -40,6 +38,22 @@ import static edu.wpi.first.wpilibj2.command.Commands.*;
  * pivot's gravity gain varying with angle). Subclasses instead override
  * {@link #calculateFeedforward(double)} to combine {@link PIDFFConfig} with whatever
  * shape of feedforward their mechanism needs.
+ *
+ * <p>Hardware and controllers are passed in through the constructor, not created statically,
+ * so a mechanism can be built (and rebuilt) from wherever the robot is assembled:
+ * <pre>{@code
+ * public class Slider extends MechanismBase {
+ *     public Slider(NAR_TalonFX motor, PIDFFConfig gains) {
+ *         this(motor, gains, new PIDController(gains.kP, gains.kI, gains.kD));
+ *     }
+ *
+ *     private Slider(NAR_TalonFX motor, PIDFFConfig gains, PIDController pid) {
+ *         super(gains, pid::calculate, m -> pid.reset(), motor::getPosition, TOLERANCE, HOME, MOTOR_CONFIG, motor);
+ *     }
+ * }
+ * }</pre>
+ * The private constructor is what lets the same {@code pid} be handed to both the base class
+ * and its own callbacks without a static field.
  */
 public abstract class MechanismBase extends SubsystemBase {
 
@@ -66,8 +80,6 @@ public abstract class MechanismBase extends SubsystemBase {
 
     protected BooleanSupplier debug;
     protected DoubleSupplier debugSetpoint;
-
-    protected static List<MechanismBase> instances = new ArrayList<>();
 
     /**
      * @param gains Feedforward gains; also handed to {@link #calculateFeedforward(double)}.
@@ -131,33 +143,6 @@ public abstract class MechanismBase extends SubsystemBase {
      */
     protected double calculateFeedforward(double pidOutput) {
         return 0;
-    }
-
-    /**
-     * This is an extendable implementation of the singleton pattern<br><br>
-     *
-     * When getting a mechanism instance whose class name is [CLASS_NAME], use the following code:<br>
-     * <strong>[CLASS_NAME] mechanism = [CLASS_NAME].getInstance([CLASS_NAME].class);</strong><br>
-     *
-     * @param type [MECHANISM_CLASS_NAME].class
-     * @return a singleton instance of the mechanism
-     */
-    public static <T extends MechanismBase> T getInstance(Class<T> type) {
-        for (MechanismBase instance : instances) {
-            if (type.isInstance(instance)) {
-                return type.cast(instance);
-            }
-        }
-
-        MechanismBase instance;
-        try {
-            instance = type.getDeclaredConstructor().newInstance();
-            instances.add(instance);
-        } catch (ReflectiveOperationException e) {
-            throw new RuntimeException("Failed to instantiate " + type.getName(), e);
-        }
-
-        return type.cast(instance);
     }
 
     @Override
