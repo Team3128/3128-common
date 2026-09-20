@@ -99,9 +99,10 @@ public abstract class MechanismBase extends SubsystemBase {
      * Creates an open-loop-only mechanism, with no PID/feedforward loop.
      * {@link #enable()}/{@link #setSetpoint(double)} are unavailable; use {@link #run(double)}
      * or {@link #runVolts(double)} directly.
+     * The measurement defaults to the first motor's position so Shuffleboard widgets still work.
      */
     public MechanismBase(MotorConfig motorConfig, NAR_Motor... motors) {
-        this(new PIDFFConfig(), null, null, null, 0, motorConfig, motors);
+        this(new PIDFFConfig(), null, null, motors[0]::getPosition, 0, motorConfig, motors);
     }
 
     public void invertMotor(int motorIndex) {
