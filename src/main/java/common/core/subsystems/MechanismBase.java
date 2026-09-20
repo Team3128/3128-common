@@ -55,7 +55,10 @@ public abstract class MechanismBase extends SubsystemBase {
     private final double resetPosition;
 
     private double setpointValue;
+    private double inputMin = Double.NEGATIVE_INFINITY;
+    private double inputMax = Double.POSITIVE_INFINITY;
     private boolean enabled = false;
+    private boolean disableAtSetpoint = true;
 
     private double safetyThresh = 5;
     private final Timer safetyTimer = new Timer();
@@ -170,7 +173,7 @@ public abstract class MechanismBase extends SubsystemBase {
             if (atSetpoint()) {
                 safetyTimer.restart();
                 NAR_Shuffleboard.addData(getName(), "AtSetpoint", true, 1, 0);
-                disable();
+                if (disableAtSetpoint) disable();
             }
         }
 
@@ -210,12 +213,31 @@ public abstract class MechanismBase extends SubsystemBase {
      */
     public void setSetpoint(double setpoint) {
         enable();
-        setpointValue = (debug != null && debug.getAsBoolean()) ? debugSetpoint.getAsDouble() : setpoint;
+        final double requested = (debug != null && debug.getAsBoolean()) ? debugSetpoint.getAsDouble() : setpoint;
+        setpointValue = MathUtil.clamp(requested, inputMin, inputMax);
         NAR_Shuffleboard.addData(getName(), "AtSetpoint", false, 1, 0);
     }
 
     public Command setSetpointCommand(double setpoint) {
         return runOnce(() -> setSetpoint(setpoint));
+    }
+
+    /**
+     * Sets whether PID control disables itself (leaving the motors at their last output) once
+     * {@link #atSetpoint()} is true. Defaults to true; set to false for mechanisms that must keep
+     * holding position, e.g. an elevator.
+     */
+    public void setDisableAtSetpoint(boolean disableAtSetpoint) {
+        this.disableAtSetpoint = disableAtSetpoint;
+    }
+
+    /**
+     * Limits every setpoint passed to {@link #setSetpoint(double)} to {@code [min, max]}.
+     * Unlimited by default.
+     */
+    public void setInputRange(double min, double max) {
+        inputMin = min;
+        inputMax = max;
     }
 
     /**
@@ -261,11 +283,12 @@ public abstract class MechanismBase extends SubsystemBase {
     }
 
     /**
-     * Sets power to motors.
+     * Sets power to motors. Disables PID control.
      *
      * @param power The power to set the motors to between -1 and 1.
      */
     public void run(double power) {
+        disable();
         for (NAR_Motor motor : motors) {
             motor.set(power);
         }
@@ -282,11 +305,12 @@ public abstract class MechanismBase extends SubsystemBase {
     }
 
     /**
-     * Sets voltage to motors.
+     * Sets voltage to motors. Disables PID control.
      *
      * @param volts The voltage to set the motors to.
      */
     public void runVolts(double volts) {
+        disable();
         for (NAR_Motor motor : motors) {
             motor.setVolts(volts);
         }
@@ -327,6 +351,7 @@ public abstract class MechanismBase extends SubsystemBase {
      * Resets every motor's position to {@code position}.
      */
     public void reset(double position) {
+        disable();
         for (NAR_Motor motor : motors) {
             motor.resetPosition(position);
         }
