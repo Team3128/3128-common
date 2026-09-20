@@ -199,7 +199,7 @@ public abstract class MechanismBase extends SubsystemBase {
 
     /**
      * Called when the safety timeout is reached.
-     * Disables the PID control.
+     * Disables the PID control and stops the motors.
      */
     public void onSafetyTimeout(){
         Log.unusual(getName(), "Safety Timeout Reached");
@@ -223,7 +223,7 @@ public abstract class MechanismBase extends SubsystemBase {
     }
 
     /**
-     * Sets whether PID control disables itself (leaving the motors at their last output) once
+     * Sets whether PID control disables itself (stopping the motors) once
      * {@link #atSetpoint()} is true. Defaults to true; set to false for mechanisms that must keep
      * holding position, e.g. an elevator.
      */
@@ -267,8 +267,13 @@ public abstract class MechanismBase extends SubsystemBase {
         Log.debug(Log.Type.CONTROLLER, getName(), "Enabled PID");
     }
 
-    /** Disables the PID control. Sets output to zero. */
+    /** Disables the PID control. If it was running, also stops the motors so they don't hold their last output. */
     public void disable() {
+        if (enabled) {
+            for (NAR_Motor motor : motors) {
+                motor.set(0);
+            }
+        }
         enabled = false;
         Log.debug(Log.Type.CONTROLLER, getName(), "Disabled PID");
     }
