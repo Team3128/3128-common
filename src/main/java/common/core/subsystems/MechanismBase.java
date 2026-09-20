@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleBinaryOperator;
+import java.util.function.DoubleConsumer;
 import java.util.function.DoubleSupplier;
 
 import common.core.controllers.PIDFFConfig;
@@ -47,6 +48,8 @@ public abstract class MechanismBase extends SubsystemBase {
 
     /** Computes controller output from (measurement, setpoint), e.g. {@code pid::calculate}. */
     private final DoubleBinaryOperator feedback;
+    /** Resets the controller's internal state, given the current measurement. */
+    private final DoubleConsumer resetController;
     private final DoubleSupplier measurement;
     private final double tolerance;
 
@@ -65,18 +68,23 @@ public abstract class MechanismBase extends SubsystemBase {
     /**
      * @param gains Feedforward gains; also handed to {@link #calculateFeedforward(double)}.
      * @param feedback The WPILib controller's {@code calculate(measurement, setpoint)} method reference.
+     * @param resetController Resets the controller's internal state (integral, previous error, profile) given the
+     *                        current measurement; called when the mechanism goes from disabled to enabled. Use
+     *                        {@code m -> pid.reset()} for a {@code PIDController}, {@code profiled::reset} for a
+     *                        {@code ProfiledPIDController}, or {@code m -> {}} for a {@code BangBangController}.
      * @param measurement Supplies the mechanism's current measurement, e.g. {@code leader::getPosition}.
      * @param tolerance Error tolerance for {@link #atSetpoint()}.
      * @param motorConfig Hardware configuration applied to every motor.
      * @param motors The motor(s) driven by this mechanism. Output is applied to all of them.
      */
-    public MechanismBase(PIDFFConfig gains, DoubleBinaryOperator feedback, DoubleSupplier measurement,
-                          double tolerance, MotorConfig motorConfig, NAR_Motor... motors) {
+    public MechanismBase(PIDFFConfig gains, DoubleBinaryOperator feedback, DoubleConsumer resetController,
+                          DoubleSupplier measurement, double tolerance, MotorConfig motorConfig, NAR_Motor... motors) {
         requireNonNullParam(motors, "motors", "MechanismBase");
         requireNonNullParam(gains, "gains", "MechanismBase");
 
         this.gains = gains;
         this.feedback = feedback;
+        this.resetController = resetController;
         this.measurement = measurement;
         this.tolerance = tolerance;
         this.motorConfig = motorConfig;
@@ -93,7 +101,7 @@ public abstract class MechanismBase extends SubsystemBase {
      * or {@link #runVolts(double)} directly.
      */
     public MechanismBase(MotorConfig motorConfig, NAR_Motor... motors) {
-        this(new PIDFFConfig(), null, null, 0, motorConfig, motors);
+        this(new PIDFFConfig(), null, null, null, 0, motorConfig, motors);
     }
 
     public void invertMotor(int motorIndex) {
@@ -219,9 +227,10 @@ public abstract class MechanismBase extends SubsystemBase {
         return Math.abs(measurement.getAsDouble() - setpointValue) < tolerance;
     }
 
-    /** Enables the PID control. */
+    /** Enables the PID control. Resets the controller if it was previously disabled. */
     public void enable() {
         requireNonNullParam(feedback, "feedback", "MechanismBase.enable");
+        if (!enabled) resetController.accept(measurement.getAsDouble());
         enabled = true;
         safetyTimer.restart();
         Log.debug(Log.Type.CONTROLLER, getName(), "Enabled PID");
