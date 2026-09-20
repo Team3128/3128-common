@@ -215,7 +215,30 @@ public class PIDFFConfig {
         return kG_Function;
     }
 
-    public double getFF() {
-        return getkS() + getkV() + getkA() + getkG();
+    /**
+     * Feedforward for a position-controlled mechanism: static + gravity gain only.
+     * <p>Does not include kV/kA, since the setpoint here is a position, not a velocity.
+     *
+     * @param pidOutput The PID controller's output this cycle, used to sign kS.
+     * @param atSetpoint Whether the mechanism is currently at its setpoint (suppresses kS to avoid dithering).
+     */
+    public double positionFF(double pidOutput, boolean atSetpoint) {
+        final double staticGain = atSetpoint ? 0 : Math.copySign(getkS(), pidOutput);
+        final double gravityGain = getkG() * getkG_Function().getAsDouble();
+        return staticGain + gravityGain;
+    }
+
+    /**
+     * Feedforward for a velocity-controlled mechanism: static + velocity + gravity gain.
+     *
+     * @param setpoint The velocity setpoint.
+     * @param pidOutput The PID controller's output this cycle, used to sign kS.
+     * @param atSetpoint Whether the mechanism is currently at its setpoint (suppresses kS to avoid dithering).
+     */
+    public double velocityFF(double setpoint, double pidOutput, boolean atSetpoint) {
+        final double staticGain = atSetpoint ? 0 : Math.copySign(getkS(), pidOutput);
+        final double velocityGain = getkV() * setpoint;
+        final double gravityGain = getkG() * getkG_Function().getAsDouble();
+        return staticGain + velocityGain + gravityGain;
     }
 }
