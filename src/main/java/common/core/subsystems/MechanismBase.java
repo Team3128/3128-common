@@ -81,6 +81,12 @@ public abstract class MechanismBase extends SubsystemBase {
                           DoubleSupplier measurement, double tolerance, MotorConfig motorConfig, NAR_Motor... motors) {
         requireNonNullParam(motors, "motors", "MechanismBase");
         requireNonNullParam(gains, "gains", "MechanismBase");
+        if (motors.length == 0) {
+            throw new IllegalArgumentException("MechanismBase requires at least one motor");
+        }
+        for (int i = 0; i < motors.length; i++) {
+            requireNonNullParam(motors[i], "motors[" + i + "]", "MechanismBase");
+        }
 
         this.gains = gains;
         this.feedback = feedback;
@@ -102,7 +108,7 @@ public abstract class MechanismBase extends SubsystemBase {
      * The measurement defaults to the first motor's position so Shuffleboard widgets still work.
      */
     public MechanismBase(MotorConfig motorConfig, NAR_Motor... motors) {
-        this(new PIDFFConfig(), null, null, motors[0]::getPosition, 0, motorConfig, motors);
+        this(new PIDFFConfig(), null, null, () -> motors[0].getPosition(), 0, motorConfig, motors);
     }
 
     public void invertMotor(int motorIndex) {
