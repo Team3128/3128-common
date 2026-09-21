@@ -62,11 +62,6 @@ public class Camera2 {
         enabled = false;
     }
 
-    // public void setThresholds(double minDistThreshold, double maxDistThreshold) {
-    //     this.minDistThreshold = minDistThreshold;
-    //     this.maxDistThreshold = maxDistThreshold;
-    // }
-
     public void setThresholds(double minDistThreshold, double maxDistThreshold, double ambiguityThreshold) {
         this.minDistThreshold = minDistThreshold;
         this.ambiguityThreshold = ambiguityThreshold;
