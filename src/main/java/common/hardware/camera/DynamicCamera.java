@@ -18,7 +18,6 @@ public class DynamicCamera {
 
     //static variables
     public static final LinkedList<DynamicCamera> dynamicCameras = new LinkedList<DynamicCamera>();
-    private static double minDistThreshold = 0, maxDistThreshold = 100, ambiguityThreshold = 0.2;
     public static boolean enabled = true;
 
     //dynamic camera related variables
@@ -30,6 +29,7 @@ public class DynamicCamera {
     private double yOffset;
     private Supplier<Rotation2d> angularOffset;
     private Supplier<Pose2d> robotPose2d;
+    private double minDistThreshold = 0, maxDistThreshold = 100, ambiguityThreshold = 0.2;
 
     // estConsumer sends estimated poses to the SwerveBase where they are factored into the robot's odometry
     //not dynamic constructor
@@ -66,9 +66,9 @@ public class DynamicCamera {
 
             for (var result : dynamicCamera.photonCamera.getAllUnreadResults()) {
                 for (int i = 0; i < result.targets.size(); i++) {
-                    if (result.targets.get(i).poseAmbiguity > ambiguityThreshold 
-                    || result.targets.get(i).bestCameraToTarget.getTranslation().getNorm() < minDistThreshold 
-                    || result.targets.get(i).bestCameraToTarget.getTranslation().getNorm() > maxDistThreshold) 
+                    if (result.targets.get(i).poseAmbiguity > dynamicCamera.ambiguityThreshold 
+                    || result.targets.get(i).bestCameraToTarget.getTranslation().getNorm() < dynamicCamera.minDistThreshold 
+                    || result.targets.get(i).bestCameraToTarget.getTranslation().getNorm() > dynamicCamera.maxDistThreshold) 
                     {
                         result.targets.remove(i);
                         i--;
@@ -84,14 +84,14 @@ public class DynamicCamera {
                 if (curEst.isPresent()) {
                     Pose2d dynamicPose = curEst.get().estimatedPose.toPose2d();
                     double timeStamp = curEst.get().timestampSeconds;
-
+                    
                     if (dynamicCamera.isDynamic) {
                         //the dynamic pose you had was center of the turret
                         Pose2d currentRobotPose2d = dynamicCamera.robotPose2d.get();
 
                         Rotation2d newRotation = dynamicPose.getRotation().plus(dynamicCamera.angularOffset.get());
-                        double newX = dynamicPose.getX() - dynamicCamera.xOffset * dynamicPose.getRotation().getCos();
-                        double newY = dynamicPose.getY() - dynamicCamera.yOffset * dynamicPose.getRotation().getSin();
+                        double newX = dynamicPose.getX() - dynamicCamera.xOffset * newRotation.getCos();
+                        double newY = dynamicPose.getY() - dynamicCamera.yOffset * newRotation.getSin();
 
                         //the line below modifies the result to make it centered at teh robot
                         dynamicPose = new Pose2d(newX, newY, newRotation);
@@ -104,10 +104,10 @@ public class DynamicCamera {
         }
     }
 
-    public static void setThresholds(double newMinDistThreshold, double newMaxDistThreshold, double newAmbiguityThreshold) {
-        minDistThreshold = newMinDistThreshold;
-        ambiguityThreshold = newAmbiguityThreshold;
-        maxDistThreshold = newMaxDistThreshold;
+    public void setThresholds(double newMinDistThreshold, double newMaxDistThreshold, double newAmbiguityThreshold) {
+        this.minDistThreshold = newMinDistThreshold;
+        this.maxDistThreshold = newMaxDistThreshold;
+        this.ambiguityThreshold = newAmbiguityThreshold;
     }
 
     public static void enable() {
