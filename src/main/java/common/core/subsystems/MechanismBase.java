@@ -46,7 +46,10 @@ public abstract class MechanismBase extends SubsystemBase {
             controller.addMotor(motors[i]);
             motors[i].configMotor(m_config);
         }
+
+        setpoint = ()->controller.getSetpoint();
     }
+
 
     public void invertMotor(int motorIndex){
         motors[motorIndex].setInverted(!config.inverted);
@@ -88,7 +91,7 @@ public abstract class MechanismBase extends SubsystemBase {
         if (controller.isEnabled()) {
             controller.useOutput();
             if (safetyTimer.hasElapsed(safetyThresh)) onSafetyTimeout();
-            if (atSetpoint()) {
+            if (controller.atSetpoint()) {
                 safetyTimer.restart();
                 NAR_Shuffleboard.addData(getName(), "AtSetpoint", true, 1, 0);
                 disable();
@@ -96,8 +99,11 @@ public abstract class MechanismBase extends SubsystemBase {
         }
 
         NAR_Shuffleboard.addData(getName(), "Velocity", motors[0].getVelocity(), 5, 1);
-        NAR_Shuffleboard.addData(getName(), "Setpoint", setpoint, 1, 1);
-        NAR_Shuffleboard.addData(getName(), "Setpoint Graph", setpoint, 8, 0, 2, 2).withWidget(BuiltInWidgets.kGraph);
+        NAR_Shuffleboard.addData(getName(), "Measurement", controller.getMeasurement(), 5, 2);
+        NAR_Shuffleboard.addData(getName(), "Output", motors[0].getAppliedOutput(), 5, 3);
+        NAR_Shuffleboard.addData(getName(), "Setpoint", ()->setpoint.getAsDouble(), 1, 1);
+        NAR_Shuffleboard.addData(getName(), "AtSetpoint", ()->controller.atSetpoint(), 1, 2);
+        NAR_Shuffleboard.addData(getName(), "Setpoint Graph", ()->setpoint.getAsDouble(), 8, 0, 2, 2).withWidget(BuiltInWidgets.kGraph);
     }
 
     /**

@@ -29,6 +29,16 @@ public class VelocityController extends ControllerBase implements AutoCloseable 
     }
 
     @Override
+    public double getSetpoint() {
+        return controller.getSetpoint();
+    }
+
+    @Override
+    public boolean atSetpoint() {
+        return controller.atSetpoint();
+    }
+
+    @Override
     public void setTolerance(double tolerance) {
         super.setTolerance(tolerance);
         controller.setTolerance(tolerance);

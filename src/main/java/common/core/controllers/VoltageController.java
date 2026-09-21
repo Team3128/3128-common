@@ -32,6 +32,16 @@ public class VoltageController extends ControllerBase implements AutoCloseable {
     }
 
     @Override
+    public double getSetpoint() {
+        return setpoint;
+    }
+
+    @Override
+    public boolean atSetpoint() {
+        return true;
+    }
+
+    @Override
     public void setTolerance(double tolerance) {
         super.setTolerance(tolerance);
     }
