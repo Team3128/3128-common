@@ -3,6 +3,7 @@ package common.hardware.camera;
 import java.util.LinkedList;
 import java.util.Optional;
 import java.util.function.BiConsumer;
+import java.util.function.Supplier;
 
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
@@ -10,6 +11,7 @@ import org.photonvision.PhotonPoseEstimator;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform3d;
 
 public class DynamicCamera {
@@ -24,13 +26,34 @@ public class DynamicCamera {
     private final PhotonPoseEstimator poseEstimator;
     private final BiConsumer<Pose2d, Double> estConsumer;
     private final boolean isDynamic;
+    private double xOffset;
+    private double yOffset;
+    private Supplier<Rotation2d> angularOffset;
+    private Supplier<Pose2d> robotPose2d;
 
     // estConsumer sends estimated poses to the SwerveBase where they are factored into the robot's odometry
-    public DynamicCamera(String cameraName, Boolean isDynamic, Transform3d robotToCam, AprilTagFieldLayout tagLayout, BiConsumer<Pose2d, Double> estConsumer) {
+    //not dynamic constructor
+    public DynamicCamera(String cameraName, Transform3d robotToCam, AprilTagFieldLayout tagLayout, BiConsumer<Pose2d, Double> estConsumer) {
         this.photonCamera = new PhotonCamera(cameraName);
         this.poseEstimator = new PhotonPoseEstimator(tagLayout, robotToCam);
         this.estConsumer = estConsumer;
-        this.isDynamic = isDynamic;
+        this.isDynamic = false;
+
+        dynamicCameras.add(this);
+    }
+
+    //dynamic constructor
+    public DynamicCamera(String cameraName, Transform3d robotToCam, AprilTagFieldLayout tagLayout, BiConsumer<Pose2d, Double> estConsumer, double xOffset, double yOffset, Supplier<Rotation2d> angularOffset, Supplier<Pose2d> robotPose2d) {
+        this.photonCamera = new PhotonCamera(cameraName);
+        this.poseEstimator = new PhotonPoseEstimator(tagLayout, robotToCam);
+        this.estConsumer = estConsumer;
+        this.isDynamic = true;
+        
+        this.xOffset = xOffset;
+        this.yOffset = yOffset;
+        this.angularOffset = angularOffset;
+
+        this.robotPose2d = robotPose2d;
 
         dynamicCameras.add(this);
     }
@@ -63,7 +86,15 @@ public class DynamicCamera {
                     double timeStamp = curEst.get().timestampSeconds;
 
                     if (dynamicCamera.isDynamic) {
-                        dynamicPose = new Pose2d();
+                        //the dynamic pose you had was center of the turret
+                        Pose2d currentRobotPose2d = dynamicCamera.robotPose2d.get();
+
+                        Rotation2d newRotation = dynamicPose.getRotation().plus(dynamicCamera.angularOffset.get());
+                        double newX = dynamicPose.getX() - dynamicCamera.xOffset * dynamicPose.getRotation().getCos();
+                        double newY = dynamicPose.getY() - dynamicCamera.yOffset * dynamicPose.getRotation().getSin();
+
+                        //the line below modifies the result to make it centered at teh robot
+                        dynamicPose = new Pose2d(newX, newY, newRotation);
                         dynamicCamera.estConsumer.accept(dynamicPose, timeStamp);
                     } else {
                         dynamicCamera.estConsumer.accept(dynamicPose, timeStamp);
