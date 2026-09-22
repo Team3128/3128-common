@@ -29,6 +29,9 @@ public class VoltageController extends ControllerBase implements AutoCloseable {
     @Override
     public void setSetpoint(double setpoint) {
         this.setpoint = setpoint;
+        for (NAR_Motor motor : motors) {
+            motor.setVolts(setpoint);
+        }
     }
 
     @Override

@@ -103,6 +103,7 @@ public abstract class MechanismBase extends SubsystemBase {
         NAR_Shuffleboard.addData(getName(), "Output", motors[0].getAppliedOutput(), 5, 3);
         NAR_Shuffleboard.addData(getName(), "Setpoint", ()->setpoint.getAsDouble(), 1, 1);
         NAR_Shuffleboard.addData(getName(), "AtSetpoint", ()->controller.atSetpoint(), 1, 2);
+        NAR_Shuffleboard.addData(getName(), "isEnabled", ()->controller.isEnabled(), 1, 3);
         NAR_Shuffleboard.addData(getName(), "Setpoint Graph", ()->setpoint.getAsDouble(), 8, 0, 2, 2).withWidget(BuiltInWidgets.kGraph);
     }
 
