@@ -1,6 +1,7 @@
 package common.core.controllers;
 import edu.wpi.first.math.VecBuilder;
 import common.hardware.motorcontroller.NAR_Motor;
+import common.utility.Log;
 import edu.wpi.first.math.controller.LinearQuadraticRegulator;
 import edu.wpi.first.math.estimator.KalmanFilter;
 import edu.wpi.first.math.numbers.N1;
@@ -16,6 +17,7 @@ import edu.wpi.first.math.Num;
 public class VelocitySSController<N extends Num> extends ControllerBase {
     public NAR_Motor motor;
     public LinearSystemLoop<N1, N1, N1> loop;
+    public double setpoint;
     
     public VelocitySSController(PIDFFConfig config, Vector<N1> stateSTD, Vector<N1> measurementSTD, Vector<N1> qelms, Vector<N1> relms, double tolerance) {
         super(config, tolerance);
@@ -28,17 +30,27 @@ public class VelocitySSController<N extends Num> extends ControllerBase {
 
     @Override
     public void setSetpoint(double setpoint) {
+        Log.info("Test", setpoint);
+        Log.info("AtSetpoint", Boolean.toString(atSetpoint()));
+        this.setpoint = setpoint;
         this.loop.setNextR(VecBuilder.fill(setpoint));
     }
 
     @Override
     public void useOutput() {
         if (isEnabled() && atSetpoint()) disable();
+
+        if (isEnabled()) {
         this.loop.correct(VecBuilder.fill(getMeasurement()));
         this.loop.predict(0.020);
-        final double output = MathUtil.clamp(this.loop.getU(0), -12, 12);
+        final double output = MathUtil.clamp(this.loop.getU(0), -1, 1);
         for (NAR_Motor motor : getMotors()) {
+            Log.info("AtSetpoint", Boolean.toString(atSetpoint()));
+            Log.info("Test" , output);
             motor.setVolts(output);
+        }} else {
+            Log.info("AtSetpoint", Boolean.toString(atSetpoint()));
+            reset();
         }
     }
 
@@ -49,17 +61,21 @@ public class VelocitySSController<N extends Num> extends ControllerBase {
 
     @Override
     public double getSetpoint() {
-       return this.loop.getNextR(0);
+        return this.setpoint;
     }
 
     @Override
     public double getMeasurement() {
+        Log.info("Velocity", motor.getVelocity());
         return motor.getVelocity();
     }
 
     @Override
     public boolean atSetpoint() {
-        return VecBuilder.fill(getMeasurement()).minus(getSetpoint()).normF() < tolerance;
+        
+        Log.info("current", getMeasurement());
+        Log.info("target", getSetpoint());
+        return Math.pow(getMeasurement() - getSetpoint(), 2) < Math.pow(tolerance, 2);
     }
 
     @Override
