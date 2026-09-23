@@ -1,6 +1,7 @@
 package common.core.controllers;
 
 import common.hardware.motorcontroller.NAR_Motor;
+import common.utility.Log;
 import edu.wpi.first.math.controller.PIDController;
 
 public class VelocityController extends ControllerBase implements AutoCloseable {

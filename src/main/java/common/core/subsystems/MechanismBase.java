@@ -7,6 +7,7 @@ import java.util.function.DoubleSupplier;
 
 import common.core.controllers.ControllerBase;
 import common.core.controllers.PositionController;
+import common.core.controllers.VelocityController;
 import common.hardware.motorcontroller.NAR_Motor;
 import common.hardware.motorcontroller.NAR_Motor.MotorConfig;
 import common.utility.Log;
@@ -28,6 +29,8 @@ public abstract class MechanismBase extends SubsystemBase {
     private double safetyThresh;
     private Timer safetyTimer = new Timer();
     private MotorConfig config;
+    private double plateau=1;
+    private double plateauCount=0;
 
     protected BooleanSupplier debug;
     protected DoubleSupplier setpoint;
@@ -39,6 +42,9 @@ public abstract class MechanismBase extends SubsystemBase {
         this.config = m_config;
         this.motors = motors;
         this.safetyThresh = 5;
+        if(controller instanceof VelocityController){
+            plateau=10;
+        }
 
         requireNonNullParam(motors, "motors", "MechanismBase");
         controller.setMeasurementSource(motors[0]);
@@ -92,11 +98,16 @@ public abstract class MechanismBase extends SubsystemBase {
             controller.useOutput();
             if (safetyTimer.hasElapsed(safetyThresh)) onSafetyTimeout();
             if (controller.atSetpoint()) {
-                safetyTimer.restart();
-                NAR_Shuffleboard.addData(getName(), "AtSetpoint", true, 1, 0);
-                disable();
+                plateauCount++;
+                if(plateauCount>= plateau){
+                    plateauCount = 0;
+                    safetyTimer.restart();
+                    NAR_Shuffleboard.addData(getName(), "AtSetpoint", true, 1, 0);
+                    disable();
+                }
             }
         }
+        else if(motors[0].getAppliedOutput()!=0) disable();
 
         NAR_Shuffleboard.addData(getName(), "Velocity", motors[0].getVelocity(), 5, 1);
         NAR_Shuffleboard.addData(getName(), "Measurement", controller.getMeasurement(), 5, 2);
@@ -104,6 +115,7 @@ public abstract class MechanismBase extends SubsystemBase {
         NAR_Shuffleboard.addData(getName(), "Setpoint", ()->setpoint.getAsDouble(), 1, 1);
         NAR_Shuffleboard.addData(getName(), "AtSetpoint", ()->controller.atSetpoint(), 1, 2);
         NAR_Shuffleboard.addData(getName(), "isEnabled", ()->controller.isEnabled(), 1, 3);
+        NAR_Shuffleboard.addData(getName(), "Safety timer", ()->safetyTimer.get(), 1, 3);
         NAR_Shuffleboard.addData(getName(), "Setpoint Graph", ()->setpoint.getAsDouble(), 8, 0, 2, 2).withWidget(BuiltInWidgets.kGraph);
     }
 
@@ -187,6 +199,7 @@ public abstract class MechanismBase extends SubsystemBase {
     /** Disables the PID control. Sets output to zero. */
     public void disable() {
         controller.disable();
+        safetyTimer.reset();
         Log.debug(Log.Type.CONTROLLER, getName(), "Disabled PID");
     }
 
