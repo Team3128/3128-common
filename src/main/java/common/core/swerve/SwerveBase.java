@@ -5,6 +5,7 @@ import java.util.function.DoubleSupplier;
 
 import common.hardware.motorcontroller.NAR_Motor;
 import common.hardware.motorcontroller.NAR_Motor.Control;
+import common.utility.Log;
 import common.utility.narwhaldashboard.NarwhalDashboard;
 import common.utility.shuffleboard.NAR_Shuffleboard;
 import common.utility.sysid.CmdSysId;
@@ -49,10 +50,9 @@ public abstract class SwerveBase extends SubsystemBase {
             new SwerveModule(configs[2]),
             new SwerveModule(configs[3])
         };
-        Timer.delay(1.5);
+        // Timer.delay(1.5);
 
         resetEncoders();
-
         odometry = new SwerveDrivePoseEstimator(kinematics, new Rotation2d(), getPositions(),
                                                 estimatedPose, stateStdDevs, visionMeasurementDevs);
     }
@@ -99,9 +99,10 @@ public abstract class SwerveBase extends SubsystemBase {
      * @param velocity requested velocity
      */
     public void assign(ChassisSpeeds velocity) {
+        velocity = new ChassisSpeeds(velocity.vxMetersPerSecond * throttle, velocity.vyMetersPerSecond * throttle, velocity.omegaRadiansPerSecond);
         if(fieldRelative) velocity = ChassisSpeeds.fromFieldRelativeSpeeds(velocity, getGyroRotation2d()); // convert to field relative if applicable
         if(chassisVelocityCorrection) velocity = ChassisSpeeds.discretize(velocity, dtConstant);
-        setModuleStates(kinematics.toSwerveModuleStates(velocity.times(throttle)));
+        setModuleStates(kinematics.toSwerveModuleStates(velocity/*.times(throttle)*/));
     }
 
     public void stop() {

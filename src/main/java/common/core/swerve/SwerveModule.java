@@ -15,6 +15,7 @@ import common.core.controllers.PIDFFConfig;
 import common.core.swerve.SwerveModuleConfig.SwerveEncoderConfig;
 import common.core.swerve.SwerveModuleConfig.SwerveMotorConfig;
 import common.hardware.motorcontroller.NAR_Motor;
+import common.hardware.motorcontroller.NAR_TalonFX;
 import common.hardware.motorcontroller.NAR_Motor.Control;
 import common.hardware.motorcontroller.NAR_Motor.Neutral;
 import common.utility.narwhaldashboard.NarwhalDashboard.State;
@@ -132,7 +133,8 @@ public class SwerveModule {
      * @param desiredState The desired state with a velocity and angular component
      */
     private void setSpeed(SwerveModuleState desiredState) {
-        driveMotor.set(desiredState.speedMetersPerSecond, Control.Velocity, feedforward.calculate(desiredState.speedMetersPerSecond));
+        // driveMotor.set(desiredState.speedMetersPerSecond, Control.Velocity, feedforward.calculate(desiredState.speedMetersPerSecond));
+        ((NAR_TalonFX) driveMotor).setVelocityFOC2(desiredState.speedMetersPerSecond, feedforward.calculate(desiredState.speedMetersPerSecond));
     }
 
     /**

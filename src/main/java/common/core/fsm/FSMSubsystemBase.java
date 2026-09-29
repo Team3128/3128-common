@@ -9,6 +9,7 @@ import common.hardware.motorcontroller.NAR_Motor.Neutral;
 import common.utility.Log;
 import common.utility.shuffleboard.NAR_Shuffleboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -52,6 +53,11 @@ public abstract class FSMSubsystemBase<S extends Enum<S>> extends SubsystemBase 
             NAR_Shuffleboard.addData(this.getName(), state.name(), ()-> stateEquals(state), (state.ordinal() % 8), state.ordinal() / 8 + 1);
         }
     }
+
+    public void overrideState(S nextState) {
+        previousState = currentState;
+        currentState = nextState;
+    }
     
     public void setState(S nextState) {
         if(transitionMap.isEmpty()) {
@@ -68,14 +74,10 @@ public abstract class FSMSubsystemBase<S extends Enum<S>> extends SubsystemBase 
         Transition<S> transition = transitionMap.getTransition(getState(), nextState);
         
         // if not the same state
-        if(!stateEquals(nextState)) requestTransition = transition;
-        else {
-            Log.debug(Log.Type.STATE_MACHINE_SECONDARY, getName(), "Invalid Transition: Requested state already reached");
-            return;
-        }
+        requestTransition = transition;
 
         // if invalid trnasition
-        if(transition == null) {
+        if(transition == null || transition.getCommand() == null) {
             Log.unusual(getName(), "Invalid Transition: Requested transition null");
             return;
         }
@@ -91,7 +93,7 @@ public abstract class FSMSubsystemBase<S extends Enum<S>> extends SubsystemBase 
 
         Log.debug(Log.Type.STATE_MACHINE_SECONDARY, getName(), "Scheduling transition...");
         currentTransition = transition;
-        currentTransition.getCommand().schedule();
+        CommandScheduler.getInstance().schedule(currentTransition.getCommand());
         previousState = currentState;
         currentState = nextState;
         return;
@@ -102,12 +104,7 @@ public abstract class FSMSubsystemBase<S extends Enum<S>> extends SubsystemBase 
     }
 
     public boolean stateEquals(S otherState) {
-        if(currentState == null) return false;
-        if(otherState == null) {
-            Log.recoverable(getName(), "Null state passed");
-            return false;
-        }
-        return currentState.name().equals(otherState.name()) && !isTransitioning();
+        return getState() == otherState;
     }
 
     @SuppressWarnings("unchecked")
