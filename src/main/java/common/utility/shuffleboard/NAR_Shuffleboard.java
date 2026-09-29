@@ -7,7 +7,7 @@ import java.util.function.DoubleSupplier;
 import java.util.function.LongSupplier;
 import java.util.function.Supplier;
 
-import com.ctre.phoenix.sensors.WPI_PigeonIMU;
+// import com.ctre.phoenix.sensors.WPI_PigeonIMU;
 
 import common.core.misc.NAR_Robot;
 import edu.wpi.first.math.controller.PIDController;
@@ -220,7 +220,7 @@ public class NAR_Shuffleboard {
     public static ComplexWidget addSendable(String tabName, String name, Sendable data, int x, int y) {
         if (data instanceof SubsystemBase) return addSendable(tabName, name, data, x, y, 2, 1);
         if (data instanceof PIDController) return addSendable(tabName, name, data, x, y, 1, 2);
-        if (data instanceof WPI_PigeonIMU) return addSendable(tabName, name, data, x, y, 2, 2);
+        // if (data instanceof WPI_PigeonIMU) return addSendable(tabName, name, data, x, y, 2, 2);
         return addSendable(tabName, name, data, x, y, 1, 1); // Default width and height
     }
 
