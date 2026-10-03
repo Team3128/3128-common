@@ -7,7 +7,7 @@ public class BangBangController extends ControllerBase {
 
     private edu.wpi.first.math.controller.BangBangController controller;
 
-    public BangBangController(PIDFFConfig config, double tolerance) {
+    public BangBangController(PIDFFConfig config, double tolerance, edu.wpi.first.math.controller.BangBangController controller) {
         super(config, tolerance);
     }
 
