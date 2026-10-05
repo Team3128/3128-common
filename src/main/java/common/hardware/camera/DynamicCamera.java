@@ -28,7 +28,6 @@ public class DynamicCamera {
     private double xOffset;
     private double yOffset;
     private Supplier<Rotation2d> angularOffset;
-    private Supplier<Pose2d> robotPose2d;
     private double minDistThreshold = 0, maxDistThreshold = 100, ambiguityThreshold = 0.2;
 
     // estConsumer sends estimated poses to the SwerveBase where they are factored into the robot's odometry
@@ -43,7 +42,8 @@ public class DynamicCamera {
     }
 
     //dynamic constructor
-    public DynamicCamera(String cameraName, Transform3d robotToCam, AprilTagFieldLayout tagLayout, BiConsumer<Pose2d, Double> estConsumer, double xOffset, double yOffset, Supplier<Rotation2d> angularOffset, Supplier<Pose2d> robotPose2d) {
+
+    public DynamicCamera(String cameraName, Transform3d robotToCam, AprilTagFieldLayout tagLayout, BiConsumer<Pose2d, Double> estConsumer, double xOffset, double yOffset, Supplier<Rotation2d> angularOffset) {
         this.photonCamera = new PhotonCamera(cameraName);
         this.poseEstimator = new PhotonPoseEstimator(tagLayout, robotToCam);
         this.estConsumer = estConsumer;
@@ -52,8 +52,6 @@ public class DynamicCamera {
         this.xOffset = xOffset;
         this.yOffset = yOffset;
         this.angularOffset = angularOffset;
-
-        this.robotPose2d = robotPose2d;
 
         dynamicCameras.add(this);
     }
@@ -86,9 +84,6 @@ public class DynamicCamera {
                     double timeStamp = curEst.get().timestampSeconds;
                     
                     if (dynamicCamera.isDynamic) {
-                        //the dynamic pose you had was center of the turret
-                        Pose2d currentRobotPose2d = dynamicCamera.robotPose2d.get();
-
                         Rotation2d newRotation = dynamicPose.getRotation().plus(dynamicCamera.angularOffset.get());
                         double newX = dynamicPose.getX() - dynamicCamera.xOffset * newRotation.getCos();
                         double newY = dynamicPose.getY() - dynamicCamera.yOffset * newRotation.getSin();
