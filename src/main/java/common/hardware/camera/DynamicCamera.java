@@ -13,6 +13,7 @@ import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation2d;
 
 public class DynamicCamera {
 
@@ -25,8 +26,7 @@ public class DynamicCamera {
     private final PhotonPoseEstimator poseEstimator;
     private final BiConsumer<Pose2d, Double> estConsumer;
     private final boolean isDynamic;
-    private double xOffset;
-    private double yOffset;
+    private Translation2d offset;
     private Supplier<Rotation2d> angularOffset;
     private double minDistThreshold = 0, maxDistThreshold = 100, ambiguityThreshold = 0.2;
 
@@ -43,14 +43,13 @@ public class DynamicCamera {
 
     //dynamic constructor
 
-    public DynamicCamera(String cameraName, Transform3d robotToCam, AprilTagFieldLayout tagLayout, BiConsumer<Pose2d, Double> estConsumer, double xOffset, double yOffset, Supplier<Rotation2d> angularOffset) {
+    public DynamicCamera(String cameraName, Transform3d robotToCam, AprilTagFieldLayout tagLayout, BiConsumer<Pose2d, Double> estConsumer, Translation2d offset, Supplier<Rotation2d> angularOffset) {
         this.photonCamera = new PhotonCamera(cameraName);
         this.poseEstimator = new PhotonPoseEstimator(tagLayout, robotToCam);
         this.estConsumer = estConsumer;
         this.isDynamic = true;
         
-        this.xOffset = xOffset;
-        this.yOffset = yOffset;
+        this.offset = offset;
         this.angularOffset = angularOffset;
 
         dynamicCameras.add(this);
@@ -85,8 +84,8 @@ public class DynamicCamera {
                     
                     if (dynamicCamera.isDynamic) {
                         Rotation2d newRotation = dynamicPose.getRotation().plus(dynamicCamera.angularOffset.get());
-                        double newX = dynamicPose.getX() - dynamicCamera.xOffset * newRotation.getCos();
-                        double newY = dynamicPose.getY() - dynamicCamera.yOffset * newRotation.getSin();
+                        double newX = dynamicPose.getX() - dynamicCamera.offset.getX() * newRotation.getCos();
+                        double newY = dynamicPose.getY() - dynamicCamera.offset.getY() * newRotation.getSin();
 
                         //the line below modifies the result to make it centered at teh robot
                         dynamicPose = new Pose2d(newX, newY, newRotation);
