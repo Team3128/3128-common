@@ -2,6 +2,8 @@ package common.core.controllers;
 
 import java.util.function.DoubleSupplier;
 
+import common.utility.Log;
+
 /**
  * Stores PID and feedforward constants.
  */
@@ -216,6 +218,8 @@ public class PIDFFConfig {
     }
 
     public double getFF() {
-        return getkS() + getkV() + getkA() + getkG();
+        double FF = getkS() + getkV() + getkA() + getkG();
+        Log.info("getFF", FF);
+        return FF;
     }
 }

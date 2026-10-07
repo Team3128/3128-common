@@ -17,7 +17,7 @@ public class PositionController extends ControllerBase implements AutoCloseable 
 
     @Override
     protected double calculate(double measurement) {
-        return controller.calculate(measurement) + config.getFF();
+        return controller.calculate(measurement);
     }
 
     @Override
@@ -42,13 +42,11 @@ public class PositionController extends ControllerBase implements AutoCloseable 
 
     @Override
     public void setTolerance(double tolerance) {
-        super.setTolerance(tolerance);
         controller.setTolerance(tolerance);
     }
 
     @Override
     public void reset() {
-        super.reset();
         controller.reset();
     }
 
@@ -70,4 +68,5 @@ public class PositionController extends ControllerBase implements AutoCloseable 
     public double[] getInputRange() {
         return inputRange;
     }
+
 }
