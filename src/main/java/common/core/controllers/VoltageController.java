@@ -1,7 +1,6 @@
 package common.core.controllers;
 
 import common.hardware.motorcontroller.NAR_Motor;
-import edu.wpi.first.math.controller.PIDController;
 
 public class VoltageController extends ControllerBase implements AutoCloseable {
 
@@ -14,11 +13,8 @@ public class VoltageController extends ControllerBase implements AutoCloseable {
     }
 
     @Override
-    public void useOutput() {
-        if (isEnabled() && atSetpoint()) disable();
-        for (NAR_Motor motor : motors) {
-            motor.setVolts(setpoint);
-        }
+    protected double calculate(double measurement) {
+        return setpoint/12;
     }
 
     @Override
@@ -46,12 +42,10 @@ public class VoltageController extends ControllerBase implements AutoCloseable {
 
     @Override
     public void setTolerance(double tolerance) {
-        super.setTolerance(tolerance);
     }
 
     @Override
     public void reset() {
-        super.reset();
     }
 
     @Override

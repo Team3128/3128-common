@@ -13,7 +13,16 @@ public class BangBangController extends ControllerBase {
 
     @Override
     protected double calculate(double measurement) {
-        return controller.calculate(measurement) + config.getFF();
+        return controller.calculate(measurement) + calculateFF(controller.calculate(measurement));
+    }
+
+    @Override
+    public double calculateFF(double pidOutput){
+        if (atSetpoint()){
+            return config.getkS() + config.getkV() *getMeasurement();
+        } else {
+            return 0;
+        }
     }
 
     @Override
@@ -28,7 +37,6 @@ public class BangBangController extends ControllerBase {
 
     @Override
     public void setTolerance(double tolerance) {
-        super.setTolerance(tolerance);
         controller.setTolerance(tolerance);
     }
 
@@ -36,5 +44,14 @@ public class BangBangController extends ControllerBase {
     public void initSendable(SendableBuilder builder) {
         builder.setSmartDashboardType("BangBangController");
         builder.addDoubleProperty("setpoint", this::getSetpoint, this::setSetpoint);
+    }
+
+    @Override
+    public boolean atSetpoint() {
+        return controller.atSetpoint();
+    }
+
+    @Override
+    public void reset() {
     }
 }

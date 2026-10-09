@@ -1,7 +1,6 @@
 package common.core.controllers;
 
 import common.hardware.motorcontroller.NAR_Motor;
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 
@@ -35,13 +34,24 @@ public abstract class ControllerBase implements Sendable {
 
     public void setMeasurementSource(NAR_Motor motor) {}
 
-    protected double calculate(double measurement) { return 0; }
+    protected abstract double calculate(double measurement);
+
+    protected double calculateFF(double pidOutput){
+        final double staticGain = !atSetpoint() ? Math.copySign(config.getkS(), pidOutput) : 0;
+        final double velocityGain = config.getkV() * getSetpoint();
+        final double gravityGain = config.getkG() * config.getkG_Function().getAsDouble();
+        return staticGain + velocityGain + gravityGain;
+    }
 
     public void useOutput() {
-        if (isEnabled() && atSetpoint()) disable();
-        final double output = MathUtil.clamp(calculate(getMeasurement()), -12, 12);
-        for (NAR_Motor motor : motors) {
-            motor.setVolts(output);
+        if (atSetpoint()) {
+            disable();
+        }
+        else if (isEnabled()) {
+            final double output = calculate(getMeasurement()) + calculateFF(calculate(getMeasurement()));
+            for (NAR_Motor motor : motors) {
+                motor.set(output);
+            }
         }
     }
 
@@ -49,13 +59,9 @@ public abstract class ControllerBase implements Sendable {
         return measurement.getAsDouble();
     }
 
-    public void setTolerance(double tolerance) {
-        this.tolerance = tolerance;
-    }
+    public abstract void setTolerance(double tolerance);
 
-    public boolean atSetpoint() {
-        return Math.abs(getMeasurement() - getSetpoint()) < tolerance;
-    }
+    public abstract boolean atSetpoint();
 
     /**
      * Sets the setpoint for the PIDController.
@@ -76,11 +82,7 @@ public abstract class ControllerBase implements Sendable {
     }
 
     /** Resets the previous error and the integral term. */
-    public void reset() {
-        for (NAR_Motor motor : motors) {
-            motor.setVolts(0);
-        }
-    }
+    public abstract void reset();
 
     public PIDFFConfig getConfig() {
         return this.config;
@@ -97,6 +99,7 @@ public abstract class ControllerBase implements Sendable {
     public boolean isEnabled() {
         return enabled;
     }
+
 
     @Override
     public void initSendable(SendableBuilder builder) {

@@ -41,7 +41,7 @@ public abstract class MechanismBase extends SubsystemBase {
         this.controller = controller;
         this.config = m_config;
         this.motors = motors;
-        this.safetyThresh = 5;
+        this.safetyThresh = 100;
         if(controller instanceof VelocityController){
             plateau=10;
         }
@@ -98,20 +98,14 @@ public abstract class MechanismBase extends SubsystemBase {
             controller.useOutput();
             if (safetyTimer.hasElapsed(safetyThresh)) onSafetyTimeout();
             if (controller.atSetpoint()) {
-                plateauCount++;
-                if(plateauCount>= plateau){
-                    plateauCount = 0;
-                    safetyTimer.restart();
-                    NAR_Shuffleboard.addData(getName(), "AtSetpoint", true, 1, 0);
-                    disable();
-                }
+                safetyTimer.restart();
+                NAR_Shuffleboard.addData(getName(), "AtSetpoint", true, 1, 0);
+                disable();
             }
         }
-        else if(motors[0].getAppliedOutput()!=0) disable();
-
         NAR_Shuffleboard.addData(getName(), "Velocity", motors[0].getVelocity(), 5, 1);
         NAR_Shuffleboard.addData(getName(), "Measurement", controller.getMeasurement(), 5, 2);
-        NAR_Shuffleboard.addData(getName(), "Output", motors[0].getAppliedOutput(), 5, 3);
+        NAR_Shuffleboard.addData(getName(), "Output", motors[0].getAppliedOutput()*12, 5, 3);
         NAR_Shuffleboard.addData(getName(), "Setpoint", ()->setpoint.getAsDouble(), 1, 1);
         NAR_Shuffleboard.addData(getName(), "AtSetpoint", ()->controller.atSetpoint(), 1, 2);
         NAR_Shuffleboard.addData(getName(), "isEnabled", ()->controller.isEnabled(), 1, 3);
