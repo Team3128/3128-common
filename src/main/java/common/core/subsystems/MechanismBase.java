@@ -5,9 +5,8 @@ import java.util.List;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
-import common.core.controllers.ControllerBase;
-import common.core.controllers.PositionController;
-import common.core.controllers.VelocityController;
+import common.core.controllers.Controller;
+import common.core.controllers.Controller.Type;
 import common.hardware.motorcontroller.NAR_Motor;
 import common.hardware.motorcontroller.NAR_Motor.MotorConfig;
 import common.utility.Log;
@@ -24,27 +23,22 @@ import static edu.wpi.first.wpilibj2.command.Commands.*;
 
 public abstract class MechanismBase extends SubsystemBase {
 
-    protected ControllerBase controller;
+    protected Controller controller;
     protected NAR_Motor[] motors;
     private double safetyThresh;
     private Timer safetyTimer = new Timer();
     private MotorConfig config;
-    private double plateau=1;
-    private double plateauCount=0;
 
     protected BooleanSupplier debug;
     protected DoubleSupplier setpoint;
 
     protected static List<MechanismBase> instances = new ArrayList<>();
 
-    public MechanismBase(ControllerBase controller, MotorConfig m_config, NAR_Motor... motors) {
+    public MechanismBase(Controller controller, MotorConfig m_config, NAR_Motor... motors) {
         this.controller = controller;
         this.config = m_config;
         this.motors = motors;
         this.safetyThresh = 100;
-        if(controller instanceof VelocityController){
-            plateau=10;
-        }
 
         requireNonNullParam(motors, "motors", "MechanismBase");
         controller.setMeasurementSource(motors[0]);
@@ -118,7 +112,7 @@ public abstract class MechanismBase extends SubsystemBase {
      *
      * @return The Controller
      */
-    public ControllerBase getController() {
+    public Controller getController() {
         return controller;
     }
 
@@ -260,7 +254,8 @@ public abstract class MechanismBase extends SubsystemBase {
      */
     public void reset() {
         for (NAR_Motor motor : motors) {
-            motor.resetPosition(((PositionController) controller).getInputRange()[0]);
+            if(controller.getType() == Type.VELOCITY) motor.resetPosition(0);
+            motor.resetPosition(controller.getInputRange()[0]);
         }
     }
 
@@ -331,7 +326,7 @@ public abstract class MechanismBase extends SubsystemBase {
         NAR_Shuffleboard.addData(getName(), "Voltage", this::getVolts, x + 4, y + 3);
     }
 
-    private void FFWidgets(ControllerBase controller, int x, int y) {
+    private void FFWidgets(Controller controller, int x, int y) {
         controller.getConfig().setkS(NAR_Shuffleboard.debug(getName(), "kS", controller.getConfig().getkS(), x, y+2));
         controller.getConfig().setkV(NAR_Shuffleboard.debug(getName(), "kV", controller.getConfig().getkV(), x + 1, y+2));
         controller.getConfig().setkA(NAR_Shuffleboard.debug(getName(), "kA", controller.getConfig().getkA(), x + 1, y + 3));
