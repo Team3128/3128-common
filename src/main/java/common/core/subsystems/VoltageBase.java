@@ -1,0 +1,102 @@
+package common.core.subsystems;
+
+import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
+
+import java.util.List;
+import java.util.function.Consumer;
+
+import common.hardware.motorcontroller.NAR_Motor;
+import common.hardware.motorcontroller.NAR_Motor.MotorConfig;
+import common.hardware.motorcontroller.NAR_Motor.Neutral;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
+public abstract class VoltageBase extends SubsystemBase {
+    protected final List<NAR_Motor> motors;
+    private double currentThreshold;
+
+    public VoltageBase(MotorConfig config, double currentThreshold, NAR_Motor... motors){
+        requireNonNullParam(motors, "motors", "VoltageSubsystemBase");
+        
+        this.motors = List.of(motors);
+        this.currentThreshold = currentThreshold;
+
+        for (NAR_Motor motor : motors) {
+            motor.configMotor(config);
+        }
+    }
+
+    public VoltageBase(MotorConfig config, NAR_Motor... motors){
+        this(config, 30, motors);
+    }
+
+    /**
+     * Returns whether manipulator has an object.
+     */
+    public boolean hasObjectPresent(){
+        return Math.abs(getCurrent()) > currentThreshold;
+    }
+    
+    protected void apply(Consumer<NAR_Motor> action) {
+        motors.forEach(action);
+    }
+
+    protected Command applyCommand(Consumer<NAR_Motor> action) {
+        return runOnce(()-> apply(action));
+    }
+
+    /**
+     * Sets power to motor.
+     * 
+     * @param power Setpoint the pivot goes to.
+     */
+    public void run(double power) {
+        apply(motor -> motor.set(power));
+    }
+
+    public Command runCommand(double power) {
+        return applyCommand(motor -> motor.set(power));
+    }
+
+    public void runVolts(double volts) {
+        apply(motor -> motor.setVolts(volts));
+    }
+
+    public Command runVoltsCommand(double volts) {
+        return applyCommand(motor -> motor.setVolts(volts));
+    }
+
+    public double getVolts() {
+        return motors.get(0).getAppliedOutput() * 12;
+    }
+
+    /**
+     * Stops all motors in the subsystem.
+     */
+    public void stop() {
+        run(0);
+    }
+
+    public Command stopCommand() {
+        return runCommand(0);
+    }
+
+    /**
+     * Returns current of the first motor.
+     */
+    public double getCurrent(){
+        return motors.get(0).getStallCurrent();
+    }
+
+    public void setNeutralMode(Neutral mode) {
+        motors.forEach(motor -> motor.setNeutralMode(mode));
+    }
+
+    /**
+     * Resets the position of the motor.
+     */
+    public void reset() {
+        apply(motor -> motor.resetPosition(0));
+    }
+    
+}
