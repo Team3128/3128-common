@@ -2,7 +2,6 @@ package common.utility.sysid;
 
 
 import common.hardware.motorcontroller.NAR_Motor;
-import common.hardware.motorcontroller.NAR_TalonFX;
 import common.utility.Log;
 import edu.wpi.first.units.measure.MutDistance;
 import edu.wpi.first.units.measure.MutLinearVelocity;

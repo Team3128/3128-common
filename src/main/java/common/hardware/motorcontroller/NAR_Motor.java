@@ -1,13 +1,33 @@
 package common.hardware.motorcontroller;
 
+import static common.hardware.motorcontroller.MotorControllerConstants.HIGH_PRIORITY_FREQ;
+import static common.hardware.motorcontroller.MotorControllerConstants.NEO_STATOR_CurrentLimit;
+import static common.hardware.motorcontroller.MotorControllerConstants.NEO_SUPPLY_CurrentLimit;
+
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.function.Supplier;
+
+import com.ctre.phoenix6.CANBus;
+import com.ctre.phoenix6.StatusCode;
+import com.ctre.phoenix6.StatusSignal;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.PositionVoltage;
+import com.ctre.phoenix6.controls.VelocityVoltage;
+import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import common.core.controllers.PIDFFConfig;
 import common.core.misc.NAR_Robot;
 import common.utility.Log;
 import common.utility.narwhaldashboard.NarwhalDashboard;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.units.Units;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Current;
+import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 
 /**
@@ -15,7 +35,7 @@ import edu.wpi.first.wpilibj.motorcontrol.MotorController;
  * @since 2023 Charged Up
  * @author Mason Lam
  */
-public abstract class NAR_Motor implements AutoCloseable {
+public class NAR_Motor implements AutoCloseable {
 
     /**
      * Store conversion factors for motor
@@ -64,14 +84,6 @@ public abstract class NAR_Motor implements AutoCloseable {
             this(distanceFactor, timeFactor, statorLimit, 120, 12, inverted, mode, StatusFrames.DEFAULT);
         }
 
-        public MotorConfig invert() {
-            return new MotorConfig(this.distanceFactor, this.timeFactor, this.statorLimit, this.supplyLimit, this.voltageCompensation, !this.inverted, this.mode, this.statusFrames);
-        }
-
-        public MotorConfig invertFollower() {
-            return new MotorConfig(this.distanceFactor, this.timeFactor, this.statorLimit, this.supplyLimit, this.voltageCompensation, !this.inverted, this.mode, StatusFrames.FOLLOWER);
-        }
-
         public MotorConfig follower() {
             return new MotorConfig(this.distanceFactor, this.timeFactor, this.statorLimit, this.supplyLimit, this.voltageCompensation, this.inverted, this.mode, StatusFrames.FOLLOWER);
         }
@@ -118,7 +130,13 @@ public abstract class NAR_Motor implements AutoCloseable {
 
     private static final HashSet<NAR_Motor> leaders = new HashSet<NAR_Motor>();
 
-    
+    private static int numFailedConfigs = 0;
+
+    public static int maximumRetries = 5;
+
+    public static int getNumFailedConfigs() {
+        return numFailedConfigs;
+    }
 
     static {
         NAR_Robot.addPeriodic(()-> {
@@ -138,14 +156,55 @@ public abstract class NAR_Motor implements AutoCloseable {
     private double prevFeedForward = 0;
     private double minInput;
     private double maxInput;
-    private double relativePosition = 0;
     private boolean isContinuous = false;
-    protected double unitConversionFactor = 1;
-    protected double timeConversionFactor = 1;
-    
+    private boolean useFOC = false;
+    private double unitConversionFactor = 1;
+    private double timeConversionFactor = 1;
 
-    public NAR_Motor(int id){
+    private final TalonFX motor;
+    private final TalonFXConfiguration configs = new TalonFXConfiguration();
+
+    private final StatusSignal<Double> appliedOutput;
+    private final StatusSignal<Current> stallCurrent;
+    private final StatusSignal<Angle> position;
+    private final StatusSignal<AngularVelocity> velocity;
+    private final StatusSignal<Temperature> temperature;
+
+    public NAR_Motor(int id, String canbus, PIDFFConfig pidConfig) {
         this.id = id;
+        motor = new TalonFX(id, new CANBus(canbus));
+
+        appliedOutput = motor.getDutyCycle();
+        stallCurrent = motor.getStatorCurrent();
+        position = motor.getPosition();
+        velocity = motor.getVelocity();
+        temperature = motor.getDeviceTemp();
+
+        enableVoltageCompensationNoApply(12);
+        setStatorLimitNoApply(NEO_STATOR_CurrentLimit);
+        setSupplyLimitNoApply(NEO_SUPPLY_CurrentLimit);
+        configPIDNoApply(pidConfig);
+        apply();
+    }
+
+    public NAR_Motor(int id, String canbus) {
+        this(id, canbus, new PIDFFConfig());
+    }
+
+    public NAR_Motor(int id) {
+        this(id, "");
+    }
+
+    private void configTalonFX(Supplier<StatusCode> config) {
+        for (int i = 0; i < maximumRetries; i++) {
+            if (config.get() == StatusCode.OK) return;
+        }
+        numFailedConfigs++;
+        Log.info("Motors", "Failed to configure Talon FX " + id);
+    }
+
+    public void enableFOC(boolean enable) {
+        useFOC = enable;
     }
 
     /**
@@ -205,6 +264,13 @@ public abstract class NAR_Motor implements AutoCloseable {
         }
     }
 
+    public void setVelocityFOC2(double setpoint, double feedforward) {
+        var velocitySetpoint = new VelocityVoltage(setpoint / unitConversionFactor * timeConversionFactor / 60)
+            .withEnableFOC(true)
+            .withFeedForward(feedforward);
+        motor.setControl(velocitySetpoint);
+    }
+
     /**
      * Configures all major motor settings.
      * @param config Motor settings.
@@ -237,15 +303,24 @@ public abstract class NAR_Motor implements AutoCloseable {
         Log.debug(Log.Type.MOTOR, "Motor (" + this.id + ")", config.toString());
     }
 
-    public abstract void apply();
+    public void apply() {
+        configTalonFX(() -> motor.getConfigurator().apply(configs));
+    }
 
     /**
 	 * Set the PID values for the controller.
 	 * @param config PIDFFConfig containing kP, kI, and kD values.
 	 */
-	public abstract void configPID(PIDFFConfig config);
+    public void configPID(PIDFFConfig config) {
+        configPIDNoApply(config);
+        configTalonFX(()-> motor.getConfigurator().apply(configs.Slot0));
+    }
 
-    public abstract void configPIDNoApply(PIDFFConfig config);
+    public void configPIDNoApply(PIDFFConfig config) {
+        configs.Slot0.kP = config.kP;
+        configs.Slot0.kI = config.kI;
+        configs.Slot0.kD = config.kD;
+    }
 
     /**
      * Wraps a measurement value to the min and max input
@@ -298,57 +373,70 @@ public abstract class NAR_Motor implements AutoCloseable {
      * Sets the motor inverted
      * @param inverted Inverts the motor
      */
-    public abstract void setInverted(boolean inverted);
+    public void setInverted(boolean inverted) {
+        setInvertedNoApply(inverted);
+        configTalonFX(()-> motor.getConfigurator().apply(configs.MotorOutput));
+    }
 
-    public abstract void setInvertedNoApply(boolean inverted);
+    public void setInvertedNoApply(boolean inverted) {
+        configs.MotorOutput.Inverted = inverted ? InvertedValue.Clockwise_Positive : InvertedValue.CounterClockwise_Positive;
+    }
 
     /**
      * Sets motor output power
      * @param speed The speed of the motor from -1 to 1
      */
-    protected abstract void setPercentOutput(double speed);
+    private void setPercentOutput(double speed) {
+        motor.set(speed);
+    }
 
     /**
      * Sets the motor output based on its velocity
      * @param rpm Velocity of the motor in RPM
      * @param feedForward Feedforward component measured in volts
      */
-    protected abstract void setVelocity(double rpm, double feedForward);
+    private void setVelocity(double rpm, double feedForward) {
+        var velocitySetpoint = new VelocityVoltage(rpm / 60)
+            .withEnableFOC(useFOC)
+            .withFeedForward(feedForward);
+        motor.setControl(velocitySetpoint);
+    }
 
     /**
      * Sets motor output based on its position
      * @param rotations Position of the motor in rotations
      * @param feedForward Feedforward component measured in volts
      */
-    protected abstract void setPosition(double rotations, double feedForward);
-
-    public void resetRelativePosition() {
-        this.relativePosition = getPosition();
+    private void setPosition(double rotations, double feedForward) {
+        var positionSetpoint = new PositionVoltage(rotations)
+            .withEnableFOC(useFOC)
+            .withFeedForward(feedForward);
+        motor.setControl(positionSetpoint);
     }
 
     /**
      * Resets the motor position
      * @param rotations Number of rotations
      */
-    protected abstract void resetRawPosition(double rotations);
+    private void resetRawPosition(double rotations) {
+        motor.setPosition(rotations);
+    }
 
     /**
      * Gets the motors current output
      * @return Double measuring percent output from -1 to 1
      */
-    public abstract double getAppliedOutput();
+    public double getAppliedOutput() {
+        return appliedOutput.refresh().getValue();
+    }
 
     /**
      * Returns the current going to the motor, increasing values means the motor is stalling
      * @return Double measuring the stall current of the motor
      */
-    public abstract double getStallCurrent();
-
-    /**
-     * Returns the torque applied by the motor stator
-     * @return
-     */
-    public abstract double getTorque();
+    public double getStallCurrent() {
+        return stallCurrent.refresh().getValue().in(Units.Amp);
+    }
 
     /**
      * Returns the current motor position, default unit - rotations
@@ -357,10 +445,6 @@ public abstract class NAR_Motor implements AutoCloseable {
     public double getPosition() {
         final double position = getRawPosition() * unitConversionFactor;
         return convertInput(position);
-    }
-
-    public double getRelativePosition() {
-        return getPosition() - this.relativePosition;
     }
 
     /**
@@ -375,19 +459,25 @@ public abstract class NAR_Motor implements AutoCloseable {
      * Returns the motor position in rotations
      * @return Double measuring motor position
      */
-    protected abstract double getRawPosition();
+    private double getRawPosition() {
+        return position.refresh().getValue().in(Units.Revolution);
+    }
 
     /**
      * Returns the current motor velocity in RPM
      * @return Double measuring motor velocity
      */
-    protected abstract double getRawVelocity();
+    private double getRawVelocity() {
+        return velocity.refresh().getValue().in(Units.RotationsPerSecond) * 60.0;
+    }
 
     /**
      * Returns the Motor's temperature in celsius.
      * @return The temperature in celsius.
      */
-    public abstract double getTemperature();
+    public double getTemperature() {
+        return temperature.refresh().getValue().in(Units.Celsius);
+    }
 
     /**
      * Sets a motor's output based on the leader's
@@ -396,8 +486,6 @@ public abstract class NAR_Motor implements AutoCloseable {
     public void follow(NAR_Motor leader) {
         leader.followers.add(this);
         leaders.add(leader);
-        System.out.println(leader.followers.toString());
-        System.out.println(leader.followers.size());
     }
 
     /**
@@ -417,96 +505,113 @@ public abstract class NAR_Motor implements AutoCloseable {
      * @param mode Type of idle mode
      */
     public void setNeutralMode(Neutral mode) {
-        switch(mode) {
-            case BRAKE:
-                setBrakeMode();
-                break;
-            case COAST:
-                setCoastMode();
-                break;
-        }
+        setNeutralModeNoApply(mode);
+        configTalonFX(()-> motor.getConfigurator().apply(configs.MotorOutput));
         followers.forEach(follower -> follower.setNeutralMode(mode));
     }
 
     public void setNeutralModeNoApply(Neutral mode) {
-        switch (mode) {
-            case BRAKE:
-                setBrakeModeNoApply();
-                break;
-            case COAST:
-                setCoastModeNoApply();
-                break;
-        }
+        configs.MotorOutput.NeutralMode = mode == Neutral.BRAKE ? NeutralModeValue.Brake : NeutralModeValue.Coast;
         followers.forEach(follower -> follower.setNeutralModeNoApply(mode));
     }
-
-    /**
-     * Sets the motor in brake mode
-     */
-    protected abstract void setBrakeMode();
-
-    protected abstract void setBrakeModeNoApply();
-
-    /**
-     * Sets the motor in coast mode
-     */
-    protected abstract void setCoastMode();
-
-    protected abstract void setCoastModeNoApply();
 
     /**
      * Sets voltage compensation, keeps output consistent when battery is above x volts
      * @param volts The max volts the motor goes too
      */
-    public abstract void enableVoltageCompensation(double volts);
+    public void enableVoltageCompensation(double volts) {
+        enableVoltageCompensationNoApply(volts);
+        configTalonFX(()-> motor.getConfigurator().apply(configs.Voltage));
+    }
 
-    public abstract void enableVoltageCompensationNoApply(double volts);
+    public void enableVoltageCompensationNoApply(double volts) {
+        configs.Voltage.PeakForwardVoltage = volts;
+        configs.Voltage.PeakReverseVoltage = -volts;
+    }
 
     /**
 	 * Sets the stator limit in Amps.
 	 * @param limit The current limit in Amps.
 	 */
-    public abstract void setStatorLimit(int limit);
+    public void setStatorLimit(int limit) {
+        setStatorLimitNoApply(limit);
+        configTalonFX(()-> motor.getConfigurator().apply(configs.CurrentLimits));
+    }
 
-    public abstract void setStatorLimitNoApply(int limit);
+    public void setStatorLimitNoApply(int limit) {
+        configs.CurrentLimits.StatorCurrentLimit = limit;
+        configs.CurrentLimits.StatorCurrentLimitEnable = true;
+    }
 
     /**
 	 * Sets the supply limit in Amps.
 	 * @param limit The current limit in Amps.
 	 */
-    public abstract void setSupplyLimit(int limit);
+    public void setSupplyLimit(int limit) {
+        setSupplyLimitNoApply(limit);
+        configTalonFX(()-> motor.getConfigurator().apply(configs.CurrentLimits));
+    }
 
-    public abstract void setSupplyLimitNoApply(int limit);
+    public void setSupplyLimitNoApply(int limit) {
+        configs.CurrentLimits.SupplyCurrentLimit = limit;
+        configs.CurrentLimits.SupplyCurrentLimitEnable = true;
+    }
 
     /**
 	 * Returns motor and motor controller functionality.
 	 * @return State of the motor controller and motor.
 	 */
-    public abstract NarwhalDashboard.State getState();
+    public NarwhalDashboard.State getState() {
+        return NarwhalDashboard.State.RUNNING;
+    }
 
     /**
      * Set the status frame rate to Team 3128's defaults
      */
-    public abstract void setDefaultStatusFrames();
+    public void setDefaultStatusFrames() {
+        configTalonFX(()-> appliedOutput.setUpdateFrequency(HIGH_PRIORITY_FREQ));
+        configTalonFX(()-> stallCurrent.setUpdateFrequency(HIGH_PRIORITY_FREQ));
+        configTalonFX(()-> velocity.setUpdateFrequency(HIGH_PRIORITY_FREQ));
+        configTalonFX(()-> position.setUpdateFrequency(HIGH_PRIORITY_FREQ));
+        configTalonFX(()-> temperature.setUpdateFrequency(HIGH_PRIORITY_FREQ));
+        configTalonFX(()-> motor.optimizeBusUtilization());
+    }
 
     /**
      * Set the status frame rate to Team 3128's for a position motor
      */
-    public abstract void setPositionStatusFrames();
+    public void setPositionStatusFrames() {
+        configTalonFX(()-> appliedOutput.setUpdateFrequency(HIGH_PRIORITY_FREQ));
+        configTalonFX(()-> position.setUpdateFrequency(HIGH_PRIORITY_FREQ));
+        configTalonFX(()-> motor.optimizeBusUtilization());
+    }
 
     /**
      * Set the status frame rate to Team 3128's for a velocity motor
      */
-    public abstract void setVelocityStatusFrames();
+    public void setVelocityStatusFrames() {
+        configTalonFX(()-> velocity.setUpdateFrequency(HIGH_PRIORITY_FREQ));
+        configTalonFX(()-> stallCurrent.setUpdateFrequency(HIGH_PRIORITY_FREQ));
+        configTalonFX(()-> motor.optimizeBusUtilization());
+    }
 
     /**
      * Set the status frame rate to Team 3128's for a follower motor
      */
-    public abstract void setFollowerStatusFrames();
+    public void setFollowerStatusFrames() {
+        configTalonFX(()-> motor.optimizeBusUtilization());
+    }
 
     /**
      * Returns the motor object controlling the motion
      * @return The motor ie. SparkMax, TalonFX
      */
-    public abstract Object getMotor();
+    public TalonFX getMotor() {
+        return motor;
+    }
+
+    @Override
+    public void close() {
+        motor.close();
+    }
 }
