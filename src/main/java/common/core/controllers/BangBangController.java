@@ -1,57 +1,58 @@
 package common.core.controllers;
 
-import common.hardware.motorcontroller.NAR_Motor;
 import edu.wpi.first.util.sendable.SendableBuilder;
 
-public class BangBangController extends ControllerBase {
+public class BangBangController extends Controller {
 
-    private edu.wpi.first.math.controller.BangBangController controller;
+    private final edu.wpi.first.math.controller.BangBangController bangBang;
 
-    public BangBangController(PIDFFConfig config, double tolerance, edu.wpi.first.math.controller.BangBangController controller) {
-        super(config, tolerance);
+    public BangBangController(PIDFFConfig config, double tolerance) {
+        super(config, tolerance, Type.VELOCITY);
+        bangBang = new edu.wpi.first.math.controller.BangBangController(tolerance);
     }
 
     @Override
-    protected double calculate(double measurement) {
-        return controller.calculate(measurement) + calculateFF(controller.calculate(measurement));
+    protected double calculatePID(double measurement) {
+        return bangBang.calculate(measurement);
     }
 
     @Override
-    public double calculateFF(double pidOutput){
-        if (atSetpoint()){
-            return config.getkS() + config.getkV() *getMeasurement();
+    protected double calculateFF(double pidOutput) {
+        if (atSetpoint()) {
+            return config.getkS() + config.getkV() * getMeasurement();
         } else {
             return 0;
         }
     }
 
     @Override
-    public void setMeasurementSource(NAR_Motor motor) {
-        measurement = () -> motor.getVelocity();
+    public void setSetpoint(double setpoint) {
+        bangBang.setSetpoint(setpoint);
     }
 
     @Override
-    public void setSetpoint(double setpoint) {
-        controller.setSetpoint(setpoint);
+    public double getSetpoint() {
+        return bangBang.getSetpoint();
     }
 
     @Override
     public void setTolerance(double tolerance) {
-        controller.setTolerance(tolerance);
+        this.tolerance = tolerance;
+        bangBang.setTolerance(tolerance);
+    }
+
+    @Override
+    public boolean atSetpoint() {
+        return bangBang.atSetpoint();
+    }
+
+    @Override
+    public void reset() {
     }
 
     @Override
     public void initSendable(SendableBuilder builder) {
         builder.setSmartDashboardType("BangBangController");
         builder.addDoubleProperty("setpoint", this::getSetpoint, this::setSetpoint);
-    }
-
-    @Override
-    public boolean atSetpoint() {
-        return controller.atSetpoint();
-    }
-
-    @Override
-    public void reset() {
     }
 }
