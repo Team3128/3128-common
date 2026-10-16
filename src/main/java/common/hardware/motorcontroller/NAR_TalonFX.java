@@ -87,7 +87,7 @@ public class NAR_TalonFX extends NAR_Motor {
     }
 
     public NAR_TalonFX(int deviceNumber) {
-        this(deviceNumber, "");
+        this(deviceNumber, "drivetrain");
     }
     
     /**
