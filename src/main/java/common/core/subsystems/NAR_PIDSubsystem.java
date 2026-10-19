@@ -167,7 +167,7 @@ public abstract class NAR_PIDSubsystem extends SubsystemBase {
 
         debug = NAR_Shuffleboard.debugSwitch(getName(), "DEBUG", false, 2, 0);
         setpoint = NAR_Shuffleboard.debug(getName(), "Debug_Setpoint", 0, 2,1);
-        NAR_Shuffleboard.addData(getName(), "UseOutput", controller::useOutput, 0, 2);
+        NAR_Shuffleboard.addData(getName(), "Output", () -> controller.calculate(controller.getMeasurement()), 0, 2);
 
         NAR_Shuffleboard.addSendable(getName(), "PID_Controller", controller, 3, 1, 2, 3).withWidget(BuiltInWidgets.kPIDController);
 
