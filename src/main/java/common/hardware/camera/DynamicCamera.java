@@ -83,12 +83,11 @@ public class DynamicCamera {
                     double timeStamp = curEst.get().timestampSeconds;
                     
                     if (dynamicCamera.isDynamic) {
-                        Rotation2d newRotation = dynamicPose.getRotation().plus(dynamicCamera.angularOffset.get());
-                        double newX = dynamicPose.getX() - dynamicCamera.offset.getX() * newRotation.getCos();
-                        double newY = dynamicPose.getY() - dynamicCamera.offset.getY() * newRotation.getSin();
+                        Rotation2d newRotation = dynamicPose.getRotation().minus(dynamicCamera.angularOffset.get());
+                        Translation2d newTrans = dynamicPose.getTranslation().minus(dynamicCamera.offset.rotateBy(newRotation));
 
                         //the line below modifies the result to make it centered at teh robot
-                        dynamicPose = new Pose2d(newX, newY, newRotation);
+                        dynamicPose = new Pose2d(newTrans, newRotation);
                         dynamicCamera.estConsumer.accept(dynamicPose, timeStamp);
                     } else {
                         dynamicCamera.estConsumer.accept(dynamicPose, timeStamp);
