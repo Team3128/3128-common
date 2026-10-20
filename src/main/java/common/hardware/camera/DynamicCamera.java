@@ -111,4 +111,15 @@ public class DynamicCamera {
     public static void disable() {
         enabled = false;
     }
+
+    public void initShuffleboard() {
+        NAR_Shuffleboard.addData(camera.getName(), "WithinDist", () -> withinDist, 2, 2, 1, 1);
+        NAR_Shuffleboard.addData(camera.getName(), "Estimated Pose X", () -> estimatedPose.getX(), 0, 0, 2, 1);
+        NAR_Shuffleboard.addData(camera.getName(), "Estimated Pose Y", () -> estimatedPose.getY(), 0, 1, 2, 1);
+        NAR_Shuffleboard.addData(camera.getName(), "camera pose X", () -> cameraPose.getX(), 2, 0, 2, 1);
+        NAR_Shuffleboard.addData(camera.getName(), "camera pose Y", () -> cameraPose.getY(), 2, 1, 2, 1);
+        NAR_Shuffleboard.addData(camera.getName(), "dist", () -> distance, 0, 2, 1, 1);
+        NAR_Shuffleboard.addData(camera.getName(), "Has target", () -> result.hasTargets(), 1, 2, 1, 1);
+        NAR_Shuffleboard.addData(camera.getName(), "Enabled", () -> !isDisabled, 3, 2);
+    }
 }
