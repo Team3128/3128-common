@@ -1,5 +1,6 @@
 package common.hardware.camera;
-
+ import java.util.ArrayList;
+ import java.util.List;
 import java.util.LinkedList;
 import java.util.Optional;
 import java.util.function.BiConsumer;
@@ -17,12 +18,21 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.geometry.Pose3d;
+import org.photonvision.targeting.PhotonPipelineResult;
 
 public class DynamicCamera {
 
     //static variables
     public static final LinkedList<DynamicCamera> dynamicCameras = new LinkedList<DynamicCamera>();
     public static boolean enabled = true;
+    public boolean withinDist = true;
+    public Pose2d estimatedPose = new Pose2d();
+    public Pose3d cameraPose = new Pose3d();
+     public double distance = 0;
+    private PhotonPipelineResult result = new PhotonPipelineResult();
+     private List<PhotonPipelineResult> resultList = new ArrayList<PhotonPipelineResult>();
+     public boolean isDisabled = false;
 
     //dynamic camera related variables
     private final PhotonCamera photonCamera;
@@ -62,6 +72,9 @@ public class DynamicCamera {
 
     public static void periodic() {
         if (!enabled) return;
+      
+   
+
 
         for (final DynamicCamera dynamicCamera : dynamicCameras) {
             Optional<EstimatedRobotPose> curEst = Optional.empty();
@@ -117,13 +130,13 @@ public class DynamicCamera {
     }
 
     public void initShuffleboard() {
-        // NAR_Shuffleboard.addData(photonCamera.getName(), "WithinDist", () -> withinDist, 2, 2, 1, 1);
-        // NAR_Shuffleboard.addData(photonCamera.getName(), "Estimated Pose X", () -> estimatedPose.getX(), 0, 0, 2, 1);
-        // NAR_Shuffleboard.addData(photonCamera.getName(), "Estimated Pose Y", () -> estimatedPose.getY(), 0, 1, 2, 1);
-        // NAR_Shuffleboard.addData(photonCamera.getName(), "camera pose X", () -> cameraPose.getX(), 2, 0, 2, 1);
-        // NAR_Shuffleboard.addData(photonCamera.getName(), "camera pose Y", () -> cameraPose.getY(), 2, 1, 2, 1);
-        // NAR_Shuffleboard.addData(photonCamera.getName(), "dist", () -> distance, 0, 2, 1, 1);
+        NAR_Shuffleboard.addData(photonCamera.getName(), "WithinDist", () -> withinDist, 2, 2, 1, 1);
+        NAR_Shuffleboard.addData(photonCamera.getName(), "Estimated Pose X", () -> estimatedPose.getX(), 0, 0, 2, 1);
+        NAR_Shuffleboard.addData(photonCamera.getName(), "Estimated Pose Y", () -> estimatedPose.getY(), 0, 1, 2, 1);
+        NAR_Shuffleboard.addData(photonCamera.getName(), "camera pose X", () -> cameraPose.getX(), 2, 0, 2, 1);
+        NAR_Shuffleboard.addData(photonCamera.getName(), "camera pose Y", () -> cameraPose.getY(), 2, 1, 2, 1);
+        NAR_Shuffleboard.addData(photonCamera.getName(), "dist", () -> distance, 0, 2, 1, 1);
         // NAR_Shuffleboard.addData(photonCamera.getName(), "Has target", () -> result.hasTargets(), 1, 2, 1, 1);
-        // NAR_Shuffleboard.addData(photonCamera.getName(), "Enabled", () -> !isDisabled, 3, 2);
+        NAR_Shuffleboard.addData(photonCamera.getName(), "Enabled", () -> !isDisabled, 3, 2);
     }
 }
