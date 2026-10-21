@@ -9,11 +9,14 @@ import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
 
+import common.utility.shuffleboard.NAR_Shuffleboard;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 
 public class DynamicCamera {
 
@@ -26,6 +29,7 @@ public class DynamicCamera {
     private final PhotonPoseEstimator poseEstimator;
     private final BiConsumer<Pose2d, Double> estConsumer;
     private final boolean isDynamic;
+    private Transform3d pivotToCam;
     private Translation2d offset;
     private Supplier<Rotation2d> angularOffset;
     private double minDistThreshold = 0, maxDistThreshold = 100, ambiguityThreshold = 0.2;
@@ -43,11 +47,12 @@ public class DynamicCamera {
 
     //dynamic constructor
 
-    public DynamicCamera(String cameraName, Transform3d robotToCam, AprilTagFieldLayout tagLayout, BiConsumer<Pose2d, Double> estConsumer, Translation2d offset, Supplier<Rotation2d> angularOffset) {
+    public DynamicCamera(String cameraName, Transform3d pivotToCam, AprilTagFieldLayout tagLayout, BiConsumer<Pose2d, Double> estConsumer, Translation2d offset, Supplier<Rotation2d> angularOffset) {
         this.photonCamera = new PhotonCamera(cameraName);
-        this.poseEstimator = new PhotonPoseEstimator(tagLayout, robotToCam);
+        this.poseEstimator = new PhotonPoseEstimator(tagLayout, pivotToCam);
         this.estConsumer = estConsumer;
         this.isDynamic = true;
+        this.pivotToCam = pivotToCam;
         
         this.offset = offset;
         this.angularOffset = angularOffset;
@@ -60,6 +65,10 @@ public class DynamicCamera {
 
         for (final DynamicCamera dynamicCamera : dynamicCameras) {
             Optional<EstimatedRobotPose> curEst = Optional.empty();
+
+            if (dynamicCamera.isDynamic) {
+                dynamicCamera.poseEstimator.setRobotToCameraTransform(dynamicCamera.getRobotToCam());
+            }
 
             for (var result : dynamicCamera.photonCamera.getAllUnreadResults()) {
                 for (int i = 0; i < result.targets.size(); i++) {
@@ -79,19 +88,7 @@ public class DynamicCamera {
                 }
 
                 if (curEst.isPresent()) {
-                    Pose2d dynamicPose = curEst.get().estimatedPose.toPose2d();
-                    double timeStamp = curEst.get().timestampSeconds;
-                    
-                    if (dynamicCamera.isDynamic) {
-                        Rotation2d newRotation = dynamicPose.getRotation().minus(dynamicCamera.angularOffset.get());
-                        Translation2d newTrans = dynamicPose.getTranslation().minus(dynamicCamera.offset.rotateBy(newRotation));
-
-                        //the line below modifies the result to make it centered at teh robot
-                        dynamicPose = new Pose2d(newTrans, newRotation);
-                        dynamicCamera.estConsumer.accept(dynamicPose, timeStamp);
-                    } else {
-                        dynamicCamera.estConsumer.accept(dynamicPose, timeStamp);
-                    }
+                    dynamicCamera.estConsumer.accept(curEst.get().estimatedPose.toPose2d(), curEst.get().timestampSeconds);
                 }
             }
         }
@@ -111,14 +108,22 @@ public class DynamicCamera {
         enabled = false;
     }
 
+    // robot center -> turret pivot, rotated by the turret angle, then pivot -> camera
+    private Transform3d getRobotToCam() {
+        Transform3d robotToPivot = new Transform3d(
+            new Translation3d(offset.getX(), offset.getY(), 0),
+            new Rotation3d(0, 0, angularOffset.get().getRadians()));
+        return robotToPivot.plus(pivotToCam);
+    }
+
     public void initShuffleboard() {
-        NAR_Shuffleboard.addData(camera.getName(), "WithinDist", () -> withinDist, 2, 2, 1, 1);
-        NAR_Shuffleboard.addData(camera.getName(), "Estimated Pose X", () -> estimatedPose.getX(), 0, 0, 2, 1);
-        NAR_Shuffleboard.addData(camera.getName(), "Estimated Pose Y", () -> estimatedPose.getY(), 0, 1, 2, 1);
-        NAR_Shuffleboard.addData(camera.getName(), "camera pose X", () -> cameraPose.getX(), 2, 0, 2, 1);
-        NAR_Shuffleboard.addData(camera.getName(), "camera pose Y", () -> cameraPose.getY(), 2, 1, 2, 1);
-        NAR_Shuffleboard.addData(camera.getName(), "dist", () -> distance, 0, 2, 1, 1);
-        NAR_Shuffleboard.addData(camera.getName(), "Has target", () -> result.hasTargets(), 1, 2, 1, 1);
-        NAR_Shuffleboard.addData(camera.getName(), "Enabled", () -> !isDisabled, 3, 2);
+        // NAR_Shuffleboard.addData(photonCamera.getName(), "WithinDist", () -> withinDist, 2, 2, 1, 1);
+        // NAR_Shuffleboard.addData(photonCamera.getName(), "Estimated Pose X", () -> estimatedPose.getX(), 0, 0, 2, 1);
+        // NAR_Shuffleboard.addData(photonCamera.getName(), "Estimated Pose Y", () -> estimatedPose.getY(), 0, 1, 2, 1);
+        // NAR_Shuffleboard.addData(photonCamera.getName(), "camera pose X", () -> cameraPose.getX(), 2, 0, 2, 1);
+        // NAR_Shuffleboard.addData(photonCamera.getName(), "camera pose Y", () -> cameraPose.getY(), 2, 1, 2, 1);
+        // NAR_Shuffleboard.addData(photonCamera.getName(), "dist", () -> distance, 0, 2, 1, 1);
+        // NAR_Shuffleboard.addData(photonCamera.getName(), "Has target", () -> result.hasTargets(), 1, 2, 1, 1);
+        // NAR_Shuffleboard.addData(photonCamera.getName(), "Enabled", () -> !isDisabled, 3, 2);
     }
 }
