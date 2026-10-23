@@ -40,7 +40,7 @@ public class DynamicCamera {
     private final BiConsumer<Pose2d, Double> estConsumer;
     private final boolean isDynamic;
     private Transform3d pivotToCam;
-    private Translation2d offset;
+    private Translation3d offset;
     private Supplier<Rotation2d> angularOffset;
     private double minDistThreshold = 0, maxDistThreshold = 100, ambiguityThreshold = 0.2;
 
@@ -57,7 +57,7 @@ public class DynamicCamera {
 
     //dynamic constructor
 
-    public DynamicCamera(String cameraName, Transform3d pivotToCam, AprilTagFieldLayout tagLayout, BiConsumer<Pose2d, Double> estConsumer, Translation2d offset, Supplier<Rotation2d> angularOffset) {
+    public DynamicCamera(String cameraName, Transform3d pivotToCam, AprilTagFieldLayout tagLayout, BiConsumer<Pose2d, Double> estConsumer, Translation3d offset, Supplier<Rotation2d> angularOffset) {
         this.photonCamera = new PhotonCamera(cameraName);
         this.poseEstimator = new PhotonPoseEstimator(tagLayout, pivotToCam);
         this.estConsumer = estConsumer;
@@ -124,7 +124,7 @@ public class DynamicCamera {
     // robot center -> turret pivot, rotated by the turret angle, then pivot -> camera
     private Transform3d getRobotToCam() {
         Transform3d robotToPivot = new Transform3d(
-            new Translation3d(offset.getX(), offset.getY(), 0),
+            offset,
             new Rotation3d(0, 0, angularOffset.get().getRadians()));
         return robotToPivot.plus(pivotToCam);
     }
