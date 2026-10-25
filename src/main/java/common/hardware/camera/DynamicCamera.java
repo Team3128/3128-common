@@ -94,10 +94,10 @@ public class DynamicCamera {
                     }                    
                 }
 
+                // prefer the multi-tag estimate, single-tag is only a fallback
+                curEst = dynamicCamera.poseEstimator.estimateCoprocMultiTagPose(result);
                 if (curEst.isEmpty()) {
                     curEst = dynamicCamera.poseEstimator.estimateLowestAmbiguityPose(result);
-                } else {
-                    curEst = dynamicCamera.poseEstimator.estimateCoprocMultiTagPose(result);
                 }
 
                 if (curEst.isPresent()) {
