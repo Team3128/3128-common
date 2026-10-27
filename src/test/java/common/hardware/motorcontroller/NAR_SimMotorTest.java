@@ -79,4 +79,15 @@ class NAR_SimMotorTest {
         run(3);
         assertEquals(5, motor.getPosition(), 0.05);
     }
+
+    @Test
+    void solidCylinderMoiMatchesFormula() {
+        assertEquals(0.5 * 2.0 * 0.1 * 0.1, NAR_SimMotor.solidCylinderMoi(2.0, 0.1), 1e-12);
+    }
+
+    @Test
+    void linearMoiMatchesFormula() {
+        // 2 kg moving 2*pi meters per rotation is 1 meter per radian, so J = m
+        assertEquals(2.0, NAR_SimMotor.linearMoi(2.0, 2 * Math.PI), 1e-12);
+    }
 }

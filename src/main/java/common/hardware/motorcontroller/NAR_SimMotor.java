@@ -54,6 +54,27 @@ public class NAR_SimMotor extends NAR_Motor {
         this.sim = new DCMotorSim(LinearSystemId.createDCMotorSystem(motor, moiKgMetersSq, gearing), motor);
     }
 
+    /**
+     * Moment of inertia of a solid cylinder (flywheel, roller) spinning about its axis.
+     * @param massKg Mass in kilograms
+     * @param radiusMeters Radius in meters
+     * @return Inertia in kg*m^2
+     */
+    public static double solidCylinderMoi(double massKg, double radiusMeters) {
+        return 0.5 * massKg * radiusMeters * radiusMeters;
+    }
+
+    /**
+     * Equivalent rotational inertia, at the mechanism shaft, of a mass moving in a line.
+     * @param massKg Mass in kilograms
+     * @param metersPerRotation Linear distance the mass moves per mechanism rotation
+     * @return Inertia in kg*m^2
+     */
+    public static double linearMoi(double massKg, double metersPerRotation) {
+        final double metersPerRadian = metersPerRotation / (2 * Math.PI);
+        return massKg * metersPerRadian * metersPerRadian;
+    }
+
     /** Advances the model to now. */
     private void update() {
         final double now = Timer.getFPGATimestamp();
