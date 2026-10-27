@@ -27,7 +27,6 @@ import com.ctre.phoenix6.sim.TalonFXSimState;
 import common.core.controllers.PIDFFConfig;
 import common.utility.Log;
 import common.utility.narwhaldashboard.NarwhalDashboard;
-import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
@@ -274,7 +273,8 @@ public class NAR_TalonFX extends NAR_Motor {
 
     @Override
 	public double getTorque() {
-		return DCMotor.getKrakenX60(1).withReduction(unitConversionFactor).getTorque(getStallCurrent());
+		// The Talon reports the torque constant of the motor it drives, so this works for X60s, X44s and Falcons
+		return motor.getTorqueCurrent().getValueAsDouble() * motor.getMotorKT().getValueAsDouble();
 	}
 
     @Override

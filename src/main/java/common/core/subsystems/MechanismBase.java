@@ -176,7 +176,8 @@ public abstract class MechanismBase extends SubsystemBase {
     /**
      * Makes the motor controller multiply kG by the cosine of the arm's angle instead of applying
      * it as a constant. Position 0 must be the arm held horizontal.
-     * @param motorRotationsPerArmRotation Gearing between the motor and the arm
+     * @param motorRotationsPerArmRotation Rotations of the leader's encoder per arm rotation: the
+     *                                     gearing, or 1 for an absolute encoder on the arm's shaft
      */
     protected void useArmGravity(double motorRotationsPerArmRotation) {
         this.motorRotationsPerArmRotation = motorRotationsPerArmRotation;

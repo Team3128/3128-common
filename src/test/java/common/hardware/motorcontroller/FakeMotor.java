@@ -80,8 +80,8 @@ public class FakeMotor extends NAR_Motor {
         if (simModel == null) return;
         final double volts = lastMode == Control.PercentOutput ? lastVolts() : 0;
         simModel.update(volts, dtSeconds);
-        rawPosition = simModel.getRotorRotations();
-        rawVelocity = simModel.getRotorRPS() * 60;
+        rawPosition = simModel.getRotorRotations() / motorRotationsPerSensorRotation;
+        rawVelocity = simModel.getRotorRPS() * 60 / motorRotationsPerSensorRotation;
     }
 
     @Override

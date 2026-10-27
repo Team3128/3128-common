@@ -146,6 +146,7 @@ public abstract class NAR_Motor implements AutoCloseable {
     private boolean isContinuous = false;
     protected double unitConversionFactor = 1;
     protected double timeConversionFactor = 1;
+    protected double motorRotationsPerSensorRotation = 1;
     
 
     public NAR_Motor(int id){
@@ -300,7 +301,8 @@ public abstract class NAR_Motor implements AutoCloseable {
      * Like {@link #configClosedLoop(PIDFFConfig, Control)} for position control of an arm, where
      * kG is multiplied by the cosine of the arm's angle. Position 0 must be the arm held horizontal.
      * @param gains PID and feedforward gains, as in {@link #configClosedLoop(PIDFFConfig, Control)}
-     * @param motorRotationsPerArmRotation Gearing between the motor and the arm
+     * @param motorRotationsPerArmRotation Rotations of this motor's encoder per arm rotation: the
+     *                                     gearing, or 1 for an absolute encoder on the arm's shaft
      */
     public void configArmClosedLoop(PIDFFConfig gains, double motorRotationsPerArmRotation) {
         configClosedLoop(gains, Control.Position, motorRotationsPerArmRotation);
@@ -458,10 +460,25 @@ public abstract class NAR_Motor implements AutoCloseable {
     public abstract double getStallCurrent();
 
     /**
-     * Returns the torque applied by the motor stator
-     * @return
+     * Returns the torque at the motor's shaft, before any gearing.
+     * @return Torque in newton meters
      */
     public abstract double getTorque();
+
+    /**
+     * For an encoder that isn't on the motor, e.g. an absolute encoder on an arm's shaft: how many
+     * times the motor turns per turn of the encoder. Simulation needs this to turn the motor's
+     * motion into encoder readings. Call it before building the mechanism. 1 by default.
+     * @param ratio Motor rotations per encoder rotation
+     */
+    public void setMotorRotationsPerSensorRotation(double ratio) {
+        motorRotationsPerSensorRotation = ratio;
+    }
+
+    /** Motor rotations per rotation of the encoder this motor reads, 1 for the motor's own encoder. */
+    public double getMotorRotationsPerSensorRotation() {
+        return motorRotationsPerSensorRotation;
+    }
 
     /**
      * Returns the current motor position, default unit - rotations

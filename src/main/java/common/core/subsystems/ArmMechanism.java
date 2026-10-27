@@ -40,9 +40,10 @@ public class ArmMechanism extends MechanismBase {
         setInputRange(minPosition, maxPosition);
         setDisableAtSetpoint(false); // keep holding against gravity
 
-        // distanceFactor is position units per motor rotation
-        final double gearing = 2 * Math.PI / (motorConfig.distanceFactor * radiansPerUnit);
-        useArmGravity(gearing);
+        // distanceFactor is position units per encoder rotation, and the encoder may be on the arm's shaft
+        final double encoderRotationsPerArmRotation = 2 * Math.PI / (motorConfig.distanceFactor * radiansPerUnit);
+        useArmGravity(encoderRotationsPerArmRotation);
+        final double gearing = encoderRotationsPerArmRotation * motors[0].getMotorRotationsPerSensorRotation();
         motors[0].enableSim(new ArmSimModel(MotorSimModel.gearbox(motorType, motors.length), gearing, lengthMeters,
             massKg, minPosition * radiansPerUnit, maxPosition * radiansPerUnit, startPosition * radiansPerUnit));
         reset();

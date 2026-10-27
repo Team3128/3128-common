@@ -39,8 +39,9 @@ public class LinearMechanism extends MechanismBase {
         setInputRange(minPosition, maxPosition);
         setDisableAtSetpoint(false); // keep holding position
 
-        // distanceFactor is position units per motor rotation
-        final double motorRotationsPerMeter = 1 / (motorConfig.distanceFactor * metersPerUnit);
+        // distanceFactor is position units per encoder rotation, and the encoder may not be on the motor
+        final double motorRotationsPerMeter =
+            motors[0].getMotorRotationsPerSensorRotation() / (motorConfig.distanceFactor * metersPerUnit);
         motors[0].enableSim(new LinearSimModel(MotorSimModel.gearbox(motorType, motors.length), motorRotationsPerMeter,
             massKg, minPosition * metersPerUnit, maxPosition * metersPerUnit, angleRadians));
     }

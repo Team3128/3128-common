@@ -25,7 +25,9 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.SparkBase.Faults;
 import com.revrobotics.PersistMode;
 import com.revrobotics.ResetMode;
+import com.revrobotics.sim.SparkAbsoluteEncoderSim;
 import com.revrobotics.sim.SparkFlexSim;
+import com.revrobotics.spark.FeedbackSensor;
 import com.revrobotics.sim.SparkMaxSim;
 
 import common.core.controllers.PIDFFConfig;
@@ -116,6 +118,9 @@ public class NAR_CANSpark extends NAR_Motor {
 	private final SparkBaseConfig config;
 	private SparkMaxSim maxSim;
 	private SparkFlexSim flexSim;
+	private SparkAbsoluteEncoderSim absoluteSim;
+	/** Absolute encoder rotations when the sim model was at zero. */
+	private double absoluteSimOffset = 0;
 
     /**
 	 * Create a new object to control a SPARK motor
@@ -153,8 +158,12 @@ public class NAR_CANSpark extends NAR_Motor {
 			config.encoder.uvwMeasurementPeriod(10);
 		}
 		else {
+			absoluteEncoder = motor.getAbsoluteEncoder();
 			config.absoluteEncoder.averageDepth(2);
+			// Read in RPM, like the built-in encoder
 			config.absoluteEncoder.velocityConversionFactor(60);
+			// Run the Spark's own control loop on the absolute encoder too
+			config.closedLoop.feedbackSensor(FeedbackSensor.kAbsoluteEncoder);
 		}
 
 		controller = motor.getClosedLoopController();
@@ -498,14 +507,18 @@ public class NAR_CANSpark extends NAR_Motor {
 
 	@Override
 	public double getTorque() {
-		// A Spark Flex drives a Neo Vortex; a Spark Max drives a NEO
-		if(motor instanceof SparkFlex) return DCMotor.getNeoVortex(1).withReduction(unitConversionFactor).getTorque(getStallCurrent());
-		return DCMotor.getNEO(1).withReduction(unitConversionFactor).getTorque(getStallCurrent());
+		// A Spark Flex drives a Neo Vortex; a Spark Max is assumed to drive a NEO
+		final DCMotor neo = motor instanceof SparkFlex ? DCMotor.getNeoVortex(1) : DCMotor.getNEO(1);
+		return neo.getTorque(getStallCurrent());
 	}
 	
 	@Override
 	public void resetRawPosition(double rotations) {
 		if (encoderType == EncoderType.Relative) relativeEncoder.setPosition(rotations);
+		// An absolute encoder already knows where it is. In simulation it doesn't, so remember where it starts.
+		else if (RobotBase.isSimulation()) {
+			absoluteSimOffset = rotations - getSimRotorRotations() / motorRotationsPerSensorRotation;
+		}
 	}
 
     @Override
@@ -519,8 +532,9 @@ public class NAR_CANSpark extends NAR_Motor {
     }
 
 	/**
-	 * Follows REV's SparkSim pattern. Only the built-in relative encoder is simulated; the
-	 * encoder has no conversion factor, so iterate() takes rotor RPM.
+	 * Follows REV's SparkSim pattern. The built-in encoder has no conversion factor, so iterate()
+	 * takes rotor RPM. An absolute encoder is moved by the motor's motion divided by
+	 * {@link #setMotorRotationsPerSensorRotation(double)}.
 	 */
 	@Override
 	protected void simulationStep(double dtSeconds) {
@@ -529,11 +543,23 @@ public class NAR_CANSpark extends NAR_Motor {
 			if (flexSim == null) flexSim = new SparkFlexSim(flex, simModel.getMotor());
 			simModel.update(flexSim.getAppliedOutput() * busVolts, dtSeconds);
 			flexSim.iterate(simModel.getRotorRPS() * 60.0, busVolts, dtSeconds);
+			if (encoderType == EncoderType.Absolute && absoluteSim == null) absoluteSim = new SparkAbsoluteEncoderSim(flex);
 		} else {
 			if (maxSim == null) maxSim = new SparkMaxSim((SparkMax) motor, simModel.getMotor());
 			simModel.update(maxSim.getAppliedOutput() * busVolts, dtSeconds);
 			maxSim.iterate(simModel.getRotorRPS() * 60.0, busVolts, dtSeconds);
+			if (encoderType == EncoderType.Absolute && absoluteSim == null) absoluteSim = new SparkAbsoluteEncoderSim((SparkMax) motor);
 		}
+
+		if (absoluteSim != null) {
+			// In the encoder's units after its conversion factors: rotations and RPM
+			absoluteSim.setPosition(absoluteSimOffset + simModel.getRotorRotations() / motorRotationsPerSensorRotation);
+			absoluteSim.setVelocity(simModel.getRotorRPS() * 60.0 / motorRotationsPerSensorRotation);
+		}
+	}
+
+	private double getSimRotorRotations() {
+		return simModel == null ? 0 : simModel.getRotorRotations();
 	}
 
 	@Override
