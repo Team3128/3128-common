@@ -1,5 +1,7 @@
 package common.core.subsystems;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleBinaryOperator;
 import java.util.function.DoubleConsumer;
@@ -7,6 +9,7 @@ import java.util.function.DoubleSupplier;
 
 import common.core.controllers.PIDFFConfig;
 import common.hardware.motorcontroller.NAR_Motor;
+import common.hardware.motorcontroller.NAR_Motor.Control;
 import common.hardware.motorcontroller.NAR_Motor.MotorConfig;
 import common.utility.Log;
 import common.utility.shuffleboard.NAR_Shuffleboard;
@@ -23,37 +26,26 @@ import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 import static edu.wpi.first.wpilibj2.command.Commands.*;
 
 /**
- * Base class for a PID-controlled mechanism.
+ * Base class for a mechanism that drives its motors to a setpoint.
  *
- * <p>This class does not define its own controller type. Instead it drives a plain
- * WPILib controller (e.g. {@link edu.wpi.first.math.controller.PIDController},
- * {@link edu.wpi.first.math.controller.ProfiledPIDController},
- * {@link edu.wpi.first.math.controller.BangBangController}) directly: those classes are
- * pure {@code (measurement, setpoint) -> output} calculators and know nothing about
- * motors, so {@code MechanismBase} is the one responsible for reading the measurement,
- * calling the controller, adding feedforward, and applying the result to its motors.
+ * <p>The control loop can run in one of two places:
+ * <ul>
+ * <li><b>On the motor controller</b> (the usual choice): the TalonFX or Spark runs PID at 1 kHz
+ *     on its own encoder, e.g. Phoenix {@code PositionVoltage} or {@code VelocityVoltage}.
+ *     Gains are given in this mechanism's units and converted for the motor controller.
+ *     <pre>{@code super(gains, Control.Position, TOLERANCE, HOME, MOTOR_CONFIG, motor);}</pre></li>
+ * <li><b>On the roboRIO</b>, with a WPILib controller such as a {@code BangBangController},
+ *     or when the measurement doesn't come from the motor's encoder, e.g. a gyro or camera.
+ *     The controller is a pure {@code (measurement, setpoint) -> volts} calculator:
+ *     <pre>{@code super(gains, pid::calculate, m -> pid.reset(), gyro::getAngle, TOLERANCE, HOME, MOTOR_CONFIG, motor);}</pre></li>
+ * </ul>
  *
- * <p>Feedforward (kS/kV/kA/kG) is not part of the injected controller either, since
- * WPILib's feedforward classes don't support the dynamic kG use this team needs (e.g. a
- * pivot's gravity gain varying with angle). Subclasses instead override
- * {@link #calculateFeedforward(double)} to combine {@link PIDFFConfig} with whatever
- * shape of feedforward their mechanism needs.
+ * <p>Either way, feedforward (kS/kV/kG) is worked out on the roboRIO every loop by
+ * {@link #calculateFeedforward(double)}, which subclasses override, since this team's kG
+ * can vary, e.g. with an arm's angle.
  *
- * <p>Hardware and controllers are passed in through the constructor, not created statically,
- * so a mechanism can be built (and rebuilt) from wherever the robot is assembled:
- * <pre>{@code
- * public class Slider extends MechanismBase {
- *     public Slider(NAR_TalonFX motor, PIDFFConfig gains) {
- *         this(motor, gains, new PIDController(gains.kP, gains.kI, gains.kD));
- *     }
- *
- *     private Slider(NAR_TalonFX motor, PIDFFConfig gains, PIDController pid) {
- *         super(gains, pid::calculate, m -> pid.reset(), motor::getPosition, TOLERANCE, HOME, MOTOR_CONFIG, motor);
- *     }
- * }
- * }</pre>
- * The private constructor is what lets the same {@code pid} be handed to both the base class
- * and its own callbacks without a static field.
+ * <p>When several motors drive one mechanism, the first is the leader and the rest follow it
+ * on the motor controller where possible. Only the leader runs the control loop.
  */
 public abstract class MechanismBase extends SubsystemBase {
 
@@ -61,8 +53,12 @@ public abstract class MechanismBase extends SubsystemBase {
     public static final double MAX_VOLTS = 12;
 
     protected final NAR_Motor[] motors;
+    /** The leader, plus any motor that can't follow it on the motor controller. */
+    private final NAR_Motor[] commandedMotors;
     protected final PIDFFConfig gains;
 
+    /** Position or Velocity when the motor controller runs the loop; null when the roboRIO does. */
+    private final Control controllerMode;
     /** Computes controller output from (measurement, setpoint), e.g. {@code pid::calculate}. */
     private final DoubleBinaryOperator feedback;
     /** Resets the controller's internal state, given the current measurement. */
@@ -85,6 +81,26 @@ public abstract class MechanismBase extends SubsystemBase {
     protected DoubleSupplier debugSetpoint;
 
     /**
+     * Creates a mechanism whose PID runs on the leader's motor controller.
+     *
+     * @param gains kP/kI/kD in volts per unit of error (converted for the motor controller), and
+     *              feedforward gains handed to {@link #calculateFeedforward(double)}.
+     * @param controllerMode {@link Control#Position} or {@link Control#Velocity}.
+     * @param tolerance Error tolerance for {@link #atSetpoint()}.
+     * @param resetPosition Position the motors are reset to by {@link #reset()}, e.g. the mechanism's home position.
+     * @param motorConfig Hardware configuration applied to every motor; sets the units.
+     * @param motors The motor(s) driven by this mechanism. The first is the leader.
+     */
+    public MechanismBase(PIDFFConfig gains, Control controllerMode, double tolerance, double resetPosition,
+                          MotorConfig motorConfig, NAR_Motor... motors) {
+        this(gains, controllerMode, null, null,
+            controllerMode == Control.Velocity ? () -> motors[0].getVelocity() : () -> motors[0].getPosition(),
+            tolerance, resetPosition, motorConfig, motors);
+    }
+
+    /**
+     * Creates a mechanism whose control loop runs on the roboRIO.
+     *
      * @param gains Feedforward gains; also handed to {@link #calculateFeedforward(double)}.
      * @param feedback The WPILib controller's {@code calculate(measurement, setpoint)} method reference.
      * @param resetController Resets the controller's internal state (integral, previous error, profile) given the
@@ -95,11 +111,21 @@ public abstract class MechanismBase extends SubsystemBase {
      * @param tolerance Error tolerance for {@link #atSetpoint()}.
      * @param resetPosition Position the motors are reset to by {@link #reset()}, e.g. the mechanism's home position.
      * @param motorConfig Hardware configuration applied to every motor.
-     * @param motors The motor(s) driven by this mechanism. Output is applied to all of them.
+     * @param motors The motor(s) driven by this mechanism. The first is the leader.
      */
     public MechanismBase(PIDFFConfig gains, DoubleBinaryOperator feedback, DoubleConsumer resetController,
                           DoubleSupplier measurement, double tolerance, double resetPosition,
                           MotorConfig motorConfig, NAR_Motor... motors) {
+        this(gains, null, feedback, resetController, measurement, tolerance, resetPosition, motorConfig, motors);
+    }
+
+    /**
+     * Takes either a {@code controllerMode} for a loop on the motor controller, or a
+     * {@code feedback} for a loop on the roboRIO; leave the other null. Both null is open loop.
+     */
+    protected MechanismBase(PIDFFConfig gains, Control controllerMode, DoubleBinaryOperator feedback,
+                            DoubleConsumer resetController, DoubleSupplier measurement, double tolerance,
+                            double resetPosition, MotorConfig motorConfig, NAR_Motor... motors) {
         requireNonNullParam(motors, "motors", "MechanismBase");
         requireNonNullParam(gains, "gains", "MechanismBase");
         if (motors.length == 0) {
@@ -110,6 +136,7 @@ public abstract class MechanismBase extends SubsystemBase {
         }
 
         this.gains = gains;
+        this.controllerMode = controllerMode;
         this.feedback = feedback;
         this.resetController = resetController;
         this.measurement = measurement;
@@ -120,6 +147,19 @@ public abstract class MechanismBase extends SubsystemBase {
 
         for (NAR_Motor motor : motors) {
             motor.configMotor(motorConfig);
+        }
+
+        final List<NAR_Motor> commanded = new ArrayList<>();
+        commanded.add(motors[0]);
+        for (int i = 1; i < motors.length; i++) {
+            if (!motors[i].followOnController(motors[0], false)) commanded.add(motors[i]);
+        }
+        commandedMotors = commanded.toArray(new NAR_Motor[0]);
+
+        if (controllerMode != null) {
+            for (NAR_Motor motor : commandedMotors) {
+                motor.configPID(gains, controllerMode);
+            }
         }
     }
 
@@ -133,8 +173,13 @@ public abstract class MechanismBase extends SubsystemBase {
         this(new PIDFFConfig(), null, null, () -> motors[0].getPosition(), 0, 0, motorConfig, motors);
     }
 
+    /** Makes one motor spin the opposite way to {@code motorConfig}, e.g. when it faces the other way. */
     public void invertMotor(int motorIndex) {
-        motors[motorIndex].setInverted(!motorConfig.inverted);
+        final NAR_Motor motor = motors[motorIndex];
+        // A follower's direction is set relative to the leader rather than by its own inversion
+        if (motorIndex == 0 || !motor.followOnController(motors[0], true)) {
+            motor.setInverted(!motorConfig.inverted);
+        }
     }
 
     /** Sets the stator current limit of every motor, e.g. to push gently against a hard stop. */
@@ -149,29 +194,29 @@ public abstract class MechanismBase extends SubsystemBase {
      * Default is no feedforward; override to add e.g. {@code gains.positionFF(pidOutput, atSetpoint())}
      * or {@code gains.velocityFF(getSetpoint(), pidOutput, atSetpoint())}.
      *
-     * @param pidOutput The output of {@code feedback} this cycle.
+     * @param pidOutput The output of {@code feedback} this cycle, or the error (setpoint minus
+     *                  measurement) when the motor controller runs the loop. Use it to sign kS.
      */
     protected double calculateFeedforward(double pidOutput) {
         return 0;
     }
 
-    /**
-     * Drives the motors toward the setpoint; called every loop while enabled.
-     * Default runs {@code feedback} plus {@link #calculateFeedforward(double)} on the roboRIO and
-     * applies the result as volts. Override to run the loop on the motor controller instead.
-     */
-    protected void applyOutput() {
-        final double pidOutput = feedback.applyAsDouble(measurement.getAsDouble(), setpointValue);
-        final double output = MathUtil.clamp(pidOutput + calculateFeedforward(pidOutput), -MAX_VOLTS, MAX_VOLTS);
-        for (NAR_Motor motor : motors) {
-            motor.setVolts(output);
-        }
-    }
-
     @Override
     public void periodic() {
         if (enabled) {
-            applyOutput();
+            if (controllerMode != null) {
+                // The motor controller runs the PID; the error only signs kS in the feedforward
+                final double feedforward = calculateFeedforward(setpointValue - measurement.getAsDouble());
+                for (NAR_Motor motor : commandedMotors) {
+                    motor.set(setpointValue, controllerMode, feedforward);
+                }
+            } else {
+                final double pidOutput = feedback.applyAsDouble(measurement.getAsDouble(), setpointValue);
+                final double output = MathUtil.clamp(pidOutput + calculateFeedforward(pidOutput), -MAX_VOLTS, MAX_VOLTS);
+                for (NAR_Motor motor : commandedMotors) {
+                    motor.setVolts(output);
+                }
+            }
 
             if (safetyTimer.hasElapsed(safetyThresh)) onSafetyTimeout();
             if (atSetpoint()) {
@@ -264,8 +309,10 @@ public abstract class MechanismBase extends SubsystemBase {
 
     /** Enables the PID control. Resets the controller if it was previously disabled. */
     public void enable() {
-        requireNonNullParam(feedback, "feedback", "MechanismBase.enable");
-        if (!enabled) resetController.accept(measurement.getAsDouble());
+        if (controllerMode == null) {
+            requireNonNullParam(feedback, "feedback", "MechanismBase.enable");
+            if (!enabled) resetController.accept(measurement.getAsDouble());
+        }
         enabled = true;
         safetyTimer.restart();
         Log.debug(Log.Type.CONTROLLER, getName(), "Enabled PID");
@@ -274,7 +321,7 @@ public abstract class MechanismBase extends SubsystemBase {
     /** Disables the PID control. If it was running, also stops the motors so they don't hold their last output. */
     public void disable() {
         if (enabled) {
-            for (NAR_Motor motor : motors) {
+            for (NAR_Motor motor : commandedMotors) {
                 motor.set(0);
             }
         }
@@ -298,7 +345,7 @@ public abstract class MechanismBase extends SubsystemBase {
      */
     public void run(double power) {
         disable();
-        for (NAR_Motor motor : motors) {
+        for (NAR_Motor motor : commandedMotors) {
             motor.set(power);
         }
     }
@@ -320,7 +367,7 @@ public abstract class MechanismBase extends SubsystemBase {
      */
     public void runVolts(double volts) {
         disable();
-        for (NAR_Motor motor : motors) {
+        for (NAR_Motor motor : commandedMotors) {
             motor.setVolts(volts);
         }
     }

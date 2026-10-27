@@ -284,6 +284,42 @@ public abstract class NAR_Motor implements AutoCloseable {
     public abstract void configPIDNoApply(PIDFFConfig config);
 
     /**
+     * Loads PID gains for the motor controller's own control loop, converting them from this
+     * motor's units (set by {@link MotorConfig}) to the motor controller's units.
+     * @param gains kP, kI and kD in volts per unit of position or velocity error, with time in seconds
+     * @param mode {@link Control#Position} or {@link Control#Velocity}
+     */
+    public void configPID(PIDFFConfig gains, Control mode) {
+        // This motor's units per one unit of the motor controller's own position or velocity
+        final double unitsPerNative = mode == Control.Velocity
+            ? unitConversionFactor / timeConversionFactor * getNativeVelocityRPM()
+            : unitConversionFactor;
+        final double scale = unitsPerNative / getNativeOutputVolts();
+        final double loopSeconds = getNativeTimeSeconds();
+        configPID(new PIDFFConfig(gains.kP * scale, gains.kI * scale * loopSeconds, gains.kD * scale / loopSeconds));
+    }
+
+    /** Rotor RPM in one unit of the motor controller's own velocity, e.g. 60 for rotations per second. */
+    protected abstract double getNativeVelocityRPM();
+
+    /** Volts in one unit of the motor controller's PID output, e.g. 1 for volts or 12 for output fraction. */
+    protected abstract double getNativeOutputVolts();
+
+    /** Seconds in the motor controller's time unit for kI and kD. */
+    protected abstract double getNativeTimeSeconds();
+
+    /**
+     * Makes this motor copy {@code leader}'s output on the motor controller itself, so it
+     * follows instantly instead of waiting for robot code.
+     * @param leader The motor to follow
+     * @param opposeLeader Whether this motor spins the opposite way to the leader
+     * @return False if the two motor controllers can't follow each other, e.g. a Spark and a TalonFX
+     */
+    public boolean followOnController(NAR_Motor leader, boolean opposeLeader) {
+        return false;
+    }
+
+    /**
      * Wraps a measurement value to the min and max input
      * @param value A measurement value
      * @return The measurement value wrapped by the min and max input

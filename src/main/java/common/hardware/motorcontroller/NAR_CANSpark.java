@@ -406,6 +406,30 @@ public class NAR_CANSpark extends NAR_Motor {
 		config.follow(leader.motor, invert);
 	}
 
+	// REV closed loops run on rotor rotations and RPM (the encoders have no conversion factor),
+	// output a fraction of the 12 V compensation voltage, and step once per 1 ms
+	@Override
+	protected double getNativeVelocityRPM() {
+		return 1;
+	}
+
+	@Override
+	protected double getNativeOutputVolts() {
+		return 12;
+	}
+
+	@Override
+	protected double getNativeTimeSeconds() {
+		return 0.001;
+	}
+
+	@Override
+	public boolean followOnController(NAR_Motor leader, boolean opposeLeader) {
+		if (!(leader instanceof NAR_CANSpark spark)) return false;
+		follow(spark, opposeLeader);
+		return true;
+	}
+
 	@Override
 	public void follow(NAR_Motor leader) {
 		if (leader instanceof NAR_CANSpark) {

@@ -12,11 +12,13 @@ import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.VoltageConfigs;
+import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.sim.TalonFXSimState;
 
@@ -126,6 +128,31 @@ public class NAR_TalonFX extends NAR_Motor {
         configs.Slot0.kP = config.kP;
         configs.Slot0.kI = config.kI;
         configs.Slot0.kD = config.kD;
+    }
+
+    // Phoenix 6 closed loops run on rotor rotations and rotations per second, output volts, and use seconds
+    @Override
+    protected double getNativeVelocityRPM() {
+        return 60;
+    }
+
+    @Override
+    protected double getNativeOutputVolts() {
+        return 1;
+    }
+
+    @Override
+    protected double getNativeTimeSeconds() {
+        return 1;
+    }
+
+    @Override
+    public boolean followOnController(NAR_Motor leader, boolean opposeLeader) {
+        if (!(leader instanceof NAR_TalonFX talon)) return false;
+        // Both motors must be on the same CAN bus
+        motor.setControl(new Follower(talon.motor.getDeviceID(),
+            opposeLeader ? MotorAlignmentValue.Opposed : MotorAlignmentValue.Aligned));
+        return true;
     }
 
     @Override

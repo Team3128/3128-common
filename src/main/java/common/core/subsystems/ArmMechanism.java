@@ -2,19 +2,19 @@ package common.core.subsystems;
 
 import common.core.controllers.PIDFFConfig;
 import common.hardware.motorcontroller.NAR_Motor;
+import common.hardware.motorcontroller.NAR_Motor.Control;
 import common.hardware.motorcontroller.NAR_Motor.MotorConfig;
 import common.hardware.motorcontroller.sim.ArmSimModel;
 import common.hardware.motorcontroller.sim.MotorSimModel;
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 
 /**
  * Rotates to an angle and holds it against gravity: arms, pivots, wrists.
  *
- * <p>Angles follow WPILib: 0 is horizontal and positive is up. Feedforward is kS plus
- * kG times the cosine of the angle, so kG is the voltage to hold the arm level.
- * The arm is assumed to be at {@code startPosition} when the robot turns on, and the
- * encoder is reset to it.
+ * <p>Angles follow WPILib: 0 is horizontal and positive is up. PID runs on the motor
+ * controller. Feedforward is kS plus kG times the cosine of the angle, so kG is the voltage
+ * to hold the arm level. The arm is assumed to be at {@code startPosition} when the robot
+ * turns on, and the encoder is reset to it.
  */
 public class ArmMechanism extends MechanismBase {
 
@@ -30,21 +30,12 @@ public class ArmMechanism extends MechanismBase {
      * @param lengthMeters Pivot to the end of the arm; used only in simulation
      * @param massKg Mass of the arm; used only in simulation
      * @param motorType Model of one motor, e.g. {@code DCMotor.getKrakenX44(1)}; used only in simulation
-     * @param motors Every motor on the arm. All of them get the same output.
+     * @param motors Every motor on the arm. The first is the leader.
      */
     public ArmMechanism(String name, MotorConfig motorConfig, PIDFFConfig gains, double tolerance,
                         double minPosition, double maxPosition, double startPosition, double radiansPerUnit,
                         double lengthMeters, double massKg, DCMotor motorType, NAR_Motor... motors) {
-        this(name, motorConfig, gains, new PIDController(gains.kP, gains.kI, gains.kD), tolerance, minPosition,
-            maxPosition, startPosition, radiansPerUnit, lengthMeters, massKg, motorType, motors);
-    }
-
-    private ArmMechanism(String name, MotorConfig motorConfig, PIDFFConfig gains, PIDController pid,
-                         double tolerance, double minPosition, double maxPosition, double startPosition,
-                         double radiansPerUnit, double lengthMeters, double massKg, DCMotor motorType,
-                         NAR_Motor... motors) {
-        super(gains, pid::calculate, m -> pid.reset(), () -> motors[0].getPosition(), tolerance, startPosition,
-            motorConfig, motors);
+        super(gains, Control.Position, tolerance, startPosition, motorConfig, motors);
         setName(name);
         setInputRange(minPosition, maxPosition);
         setDisableAtSetpoint(false); // keep holding against gravity
@@ -58,7 +49,7 @@ public class ArmMechanism extends MechanismBase {
     }
 
     @Override
-    protected double calculateFeedforward(double pidOutput) {
-        return gains.positionFF(pidOutput, atSetpoint());
+    protected double calculateFeedforward(double error) {
+        return gains.positionFF(error, atSetpoint());
     }
 }

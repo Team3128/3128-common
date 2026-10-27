@@ -2,18 +2,19 @@ package common.core.subsystems;
 
 import common.core.controllers.PIDFFConfig;
 import common.hardware.motorcontroller.NAR_Motor;
+import common.hardware.motorcontroller.NAR_Motor.Control;
 import common.hardware.motorcontroller.NAR_Motor.MotorConfig;
 import common.hardware.motorcontroller.sim.LinearSimModel;
 import common.hardware.motorcontroller.sim.MotorSimModel;
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 
 /**
  * Moves in a straight line to a position and holds it, at any incline:
  * sliders (0 degrees), elevators (90 degrees), or anything in between.
  *
- * <p>Feedforward is kS plus a constant kG from {@code gains}; leave kG at 0 for a horizontal slider.
- * The mechanism is assumed to be at {@code minPosition} when the robot turns on.
+ * <p>PID runs on the motor controller. Feedforward is kS plus a constant kG from {@code gains};
+ * leave kG at 0 for a horizontal slider. The mechanism is assumed to be at {@code minPosition}
+ * when the robot turns on.
  */
 public class LinearMechanism extends MechanismBase {
 
@@ -28,20 +29,12 @@ public class LinearMechanism extends MechanismBase {
      * @param angleRadians Incline of travel, 0 is horizontal and pi/2 is straight up; used only in simulation
      * @param massKg Mass that moves; used only in simulation
      * @param motorType Model of one motor, e.g. {@code DCMotor.getKrakenX60(1)}; used only in simulation
-     * @param motors Every motor on the mechanism. All of them get the same output.
+     * @param motors Every motor on the mechanism. The first is the leader.
      */
     public LinearMechanism(String name, MotorConfig motorConfig, PIDFFConfig gains, double tolerance,
                            double minPosition, double maxPosition, double metersPerUnit, double angleRadians,
                            double massKg, DCMotor motorType, NAR_Motor... motors) {
-        this(name, motorConfig, gains, new PIDController(gains.kP, gains.kI, gains.kD), tolerance,
-            minPosition, maxPosition, metersPerUnit, angleRadians, massKg, motorType, motors);
-    }
-
-    private LinearMechanism(String name, MotorConfig motorConfig, PIDFFConfig gains, PIDController pid,
-                            double tolerance, double minPosition, double maxPosition, double metersPerUnit,
-                            double angleRadians, double massKg, DCMotor motorType, NAR_Motor... motors) {
-        super(gains, pid::calculate, m -> pid.reset(), () -> motors[0].getPosition(), tolerance, minPosition,
-            motorConfig, motors);
+        super(gains, Control.Position, tolerance, minPosition, motorConfig, motors);
         setName(name);
         setInputRange(minPosition, maxPosition);
         setDisableAtSetpoint(false); // keep holding position
@@ -53,7 +46,7 @@ public class LinearMechanism extends MechanismBase {
     }
 
     @Override
-    protected double calculateFeedforward(double pidOutput) {
-        return gains.positionFF(pidOutput, atSetpoint());
+    protected double calculateFeedforward(double error) {
+        return gains.positionFF(error, atSetpoint());
     }
 }
