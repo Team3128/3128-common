@@ -87,6 +87,14 @@ class FSMSubsystemBaseTest {
     }
 
     @Test
+    void stateEqualsAnyOfSeveralStates() {
+        final TestFSM fsm = fsm(map -> {});
+
+        assertTrue(fsm.stateEquals(TestState.SHOOT, TestState.IDLE));
+        assertFalse(fsm.stateEquals(TestState.SHOOT, TestState.INTAKE));
+    }
+
+    @Test
     void invalidTransitionLeavesTheStateAlone() {
         final TestFSM fsm = fsm(map -> map.addTransition(TestState.IDLE, TestState.INTAKE, Commands.none()));
 
