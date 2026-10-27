@@ -15,7 +15,8 @@ import edu.wpi.first.wpilibj.simulation.XboxControllerSim;
 class NAR_XboxControllerTest {
 
     private static final int PORT = 0;
-    private static final double TOLERANCE = 1e-9;
+    // The Driver Station stores axes as floats
+    private static final double TOLERANCE = 1e-6;
 
     private NAR_XboxController controller;
     private XboxControllerSim sim;
