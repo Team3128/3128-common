@@ -407,7 +407,8 @@ public class NAR_CANSpark extends NAR_Motor {
 	}
 
 	// REV closed loops run on rotor rotations and RPM (the encoders have no conversion factor),
-	// output a fraction of the 12 V compensation voltage, and step once per 1 ms
+	// output a fraction of the 12 V compensation voltage, and run every 1 ms without scaling kI and kD
+	// by the period, matching WPILib SysId's REV presets
 	@Override
 	protected double getNativeVelocityRPM() {
 		return 1;

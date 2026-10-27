@@ -149,7 +149,8 @@ public class NAR_TalonFX extends NAR_Motor {
     @Override
     public boolean followOnController(NAR_Motor leader, boolean opposeLeader) {
         if (!(leader instanceof NAR_TalonFX talon)) return false;
-        // Both motors must be on the same CAN bus
+        // Both motors must be on the same CAN bus. The follower's direction comes from the
+        // leader's Inverted config and the alignment; its own Inverted config isn't used.
         motor.setControl(new Follower(talon.motor.getDeviceID(),
             opposeLeader ? MotorAlignmentValue.Opposed : MotorAlignmentValue.Aligned));
         return true;
