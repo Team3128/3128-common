@@ -60,18 +60,43 @@ class MotorSimModelTest {
     @Test
     void linearStopsAtHardStop() {
         final double rotationsPerMeter = 50;
-        final LinearSimModel slider = new LinearSimModel(KRAKEN, rotationsPerMeter, 2, 0, 0.3, false);
+        final LinearSimModel slider = new LinearSimModel(KRAKEN, rotationsPerMeter, 2, 0, 0.3, 0);
         run(slider, 12, 3);
         assertEquals(0.3 * rotationsPerMeter, slider.getRotorRotations(), 1e-6);
     }
 
     @Test
     void linearWithGravityFallsWithoutPower() {
-        final LinearSimModel elevator = new LinearSimModel(KRAKEN, 50, 5, 0, 1, true);
+        final LinearSimModel elevator = new LinearSimModel(KRAKEN, 50, 5, 0, 1, Math.PI / 2);
         run(elevator, 12, 0.5);
         final double raised = elevator.getRotorRotations();
         run(elevator, 0, 2);
         assertTrue(elevator.getRotorRotations() < raised);
+    }
+
+    @Test
+    void horizontalSliderStaysPutWithoutPower() {
+        final LinearSimModel slider = new LinearSimModel(KRAKEN, 50, 2, 0, 0.3, 0);
+        run(slider, 6, 0.2);
+        run(slider, 0, 2); // let it coast to a stop
+        final double stopped = slider.getRotorRotations();
+        run(slider, 0, 1);
+        assertEquals(stopped, slider.getRotorRotations(), 1e-3);
+    }
+
+    @Test
+    void steeperInclineRisesSlower() {
+        final LinearSimModel shallow = new LinearSimModel(KRAKEN, 50, 5, 0, 1, Math.toRadians(20));
+        final LinearSimModel steep = new LinearSimModel(KRAKEN, 50, 5, 0, 1, Math.toRadians(80));
+        run(shallow, 12, 0.3);
+        run(steep, 12, 0.3);
+        assertTrue(steep.getRotorRotations() < shallow.getRotorRotations());
+    }
+
+    @Test
+    void gearboxOfTwoHasTwiceTheStallTorque() {
+        assertEquals(2 * KRAKEN.stallTorqueNewtonMeters, MotorSimModel.gearbox(KRAKEN, 2).stallTorqueNewtonMeters, 1e-9);
+        assertEquals(KRAKEN.freeSpeedRadPerSec, MotorSimModel.gearbox(KRAKEN, 2).freeSpeedRadPerSec, 1e-9);
     }
 
     @Test

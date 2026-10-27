@@ -26,4 +26,15 @@ public interface MotorSimModel {
 
     /** Current drawn by the motor(s) in amps. */
     double getCurrentAmps();
+
+    /**
+     * Combines several identical motors driving one mechanism.
+     * @param oneMotor The model of a single motor, e.g. {@code DCMotor.getKrakenX44(1)}
+     * @param count How many of them drive the mechanism
+     * @return A model of all of them together
+     */
+    static DCMotor gearbox(DCMotor oneMotor, int count) {
+        return new DCMotor(oneMotor.nominalVoltageVolts, oneMotor.stallTorqueNewtonMeters, oneMotor.stallCurrentAmps,
+            oneMotor.freeCurrentAmps, oneMotor.freeSpeedRadPerSec, count);
+    }
 }

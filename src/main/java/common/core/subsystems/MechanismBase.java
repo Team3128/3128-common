@@ -134,6 +134,13 @@ public abstract class MechanismBase extends SubsystemBase {
         motors[motorIndex].setInverted(!motorConfig.inverted);
     }
 
+    /** Sets the stator current limit of every motor, e.g. to push gently against a hard stop. */
+    public void setStatorLimit(int amps) {
+        for (NAR_Motor motor : motors) {
+            motor.setStatorLimit(amps);
+        }
+    }
+
     /**
      * Combines the controller's PID output with this mechanism's feedforward.
      * Default is no feedforward; override to add e.g. {@code gains.positionFF(pidOutput, atSetpoint())}
