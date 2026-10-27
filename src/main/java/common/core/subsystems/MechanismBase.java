@@ -57,6 +57,9 @@ import static edu.wpi.first.wpilibj2.command.Commands.*;
  */
 public abstract class MechanismBase extends SubsystemBase {
 
+    /** Nominal battery voltage. Closed-loop output is limited to plus or minus this. */
+    public static final double MAX_VOLTS = 12;
+
     protected final NAR_Motor[] motors;
     protected final PIDFFConfig gains;
 
@@ -156,7 +159,7 @@ public abstract class MechanismBase extends SubsystemBase {
     public void periodic() {
         if (enabled) {
             final double pidOutput = feedback.applyAsDouble(measurement.getAsDouble(), setpointValue);
-            final double output = MathUtil.clamp(pidOutput + calculateFeedforward(pidOutput), -12, 12);
+            final double output = MathUtil.clamp(pidOutput + calculateFeedforward(pidOutput), -MAX_VOLTS, MAX_VOLTS);
             for (NAR_Motor motor : motors) {
                 motor.setVolts(output);
             }
@@ -385,7 +388,7 @@ public abstract class MechanismBase extends SubsystemBase {
      * @return The volts applied to the first motor.
      */
     public double getVolts() {
-        return motors[0].getAppliedOutput() * 12;
+        return motors[0].getAppliedOutput() * MAX_VOLTS;
     }
 
     public Command characterization(double rampRate, double stepVoltage) {

@@ -77,7 +77,8 @@ public class RollerMechanism extends MechanismBase {
         super(gains,
             control == VelocityControl.PID
                 ? pid::calculate
-                : (measurement, setpoint) -> 12 * bangBang.calculate(measurement, setpoint),
+                // BangBangController outputs 0 or 1, so scale it to full voltage
+                : (measurement, setpoint) -> MAX_VOLTS * bangBang.calculate(measurement, setpoint),
             measurement -> pid.reset(),
             () -> motors[0].getVelocity(), tolerance, 0, motorConfig, motors);
         setName(name);
