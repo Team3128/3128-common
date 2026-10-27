@@ -402,11 +402,20 @@ public abstract class NAR_Motor implements AutoCloseable {
     }
 
     /**
-     * Resets the motor position
+     * Resets the motor position. For an absolute encoder this moves its zero, e.g. after it slipped.
      * @param position Motor position, default units - rotations
      */
     public void resetPosition(double position) {
         resetRawPosition(position / unitConversionFactor);
+    }
+
+    /**
+     * Tells the encoder where the mechanism is when the robot turns on. Unlike
+     * {@link #resetPosition(double)}, this leaves an absolute encoder alone, since it already knows.
+     * @param position Starting position, default units - rotations
+     */
+    public void setStartingPosition(double position) {
+        resetPosition(position);
     }
 
     /**
