@@ -17,9 +17,11 @@ import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
 import com.ctre.phoenix6.sim.TalonFXSimState;
 
 import common.core.controllers.PIDFFConfig;
@@ -58,6 +60,8 @@ public class NAR_TalonFX extends NAR_Motor {
     // private final MotorOutputConfigs motorOutputConfigs = new MotorOutputConfigs();
     // private final Slot0Configs slot0Configs = new Slot0Configs();
     TalonFXConfiguration configs = new TalonFXConfiguration();
+    /** Rotor rotations per rotation the Talon reports, from SensorToMechanismRatio. */
+    private double mechanismRatio = 1;
 
     private final StatusSignal<Double> appliedOutput;
     private final StatusSignal<Current> stallCurrent;
@@ -130,10 +134,43 @@ public class NAR_TalonFX extends NAR_Motor {
         configs.Slot0.kD = config.kD;
     }
 
-    // Phoenix 6 closed loops run on rotor rotations and rotations per second, output volts, and use seconds
+    @Override
+    protected void configNativeClosedLoop(Control mode, double kP, double kI, double kD,
+                                          double kS, double kV, double kG, double motorRotationsPerArmRotation) {
+        configs.Slot0.kP = kP;
+        configs.Slot0.kI = kI;
+        configs.Slot0.kD = kD;
+        configs.Slot0.kS = kS;
+        configs.Slot0.kV = kV;
+        configs.Slot0.kG = kG;
+        configs.Slot0.GravityType = motorRotationsPerArmRotation > 0 ? GravityTypeValue.Arm_Cosine : GravityTypeValue.Elevator_Static;
+        // A position request has no velocity to sign kS by, so use the error instead
+        configs.Slot0.StaticFeedforwardSign = mode == Control.Position
+            ? StaticFeedforwardSignValue.UseClosedLoopSign
+            : StaticFeedforwardSignValue.UseVelocitySign;
+        configTalonFX(()-> motor.getConfigurator().apply(configs.Slot0));
+    }
+
+    /**
+     * Arm_Cosine needs the Talon's position in arm rotations, so the Talon divides by this ratio.
+     * Everything else in this class still works in rotor rotations.
+     */
+    @Override
+    protected void setMechanismRatio(double motorRotationsPerMechanismRotation) {
+        mechanismRatio = motorRotationsPerMechanismRotation;
+        configs.Feedback.SensorToMechanismRatio = mechanismRatio;
+        configTalonFX(()-> motor.getConfigurator().apply(configs.Feedback));
+    }
+
+    // Phoenix 6 closed loops run on mechanism rotations and rotations per second, output volts, and use seconds
+    @Override
+    protected double getNativePositionRotations() {
+        return mechanismRatio;
+    }
+
     @Override
     protected double getNativeVelocityRPM() {
-        return 60;
+        return 60 * mechanismRatio;
     }
 
     @Override
@@ -180,13 +217,13 @@ public class NAR_TalonFX extends NAR_Motor {
 
     @Override
     protected void setVelocity(double rpm, double feedForward) {
-        var velocitySetpoint = new VelocityVoltage(rpm / 60);
+        var velocitySetpoint = new VelocityVoltage(rpm / 60 / mechanismRatio);
         velocitySetpoint.FeedForward = feedForward;
         motor.setControl(velocitySetpoint);
     }
 
     public void setVelocityFOC(double rpm, double feedforward) {
-        var velocitySetpoint = new VelocityVoltage(rpm / 60)
+        var velocitySetpoint = new VelocityVoltage(rpm / 60 / mechanismRatio)
             .withEnableFOC(true)
             .withFeedForward(feedforward);
         motor.setControl(velocitySetpoint);
@@ -198,13 +235,13 @@ public class NAR_TalonFX extends NAR_Motor {
 
     @Override
     protected void setPosition(double rotations, double feedForward) {
-        var positionSetpoint = new PositionVoltage(rotations);
+        var positionSetpoint = new PositionVoltage(rotations / mechanismRatio);
         positionSetpoint.FeedForward = feedForward;
         motor.setControl(positionSetpoint);
     }
 
     public void setPositionFOC(double rotations, double feedforward) {
-        var positionSetpoint = new PositionVoltage(rotations)
+        var positionSetpoint = new PositionVoltage(rotations / mechanismRatio)
             .withEnableFOC(true)
             .withFeedForward(feedforward);
         motor.setControl(positionSetpoint);
@@ -212,7 +249,7 @@ public class NAR_TalonFX extends NAR_Motor {
 
     @Override
     protected void resetRawPosition(double rotations) {
-        motor.setPosition(rotations);
+        motor.setPosition(rotations / mechanismRatio);
     }
 
     @Override
@@ -242,12 +279,12 @@ public class NAR_TalonFX extends NAR_Motor {
 
     @Override
     protected double getRawPosition() {
-        return position.refresh().getValue().in(Units.Revolution);
+        return position.refresh().getValue().in(Units.Revolution) * mechanismRatio;
     }
 
     @Override
     protected double getRawVelocity() {
-        return velocity.refresh().getValue().in(Units.RotationsPerSecond) * 60.0;
+        return velocity.refresh().getValue().in(Units.RotationsPerSecond) * 60.0 * mechanismRatio;
     }
 
     @Override

@@ -406,9 +406,29 @@ public class NAR_CANSpark extends NAR_Motor {
 		config.follow(leader.motor, invert);
 	}
 
+	@Override
+	protected void configNativeClosedLoop(Control mode, double kP, double kI, double kD,
+										  double kS, double kV, double kG, double motorRotationsPerArmRotation) {
+		final boolean arm = motorRotationsPerArmRotation > 0;
+		config.closedLoop.p(kP).i(kI).d(kD);
+		config.closedLoop.feedForward
+			.kS(kS)
+			.kV(kV)
+			.kG(arm ? 0 : kG)
+			.kCos(arm ? kG : 0)
+			// Converts encoder rotations to arm rotations
+			.kCosRatio(arm ? 1 / motorRotationsPerArmRotation : 1);
+		configure();
+	}
+
 	// REV closed loops run on rotor rotations and RPM (the encoders have no conversion factor),
 	// output a fraction of the 12 V compensation voltage, and run every 1 ms without scaling kI and kD
-	// by the period, matching WPILib SysId's REV presets
+	// by the period, matching WPILib SysId's REV presets. Feedforward gains are in volts.
+	@Override
+	protected double getNativePositionRotations() {
+		return 1;
+	}
+
 	@Override
 	protected double getNativeVelocityRPM() {
 		return 1;

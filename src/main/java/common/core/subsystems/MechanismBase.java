@@ -40,9 +40,9 @@ import static edu.wpi.first.wpilibj2.command.Commands.*;
  *     <pre>{@code super(gains, pid::calculate, m -> pid.reset(), gyro::getAngle, TOLERANCE, HOME, MOTOR_CONFIG, motor);}</pre></li>
  * </ul>
  *
- * <p>Either way, feedforward (kS/kV/kG) is worked out on the roboRIO every loop by
- * {@link #calculateFeedforward(double)}, which subclasses override, since this team's kG
- * can vary, e.g. with an arm's angle.
+ * <p>On the motor controller, feedforward runs there too: kS, kV, and kG either constant or
+ * times the cosine of an arm's angle (see {@link #useArmGravity(double)}). On the roboRIO,
+ * subclasses work it out in {@link #calculateFeedforward(double)}.
  *
  * <p>When several motors drive one mechanism, the first is the leader and the rest follow it
  * on the motor controller where possible. Only the leader runs the control loop.
@@ -59,6 +59,8 @@ public abstract class MechanismBase extends SubsystemBase {
 
     /** Position or Velocity when the motor controller runs the loop; null when the roboRIO does. */
     private final Control controllerMode;
+    /** Gearing to an arm when kG follows the arm's cosine; 0 when kG is constant. */
+    private double motorRotationsPerArmRotation = 0;
     /** Computes controller output from (measurement, setpoint), e.g. {@code pid::calculate}. */
     private final DoubleBinaryOperator feedback;
     /** Resets the controller's internal state, given the current measurement. */
@@ -83,8 +85,8 @@ public abstract class MechanismBase extends SubsystemBase {
     /**
      * Creates a mechanism whose PID runs on the leader's motor controller.
      *
-     * @param gains kP/kI/kD in volts per unit of error (converted for the motor controller), and
-     *              feedforward gains handed to {@link #calculateFeedforward(double)}.
+     * @param gains kP/kI/kD in volts per unit of error, kS and kG in volts, kV in volts per unit of
+     *              velocity; converted for the motor controller.
      * @param controllerMode {@link Control#Position} or {@link Control#Velocity}.
      * @param tolerance Error tolerance for {@link #atSetpoint()}.
      * @param resetPosition Position the motors are reset to by {@link #reset()}, e.g. the mechanism's home position.
@@ -156,11 +158,29 @@ public abstract class MechanismBase extends SubsystemBase {
         }
         commandedMotors = commanded.toArray(new NAR_Motor[0]);
 
-        if (controllerMode != null) {
-            for (NAR_Motor motor : commandedMotors) {
-                motor.configPID(gains, controllerMode);
-            }
+        applyGains();
+    }
+
+    /**
+     * Sends the PID and feedforward gains to the motor controllers. Call again after changing
+     * {@code gains}, e.g. from Shuffleboard. Does nothing when the roboRIO runs the loop.
+     */
+    public void applyGains() {
+        if (controllerMode == null) return;
+        for (NAR_Motor motor : commandedMotors) {
+            if (motorRotationsPerArmRotation > 0) motor.configArmClosedLoop(gains, motorRotationsPerArmRotation);
+            else motor.configClosedLoop(gains, controllerMode);
         }
+    }
+
+    /**
+     * Makes the motor controller multiply kG by the cosine of the arm's angle instead of applying
+     * it as a constant. Position 0 must be the arm held horizontal.
+     * @param motorRotationsPerArmRotation Gearing between the motor and the arm
+     */
+    protected void useArmGravity(double motorRotationsPerArmRotation) {
+        this.motorRotationsPerArmRotation = motorRotationsPerArmRotation;
+        applyGains();
     }
 
     /**
@@ -190,9 +210,12 @@ public abstract class MechanismBase extends SubsystemBase {
     }
 
     /**
-     * Combines the controller's PID output with this mechanism's feedforward.
-     * Default is no feedforward; override to add e.g. {@code gains.positionFF(pidOutput, atSetpoint())}
-     * or {@code gains.velocityFF(getSetpoint(), pidOutput, atSetpoint())}.
+     * Feedforward worked out on the roboRIO, in volts. Default is none.
+     *
+     * <p>When the roboRIO runs the loop, override this to add e.g.
+     * {@code gains.positionFF(pidOutput, atSetpoint())}. When the motor controller runs the loop
+     * it already applies kS, kV and kG, so only override this for anything extra it can't do,
+     * e.g. a kG that changes with an elevator's height.
      *
      * @param pidOutput The output of {@code feedback} this cycle, or the error (setpoint minus
      *                  measurement) when the motor controller runs the loop. Use it to sign kS.
@@ -205,7 +228,7 @@ public abstract class MechanismBase extends SubsystemBase {
     public void periodic() {
         if (enabled) {
             if (controllerMode != null) {
-                // The motor controller runs the PID; the error only signs kS in the feedforward
+                // The motor controller runs PID and feedforward; this only adds anything extra
                 final double feedforward = calculateFeedforward(setpointValue - measurement.getAsDouble());
                 for (NAR_Motor motor : commandedMotors) {
                     motor.set(setpointValue, controllerMode, feedforward);
@@ -491,5 +514,9 @@ public abstract class MechanismBase extends SubsystemBase {
         gains.setkA(NAR_Shuffleboard.debug(getName(), "kA", gains.getkA(), x + 1, y + 3));
         gains.setkG(NAR_Shuffleboard.debug(getName(), "kG", gains.getkG(), x, y + 3));
         NAR_Shuffleboard.addCommand(getName(), "Characterize", characterization(1, 0.5), x - 1, y + 3).withSize(1, 1);
+        // The motor controller only sees new gains once they're sent to it
+        if (controllerMode != null) {
+            NAR_Shuffleboard.addCommand(getName(), "Apply Gains", runOnce(this::applyGains).ignoringDisable(true), x + 2, y + 2);
+        }
     }
 }

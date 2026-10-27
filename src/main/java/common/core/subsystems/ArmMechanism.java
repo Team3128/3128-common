@@ -11,9 +11,9 @@ import edu.wpi.first.math.system.plant.DCMotor;
 /**
  * Rotates to an angle and holds it against gravity: arms, pivots, wrists.
  *
- * <p>Angles follow WPILib: 0 is horizontal and positive is up. PID runs on the motor
- * controller. Feedforward is kS plus kG times the cosine of the angle, so kG is the voltage
- * to hold the arm level. The arm is assumed to be at {@code startPosition} when the robot
+ * <p>Angles follow WPILib: 0 is horizontal and positive is up. PID and feedforward run on the
+ * motor controller. Feedforward is kS plus kG times the cosine of the angle, so kG is the
+ * voltage to hold the arm level. The arm is assumed to be at {@code startPosition} when the robot
  * turns on, and the encoder is reset to it.
  */
 public class ArmMechanism extends MechanismBase {
@@ -39,17 +39,12 @@ public class ArmMechanism extends MechanismBase {
         setName(name);
         setInputRange(minPosition, maxPosition);
         setDisableAtSetpoint(false); // keep holding against gravity
-        gains.setkG_Function(() -> Math.cos(getPosition() * radiansPerUnit));
 
         // distanceFactor is position units per motor rotation
         final double gearing = 2 * Math.PI / (motorConfig.distanceFactor * radiansPerUnit);
+        useArmGravity(gearing);
         motors[0].enableSim(new ArmSimModel(MotorSimModel.gearbox(motorType, motors.length), gearing, lengthMeters,
             massKg, minPosition * radiansPerUnit, maxPosition * radiansPerUnit, startPosition * radiansPerUnit));
         reset();
-    }
-
-    @Override
-    protected double calculateFeedforward(double error) {
-        return gains.positionFF(error, atSetpoint());
     }
 }

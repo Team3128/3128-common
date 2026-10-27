@@ -284,20 +284,60 @@ public abstract class NAR_Motor implements AutoCloseable {
     public abstract void configPIDNoApply(PIDFFConfig config);
 
     /**
-     * Loads PID gains for the motor controller's own control loop, converting them from this
-     * motor's units (set by {@link MotorConfig}) to the motor controller's units.
-     * @param gains kP, kI and kD in volts per unit of position or velocity error, with time in seconds
+     * Loads PID and feedforward gains for the motor controller's own control loop, converting
+     * them from this motor's units (set by {@link MotorConfig}) to the motor controller's units.
+     * kG is applied as a constant, e.g. for an elevator.
+     * @param gains kP, kI and kD in volts per unit of position or velocity error, with time in seconds;
+     *              kS and kG in volts; kV in volts per unit of velocity
      * @param mode {@link Control#Position} or {@link Control#Velocity}
      */
-    public void configPID(PIDFFConfig gains, Control mode) {
-        // This motor's units per one unit of the motor controller's own position or velocity
-        final double unitsPerNative = mode == Control.Velocity
-            ? unitConversionFactor / timeConversionFactor * getNativeVelocityRPM()
-            : unitConversionFactor;
-        final double scale = unitsPerNative / getNativeOutputVolts();
-        final double loopSeconds = getNativeTimeSeconds();
-        configPID(new PIDFFConfig(gains.kP * scale, gains.kI * scale * loopSeconds, gains.kD * scale / loopSeconds));
+    public void configClosedLoop(PIDFFConfig gains, Control mode) {
+        configClosedLoop(gains, mode, 0);
     }
+
+    /**
+     * Like {@link #configClosedLoop(PIDFFConfig, Control)} for position control of an arm, where
+     * kG is multiplied by the cosine of the arm's angle. Position 0 must be the arm held horizontal.
+     * @param gains PID and feedforward gains, as in {@link #configClosedLoop(PIDFFConfig, Control)}
+     * @param motorRotationsPerArmRotation Gearing between the motor and the arm
+     */
+    public void configArmClosedLoop(PIDFFConfig gains, double motorRotationsPerArmRotation) {
+        configClosedLoop(gains, Control.Position, motorRotationsPerArmRotation);
+    }
+
+    private void configClosedLoop(PIDFFConfig gains, Control mode, double motorRotationsPerArmRotation) {
+        // Comes first, since on a TalonFX it changes the motor controller's units
+        setMechanismRatio(motorRotationsPerArmRotation > 0 ? motorRotationsPerArmRotation : 1);
+
+        // This motor's units per one unit of the motor controller's own position or velocity
+        final double unitsPerNativeVelocity = unitConversionFactor / timeConversionFactor * getNativeVelocityRPM();
+        final double unitsPerNative = mode == Control.Velocity
+            ? unitsPerNativeVelocity
+            : unitConversionFactor * getNativePositionRotations();
+        final double pidScale = unitsPerNative / getNativeOutputVolts();
+        final double loopSeconds = getNativeTimeSeconds();
+
+        // Feedforward is in volts on every motor controller, so only kV needs converting
+        configNativeClosedLoop(mode,
+            gains.kP * pidScale, gains.kI * pidScale * loopSeconds, gains.kD * pidScale / loopSeconds,
+            gains.getkS(), gains.getkV() * unitsPerNativeVelocity, gains.getkG(), motorRotationsPerArmRotation);
+    }
+
+    /**
+     * Loads gains already in the motor controller's own units.
+     * @param motorRotationsPerArmRotation Gearing to an arm for a cosine kG, or 0 for a constant kG
+     */
+    protected abstract void configNativeClosedLoop(Control mode, double kP, double kI, double kD,
+                                                   double kS, double kV, double kG, double motorRotationsPerArmRotation);
+
+    /**
+     * Makes the motor controller measure in mechanism rotations rather than motor rotations, for
+     * motor controllers that need this for an arm's cosine kG. Does nothing by default.
+     */
+    protected void setMechanismRatio(double motorRotationsPerMechanismRotation) {}
+
+    /** Rotor rotations in one unit of the motor controller's own position. */
+    protected abstract double getNativePositionRotations();
 
     /** Rotor RPM in one unit of the motor controller's own velocity, e.g. 60 for rotations per second. */
     protected abstract double getNativeVelocityRPM();

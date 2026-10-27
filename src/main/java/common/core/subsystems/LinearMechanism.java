@@ -12,8 +12,8 @@ import edu.wpi.first.math.system.plant.DCMotor;
  * Moves in a straight line to a position and holds it, at any incline:
  * sliders (0 degrees), elevators (90 degrees), or anything in between.
  *
- * <p>PID runs on the motor controller. Feedforward is kS plus a constant kG from {@code gains};
- * leave kG at 0 for a horizontal slider. The mechanism is assumed to be at {@code minPosition}
+ * <p>PID and feedforward run on the motor controller. Feedforward is kS plus a constant kG
+ * from {@code gains}; leave kG at 0 for a horizontal slider. The mechanism is assumed to be at {@code minPosition}
  * when the robot turns on.
  */
 public class LinearMechanism extends MechanismBase {
@@ -43,10 +43,5 @@ public class LinearMechanism extends MechanismBase {
         final double motorRotationsPerMeter = 1 / (motorConfig.distanceFactor * metersPerUnit);
         motors[0].enableSim(new LinearSimModel(MotorSimModel.gearbox(motorType, motors.length), motorRotationsPerMeter,
             massKg, minPosition * metersPerUnit, maxPosition * metersPerUnit, angleRadians));
-    }
-
-    @Override
-    protected double calculateFeedforward(double error) {
-        return gains.positionFF(error, atSetpoint());
     }
 }

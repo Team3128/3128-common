@@ -21,7 +21,7 @@ public class RollerMechanism extends MechanismBase {
     /** How a velocity-controlled roller works out its output. */
     public enum VelocityControl {
         /**
-         * PID on the motor controller at 1 kHz, plus feedforward. Speeds up and slows down
+         * PID and feedforward on the motor controller at 1 kHz. Speeds up and slows down
          * cleanly. Tune kV to hold speed, then kP to recover quickly after a game piece.
          */
         PID,
@@ -34,6 +34,9 @@ public class RollerMechanism extends MechanismBase {
          */
         BANG_BANG
     }
+
+    /** Null for an open-loop roller. */
+    private final VelocityControl control;
 
     /**
      * Creates an open-loop roller.
@@ -50,6 +53,7 @@ public class RollerMechanism extends MechanismBase {
                            double moiKgMetersSq, NAR_Motor... motors) {
         super(motorConfig, motors);
         setName(name);
+        control = null;
         motors[0].enableSim(new RollerSimModel(MotorSimModel.gearbox(motorType, motors.length), gearing, moiKgMetersSq));
     }
 
@@ -85,12 +89,14 @@ public class RollerMechanism extends MechanismBase {
             measurement -> {},
             () -> motors[0].getVelocity(), tolerance, 0, motorConfig, motors);
         setName(name);
+        this.control = control;
         setDisableAtSetpoint(false); // keep spinning once at speed
         motors[0].enableSim(new RollerSimModel(MotorSimModel.gearbox(motorType, motors.length), gearing, moiKgMetersSq));
     }
 
     @Override
     protected double calculateFeedforward(double pidOutput) {
-        return gains.velocityFF(getSetpoint(), pidOutput, atSetpoint());
+        // With PID, the motor controller applies the feedforward itself
+        return control == VelocityControl.BANG_BANG ? gains.velocityFF(getSetpoint(), pidOutput, atSetpoint()) : 0;
     }
 }
