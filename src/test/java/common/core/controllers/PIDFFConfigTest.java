@@ -50,4 +50,42 @@ class PIDFFConfigTest {
 
         assertEquals(expected, config.velocityFF(VELOCITY_SETPOINT, PID_OUTPUT_FORWARD, NOT_AT_SETPOINT), TOLERANCE);
     }
+
+    @Test
+    void shortConstructorsLeaveTheOtherGainsAtZero() {
+        final PIDFFConfig pOnly = new PIDFFConfig(3);
+        assertEquals(3, pOnly.getkP(), TOLERANCE);
+        assertEquals(0, pOnly.getkI(), TOLERANCE);
+        assertEquals(0, pOnly.getkS(), TOLERANCE);
+        assertEquals(0, pOnly.getkG(), TOLERANCE);
+
+        final PIDFFConfig noKA = new PIDFFConfig(1, 2, 3, KS, KV, KG);
+        assertEquals(0, noKA.getkA(), TOLERANCE);
+        assertEquals(KG, noKA.getkG(), TOLERANCE);
+    }
+
+    @Test
+    void supplierGainsReadTheirLatestValue() {
+        final double[] tunedKS = {0.1}; // e.g. a Shuffleboard widget
+        config.setkS(() -> tunedKS[0]);
+        tunedKS[0] = 0.4;
+        assertEquals(0.4, config.getkS(), TOLERANCE);
+    }
+
+    @Test
+    void changeCopiesEveryGainAndTheGravityFunction() {
+        final PIDFFConfig other = new PIDFFConfig(1, 2, 3, 4, 5, 6, 7);
+        other.setkG_Function(() -> 0.5);
+
+        config.change(other);
+
+        assertEquals(1, config.getkP(), TOLERANCE);
+        assertEquals(2, config.getkI(), TOLERANCE);
+        assertEquals(3, config.getkD(), TOLERANCE);
+        assertEquals(4, config.getkS(), TOLERANCE);
+        assertEquals(5, config.getkV(), TOLERANCE);
+        assertEquals(6, config.getkA(), TOLERANCE);
+        assertEquals(7, config.getkG(), TOLERANCE);
+        assertEquals(0.5, config.getkG_Function().getAsDouble(), TOLERANCE);
+    }
 }
