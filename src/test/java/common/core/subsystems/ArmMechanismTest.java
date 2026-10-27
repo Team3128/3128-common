@@ -7,7 +7,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import common.core.controllers.PIDFFConfig;
-import common.hardware.motorcontroller.FakeMotor;
+import common.hardware.motorcontroller.MockMotor;
 import common.hardware.motorcontroller.NAR_Motor.Control;
 import common.hardware.motorcontroller.NAR_Motor.MotorConfig;
 import common.hardware.motorcontroller.NAR_Motor.Neutral;
@@ -34,19 +34,19 @@ class ArmMechanismTest {
         assertTrue(HAL.initialize(500, 0));
     }
 
-    private static ArmMechanism arm(double degreesPerEncoderRotation, FakeMotor motor) {
+    private static ArmMechanism arm(double degreesPerEncoderRotation, MockMotor motor) {
         final MotorConfig config = new MotorConfig(degreesPerEncoderRotation, 60, 40, false, Neutral.BRAKE);
         return new ArmMechanism("ArmMechanismTest" + nextName++, config, new PIDFFConfig(KP, 0, 0, 0, 0, 0, KG),
             1, MIN, MAX, START, Math.PI / 180, 0.5, 3, KRAKEN, motor);
     }
 
-    private static ArmMechanism arm(FakeMotor motor) {
+    private static ArmMechanism arm(MockMotor motor) {
         return arm(DEGREES_PER_MOTOR_ROTATION, motor);
     }
 
     @Test
     void gravityFollowsTheArmsCosineInArmRotations() {
-        final FakeMotor motor = FakeMotor.talonLike(1);
+        final MockMotor motor = MockMotor.talonLike(1);
         arm(motor);
 
         assertEquals(GEARING, motor.armRatio, TOLERANCE);
@@ -58,14 +58,14 @@ class ArmMechanismTest {
 
     @Test
     void encoderStartsAtTheStartPosition() {
-        final FakeMotor motor = FakeMotor.talonLike(1);
+        final MockMotor motor = MockMotor.talonLike(1);
         final ArmMechanism arm = arm(motor);
         assertEquals(START, arm.getPosition(), TOLERANCE);
     }
 
     @Test
     void setpointIsSentInMotorRotations() {
-        final FakeMotor motor = FakeMotor.talonLike(1);
+        final MockMotor motor = MockMotor.talonLike(1);
         final ArmMechanism arm = arm(motor);
 
         arm.setSetpoint(45);
@@ -77,7 +77,7 @@ class ArmMechanismTest {
 
     @Test
     void setpointIsLimitedToTheArmsTravel() {
-        final ArmMechanism arm = arm(FakeMotor.talonLike(1));
+        final ArmMechanism arm = arm(MockMotor.talonLike(1));
         arm.setSetpoint(180);
         assertEquals(MAX, arm.getSetpoint(), TOLERANCE);
         arm.setSetpoint(-180);
@@ -86,7 +86,7 @@ class ArmMechanismTest {
 
     @Test
     void armKeepsHoldingAgainstGravityAtSetpoint() {
-        final FakeMotor motor = FakeMotor.talonLike(1);
+        final MockMotor motor = MockMotor.talonLike(1);
         final ArmMechanism arm = arm(motor);
         arm.setSetpoint(START);
 
@@ -97,7 +97,7 @@ class ArmMechanismTest {
 
     @Test
     void encoderOnTheArmShaftGivesAOneToOneGravityRatio() {
-        final FakeMotor motor = FakeMotor.sparkLike(1);
+        final MockMotor motor = MockMotor.sparkLike(1);
         motor.setMotorRotationsPerSensorRotation(GEARING); // the encoder turns once per arm rotation
         arm(360, motor); // 360 degrees per encoder rotation
 

@@ -14,7 +14,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import common.core.controllers.PIDFFConfig;
-import common.hardware.motorcontroller.FakeMotor;
+import common.hardware.motorcontroller.MockMotor;
 import common.hardware.motorcontroller.NAR_Motor.Control;
 import common.hardware.motorcontroller.NAR_Motor.MotorConfig;
 import common.hardware.motorcontroller.NAR_Motor.Neutral;
@@ -54,17 +54,17 @@ class MechanismBaseTest {
         return "MechanismBaseTest" + nextName++;
     }
 
-    private static LinearMechanism slider(PIDFFConfig gains, FakeMotor... motors) {
+    private static LinearMechanism slider(PIDFFConfig gains, MockMotor... motors) {
         return new LinearMechanism(uniqueName(), CONFIG, gains, SLIDER_TOLERANCE, MIN, MAX, 1, 0, 2, KRAKEN, motors);
     }
 
-    private static LinearMechanism slider(FakeMotor... motors) {
+    private static LinearMechanism slider(MockMotor... motors) {
         return slider(new PIDFFConfig(20), motors);
     }
 
     @Test
     void setSetpointEnablesAndSendsThePositionToTheLeader() {
-        final FakeMotor leader = FakeMotor.talonLike(1);
+        final MockMotor leader = MockMotor.talonLike(1);
         final LinearMechanism slider = slider(leader);
 
         slider.setSetpoint(0.2);
@@ -77,7 +77,7 @@ class MechanismBaseTest {
 
     @Test
     void setpointIsLimitedToTheInputRange() {
-        final LinearMechanism slider = slider(FakeMotor.talonLike(1));
+        final LinearMechanism slider = slider(MockMotor.talonLike(1));
         slider.setSetpoint(1);
         assertEquals(MAX, slider.getSetpoint(), TOLERANCE);
         slider.setSetpoint(-1);
@@ -86,7 +86,7 @@ class MechanismBaseTest {
 
     @Test
     void atSetpointUsesTheTolerance() {
-        final FakeMotor leader = FakeMotor.talonLike(1);
+        final MockMotor leader = MockMotor.talonLike(1);
         final LinearMechanism slider = slider(leader);
         slider.setSetpoint(0.2);
 
@@ -99,7 +99,7 @@ class MechanismBaseTest {
 
     @Test
     void positionMechanismKeepsHoldingOnceAtSetpoint() {
-        final FakeMotor leader = FakeMotor.talonLike(1);
+        final MockMotor leader = MockMotor.talonLike(1);
         final LinearMechanism slider = slider(leader);
         slider.setSetpoint(0.2);
         leader.rawPosition = 0.2 / METERS_PER_ROTATION;
@@ -111,7 +111,7 @@ class MechanismBaseTest {
 
     @Test
     void disableStopsTheMotors() {
-        final FakeMotor leader = FakeMotor.talonLike(1);
+        final MockMotor leader = MockMotor.talonLike(1);
         final LinearMechanism slider = slider(leader);
         slider.setSetpoint(0.2);
         slider.periodic();
@@ -125,7 +125,7 @@ class MechanismBaseTest {
 
     @Test
     void openLoopCommandsTurnOffClosedLoop() {
-        final FakeMotor leader = FakeMotor.talonLike(1);
+        final MockMotor leader = MockMotor.talonLike(1);
         final LinearMechanism slider = slider(leader);
         slider.setSetpoint(0.2);
 
@@ -139,7 +139,7 @@ class MechanismBaseTest {
 
     @Test
     void stopDisablesAndStopsTheMotors() {
-        final FakeMotor leader = FakeMotor.talonLike(1);
+        final MockMotor leader = MockMotor.talonLike(1);
         final LinearMechanism slider = slider(leader);
         slider.run(0.5);
 
@@ -151,8 +151,8 @@ class MechanismBaseTest {
 
     @Test
     void resetMovesEveryEncoderToTheResetPosition() {
-        final FakeMotor leader = FakeMotor.talonLike(1);
-        final FakeMotor follower = FakeMotor.talonLike(2);
+        final MockMotor leader = MockMotor.talonLike(1);
+        final MockMotor follower = MockMotor.talonLike(2);
         final LinearMechanism slider = slider(leader, follower);
         leader.rawPosition = 5;
         follower.rawPosition = 7;
@@ -165,8 +165,8 @@ class MechanismBaseTest {
 
     @Test
     void extraMotorsFollowTheLeaderOnTheMotorController() {
-        final FakeMotor leader = FakeMotor.talonLike(1);
-        final FakeMotor follower = FakeMotor.talonLike(2);
+        final MockMotor leader = MockMotor.talonLike(1);
+        final MockMotor follower = MockMotor.talonLike(2);
         final LinearMechanism slider = slider(leader, follower);
 
         slider.setSetpoint(0.2);
@@ -183,8 +183,8 @@ class MechanismBaseTest {
 
     @Test
     void invertingAFollowerMakesItOpposeTheLeader() {
-        final FakeMotor follower = FakeMotor.talonLike(2);
-        final LinearMechanism slider = slider(FakeMotor.talonLike(1), follower);
+        final MockMotor follower = MockMotor.talonLike(2);
+        final LinearMechanism slider = slider(MockMotor.talonLike(1), follower);
 
         slider.invertMotor(1);
 
@@ -195,7 +195,7 @@ class MechanismBaseTest {
 
     @Test
     void invertingTheLeaderInvertsItsOwnOutput() {
-        final FakeMotor leader = FakeMotor.talonLike(1);
+        final MockMotor leader = MockMotor.talonLike(1);
         final LinearMechanism slider = slider(leader);
 
         slider.invertMotor(0);
@@ -205,8 +205,8 @@ class MechanismBaseTest {
 
     @Test
     void motorThatCannotFollowIsCommandedDirectly() {
-        final FakeMotor leader = FakeMotor.talonLike(1);
-        final FakeMotor other = FakeMotor.cannotFollow(2);
+        final MockMotor leader = MockMotor.talonLike(1);
+        final MockMotor other = MockMotor.cannotFollow(2);
         final LinearMechanism slider = slider(leader, other);
 
         slider.setSetpoint(0.2);
@@ -220,7 +220,7 @@ class MechanismBaseTest {
     @Test
     void applyGainsSendsChangedGainsToTheMotorController() {
         final PIDFFConfig gains = new PIDFFConfig(20);
-        final FakeMotor leader = FakeMotor.talonLike(1);
+        final MockMotor leader = MockMotor.talonLike(1);
         final LinearMechanism slider = slider(gains, leader);
         assertEquals(20 * METERS_PER_ROTATION, leader.nativeKP, TOLERANCE);
 
@@ -233,7 +233,7 @@ class MechanismBaseTest {
     @Test
     void safetyTimeoutDisablesAMechanismThatNeverGetsThere() {
         SimHooks.pauseTiming();
-        final LinearMechanism slider = slider(FakeMotor.talonLike(1)); // the encoder never moves
+        final LinearMechanism slider = slider(MockMotor.talonLike(1)); // the encoder never moves
         slider.setSetpoint(0.2);
         slider.periodic();
         assertTrue(slider.isEnabled());
@@ -247,7 +247,7 @@ class MechanismBaseTest {
     @Test
     void reachingTheSetpointRestartsTheSafetyTimer() {
         SimHooks.pauseTiming();
-        final FakeMotor leader = FakeMotor.talonLike(1);
+        final MockMotor leader = MockMotor.talonLike(1);
         final LinearMechanism slider = slider(leader);
         slider.setSetpoint(0.2);
         leader.rawPosition = 0.2 / METERS_PER_ROTATION;
@@ -262,7 +262,7 @@ class MechanismBaseTest {
 
     @Test
     void openLoopMechanismCannotTakeASetpoint() {
-        final RollerMechanism roller = new RollerMechanism(uniqueName(), CONFIG, KRAKEN, 1, 0.001, FakeMotor.talonLike(1));
+        final RollerMechanism roller = new RollerMechanism(uniqueName(), CONFIG, KRAKEN, 1, 0.001, MockMotor.talonLike(1));
         assertThrows(NullPointerException.class, () -> roller.setSetpoint(1));
     }
 
@@ -271,7 +271,7 @@ class MechanismBaseTest {
         static final double KP = 2, FEEDFORWARD_VOLTS = 1;
         final AtomicInteger resets;
 
-        RioMechanism(FakeMotor motor, AtomicInteger resets) {
+        RioMechanism(MockMotor motor, AtomicInteger resets) {
             super(new PIDFFConfig(), (measurement, setpoint) -> KP * (setpoint - measurement),
                 measurement -> resets.incrementAndGet(), motor::getPosition, 0.1, 0, CONFIG, motor);
             setName(uniqueName());
@@ -286,7 +286,7 @@ class MechanismBaseTest {
 
     @Test
     void roboRioLoopAppliesFeedbackPlusFeedforwardAsVolts() {
-        final FakeMotor motor = FakeMotor.talonLike(1);
+        final MockMotor motor = MockMotor.talonLike(1);
         final RioMechanism mechanism = new RioMechanism(motor, new AtomicInteger());
 
         mechanism.setSetpoint(3);
@@ -299,7 +299,7 @@ class MechanismBaseTest {
 
     @Test
     void roboRioLoopIsLimitedToTwelveVolts() {
-        final FakeMotor motor = FakeMotor.talonLike(1);
+        final MockMotor motor = MockMotor.talonLike(1);
         final RioMechanism mechanism = new RioMechanism(motor, new AtomicInteger());
 
         mechanism.setSetpoint(100);
@@ -311,7 +311,7 @@ class MechanismBaseTest {
     @Test
     void roboRioControllerIsResetOnlyWhenEnabledFromDisabled() {
         final AtomicInteger resets = new AtomicInteger();
-        final RioMechanism mechanism = new RioMechanism(FakeMotor.talonLike(1), resets);
+        final RioMechanism mechanism = new RioMechanism(MockMotor.talonLike(1), resets);
 
         mechanism.setSetpoint(1);
         mechanism.setSetpoint(2);

@@ -16,7 +16,7 @@ import org.junit.jupiter.api.Test;
 
 import common.core.controllers.PIDFFConfig;
 import common.core.subsystems.LinearMechanism;
-import common.hardware.motorcontroller.FakeMotor;
+import common.hardware.motorcontroller.MockMotor;
 import common.hardware.motorcontroller.NAR_Motor.MotorConfig;
 import common.hardware.motorcontroller.NAR_Motor.Neutral;
 import edu.wpi.first.hal.HAL;
@@ -149,7 +149,7 @@ class FSMSubsystemBaseTest {
     void stopInterruptsTheTransitionAndStopsMechanisms() {
         final Command slowTransition = Commands.idle();
         final TestFSM fsm = fsm(map -> map.addTransition(TestState.IDLE, TestState.INTAKE, slowTransition));
-        final FakeMotor motor = FakeMotor.talonLike(1);
+        final MockMotor motor = MockMotor.talonLike(1);
         final LinearMechanism slider = new LinearMechanism("FSMSubsystemBaseTestSlider",
             new MotorConfig(0.01, 60, 40, false, Neutral.BRAKE), new PIDFFConfig(20), 0.005, 0, 0.3, 1, 0, 2,
             DCMotor.getKrakenX60(1), motor);
@@ -170,7 +170,7 @@ class FSMSubsystemBaseTest {
         final TestFSM fsm = fsm(map -> {});
         final LinearMechanism slider = new LinearMechanism("FSMSubsystemBaseTestNamed",
             new MotorConfig(0.01, 60, 40, false, Neutral.BRAKE), new PIDFFConfig(20), 0.005, 0, 0.3, 1, 0, 2,
-            DCMotor.getKrakenX60(1), FakeMotor.talonLike(1));
+            DCMotor.getKrakenX60(1), MockMotor.talonLike(1));
         fsm.addMechanisms(slider);
 
         assertSame(slider, fsm.getMechanism("FSMSubsystemBaseTestNamed"));

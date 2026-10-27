@@ -28,8 +28,8 @@ class NAR_MotorTest {
         assertTrue(HAL.initialize(500, 0));
     }
 
-    private static FakeMotor motorWithUnits() {
-        final FakeMotor motor = FakeMotor.talonLike(1);
+    private static MockMotor motorWithUnits() {
+        final MockMotor motor = MockMotor.talonLike(1);
         motor.setUnitConversionFactor(DISTANCE_FACTOR);
         motor.setTimeConversionFactor(TIME_FACTOR);
         return motor;
@@ -37,7 +37,7 @@ class NAR_MotorTest {
 
     @Test
     void positionAndVelocityAreInConfiguredUnits() {
-        final FakeMotor motor = motorWithUnits();
+        final MockMotor motor = motorWithUnits();
         motor.rawPosition = 8; // motor rotations
         motor.rawVelocity = 600; // motor RPM
 
@@ -47,7 +47,7 @@ class NAR_MotorTest {
 
     @Test
     void positionCommandIsConvertedToMotorRotations() {
-        final FakeMotor motor = motorWithUnits();
+        final MockMotor motor = motorWithUnits();
         motor.set(3, Control.Position, 0.5);
 
         assertEquals(Control.Position, motor.lastMode);
@@ -57,7 +57,7 @@ class NAR_MotorTest {
 
     @Test
     void velocityCommandIsConvertedToMotorRPM() {
-        final FakeMotor motor = motorWithUnits();
+        final MockMotor motor = motorWithUnits();
         motor.set(2.5, Control.Velocity);
 
         assertEquals(Control.Velocity, motor.lastMode);
@@ -66,7 +66,7 @@ class NAR_MotorTest {
 
     @Test
     void percentOutputIsLimitedToFullPower() {
-        final FakeMotor motor = FakeMotor.talonLike(1);
+        final MockMotor motor = MockMotor.talonLike(1);
         motor.set(1.5);
         assertEquals(1, motor.lastPercentOutput, TOLERANCE);
         motor.set(-3);
@@ -75,14 +75,14 @@ class NAR_MotorTest {
 
     @Test
     void voltsAreAFractionOfTwelve() {
-        final FakeMotor motor = FakeMotor.talonLike(1);
+        final MockMotor motor = MockMotor.talonLike(1);
         motor.setVolts(6);
         assertEquals(0.5, motor.lastPercentOutput, TOLERANCE);
     }
 
     @Test
     void repeatedCommandIsOnlySentOnce() {
-        final FakeMotor motor = FakeMotor.talonLike(1);
+        final MockMotor motor = MockMotor.talonLike(1);
         motor.set(0.3);
         motor.set(0.3);
         assertEquals(1, motor.commandCount);
@@ -92,7 +92,7 @@ class NAR_MotorTest {
 
     @Test
     void continuousInputTakesTheShortWayAround() {
-        final FakeMotor motor = FakeMotor.talonLike(1);
+        final MockMotor motor = MockMotor.talonLike(1);
         motor.setUnitConversionFactor(360); // degrees
         motor.enableContinuousInput(-180, 180);
         motor.rawPosition = 170.0 / 360; // at 170 degrees
@@ -104,7 +104,7 @@ class NAR_MotorTest {
 
     @Test
     void resetPositionIsInConfiguredUnits() {
-        final FakeMotor motor = motorWithUnits();
+        final MockMotor motor = motorWithUnits();
         motor.resetPosition(1.5);
         assertEquals(6, motor.rawPosition, TOLERANCE);
         assertEquals(1.5, motor.getPosition(), TOLERANCE);
@@ -112,7 +112,7 @@ class NAR_MotorTest {
 
     @Test
     void configMotorAppliesEverySetting() {
-        final FakeMotor motor = FakeMotor.talonLike(1);
+        final MockMotor motor = MockMotor.talonLike(1);
         motor.configMotor(new MotorConfig(DISTANCE_FACTOR, TIME_FACTOR, 40, 60, 11, true, Neutral.COAST, StatusFrames.VELOCITY));
 
         assertEquals(DISTANCE_FACTOR, motor.unitConversionFactor, TOLERANCE);
@@ -146,7 +146,7 @@ class NAR_MotorTest {
 
     @Test
     void talonPositionGainsScaleByDistanceFactor() {
-        final FakeMotor motor = motorWithUnits();
+        final MockMotor motor = motorWithUnits();
         // Volts per mechanism rotation of error; kS and kG are already volts
         motor.configClosedLoop(new PIDFFConfig(8, 2, 0.4, 0.1, 0, 0, 0.3), Control.Position);
 
@@ -161,7 +161,7 @@ class NAR_MotorTest {
 
     @Test
     void talonVelocityGainsAreConvertedToMotorRotationsPerSecond() {
-        final FakeMotor motor = motorWithUnits();
+        final MockMotor motor = motorWithUnits();
         // Volts per mechanism rotation per second
         motor.configClosedLoop(new PIDFFConfig(0.4, 0, 0, 0, 0.48, 0, 0), Control.Velocity);
 
@@ -172,7 +172,7 @@ class NAR_MotorTest {
 
     @Test
     void sparkGainsAreAFractionOfTwelveVoltsPerRPMWithAOneMillisecondLoop() {
-        final FakeMotor motor = FakeMotor.sparkLike(1);
+        final MockMotor motor = MockMotor.sparkLike(1);
         motor.setUnitConversionFactor(DISTANCE_FACTOR);
         motor.setTimeConversionFactor(TIME_FACTOR);
         motor.configClosedLoop(new PIDFFConfig(24, 24, 24, 0.2, 2.4, 0, 0), Control.Velocity);
@@ -190,7 +190,7 @@ class NAR_MotorTest {
     @Test
     void talonArmGainsAreInArmRotations() {
         final double gearing = 50; // motor rotations per arm rotation
-        final FakeMotor motor = FakeMotor.talonLike(1);
+        final MockMotor motor = MockMotor.talonLike(1);
         motor.setUnitConversionFactor(360 / gearing); // degrees of arm per motor rotation
         motor.configArmClosedLoop(new PIDFFConfig(0.1, 0, 0, 0, 0, 0, 0.5), gearing);
 
@@ -203,7 +203,7 @@ class NAR_MotorTest {
 
     @Test
     void nonArmClosedLoopResetsTheMechanismRatio() {
-        final FakeMotor motor = FakeMotor.talonLike(1);
+        final MockMotor motor = MockMotor.talonLike(1);
         motor.configArmClosedLoop(new PIDFFConfig(1), 50);
         motor.configClosedLoop(new PIDFFConfig(1), Control.Position);
         assertEquals(1, motor.mechanismRatio, TOLERANCE);
@@ -211,7 +211,7 @@ class NAR_MotorTest {
 
     @Test
     void simulationStepMovesTheEncoder() {
-        final FakeMotor motor = FakeMotor.talonLike(1);
+        final MockMotor motor = MockMotor.talonLike(1);
         motor.enableSim(new RollerSimModel(DCMotor.getKrakenX60(1), 1, 0.001));
         motor.setVolts(12);
         for (int i = 0; i < 50; i++) {

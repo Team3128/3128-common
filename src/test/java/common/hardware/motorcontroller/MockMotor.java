@@ -10,7 +10,7 @@ import common.utility.narwhaldashboard.NarwhalDashboard;
  * <p>{@link #talonLike(int)} and {@link #sparkLike(int)} use the same units for their own
  * control loops as a TalonFX and a Spark, so gain conversion can be checked against both.
  */
-public class FakeMotor extends NAR_Motor {
+public class MockMotor extends NAR_Motor {
 
     // Units of the motor controller's own control loop, see NAR_Motor.configClosedLoop
     private final boolean talonLike;
@@ -44,25 +44,25 @@ public class FakeMotor extends NAR_Motor {
     public NAR_Motor leader = null;
     public boolean opposesLeader = false;
 
-    private FakeMotor(int id, boolean talonLike, boolean canFollow) {
+    private MockMotor(int id, boolean talonLike, boolean canFollow) {
         super(id);
         this.talonLike = talonLike;
         this.canFollow = canFollow;
     }
 
     /** Volts, rotations per second and seconds, with Arm_Cosine measured in arm rotations. */
-    public static FakeMotor talonLike(int id) {
-        return new FakeMotor(id, true, true);
+    public static MockMotor talonLike(int id) {
+        return new MockMotor(id, true, true);
     }
 
     /** Output fraction, rotations and RPM, and a 1 ms loop. */
-    public static FakeMotor sparkLike(int id) {
-        return new FakeMotor(id, false, true);
+    public static MockMotor sparkLike(int id) {
+        return new MockMotor(id, false, true);
     }
 
     /** A TalonFX-like motor that can't follow another motor, like a TalonFX next to a Spark. */
-    public static FakeMotor cannotFollow(int id) {
-        return new FakeMotor(id, true, false);
+    public static MockMotor cannotFollow(int id) {
+        return new MockMotor(id, true, false);
     }
 
     /** Steps the sim model with the last percent output, as the robot's simulationPeriodic would. */

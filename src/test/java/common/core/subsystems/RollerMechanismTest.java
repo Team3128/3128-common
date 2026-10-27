@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 
 import common.core.controllers.PIDFFConfig;
 import common.core.subsystems.RollerMechanism.VelocityControl;
-import common.hardware.motorcontroller.FakeMotor;
+import common.hardware.motorcontroller.MockMotor;
 import common.hardware.motorcontroller.NAR_Motor.Control;
 import common.hardware.motorcontroller.NAR_Motor.MotorConfig;
 import common.hardware.motorcontroller.NAR_Motor.Neutral;
@@ -34,14 +34,14 @@ class RollerMechanismTest {
         assertTrue(HAL.initialize(500, 0));
     }
 
-    private static RollerMechanism roller(VelocityControl control, PIDFFConfig gains, FakeMotor motor) {
+    private static RollerMechanism roller(VelocityControl control, PIDFFConfig gains, MockMotor motor) {
         return new RollerMechanism("RollerMechanismTest" + nextName++, CONFIG, control, gains, SPEED_TOLERANCE,
             KRAKEN, 1, MOI, motor);
     }
 
     @Test
     void pidSendsTheVelocityToTheMotorController() {
-        final FakeMotor motor = FakeMotor.talonLike(1);
+        final MockMotor motor = MockMotor.talonLike(1);
         final RollerMechanism roller = roller(VelocityControl.PID, new PIDFFConfig(0.2, 0, 0, 0, 0.1, 0, 0), motor);
 
         roller.setSetpoint(50);
@@ -57,7 +57,7 @@ class RollerMechanismTest {
 
     @Test
     void rollerKeepsSpinningOnceAtSpeed() {
-        final FakeMotor motor = FakeMotor.talonLike(1);
+        final MockMotor motor = MockMotor.talonLike(1);
         final RollerMechanism roller = roller(VelocityControl.PID, new PIDFFConfig(0.2), motor);
         roller.setSetpoint(50);
         motor.rawVelocity = 50 * 60;
@@ -69,7 +69,7 @@ class RollerMechanismTest {
 
     @Test
     void bangBangGivesFullPowerBelowTheSetpoint() {
-        final FakeMotor motor = FakeMotor.talonLike(1);
+        final MockMotor motor = MockMotor.talonLike(1);
         final RollerMechanism roller = roller(VelocityControl.BANG_BANG, new PIDFFConfig(0, 0, 0, 0, 0.1, 0, 0), motor);
         roller.setSetpoint(50);
         motor.rawVelocity = 30 * 60;
@@ -82,7 +82,7 @@ class RollerMechanismTest {
 
     @Test
     void bangBangGivesOnlyFeedforwardAboveTheSetpoint() {
-        final FakeMotor motor = FakeMotor.talonLike(1);
+        final MockMotor motor = MockMotor.talonLike(1);
         final RollerMechanism roller = roller(VelocityControl.BANG_BANG, new PIDFFConfig(0, 0, 0, 0, 0.1, 0, 0), motor);
         roller.setSetpoint(50);
         motor.rawVelocity = 60 * 60;
@@ -94,7 +94,7 @@ class RollerMechanismTest {
 
     @Test
     void bangBangSpinsASimulatedFlywheelUpToSpeed() {
-        final FakeMotor motor = FakeMotor.talonLike(1);
+        final MockMotor motor = MockMotor.talonLike(1);
         // A Kraken spins about 100 rotations per second at 12 V, so 0.1 V per rotation per second
         // is a little under what holds speed, as bang-bang needs
         final RollerMechanism roller = roller(VelocityControl.BANG_BANG, new PIDFFConfig(0, 0, 0, 0, 0.1, 0, 0), motor);
@@ -111,7 +111,7 @@ class RollerMechanismTest {
 
     @Test
     void openLoopRollerRunsAtTheGivenPower() {
-        final FakeMotor motor = FakeMotor.talonLike(1);
+        final MockMotor motor = MockMotor.talonLike(1);
         final RollerMechanism roller = new RollerMechanism("RollerMechanismTest" + nextName++, CONFIG, KRAKEN, 1, MOI, motor);
 
         roller.run(0.4);
@@ -122,7 +122,7 @@ class RollerMechanismTest {
 
     @Test
     void openLoopRollerSpinsInSimulation() {
-        final FakeMotor motor = FakeMotor.talonLike(1);
+        final MockMotor motor = MockMotor.talonLike(1);
         final RollerMechanism roller = new RollerMechanism("RollerMechanismTest" + nextName++, CONFIG, KRAKEN, 1, MOI, motor);
 
         roller.runVolts(6);
