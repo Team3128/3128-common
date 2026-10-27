@@ -25,6 +25,16 @@ class MotorSimModelTest {
     }
 
     @Test
+    void hollowCylinderMoiMatchesFormula() {
+        assertEquals(0.5 * 2.0 * (0.04 * 0.04 + 0.05 * 0.05), RollerSimModel.hollowCylinderMoi(2.0, 0.04, 0.05), 1e-12);
+    }
+
+    @Test
+    void hollowCylinderWithNoHoleIsSolid() {
+        assertEquals(RollerSimModel.solidCylinderMoi(2.0, 0.05), RollerSimModel.hollowCylinderMoi(2.0, 0, 0.05), 1e-12);
+    }
+
+    @Test
     void rollerStartsAtZero() {
         final RollerSimModel roller = new RollerSimModel(KRAKEN, 3, 0.001);
         assertEquals(0, roller.getRotorRotations(), 1e-9);

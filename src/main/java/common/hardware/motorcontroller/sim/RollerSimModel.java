@@ -32,6 +32,17 @@ public class RollerSimModel implements MotorSimModel {
         return 0.5 * massKg * radiusMeters * radiusMeters;
     }
 
+    /**
+     * Moment of inertia of a tube spinning about its axis, e.g. a polycarb or aluminum roller.
+     * @param massKg Mass in kilograms
+     * @param innerRadiusMeters Inner radius in meters
+     * @param outerRadiusMeters Outer radius in meters
+     * @return Inertia in kg*m^2
+     */
+    public static double hollowCylinderMoi(double massKg, double innerRadiusMeters, double outerRadiusMeters) {
+        return 0.5 * massKg * (innerRadiusMeters * innerRadiusMeters + outerRadiusMeters * outerRadiusMeters);
+    }
+
     @Override public DCMotor getMotor() { return motor; }
 
     @Override
