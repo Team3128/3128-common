@@ -23,15 +23,14 @@ public class RollerMechanism extends MechanismBase {
         /** PID on the velocity error plus feedforward. Smooth, but kP needs tuning. */
         PID,
         /**
-         * Full power below the target and none above, plus feedforward. Recovers speed fastest
-         * after a game piece slows a flywheel down. Only kV needs tuning: set it a little under
-         * the value that holds speed, so the controller only ever adds power.
+         * Full power below the target and none above, plus feedforward, using WPILib's
+         * {@link BangBangController}. Recovers speed fastest after a game piece slows a flywheel
+         * down. Only kV needs tuning: set it a little under the value that holds speed, so the
+         * controller only ever adds power. The motors must be in coast mode, since braking fights
+         * the controller. Slowing down to a lower setpoint is a slow coast.
          */
         BANG_BANG
     }
-
-    private double overspeedTolerance = Double.POSITIVE_INFINITY;
-    private double overspeedVolts = 0;
 
     /**
      * Creates an open-loop roller.
@@ -86,29 +85,8 @@ public class RollerMechanism extends MechanismBase {
         motors[0].enableSim(new RollerSimModel(MotorSimModel.gearbox(motorType, motors.length), gearing, moiKgMetersSq));
     }
 
-    /**
-     * Applies {@code volts} whenever the roller is more than {@code toleranceOverTarget} above its
-     * velocity setpoint, e.g. {@code setOverspeedBrake(6, -6)}. Bang-bang can't slow a roller down
-     * on its own, so this helps it settle after the setpoint drops. Off by default.
-     */
-    public void setOverspeedBrake(double toleranceOverTarget, double volts) {
-        overspeedTolerance = toleranceOverTarget;
-        overspeedVolts = volts;
-    }
-
     @Override
     protected double calculateFeedforward(double feedbackOutput) {
         return gains.velocityFF(getSetpoint(), feedbackOutput, atSetpoint());
-    }
-
-    @Override
-    public void periodic() {
-        if (isEnabled() && getVelocity() > getSetpoint() + overspeedTolerance) {
-            for (NAR_Motor motor : motors) {
-                motor.setVolts(overspeedVolts);
-            }
-            return;
-        }
-        super.periodic();
     }
 }
