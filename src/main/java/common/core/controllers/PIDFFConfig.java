@@ -81,8 +81,8 @@ public class PIDFFConfig {
 
 
     /**
-     * Sets the static gain.
-     * @param kS The constant power required to overcome static friction as a double.
+     * Copies every gain, and the gravity function, from another config.
+     * @param config The config to copy.
      */
     public void change(PIDFFConfig config){
         this.kP = config.kP;
@@ -92,6 +92,7 @@ public class PIDFFConfig {
         this.kG = config.kG;
         this.kA = config.kA;
         this.kV = config.kV;
+        this.kG_Function = config.kG_Function;
     }
 
     public void setkP(double kP) {

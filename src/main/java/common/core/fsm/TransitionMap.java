@@ -23,49 +23,43 @@ public class TransitionMap<S extends Enum<S>> {
     @SuppressWarnings("unused")
     private final Class<S> enumType;
     private final List<S> states;
-    private boolean isEmpty;
-    private int transitionCount;
 
     public TransitionMap(Class<S> enumType) {
         this.enumType = enumType;
         this.states = List.of(enumType.getEnumConstants());
-        
+
 
         adjacencyMap = new Object[states.size()][states.size()];
-        isEmpty = true;
-        transitionCount = 0;
     }
 
     /**
      * @return Whether the transition map is empty
      */
     public boolean isEmpty() {
-        if(!isEmpty && transitionCount > 0) return false;
-        isEmpty = true;
-        transitionCount = 0;
-        for(Object[] row : adjacencyMap){
-            for(Object transition : row) {
-                if(transition != null) {
-                    isEmpty = false;
-                    transitionCount++;
-                }
-            }
-        }
-        return isEmpty;
+        return getTransitionCount() == 0;
     }
 
+    /**
+     * Counts the transitions in the map. Counted fresh each time, so adding a transition twice or
+     * removing one that isn't there can't throw the count off.
+     */
     public int getTransitionCount() {
+        int transitionCount = 0;
+        for(Object[] row : adjacencyMap){
+            for(Object transition : row) {
+                if(transition != null) transitionCount++;
+            }
+        }
         return transitionCount;
     }
 
     /**
-     * Update the adjacency map to include the data for the given transition Note: This WILL NOT
-     * overwrite an existing Transition
+     * Update the adjacency map to include the data for the given transition. This replaces any
+     * existing transition between the same two states. Transitions from a state to itself are ignored.
      *
      * @param transition The transition to add to the graph
      */
     public void addTransition(Transition<S> transition) {
-        transitionCount++;
         setTransition(transition);
     }
 
@@ -422,13 +416,11 @@ public class TransitionMap<S extends Enum<S>> {
     }
 
     public void setTransition(Transition<S> transition) {
-        if(transition != null && isEmpty) isEmpty = false;
         if(transition.getOutgoingState().ordinal() == transition.getIncomingState().ordinal()) return;
         adjacencyMap[transition.getOutgoingState().ordinal()][transition.getIncomingState().ordinal()] = transition;
     }
 
     public void removeTransition(S start, S end) {
-        transitionCount--;
         adjacencyMap[start.ordinal()][end.ordinal()] = null;
     }
 
@@ -450,7 +442,6 @@ public class TransitionMap<S extends Enum<S>> {
                 removeTransition(s1, s2);
             }
         }
-        isEmpty = true;
     }
 
     public Transition<S> getTransition(S start, S end) {

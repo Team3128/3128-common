@@ -498,8 +498,9 @@ public class NAR_CANSpark extends NAR_Motor {
 
 	@Override
 	public double getTorque() {
-		if(motor instanceof SparkFlex) return DCMotor.getNEO(1).withReduction(unitConversionFactor).getTorque(getStallCurrent());
-		return DCMotor.getNeoVortex(1).withReduction(unitConversionFactor).getTorque(getStallCurrent());
+		// A Spark Flex drives a Neo Vortex; a Spark Max drives a NEO
+		if(motor instanceof SparkFlex) return DCMotor.getNeoVortex(1).withReduction(unitConversionFactor).getTorque(getStallCurrent());
+		return DCMotor.getNEO(1).withReduction(unitConversionFactor).getTorque(getStallCurrent());
 	}
 	
 	@Override

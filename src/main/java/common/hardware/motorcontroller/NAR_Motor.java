@@ -81,15 +81,16 @@ public abstract class NAR_Motor implements AutoCloseable {
 
         @Override
         public String toString() {
+            // Strings can't change, so concat returns a new one that has to be kept
             String output = "Motor Config";
-            output.concat("\n Distance Factor: " + distanceFactor + ". \tEvery one true rotation of the motor will be measured as " + distanceFactor + " rotation(s).");
-            output.concat("\n Time Factor: " + timeFactor + ". \tMotor velocity will be measured in units equivalent to " + (1 / timeFactor) + " rotations per minute.");
-            output.concat("\n Stator Limit: " + statorLimit + ". \tThe maximum current applied to the stator is " + statorLimit + " amps. Max torque limited.");
-            output.concat("\n Supply Limit: " + supplyLimit + ". \tThe maximum current applied to the motor is " + supplyLimit + " amps.");
-            output.concat("\n Voltage Compensation: " + voltageCompensation + ". \tThe maximum voltage applied to the motor is " + voltageCompensation + " volts.");
-            output.concat("\n Inversion: " + inverted + ". \t" + (inverted ? ("Clockwise is positive angular displacement.") : ("Counter-Clockwise is positive angular displacement.")));
-            output.concat("\n Neutral Mode: " + mode.name() + ". \tWhen no output is applied the motor will " + mode.name().toLowerCase() + ".");
-            output.concat("\n Status Frames: " + statusFrames.name() + ". \tThe motor will send status frames consistent with a " + statusFrames.name().toLowerCase() + " motor.");
+            output = output.concat("\n Distance Factor: " + distanceFactor + ". \tEvery one true rotation of the motor will be measured as " + distanceFactor + " rotation(s).");
+            output = output.concat("\n Time Factor: " + timeFactor + ". \tMotor velocity will be measured in units equivalent to " + (1 / timeFactor) + " rotations per minute.");
+            output = output.concat("\n Stator Limit: " + statorLimit + ". \tThe maximum current applied to the stator is " + statorLimit + " amps. Max torque limited.");
+            output = output.concat("\n Supply Limit: " + supplyLimit + ". \tThe maximum current applied to the motor is " + supplyLimit + " amps.");
+            output = output.concat("\n Voltage Compensation: " + voltageCompensation + ". \tThe maximum voltage applied to the motor is " + voltageCompensation + " volts.");
+            output = output.concat("\n Inversion: " + inverted + ". \t" + (inverted ? ("Clockwise is positive angular displacement.") : ("Counter-Clockwise is positive angular displacement.")));
+            output = output.concat("\n Neutral Mode: " + mode.name() + ". \tWhen no output is applied the motor will " + mode.name().toLowerCase() + ".");
+            output = output.concat("\n Status Frames: " + statusFrames.name() + ". \tThe motor will send status frames consistent with a " + statusFrames.name().toLowerCase() + " motor.");
             return output;
         }
     }

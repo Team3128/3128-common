@@ -114,9 +114,10 @@ public abstract class FSMSubsystemBase<S extends Enum<S>> extends SubsystemBase 
         return requestTransition;
     }
 
+    /** Whether the last transition's command is still running. */
     public boolean isTransitioning() {
         if(currentTransition == null) return false;
-        return currentTransition.isFinished();
+        return currentTransition.isScheduled();
     }
 
     public abstract void registerTransitions();
