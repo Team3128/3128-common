@@ -155,14 +155,23 @@ public abstract class MechanismBase extends SubsystemBase {
         return 0;
     }
 
+    /**
+     * Drives the motors toward the setpoint; called every loop while enabled.
+     * Default runs {@code feedback} plus {@link #calculateFeedforward(double)} on the roboRIO and
+     * applies the result as volts. Override to run the loop on the motor controller instead.
+     */
+    protected void applyOutput() {
+        final double pidOutput = feedback.applyAsDouble(measurement.getAsDouble(), setpointValue);
+        final double output = MathUtil.clamp(pidOutput + calculateFeedforward(pidOutput), -MAX_VOLTS, MAX_VOLTS);
+        for (NAR_Motor motor : motors) {
+            motor.setVolts(output);
+        }
+    }
+
     @Override
     public void periodic() {
         if (enabled) {
-            final double pidOutput = feedback.applyAsDouble(measurement.getAsDouble(), setpointValue);
-            final double output = MathUtil.clamp(pidOutput + calculateFeedforward(pidOutput), -MAX_VOLTS, MAX_VOLTS);
-            for (NAR_Motor motor : motors) {
-                motor.setVolts(output);
-            }
+            applyOutput();
 
             if (safetyTimer.hasElapsed(safetyThresh)) onSafetyTimeout();
             if (atSetpoint()) {

@@ -2,6 +2,7 @@ package common.core.subsystems;
 
 import common.core.controllers.PIDFFConfig;
 import common.hardware.motorcontroller.NAR_Motor;
+import common.hardware.motorcontroller.NAR_Motor.Control;
 import common.hardware.motorcontroller.NAR_Motor.MotorConfig;
 import common.hardware.motorcontroller.sim.MotorSimModel;
 import common.hardware.motorcontroller.sim.RollerSimModel;
@@ -29,8 +30,17 @@ public class RollerMechanism extends MechanismBase {
          * controller only ever adds power. The motors must be in coast mode, since braking fights
          * the controller. Slowing down to a lower setpoint is a slow coast.
          */
-        BANG_BANG
+        BANG_BANG,
+        /**
+         * PID runs on the motor controller at 1 kHz instead of on the roboRIO at 50 Hz, e.g.
+         * Phoenix {@code VelocityVoltage}. kS/kV feedforward is still in velocity units and is sent
+         * along with the setpoint, but kP/kI/kD are in the motor controller's own units: volts per
+         * motor rotation per second on a TalonFX, output fraction per motor RPM on a Spark.
+         */
+        MOTOR_CONTROLLER
     }
+
+    private final VelocityControl control;
 
     /**
      * Creates an open-loop roller.
@@ -47,6 +57,7 @@ public class RollerMechanism extends MechanismBase {
                            double moiKgMetersSq, NAR_Motor... motors) {
         super(motorConfig, motors);
         setName(name);
+        control = null;
         motors[0].enableSim(new RollerSimModel(MotorSimModel.gearbox(motorType, motors.length), gearing, moiKgMetersSq));
     }
 
@@ -55,8 +66,8 @@ public class RollerMechanism extends MechanismBase {
      *
      * @param name Name shown on Shuffleboard and in logs
      * @param motorConfig Applied to every motor; sets the velocity units
-     * @param control PID or bang-bang
-     * @param gains kP/kI/kD (PID only) and kS/kV feedforward, in volts per velocity unit
+     * @param control Where and how the velocity loop runs
+     * @param gains kS/kV feedforward in volts per velocity unit, and kP/kI/kD for PID or MOTOR_CONTROLLER
      * @param tolerance How close to the setpoint counts as {@link #atSetpoint()}, in velocity units
      * @param motorType Model of one motor, e.g. {@code DCMotor.getKrakenX60(1)}; used only in simulation
      * @param gearing Motor rotations per roller rotation; used only in simulation
@@ -74,19 +85,38 @@ public class RollerMechanism extends MechanismBase {
                             PIDController pid, BangBangController bangBang, double tolerance, DCMotor motorType,
                             double gearing, double moiKgMetersSq, NAR_Motor... motors) {
         super(gains,
-            control == VelocityControl.PID
-                ? pid::calculate
+            control == VelocityControl.BANG_BANG
                 // BangBangController outputs 0 or 1, so scale it to full voltage
-                : (measurement, setpoint) -> MAX_VOLTS * bangBang.calculate(measurement, setpoint),
+                ? (measurement, setpoint) -> MAX_VOLTS * bangBang.calculate(measurement, setpoint)
+                : pid::calculate,
             measurement -> pid.reset(),
             () -> motors[0].getVelocity(), tolerance, 0, motorConfig, motors);
         setName(name);
+        this.control = control;
         setDisableAtSetpoint(false); // keep spinning once at speed
+        if (control == VelocityControl.MOTOR_CONTROLLER) {
+            for (NAR_Motor motor : motors) {
+                motor.configPID(gains);
+            }
+        }
         motors[0].enableSim(new RollerSimModel(MotorSimModel.gearbox(motorType, motors.length), gearing, moiKgMetersSq));
     }
 
     @Override
     protected double calculateFeedforward(double feedbackOutput) {
         return gains.velocityFF(getSetpoint(), feedbackOutput, atSetpoint());
+    }
+
+    @Override
+    protected void applyOutput() {
+        if (control != VelocityControl.MOTOR_CONTROLLER) {
+            super.applyOutput();
+            return;
+        }
+        // The error only signs kS; the motor controller does the PID
+        final double feedforward = calculateFeedforward(getSetpoint() - getVelocity());
+        for (NAR_Motor motor : motors) {
+            motor.set(getSetpoint(), Control.Velocity, feedforward);
+        }
     }
 }
