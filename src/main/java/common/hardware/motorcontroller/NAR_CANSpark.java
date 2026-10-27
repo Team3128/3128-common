@@ -33,7 +33,6 @@ import com.revrobotics.sim.SparkMaxSim;
 import common.core.controllers.PIDFFConfig;
 import common.utility.Log;
 import common.utility.narwhaldashboard.NarwhalDashboard.State;
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.RobotController;
@@ -161,8 +160,6 @@ public class NAR_CANSpark extends NAR_Motor {
 		else {
 			absoluteEncoder = motor.getAbsoluteEncoder();
 			config.absoluteEncoder.averageDepth(2);
-			// Read from -0.5 to 0.5 rotations instead of 0 to 1, so just below zero reads negative
-			config.absoluteEncoder.zeroCentered(true);
 			// Read in RPM, like the built-in encoder
 			config.absoluteEncoder.velocityConversionFactor(60);
 			// Run the Spark's own control loop on the absolute encoder too
@@ -518,30 +515,10 @@ public class NAR_CANSpark extends NAR_Motor {
 	@Override
 	public void resetRawPosition(double rotations) {
 		if (encoderType == EncoderType.Relative) relativeEncoder.setPosition(rotations);
-		// The simulated absolute encoder is moved by simulationStep, so only remember the offset
+		// An absolute encoder already knows where it is. In simulation it doesn't, so remember where it starts.
 		else if (RobotBase.isSimulation()) {
 			absoluteSimOffset = rotations - getSimRotorRotations() / motorRotationsPerSensorRotation;
 		}
-		else {
-			// Move the absolute encoder's zero so it reads this position here, e.g. after the encoder
-			// slipped on its shaft. Saved on the Spark, so it lasts through a reboot.
-			final double reading = absoluteEncoder.getPosition();
-			final double zeroOffset = MathUtil.inputModulus(getAbsoluteZeroOffset() + reading - rotations, 0, 1);
-			config.absoluteEncoder.zeroOffset(zeroOffset);
-			configure();
-		}
-	}
-
-	/** An absolute encoder already knows where it starts, so this only matters in simulation. */
-	@Override
-	public void setStartingPosition(double position) {
-		if (encoderType == EncoderType.Absolute && !RobotBase.isSimulation()) return;
-		super.setStartingPosition(position);
-	}
-
-	private double getAbsoluteZeroOffset() {
-		if (motor instanceof SparkFlex flex) return flex.configAccessor.absoluteEncoder.getZeroOffset();
-		return ((SparkMax) motor).configAccessor.absoluteEncoder.getZeroOffset();
 	}
 
     @Override

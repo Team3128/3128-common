@@ -14,9 +14,7 @@ import edu.wpi.first.math.system.plant.DCMotor;
  * <p>Angles follow WPILib: 0 is horizontal and positive is up. PID and feedforward run on the
  * motor controller. Feedforward is kS plus kG times the cosine of the angle, so kG is the
  * voltage to hold the arm level. The arm is assumed to be at {@code startPosition} when the robot
- * turns on, and the encoder is set to it, unless it's an absolute encoder, which already knows.
- * {@link #reset()} sets the encoder to {@code startPosition} at any time, absolute or not, e.g.
- * after something slipped.
+ * turns on, and the encoder is reset to it.
  */
 public class ArmMechanism extends MechanismBase {
 
@@ -48,8 +46,6 @@ public class ArmMechanism extends MechanismBase {
         final double gearing = encoderRotationsPerArmRotation * motors[0].getMotorRotationsPerSensorRotation();
         motors[0].enableSim(new ArmSimModel(MotorSimModel.gearbox(motorType, motors.length), gearing, lengthMeters,
             massKg, minPosition * radiansPerUnit, maxPosition * radiansPerUnit, startPosition * radiansPerUnit));
-        for (NAR_Motor motor : motors) {
-            motor.setStartingPosition(startPosition);
-        }
+        reset();
     }
 }
