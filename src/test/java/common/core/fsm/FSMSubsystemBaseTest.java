@@ -21,6 +21,8 @@ import common.hardware.motorcontroller.NAR_Motor.MotorConfig;
 import common.hardware.motorcontroller.NAR_Motor.Neutral;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.simulation.DriverStationSim;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -84,6 +86,19 @@ class FSMSubsystemBaseTest {
         assertEquals(TestState.INTAKE, fsm.getState());
         assertEquals(TestState.IDLE, fsm.getPreviousState());
         assertTrue(fsm.stateEquals(TestState.INTAKE));
+    }
+
+    @Test
+    void stateIsLoggedWhenItChanges() {
+        final TestFSM fsm = fsm(map -> map.addTransition(TestState.IDLE, TestState.INTAKE, Commands.none()));
+        final NetworkTableEntry logged = NetworkTableInstance.getDefault().getTable("StateMachines").getEntry(fsm.getName());
+        assertEquals("IDLE", logged.getString(""));
+
+        fsm.setState(TestState.INTAKE);
+        assertEquals("INTAKE", logged.getString(""));
+
+        fsm.overrideState(TestState.SHOOT);
+        assertEquals("SHOOT", logged.getString(""));
     }
 
     @Test

@@ -46,6 +46,9 @@ import static edu.wpi.first.wpilibj2.command.Commands.*;
  *
  * <p>When several motors drive one mechanism, the first is the leader and the rest follow it
  * on the motor controller where possible. Only the leader runs the control loop.
+ *
+ * <p>Every loop, the setpoint, measurement, volts, and each motor's current and temperature are
+ * logged under {@code Mechanisms/<name>} in NetworkTables, for AdvantageScope.
  */
 public abstract class MechanismBase extends SubsystemBase {
 
@@ -78,6 +81,7 @@ public abstract class MechanismBase extends SubsystemBase {
     private double safetyThresh = 5;
     private final Timer safetyTimer = new Timer();
     private MotorConfig motorConfig;
+    private MechanismLog log;
 
     protected BooleanSupplier debug;
     protected DoubleSupplier debugSetpoint;
@@ -251,6 +255,10 @@ public abstract class MechanismBase extends SubsystemBase {
         }
 
         NAR_Shuffleboard.addData(getName(), "Velocity", motors[0].getVelocity(), 5, 1);
+
+        // Created on first use, since subclasses set the name after this constructor runs
+        if (log == null) log = new MechanismLog(getName(), motors);
+        log.update(this, measurement.getAsDouble());
     }
 
     /**

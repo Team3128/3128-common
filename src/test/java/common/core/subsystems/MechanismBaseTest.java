@@ -1,5 +1,6 @@
 package common.core.subsystems;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -19,7 +20,10 @@ import common.hardware.motorcontroller.NAR_Motor.Control;
 import common.hardware.motorcontroller.NAR_Motor.MotorConfig;
 import common.hardware.motorcontroller.NAR_Motor.Neutral;
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.simulation.SimHooks;
 
 /**
@@ -258,6 +262,41 @@ class MechanismBaseTest {
         }
 
         assertTrue(slider.isEnabled());
+    }
+
+    @Test
+    void stateIsLoggedEveryLoop() {
+        final MockMotor leader = MockMotor.talonLike(1);
+        final MockMotor follower = MockMotor.talonLike(2);
+        final LinearMechanism slider = slider(leader, follower);
+        final NetworkTable logged = NetworkTableInstance.getDefault().getTable("Mechanisms").getSubTable(slider.getName());
+
+        slider.setSetpoint(0.2);
+        leader.rawPosition = 0.1 / METERS_PER_ROTATION;
+        slider.periodic();
+
+        assertEquals(0.2, logged.getEntry("Setpoint").getDouble(-1), TOLERANCE);
+        assertEquals(0.1, logged.getEntry("Measurement").getDouble(-1), TOLERANCE);
+        assertEquals(0.1, logged.getEntry("Position").getDouble(-1), TOLERANCE);
+        assertTrue(logged.getEntry("Enabled").getBoolean(false));
+        assertFalse(logged.getEntry("AtSetpoint").getBoolean(true));
+        // One value per motor
+        assertArrayEquals(new double[] {25, 25}, logged.getEntry("TemperatureCelsius").getDoubleArray(new double[0]), TOLERANCE);
+    }
+
+    @Test
+    void sliderPoseMovesAlongItsIncline() {
+        final MockMotor motor = MockMotor.talonLike(1);
+        final double min = 0.1;
+        final LinearMechanism slider = new LinearMechanism(uniqueName(), CONFIG, new PIDFFConfig(20), SLIDER_TOLERANCE,
+            min, MAX, 1, Math.toRadians(30), 2, KRAKEN, motor);
+
+        motor.rawPosition = (min + 0.2) / METERS_PER_ROTATION; // 0.2 m out from where it starts
+        final Pose3d pose = slider.getComponentPose();
+
+        assertEquals(0.2 * Math.cos(Math.toRadians(30)), pose.getX(), 1e-6);
+        assertEquals(0, pose.getY(), 1e-6);
+        assertEquals(0.2 * Math.sin(Math.toRadians(30)), pose.getZ(), 1e-6);
     }
 
     @Test

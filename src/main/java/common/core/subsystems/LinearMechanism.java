@@ -6,6 +6,8 @@ import common.hardware.motorcontroller.NAR_Motor.Control;
 import common.hardware.motorcontroller.NAR_Motor.MotorConfig;
 import common.hardware.motorcontroller.sim.LinearSimModel;
 import common.hardware.motorcontroller.sim.MotorSimModel;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.system.plant.DCMotor;
 
 /**
@@ -18,6 +20,10 @@ import edu.wpi.first.math.system.plant.DCMotor;
  */
 public class LinearMechanism extends MechanismBase {
 
+    private final double minPosition;
+    private final double metersPerUnit;
+    private final double angleRadians;
+
     /**
      * @param name Name shown on Shuffleboard and in logs
      * @param motorConfig Applied to every motor; its distance factor sets the position units
@@ -25,8 +31,10 @@ public class LinearMechanism extends MechanismBase {
      * @param tolerance How close to the setpoint counts as {@link #atSetpoint()}
      * @param minPosition Lowest allowed setpoint, also the starting position
      * @param maxPosition Highest allowed setpoint
-     * @param metersPerUnit Meters moved per position unit, 1 if the units are meters; used only in simulation
-     * @param angleRadians Incline of travel, 0 is horizontal and pi/2 is straight up; used only in simulation
+     * @param metersPerUnit Meters moved per position unit, 1 if the units are meters; used in simulation and
+     *                      {@link #getComponentPose()}
+     * @param angleRadians Incline of travel, 0 is horizontal and pi/2 is straight up; used in simulation and
+     *                     {@link #getComponentPose()}
      * @param massKg Mass that moves; used only in simulation
      * @param motorType Model of one motor, e.g. {@code DCMotor.getKrakenX60(1)}; used only in simulation
      * @param motors Every motor on the mechanism. The first is the leader.
@@ -35,6 +43,9 @@ public class LinearMechanism extends MechanismBase {
                            double minPosition, double maxPosition, double metersPerUnit, double angleRadians,
                            double massKg, DCMotor motorType, NAR_Motor... motors) {
         super(gains, Control.Position, tolerance, minPosition, motorConfig, motors);
+        this.minPosition = minPosition;
+        this.metersPerUnit = metersPerUnit;
+        this.angleRadians = angleRadians;
         setName(name);
         setInputRange(minPosition, maxPosition);
         setDisableAtSetpoint(false); // keep holding position
@@ -44,5 +55,14 @@ public class LinearMechanism extends MechanismBase {
             motors[0].getMotorRotationsPerSensorRotation() / (motorConfig.distanceFactor * metersPerUnit);
         motors[0].enableSim(new LinearSimModel(MotorSimModel.gearbox(motorType, motors.length), motorRotationsPerMeter,
             massKg, minPosition * metersPerUnit, maxPosition * metersPerUnit, angleRadians));
+    }
+
+    /**
+     * How far the moving part is from where it starts, for AdvantageScope's 3D view. Assumes it
+     * moves toward the front of the robot (+x), tilted up by the incline given to the constructor.
+     */
+    public Pose3d getComponentPose() {
+        final double meters = (getPosition() - minPosition) * metersPerUnit;
+        return new Pose3d(meters * Math.cos(angleRadians), 0, meters * Math.sin(angleRadians), Rotation3d.kZero);
     }
 }

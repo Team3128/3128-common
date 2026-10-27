@@ -8,6 +8,8 @@ import common.core.subsystems.MechanismBase;
 import common.hardware.motorcontroller.NAR_Motor.Neutral;
 import common.utility.Log;
 import common.utility.shuffleboard.NAR_Shuffleboard;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StringPublisher;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -25,6 +27,8 @@ public abstract class FSMSubsystemBase<S extends Enum<S>> extends SubsystemBase 
 
     protected List<MechanismBase> mechanisms = new LinkedList<MechanismBase>();
 
+    private StringPublisher statePublisher;
+
     public FSMSubsystemBase(Class<S> enumType, TransitionMap<S> transitionMap) {
         this.enumType = enumType;
         this.transitionMap = transitionMap;
@@ -33,6 +37,19 @@ public abstract class FSMSubsystemBase<S extends Enum<S>> extends SubsystemBase 
     public FSMSubsystemBase(Class<S> enumType, TransitionMap<S> transitionMap, S initalState) {
         this(enumType, transitionMap);
         this.currentState = initalState;
+        logState();
+    }
+
+    /**
+     * Publishes the current state to NetworkTables under {@code StateMachines/<name>}, for
+     * AdvantageScope and the robot's log file. Called on every state change.
+     */
+    private void logState() {
+        // Created on first use, in case a subclass sets its name after this constructor runs
+        if (statePublisher == null) {
+            statePublisher = NetworkTableInstance.getDefault().getTable("StateMachines").getStringTopic(getName()).publish();
+        }
+        statePublisher.set(currentState != null ? currentState.name() : "None");
     }
 
     public void initShuffleboard() {
@@ -48,6 +65,7 @@ public abstract class FSMSubsystemBase<S extends Enum<S>> extends SubsystemBase 
     public void overrideState(S nextState) {
         previousState = currentState;
         currentState = nextState;
+        logState();
     }
     
     public void setState(S nextState) {
@@ -87,6 +105,7 @@ public abstract class FSMSubsystemBase<S extends Enum<S>> extends SubsystemBase 
         CommandScheduler.getInstance().schedule(currentTransition.getCommand());
         previousState = currentState;
         currentState = nextState;
+        logState();
         return;
     }
 

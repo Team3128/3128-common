@@ -7,6 +7,8 @@ import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.NotifierJNI;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.wpilibj.DataLogManager;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.IterativeRobotBase;
 import edu.wpi.first.wpilibj.Timer;
 
@@ -97,6 +99,11 @@ public class NAR_Robot extends IterativeRobotBase {
     protected NAR_Robot(double period) {
         super(period);
         m_startTime = Timer.getFPGATimestamp();
+
+        // Record NetworkTables, console output, and Driver Station inputs to a .wpilog file:
+        // a USB stick on the roboRIO if one is plugged in, or logs/ in simulation
+        DataLogManager.start();
+        DriverStation.startDataLog(DataLogManager.getLog());
 
 
         addPeriodic(this::loopFunc, period);
