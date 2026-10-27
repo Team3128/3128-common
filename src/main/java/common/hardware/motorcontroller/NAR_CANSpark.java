@@ -25,12 +25,15 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.SparkBase.Faults;
 import com.revrobotics.PersistMode;
 import com.revrobotics.ResetMode;
+import com.revrobotics.sim.SparkFlexSim;
+import com.revrobotics.sim.SparkMaxSim;
 
 import common.core.controllers.PIDFFConfig;
 import common.utility.Log;
 import common.utility.narwhaldashboard.NarwhalDashboard.State;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 
 import java.util.function.Supplier;
@@ -111,6 +114,8 @@ public class NAR_CANSpark extends NAR_Motor {
 	private final SparkClosedLoopController controller;
     private final SparkBase motor;
 	private final SparkBaseConfig config;
+	private SparkMaxSim maxSim;
+	private SparkFlexSim flexSim;
 
     /**
 	 * Create a new object to control a SPARK motor
@@ -466,6 +471,24 @@ public class NAR_CANSpark extends NAR_Motor {
     public double getRawVelocity() {
         return encoderType == EncoderType.Relative ? relativeEncoder.getVelocity() : absoluteEncoder.getVelocity();
     }
+
+	/**
+	 * Follows REV's SparkSim pattern. Only the built-in relative encoder is simulated; the
+	 * encoder has no conversion factor, so iterate() takes rotor RPM.
+	 */
+	@Override
+	protected void simulationStep(double dtSeconds) {
+		final double busVolts = RobotController.getBatteryVoltage();
+		if (motor instanceof SparkFlex flex) {
+			if (flexSim == null) flexSim = new SparkFlexSim(flex, simModel.getMotor());
+			simModel.update(flexSim.getAppliedOutput() * busVolts, dtSeconds);
+			flexSim.iterate(simModel.getRotorRPS() * 60.0, busVolts, dtSeconds);
+		} else {
+			if (maxSim == null) maxSim = new SparkMaxSim((SparkMax) motor, simModel.getMotor());
+			simModel.update(maxSim.getAppliedOutput() * busVolts, dtSeconds);
+			maxSim.iterate(simModel.getRotorRPS() * 60.0, busVolts, dtSeconds);
+		}
+	}
 
 	@Override
 	public double getTemperature() {

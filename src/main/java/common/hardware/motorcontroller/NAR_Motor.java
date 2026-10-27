@@ -5,9 +5,12 @@ import java.util.LinkedList;
 
 import common.core.controllers.PIDFFConfig;
 import common.core.misc.NAR_Robot;
+import common.hardware.motorcontroller.sim.MotorSimModel;
 import common.utility.Log;
 import common.utility.narwhaldashboard.NarwhalDashboard;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 
 /**
@@ -147,6 +150,39 @@ public abstract class NAR_Motor implements AutoCloseable {
     public NAR_Motor(int id){
         this.id = id;
     }
+
+    private static final LinkedList<NAR_Motor> simulatedMotors = new LinkedList<NAR_Motor>();
+    protected MotorSimModel simModel;
+
+    /**
+     * Attaches physics so this motor moves in simulation. Does nothing on the real robot.
+     * Only attach to the leader when several motors drive one mechanism, and give the
+     * model a {@link DCMotor} for all of them, e.g. {@code DCMotor.getKrakenX60(2)}.
+     * @param model The physics of what this motor drives
+     */
+    public void enableSim(MotorSimModel model) {
+        if (!RobotBase.isSimulation()) return;
+        simModel = model;
+        simulatedMotors.add(this);
+    }
+
+    /**
+     * Steps the physics of every motor with {@link #enableSim(MotorSimModel)}.
+     * Call once per loop from {@code Robot.simulationPeriodic()}.
+     * @param dtSeconds Time since the last call, normally 0.02
+     */
+    public static void updateSimulation(double dtSeconds) {
+        for (final NAR_Motor motor : simulatedMotors) {
+            motor.simulationStep(dtSeconds);
+        }
+    }
+
+    /**
+     * Reads this motor's simulated output voltage, steps {@link #simModel}, and writes the
+     * new rotor position and velocity back to the motor controller's simulation.
+     * @param dtSeconds Time step in seconds
+     */
+    protected void simulationStep(double dtSeconds) {}
 
     /**
      * Sets motor output power in volts

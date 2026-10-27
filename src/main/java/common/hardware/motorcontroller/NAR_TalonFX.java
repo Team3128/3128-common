@@ -18,6 +18,7 @@ import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.ctre.phoenix6.sim.TalonFXSimState;
 
 import common.core.controllers.PIDFFConfig;
 import common.utility.Log;
@@ -28,6 +29,7 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Temperature;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 
 import java.util.function.Supplier;
@@ -183,6 +185,16 @@ public class NAR_TalonFX extends NAR_Motor {
     @Override
     protected void resetRawPosition(double rotations) {
         motor.setPosition(rotations);
+    }
+
+    @Override
+    protected void simulationStep(double dtSeconds) {
+        // Follows CTRE's TalonFXSimState pattern; the Talon applies inversion itself.
+        final TalonFXSimState simState = motor.getSimState();
+        simState.setSupplyVoltage(RobotController.getBatteryVoltage());
+        simModel.update(simState.getMotorVoltage(), dtSeconds);
+        simState.setRawRotorPosition(simModel.getRotorRotations());
+        simState.setRotorVelocity(simModel.getRotorRPS());
     }
 
     @Override
