@@ -94,6 +94,18 @@ public class PIDFFConfig {
         this.kV = config.kV;
     }
 
+    public void setkP(double kP) {
+        this.kP = kP;
+    }
+
+    public void setkI(double kI) {
+        this.kI= kI;
+    }
+
+    public void setkD(double kD) {
+        this.kD = kD;
+    }
+
     public void setkS(double kS) {
         setkS(()-> kS);
     }
@@ -155,6 +167,18 @@ public class PIDFFConfig {
         this.kG_Function = kG_Function;
     }
 
+    public double getkP() {
+        return kP;
+    }
+
+    public double getkI() {
+        return kI;
+    }
+
+    public double getkD() {
+        return kD;
+    }
+
     /**
      * Returns static gain.
      * @return returns kS as a double.
@@ -189,5 +213,32 @@ public class PIDFFConfig {
 
     public DoubleSupplier getkG_Function() {
         return kG_Function;
+    }
+
+    /**
+     * Feedforward for a position-controlled mechanism: static + gravity gain only.
+     * <p>Does not include kV/kA, since the setpoint here is a position, not a velocity.
+     *
+     * @param pidOutput The PID controller's output this cycle, used to sign kS.
+     * @param atSetpoint Whether the mechanism is currently at its setpoint (suppresses kS to avoid dithering).
+     */
+    public double positionFF(double pidOutput, boolean atSetpoint) {
+        final double staticGain = atSetpoint ? 0 : Math.copySign(getkS(), pidOutput);
+        final double gravityGain = getkG() * getkG_Function().getAsDouble();
+        return staticGain + gravityGain;
+    }
+
+    /**
+     * Feedforward for a velocity-controlled mechanism: static + velocity + gravity gain.
+     *
+     * @param setpoint The velocity setpoint.
+     * @param pidOutput The PID controller's output this cycle, used to sign kS.
+     * @param atSetpoint Whether the mechanism is currently at its setpoint (suppresses kS to avoid dithering).
+     */
+    public double velocityFF(double setpoint, double pidOutput, boolean atSetpoint) {
+        final double staticGain = atSetpoint ? 0 : Math.copySign(getkS(), pidOutput);
+        final double velocityGain = getkV() * setpoint;
+        final double gravityGain = getkG() * getkG_Function().getAsDouble();
+        return staticGain + velocityGain + gravityGain;
     }
 }

@@ -1,5 +1,8 @@
 package common.hardware.limelight;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -119,4 +122,114 @@ public class Limelight {
     public double getSelectedPipeline() {
         return limelightTable.getEntry("pipeline").getDouble(0);
     }
+
+    public class LimelightData extends LinkedHashMap<String, Double>{
+
+        private String csvString;
+
+        public LimelightData() {
+            super();
+            for (String valueKey : LimelightConstants.VALUE_KEYS) {
+            put(valueKey, 0.0);
+            }
+            for (String valueKey : LimelightConstants.VALUE_KEYS_PNP) {
+                put(valueKey, 0.0);
+            }
+        }
+
+        public String toString() {
+
+            csvString = "";
+
+            for (Map.Entry<String, Double> entry : entrySet()) {
+                csvString += (Double.toString(entry.getValue()) + ", ");
+            }
+
+            csvString += "\n";
+
+            return csvString;
+        }
+    }
+
+    public enum LimelightKey {
+        VALID_TARGET("tv"),
+        HORIZONTAL_OFFSET("tx"),
+        VERTICAL_OFFSET("ty"),
+        AREA("ta"),
+        SKEW("ts"),
+        LATENCY("tl"),
+        FITTED_SHORT("tshort"),
+        FITTED_LONG("tlong"),
+        LENGTH_HORIZONTAL("thor"),
+        LENGTH_VERTICAL("tvert"),
+        PIPELINE("getpipe");
+
+        private String key;
+        private LimelightKey(String key) {
+            this.key = key;
+        }
+
+        public String getKey() {
+            return key;
+        }
+
+        public String toString() {
+            return getKey();
+        }
+    }
+
+    public enum Pipeline {
+        RED(0),
+        BLUE(1);
+
+        private int pipeline;
+        private Pipeline(int pipeline) {
+            this.pipeline = pipeline;
+        }
+
+        public int getPipeline() {
+            return pipeline;
+        }
+    }
+
+    public enum StreamMode {
+        BOTH(0),
+        LIMELIGHT_CAMERA(1),
+        DRIVER_CAMERA(2);
+
+        private int stream;
+        private StreamMode(int stream) {
+            this.stream = stream;
+        }
+
+        public int getStream() {
+            return stream;
+        }
+    }
+
+    public class LimelightConstants {
+        public static final String[] VALUE_KEYS = { "tx", "ty", "ts", "ta", "thor", "tvert", "tshort", "tlong", "tv" };
+        public static final String[] VALUE_KEYS_PNP = { "x", "y", "z", "pitch", "yaw", "roll" };
+
+        public static final double SCREEN_WIDTH = 320;
+        public static final double SCREEN_HEIGHT = 240;
+
+        public static final double HORIZONTAL_FOV = 59.6; //degrees
+        public static final double VERTICAL_FOV = 45.7; //degrees
+    }
+
+    public enum LEDMode {
+        ON(3), OFF(1), BLINK(2);
+
+        private int ledMode;
+
+        private LEDMode(int ledMode) {
+            this.ledMode = ledMode;
+        }
+
+        public int getLEDMode() {
+            return ledMode;
+        }
+    }
+
 }
