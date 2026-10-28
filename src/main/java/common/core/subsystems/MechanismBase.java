@@ -15,6 +15,7 @@ import common.utility.Log;
 import common.utility.shuffleboard.NAR_Shuffleboard;
 import common.utility.sysid.NAR_SysIdCommand;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
@@ -477,6 +478,15 @@ public abstract class MechanismBase extends SubsystemBase {
      */
     public double getVolts() {
         return motors[0].getAppliedOutput() * MAX_VOLTS;
+    }
+
+    /**
+     * Where the mechanism's moving part is, relative to where it starts, for AdvantageScope's 3D
+     * view. Export the robot's CAD with every mechanism at its starting position. Default is no
+     * movement, e.g. for rollers.
+     */
+    public Pose3d getComponentPose() {
+        return Pose3d.kZero;
     }
 
     public Command characterization(double rampRate, double stepVoltage) {

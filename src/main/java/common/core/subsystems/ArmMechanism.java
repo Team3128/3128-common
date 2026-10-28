@@ -6,6 +6,9 @@ import common.hardware.motorcontroller.NAR_Motor.Control;
 import common.hardware.motorcontroller.NAR_Motor.MotorConfig;
 import common.hardware.motorcontroller.sim.ArmSimModel;
 import common.hardware.motorcontroller.sim.MotorSimModel;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.system.plant.DCMotor;
 
 /**
@@ -17,6 +20,10 @@ import edu.wpi.first.math.system.plant.DCMotor;
  * turns on, and the encoder is reset to it.
  */
 public class ArmMechanism extends MechanismBase {
+
+    private final double startPosition;
+    private final double radiansPerUnit;
+    private Translation3d pivot = Translation3d.kZero;
 
     /**
      * @param name Name shown on Shuffleboard and in logs
@@ -36,6 +43,8 @@ public class ArmMechanism extends MechanismBase {
                         double minPosition, double maxPosition, double startPosition, double radiansPerUnit,
                         double lengthMeters, double massKg, DCMotor motorType, NAR_Motor... motors) {
         super(gains, Control.Position, tolerance, startPosition, motorConfig, motors);
+        this.startPosition = startPosition;
+        this.radiansPerUnit = radiansPerUnit;
         setName(name);
         setInputRange(minPosition, maxPosition);
         setDisableAtSetpoint(false); // keep holding against gravity
@@ -47,5 +56,26 @@ public class ArmMechanism extends MechanismBase {
         motors[0].enableSim(new ArmSimModel(MotorSimModel.gearbox(motorType, motors.length), gearing, lengthMeters,
             massKg, minPosition * radiansPerUnit, maxPosition * radiansPerUnit, startPosition * radiansPerUnit));
         reset();
+    }
+
+    /**
+     * Sets where the arm's pivot is, in meters from the robot's origin, for
+     * {@link #getComponentPose()}. Take it from CAD.
+     */
+    public void setPivot(Translation3d pivot) {
+        this.pivot = pivot;
+    }
+
+    /**
+     * How far the arm has rotated from where it starts, for AdvantageScope's 3D view. Rotates about
+     * the pivot from {@link #setPivot(Translation3d)}, assuming the arm points toward the front of
+     * the robot (+x) at 0 and swings in the robot's front-to-back plane.
+     */
+    @Override
+    public Pose3d getComponentPose() {
+        // Positive angles are up, which for an arm pointing forward is a negative pitch
+        final Rotation3d rotation = new Rotation3d(0, -(getPosition() - startPosition) * radiansPerUnit, 0);
+        // Rotate about the pivot rather than the robot's origin
+        return new Pose3d(pivot.minus(pivot.rotateBy(rotation)), rotation);
     }
 }

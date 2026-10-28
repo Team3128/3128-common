@@ -12,6 +12,8 @@ import common.hardware.motorcontroller.NAR_Motor.Control;
 import common.hardware.motorcontroller.NAR_Motor.MotorConfig;
 import common.hardware.motorcontroller.NAR_Motor.Neutral;
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.system.plant.DCMotor;
 
 class ArmMechanismTest {
@@ -42,6 +44,29 @@ class ArmMechanismTest {
 
     private static ArmMechanism arm(MockMotor motor) {
         return arm(DEGREES_PER_MOTOR_ROTATION, motor);
+    }
+
+    @Test
+    void poseRotatesAboutThePivot() {
+        final MockMotor motor = MockMotor.talonLike(1);
+        final ArmMechanism arm = arm(motor);
+        final Translation3d pivot = new Translation3d(0.2, 0, 0.5);
+        arm.setPivot(pivot);
+
+        // From hanging straight down at the start to level, pointing forward
+        motor.rawPosition = 0;
+        final Pose3d pose = arm.getComponentPose();
+
+        // The tip of a 0.5 m arm starts below the pivot and ends up in front of it
+        final Translation3d tipAtStart = pivot.plus(new Translation3d(0, 0, -0.5));
+        final Translation3d tip = tipAtStart.rotateBy(pose.getRotation()).plus(pose.getTranslation());
+        assertEquals(0.7, tip.getX(), 1e-6);
+        assertEquals(0, tip.getY(), 1e-6);
+        assertEquals(0.5, tip.getZ(), 1e-6);
+
+        // The pivot itself doesn't move
+        final Translation3d movedPivot = pivot.rotateBy(pose.getRotation()).plus(pose.getTranslation());
+        assertEquals(0, movedPivot.getDistance(pivot), 1e-6);
     }
 
     @Test

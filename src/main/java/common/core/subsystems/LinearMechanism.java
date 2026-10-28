@@ -61,6 +61,7 @@ public class LinearMechanism extends MechanismBase {
      * How far the moving part is from where it starts, for AdvantageScope's 3D view. Assumes it
      * moves toward the front of the robot (+x), tilted up by the incline given to the constructor.
      */
+    @Override
     public Pose3d getComponentPose() {
         final double meters = (getPosition() - minPosition) * metersPerUnit;
         return new Pose3d(meters * Math.cos(angleRadians), 0, meters * Math.sin(angleRadians), Rotation3d.kZero);
