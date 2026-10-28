@@ -36,7 +36,6 @@ import common.utility.narwhaldashboard.NarwhalDashboard.State;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.Timer;
 
 import java.util.function.Supplier;
 
@@ -242,8 +241,12 @@ public class NAR_CANSpark extends NAR_Motor {
 		configure();
 	}
 
+	/**
+	 * Sends the settings to the Spark without saving them, as REV recommends for changes after
+	 * startup: saving is slow and wears out its flash. {@link #burnFlash()} saves them once at startup.
+	 */
 	public void configure() {
-		motor.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
+		configSpark(() -> motor.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters));
 	}
 
 	@Override
@@ -384,15 +387,19 @@ public class NAR_CANSpark extends NAR_Motor {
 	}
 
 	/**
-	 * Burns all settings to flash; stores settings between power cycles
+	 * Resets the Spark to its defaults, applies every setting, and saves them to flash, so it keeps
+	 * them if it reboots, e.g. after a brownout. REV recommends doing this once at startup;
+	 * {@code NAR_Robot} does it for every Spark after {@code robotInit}.
 	 */
 	public REVLibError burnFlash() {
-		 if (RobotBase.isSimulation()) return REVLibError.kOk;
+		if (RobotBase.isSimulation()) return REVLibError.kOk;
 
-		Timer.delay(0.5);
-		// Starts from the defaults and applies every setting, so nothing set elsewhere lingers, then saves it
-		REVLibError status = motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-		Timer.delay(0.5);
+		// configure() waits for the Spark to confirm, so there's no need to pause around it
+		REVLibError status = REVLibError.kOk;
+		for (int i = 0; i < maximumRetries; i++) {
+			status = motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+			if (status == REVLibError.kOk) break;
+		}
 		if (status == REVLibError.kOk) {
 			Log.info("Motors", "Burned flash for Spark Max " + motor.getDeviceId());
 		} else {

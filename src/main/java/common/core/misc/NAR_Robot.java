@@ -2,6 +2,7 @@ package common.core.misc;
 
 import java.util.PriorityQueue;
 
+import common.hardware.motorcontroller.NAR_CANSpark;
 import edu.wpi.first.hal.DriverStationJNI;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.NotifierJNI;
@@ -125,6 +126,8 @@ public class NAR_Robot extends IterativeRobotBase {
     public void startCompetition() {
         
         robotInit();
+        // Every Spark is configured by now, so save each one's settings once, as REV recommends
+        NAR_CANSpark.burnFlashAll();
 
         if (isSimulation()) {
             simulationInit();
