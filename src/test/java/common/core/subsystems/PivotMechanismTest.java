@@ -208,6 +208,35 @@ class PivotMechanismTest {
     }
 
     @Test
+    void armHoldsUpWhatItsTelescopeMovesOut() {
+        final MockMotor armMotor = MockMotor.talonLike(1);
+        final MockMotor telescopeMotor = MockMotor.talonLike(2);
+        final PivotMechanism arm = arm(armMotor);
+        final LinearMechanism telescope = telescope(telescopeMotor);
+        telescope.setParent(arm);
+        // Volts to hold one newton meter at the arm, through the 50:1 gearing
+        final double voltsPerNewtonMeter = KRAKEN.rOhms / (GEARING * KRAKEN.KtNMPerAmp);
+
+        // Arm level, telescope 0.3 m out: its 2 kg is 0.3 m further from the pivot
+        armMotor.rawPosition = 0;
+        telescopeMotor.rawPosition = 0.3 / 0.01;
+        assertEquals(2 * 9.81 * 0.3 * voltsPerNewtonMeter, arm.getExtensionGravityVolts(), 1e-9);
+
+        // It goes out with the arm's setpoint, on top of the kG the motor controller applies
+        arm.setSetpoint(0);
+        arm.periodic();
+        assertEquals(arm.getExtensionGravityVolts(), armMotor.lastFeedforward, 1e-9);
+
+        // A 1 kg wrist on the end goes out with it
+        wrist(Orientation.FORWARD, MockMotor.talonLike(3)).setParent(telescope);
+        assertEquals(3 * 9.81 * 0.3 * voltsPerNewtonMeter, arm.getExtensionGravityVolts(), 1e-9);
+
+        // Arm straight up: extending moves the weight straight up, no further out
+        armMotor.rawPosition = 90 / DEGREES_PER_MOTOR_ROTATION;
+        assertEquals(0, arm.getExtensionGravityVolts(), 1e-9);
+    }
+
+    @Test
     void wristOnATelescopeSwingsWithTheArmWhateverOrderTheyreMounted() {
         final MockMotor armMotor = MockMotor.talonLike(1);
         final MockMotor wristMotor = MockMotor.talonLike(3);

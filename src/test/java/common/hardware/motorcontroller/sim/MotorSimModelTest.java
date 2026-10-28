@@ -152,6 +152,18 @@ class MotorSimModelTest {
     }
 
     @Test
+    void armFallsFasterWithItsTelescopeOut() {
+        final PivotSimModel retracted = new PivotSimModel(KRAKEN, 50, 0.5, 3, -Math.PI / 2, Math.PI / 2, 0, true);
+        final PivotSimModel extended = new PivotSimModel(KRAKEN, 50, 0.5, 3, -Math.PI / 2, Math.PI / 2, 0, true);
+        extended.setExtraGravityVolts(() -> 0.2);
+
+        run(retracted, 0, 0.5);
+        run(extended, 0, 0.5);
+
+        assertTrue(extended.getRotorRotations() < retracted.getRotorRotations());
+    }
+
+    @Test
     void wristFeelsGravityOnItsArmsAngleToo() {
         // Both level relative to their arm, but one arm points straight up
         final PivotSimModel onLevelArm = new PivotSimModel(KRAKEN, 50, 0.3, 1, -Math.PI, Math.PI, 0, true);

@@ -1,6 +1,7 @@
 package common.core.subsystems;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleBinaryOperator;
@@ -518,6 +519,16 @@ public abstract class MechanismBase extends SubsystemBase {
     /** What it's mounted on; null if the robot itself. */
     public MechanismBase getParent() {
         return parent;
+    }
+
+    /** What's mounted directly on it. */
+    public List<MechanismBase> getMounted() {
+        return Collections.unmodifiableList(mounted);
+    }
+
+    /** Mass of the part that moves, if known, for gravity on what it's mounted on. Default is 0, e.g. for rollers. */
+    public double getMassKg() {
+        return 0;
     }
 
     /**

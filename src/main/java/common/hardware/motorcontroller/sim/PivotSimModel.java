@@ -23,6 +23,7 @@ public class PivotSimModel implements MotorSimModel {
     private final double levelGravityVolts;
     private final SingleJointedArmSim sim;
     private DoubleSupplier parentRadians = () -> 0;
+    private DoubleSupplier extraGravityVolts = () -> 0;
     private double appliedVolts;
 
     /**
@@ -59,16 +60,26 @@ public class PivotSimModel implements MotorSimModel {
         this.parentRadians = parentRadians;
     }
 
+    /**
+     * Adds a load from something mounted on it, e.g. what a telescope on an arm has moved out.
+     * @param extraGravityVolts Volts at the motor that would hold that load
+     */
+    public void setExtraGravityVolts(DoubleSupplier extraGravityVolts) {
+        this.extraGravityVolts = extraGravityVolts;
+    }
+
     @Override public DCMotor getMotor() { return motor; }
 
     @Override
     public void update(double motorVolts, double dtSeconds) {
         appliedVolts = motorVolts;
+        // Comes from other mechanisms' positions, which don't change until they're updated too
+        final double extraVolts = extraGravityVolts.getAsDouble();
         for (int i = 0; i < STEPS_PER_UPDATE; i++) {
             final double gravityVolts = simulateGravity
                 ? levelGravityVolts * Math.cos(sim.getAngleRads() + parentRadians.getAsDouble())
                 : 0;
-            sim.setInputVoltage(motorVolts - gravityVolts);
+            sim.setInputVoltage(motorVolts - gravityVolts - extraVolts);
             sim.update(dtSeconds / STEPS_PER_UPDATE);
         }
     }

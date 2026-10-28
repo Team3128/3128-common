@@ -25,6 +25,7 @@ public class LinearMechanism extends MechanismBase {
 
     private final double minPosition;
     private final double metersPerUnit;
+    private final double massKg;
     /** Which way it moves, with everything at its starting position. */
     private final Translation3d travelDirection;
     private final LinearSimModel simModel;
@@ -41,7 +42,7 @@ public class LinearMechanism extends MechanismBase {
      *                      {@link #getComponentPose()}
      * @param angleRadians Incline of travel when everything is at its starting position, 0 is horizontal and
      *                     pi/2 is straight up; used in simulation and {@link #getComponentPose()}
-     * @param massKg Mass that moves; used only in simulation
+     * @param massKg Mass that moves; used in simulation, and for gravity on an arm it's mounted on
      * @param motorType Model of one motor, e.g. {@code DCMotor.getKrakenX60(1)}; used only in simulation
      * @param motors Every motor on the mechanism. The first is the leader.
      */
@@ -51,6 +52,7 @@ public class LinearMechanism extends MechanismBase {
         super(gains, Control.Position, tolerance, minPosition, motorConfig, motors);
         this.minPosition = minPosition;
         this.metersPerUnit = metersPerUnit;
+        this.massKg = massKg;
         // Toward the front of the robot (+x), tilted up by the incline
         this.travelDirection = new Translation3d(Math.cos(angleRadians), 0, Math.sin(angleRadians));
         setName(name);
@@ -84,10 +86,38 @@ public class LinearMechanism extends MechanismBase {
         }
     }
 
+    /** Which way it moves now, as a unit vector from the robot, including any tilt from what it's mounted on. */
+    public Translation3d getTravelDirection() {
+        final Rotation3d tilt = getParent() == null ? Rotation3d.kZero : getParent().getComponentPose().getRotation();
+        return travelDirection.rotateBy(tilt);
+    }
+
     /** Sine of the incline of its travel now, including any tilt from what it's mounted on. */
     public double getInclineSine() {
-        final Rotation3d tilt = getParent() == null ? Rotation3d.kZero : getParent().getComponentPose().getRotation();
-        return travelDirection.rotateBy(tilt).getZ();
+        return getTravelDirection().getZ();
+    }
+
+    /** How far it has moved out from where it starts, in meters. */
+    public double getExtensionMeters() {
+        return (getPosition() - minPosition) * metersPerUnit;
+    }
+
+    @Override
+    public double getMassKg() {
+        return massKg;
+    }
+
+    /** Mass moved when it extends: its own, plus everything mounted on it. */
+    public double getMovingMassKg() {
+        return massKg + massMountedOn(this);
+    }
+
+    private static double massMountedOn(MechanismBase mechanism) {
+        double total = 0;
+        for (MechanismBase mounted : mechanism.getMounted()) {
+            total += mounted.getMassKg() + massMountedOn(mounted);
+        }
+        return total;
     }
 
     /** kG on the incline, when mounted on something that tilts it. */
@@ -100,7 +130,7 @@ public class LinearMechanism extends MechanismBase {
     /** How far the moving part is from where it starts, along its travel. */
     @Override
     protected Pose3d getOwnComponentPose() {
-        final double meters = (getPosition() - minPosition) * metersPerUnit;
+        final double meters = getExtensionMeters();
         return new Pose3d(travelDirection.times(meters), Rotation3d.kZero);
     }
 }
