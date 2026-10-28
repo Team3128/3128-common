@@ -55,6 +55,27 @@ class PivotMechanismTest {
     }
 
     @Test
+    void sideArmHasGravityAndSwingsUpOverTheLeftSide() {
+        final MockMotor motor = MockMotor.talonLike(1);
+        final MotorConfig config = new MotorConfig(DEGREES_PER_MOTOR_ROTATION, 60, 40, false, Neutral.BRAKE);
+        final PivotMechanism arm = new PivotMechanism("PivotMechanismTest" + nextName++, Axis.ROLL, config,
+            new PIDFFConfig(KP, 0, 0, 0, 0, 0, KG), 1, MIN, MAX, START, Math.PI / 180, 0.5, 3, KRAKEN, motor);
+        final Translation3d pivot = new Translation3d(0, 0.3, 0.5);
+        arm.setPivot(pivot);
+
+        assertEquals(GEARING, motor.armRatio, TOLERANCE); // kG follows the cosine
+
+        // From hanging straight down at the start to level
+        motor.rawPosition = 0;
+        final Pose3d pose = arm.getComponentPose();
+
+        // The tip of a 0.5 m arm starts below the pivot and ends up to its left
+        final Translation3d tipAtStart = pivot.plus(new Translation3d(0, 0, -0.5));
+        final Translation3d tip = tipAtStart.rotateBy(pose.getRotation()).plus(pose.getTranslation());
+        assertEquals(0, tip.getDistance(pivot.plus(new Translation3d(0, 0.5, 0))), 1e-6);
+    }
+
+    @Test
     void turretHasNoGravityFeedforward() {
         final MockMotor motor = MockMotor.talonLike(1);
         turret(motor);
