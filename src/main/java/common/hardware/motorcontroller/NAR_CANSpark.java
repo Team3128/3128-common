@@ -87,15 +87,23 @@ public class NAR_CANSpark extends NAR_Motor {
 	}
 
 	/**
-	 * How often each of the Spark's status frames is sent, in milliseconds. Each frame carries
-	 * different data, e.g. frame 1 has velocity and frame 2 has position.
+	 * How often each of the Spark's status frames is sent, in milliseconds:
+	 * <ul>
+	 * <li>0: output and faults</li>
+	 * <li>1: velocity, current, temperature and voltage</li>
+	 * <li>2: position</li>
+	 * <li>3: an analog sensor</li>
+	 * <li>4: an alternate encoder</li>
+	 * <li>5 and 6: an absolute encoder's position and velocity</li>
+	 * </ul>
+	 * Frame 1 is never turned off, since every mechanism logs its motors' current and temperature.
 	 */
 	public enum NAR_SparkMaxConfig {
 		DEFAULT(HIGH_PRIORITY, HIGH_PRIORITY, HIGH_PRIORITY, NO_PRIORITY, NO_PRIORITY, NO_PRIORITY, NO_PRIORITY),
-		FOLLOWER(HIGH_PRIORITY, NO_PRIORITY, NO_PRIORITY, NO_PRIORITY, NO_PRIORITY, NO_PRIORITY, NO_PRIORITY),
-		POSITION(HIGH_PRIORITY, NO_PRIORITY, HIGH_PRIORITY, NO_PRIORITY, NO_PRIORITY, NO_PRIORITY, NO_PRIORITY),
-		VELOCITY(HIGH_PRIORITY, HIGH_PRIORITY, NO_PRIORITY, NO_PRIORITY, NO_PRIORITY, NO_PRIORITY, NO_PRIORITY),
-		ABSOLUTE(HIGH_PRIORITY, NO_PRIORITY, NO_PRIORITY, NO_PRIORITY, NO_PRIORITY, HIGH_PRIORITY, HIGH_PRIORITY);
+		FOLLOWER(HIGH_PRIORITY, MEDIUM_PRIORITY, NO_PRIORITY, NO_PRIORITY, NO_PRIORITY, NO_PRIORITY, NO_PRIORITY),
+		POSITION(HIGH_PRIORITY, MEDIUM_PRIORITY, HIGH_PRIORITY, NO_PRIORITY, NO_PRIORITY, NO_PRIORITY, NO_PRIORITY),
+		VELOCITY(HIGH_PRIORITY, HIGH_PRIORITY, LOW_PRIORITY, NO_PRIORITY, NO_PRIORITY, NO_PRIORITY, NO_PRIORITY),
+		ABSOLUTE(HIGH_PRIORITY, MEDIUM_PRIORITY, NO_PRIORITY, NO_PRIORITY, NO_PRIORITY, HIGH_PRIORITY, HIGH_PRIORITY);
 
 		public final int status0, status1, status2, status3, status4, status5, status6;
 
@@ -356,13 +364,34 @@ public class NAR_CANSpark extends NAR_Motor {
 	}
 
 	/**
-	 * Stores a frame's rate, without sending it yet.
-	 *
-	 * <p>Known bug: this ignores {@code frame} and always sets the position frame's rate, so
-	 * {@link #setStatusFrames} ends up setting only that, to the last frame's value.
+	 * Stores a frame's rate, without sending it yet. REVLib sets rates per signal rather than per
+	 * frame, so this sets every signal the frame carries. Frame 4, an alternate encoder, isn't
+	 * supported and is ignored.
 	 */
 	public void setPeriodicFramePeriodNoApply(PeriodicFrame frame, int periodMs) {
-		config.signals.primaryEncoderPositionPeriodMs(periodMs);
+		switch (frame) {
+			case kStatus0:
+				config.signals.appliedOutputPeriodMs(periodMs).faultsPeriodMs(periodMs);
+				break;
+			case kStatus1:
+				config.signals.primaryEncoderVelocityPeriodMs(periodMs).motorTemperaturePeriodMs(periodMs)
+					.busVoltagePeriodMs(periodMs).outputCurrentPeriodMs(periodMs);
+				break;
+			case kStatus2:
+				config.signals.primaryEncoderPositionPeriodMs(periodMs);
+				break;
+			case kStatus3:
+				config.signals.analogVoltagePeriodMs(periodMs).analogVelocityPeriodMs(periodMs).analogPositionPeriodMs(periodMs);
+				break;
+			case kStatus5:
+				config.signals.absoluteEncoderPositionPeriodMs(periodMs);
+				break;
+			case kStatus6:
+				config.signals.absoluteEncoderVelocityPeriodMs(periodMs);
+				break;
+			default:
+				break;
+		}
 	}
 
 	/**

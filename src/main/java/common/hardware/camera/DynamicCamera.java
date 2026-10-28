@@ -24,6 +24,7 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.wpilibj.RobotBase;
 import org.photonvision.targeting.PhotonPipelineResult;
+import org.photonvision.targeting.PhotonTrackedTarget;
 
 /**
  * A PhotonVision camera that spots AprilTags and works out where the robot is on the field.
@@ -51,14 +52,16 @@ public class DynamicCamera {
     public static final LinkedList<DynamicCamera> dynamicCameras = new LinkedList<DynamicCamera>();
     /** Whether {@link #periodic()} reads the cameras at all. */
     public static boolean enabled = true;
-    // These show on Shuffleboard but nothing updates them yet, so they keep their starting values
+    /** Whether the last picture had any target that passed {@link #setThresholds}. */
     public boolean withinDist = true;
+    /** Where this camera last put the robot. */
     public Pose2d estimatedPose = new Pose2d();
+    /** Where this camera was on the field for that estimate. */
     public Pose3d cameraPose = new Pose3d();
-     public double distance = 0;
-    private PhotonPipelineResult result = new PhotonPipelineResult();
-     private List<PhotonPipelineResult> resultList = new ArrayList<PhotonPipelineResult>();
-     public boolean isDisabled = false;
+    /** Meters to the nearest target that passed {@link #setThresholds} in the last picture. */
+    public double distance = 0;
+    /** Set to true to ignore just this camera, e.g. if it's knocked out of place. */
+    public boolean isDisabled = false;
 
     /**
      * How simulated cameras see: resolution, field of view, noise, frame rate and latency. Roughly
@@ -144,6 +147,7 @@ public class DynamicCamera {
 
 
         for (final DynamicCamera dynamicCamera : dynamicCameras) {
+            if (dynamicCamera.isDisabled) continue;
             Optional<EstimatedRobotPose> curEst = Optional.empty();
 
             // A turret camera has moved since last loop
@@ -153,36 +157,48 @@ public class DynamicCamera {
 
             // A camera can take several pictures between loops; use each one
             for (var result : dynamicCamera.photonCamera.getAllUnreadResults()) {
-                // Throw out targets too uncertain, too close or too far to trust. This only affects
-                // the single-tag estimate: the multi-tag one was already worked out on the camera's
-                // coprocessor from every tag it saw.
+                // Throw out targets too uncertain, too close or too far to trust as a single tag
+                double nearest = Double.POSITIVE_INFINITY;
                 for (int i = 0; i < result.targets.size(); i++) {
-                    if (result.targets.get(i).poseAmbiguity > dynamicCamera.ambiguityThreshold 
-                    || result.targets.get(i).bestCameraToTarget.getTranslation().getNorm() < dynamicCamera.minDistThreshold 
-                    || result.targets.get(i).bestCameraToTarget.getTranslation().getNorm() > dynamicCamera.maxDistThreshold) 
-                    {
+                    final PhotonTrackedTarget target = result.targets.get(i);
+                    final double distance = target.bestCameraToTarget.getTranslation().getNorm();
+                    final boolean inRange = distance >= dynamicCamera.minDistThreshold && distance <= dynamicCamera.maxDistThreshold;
+                    if (!inRange || target.poseAmbiguity > dynamicCamera.ambiguityThreshold) {
                         result.targets.remove(i);
                         i--;
-                    }                    
+                    } else {
+                        nearest = Math.min(nearest, distance);
+                    }
                 }
+                dynamicCamera.withinDist = !result.targets.isEmpty();
+                if (dynamicCamera.withinDist) dynamicCamera.distance = nearest;
 
                 // Seeing several tags at once pins the robot down much better than one, so use that
-                // when it can, and the clearest single tag otherwise
+                // when it can, and the clearest single tag otherwise. If every tag was thrown out
+                // above, neither is used. Otherwise the multi-tag estimate, worked out on the
+                // camera's coprocessor, uses every tag it saw, including ones thrown out. That's on
+                // purpose: far tags still make a multi-tag estimate better, and several tags
+                // together aren't ambiguous.
                 curEst = dynamicCamera.poseEstimator.estimateCoprocMultiTagPose(result);
                 if (curEst.isEmpty()) {
                     curEst = dynamicCamera.poseEstimator.estimateLowestAmbiguityPose(result);
                 }
 
                 if (curEst.isPresent()) {
-                    dynamicCamera.estConsumer.accept(curEst.get().estimatedPose.toPose2d(), curEst.get().timestampSeconds);
+                    final Pose3d robotPose = curEst.get().estimatedPose;
+                    dynamicCamera.estimatedPose = robotPose.toPose2d();
+                    dynamicCamera.cameraPose = robotPose.transformBy(dynamicCamera.poseEstimator.getRobotToCameraTransform());
+                    dynamicCamera.estConsumer.accept(dynamicCamera.estimatedPose, curEst.get().timestampSeconds);
                 }
             }
         }
     }
 
     /**
-     * Sets which targets to trust. Tags far away or seen at a steep angle give less accurate
-     * positions, so it's often better to ignore them.
+     * Sets which tags to trust. A tag far away or seen at a steep angle gives a less accurate
+     * position, so it's often better to ignore it. A picture where no tag passes is ignored. When
+     * at least one passes and the camera saw several tags, the estimate from all of them together
+     * is used, including tags that didn't pass, since far tags still make it better.
      *
      * @param newMinDistThreshold Ignore tags closer than this, in meters
      * @param newMaxDistThreshold Ignore tags farther than this, in meters
@@ -245,7 +261,7 @@ public class DynamicCamera {
         return robotToPivot.plus(pivotToCam);
     }
 
-    /** Adds a Shuffleboard tab for this camera. Most of its values aren't updated yet; see the fields. */
+    /** Adds a Shuffleboard tab for this camera, with its latest estimate and how far its nearest target is. */
     public void initShuffleboard() {
         NAR_Shuffleboard.addData(photonCamera.getName(), "WithinDist", () -> withinDist, 2, 2, 1, 1);
         NAR_Shuffleboard.addData(photonCamera.getName(), "Estimated Pose X", () -> estimatedPose.getX(), 0, 0, 2, 1);

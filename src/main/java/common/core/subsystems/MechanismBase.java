@@ -545,7 +545,8 @@ public abstract class MechanismBase extends SubsystemBase {
 
     /**
      * A SysId routine that drives the mechanism with rising and stepped voltages and records how
-     * it responds, so WPILib's SysId tool can work out its kS, kV, kA and kG. Give it room to move!
+     * it responds, so WPILib's SysId tool can work out its kS, kV, kA and kG. Each of its four tests
+     * runs for up to 10 seconds, so give it room to move, and cancel it before it hits a hard stop.
      *
      * @param rampRate Volts per second for the slowly rising test
      * @param stepVoltage Volts for the sudden-step test

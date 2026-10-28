@@ -1,6 +1,8 @@
 package common.hardware.motorcontroller;
 
 import static common.hardware.motorcontroller.MotorControllerConstants.HIGH_PRIORITY_FREQ;
+import static common.hardware.motorcontroller.MotorControllerConstants.LOW_PRIORITY_FREQ;
+import static common.hardware.motorcontroller.MotorControllerConstants.MEDIUM_PRIORITY_FREQ;
 import static common.hardware.motorcontroller.MotorControllerConstants.NEO_STATOR_CurrentLimit;
 import static common.hardware.motorcontroller.MotorControllerConstants.NEO_SUPPLY_CurrentLimit;
 
@@ -81,6 +83,7 @@ public class NAR_TalonFX extends NAR_Motor {
     private final StatusSignal<Angle> position;
     private final StatusSignal<AngularVelocity> velocity;
     private final StatusSignal<Temperature> temperature;
+    private final StatusSignal<Integer> faults;
 
     /**
      * @param deviceNumber The Talon's CAN ID
@@ -101,6 +104,7 @@ public class NAR_TalonFX extends NAR_Motor {
         position = motor.getPosition();
         velocity = motor.getVelocity();
         temperature = motor.getDeviceTemp();
+        faults = motor.getFaultField();
 
         // Safe settings until a mechanism's MotorConfig replaces them
         enableVoltageCompensationNoApply(12);
@@ -414,41 +418,54 @@ public class NAR_TalonFX extends NAR_Motor {
     }
 
     // optimizeBusUtilization() turns off every signal whose rate hasn't been set, so each of these
-    // only keeps the signals it lists. For example, a POSITION motor stops reporting its speed,
-    // current and temperature, and reading them gives their last reported values.
+    // sets a rate for every signal that's read: the important ones for that kind of motor every
+    // 20 ms, and the rest, which are mostly for logs, less often.
 
     @Override
     public void setDefaultStatusFrames() {
-        configTalonFX(()-> appliedOutput.setUpdateFrequency(HIGH_PRIORITY_FREQ));
-        configTalonFX(()-> stallCurrent.setUpdateFrequency(HIGH_PRIORITY_FREQ));
-        configTalonFX(()-> velocity.setUpdateFrequency(HIGH_PRIORITY_FREQ));
-        configTalonFX(()-> position.setUpdateFrequency(HIGH_PRIORITY_FREQ));
-        configTalonFX(()-> temperature.setUpdateFrequency(HIGH_PRIORITY_FREQ));
-        configTalonFX(()->  motor.optimizeBusUtilization());
+        setSignalFrequencies(HIGH_PRIORITY_FREQ, HIGH_PRIORITY_FREQ, HIGH_PRIORITY_FREQ, HIGH_PRIORITY_FREQ, HIGH_PRIORITY_FREQ);
     }
-    
+
 	@Override
 	public void setPositionStatusFrames() {
-        configTalonFX(()-> appliedOutput.setUpdateFrequency(HIGH_PRIORITY_FREQ));
-        configTalonFX(()-> position.setUpdateFrequency(HIGH_PRIORITY_FREQ));
-        configTalonFX(()-> motor.optimizeBusUtilization());
+        setSignalFrequencies(HIGH_PRIORITY_FREQ, HIGH_PRIORITY_FREQ, MEDIUM_PRIORITY_FREQ, MEDIUM_PRIORITY_FREQ, LOW_PRIORITY_FREQ);
 	}
 
 	@Override
 	public void setVelocityStatusFrames() {
-        configTalonFX(()-> velocity.setUpdateFrequency(HIGH_PRIORITY_FREQ));
-        configTalonFX(()-> stallCurrent.setUpdateFrequency(HIGH_PRIORITY_FREQ));
-        configTalonFX(()-> motor.optimizeBusUtilization());
+        setSignalFrequencies(MEDIUM_PRIORITY_FREQ, LOW_PRIORITY_FREQ, HIGH_PRIORITY_FREQ, HIGH_PRIORITY_FREQ, LOW_PRIORITY_FREQ);
 	}
 
 	@Override
 	public void setFollowerStatusFrames() {
-		configTalonFX(()-> motor.optimizeBusUtilization());
+        // Only the current and temperature are read from a follower, for the logs
+        setSignalFrequencies(LOW_PRIORITY_FREQ, LOW_PRIORITY_FREQ, LOW_PRIORITY_FREQ, MEDIUM_PRIORITY_FREQ, LOW_PRIORITY_FREQ);
 	}
 
-    /** Always RUNNING for now; it doesn't check whether the Talon is connected. */
+    /** Sets how often each signal is reported, in hertz, and turns off every signal not listed. */
+    private void setSignalFrequencies(double appliedOutputHz, double positionHz, double velocityHz,
+                                      double currentHz, double temperatureHz) {
+        configTalonFX(()-> appliedOutput.setUpdateFrequency(appliedOutputHz));
+        configTalonFX(()-> position.setUpdateFrequency(positionHz));
+        configTalonFX(()-> velocity.setUpdateFrequency(velocityHz));
+        configTalonFX(()-> stallCurrent.setUpdateFrequency(currentHz));
+        configTalonFX(()-> temperature.setUpdateFrequency(temperatureHz));
+        // For getState(), which the dashboard checks
+        configTalonFX(()-> faults.setUpdateFrequency(LOW_PRIORITY_FREQ));
+        configTalonFX(()-> motor.optimizeBusUtilization());
+    }
+
+    /**
+     * DISCONNECTED if the Talon hasn't reported recently, PARTIALLY_RUNNING if it's reporting a
+     * fault, like overheating or a dropped CAN connection, and RUNNING otherwise.
+     */
     @Override
     public NarwhalDashboard.State getState() {
+        // Refreshing a signal the Talon has stopped sending gives an error instead of a value.
+        // appliedOutput is always reported, whatever the status frames.
+        if (!appliedOutput.refresh().getStatus().isOK()) return NarwhalDashboard.State.DISCONNECTED;
+        // Each bit of the fault field is a different fault; 0 means none
+        if (faults.refresh().getValue() != 0) return NarwhalDashboard.State.PARTIALLY_RUNNING;
         return NarwhalDashboard.State.RUNNING;
     }
 

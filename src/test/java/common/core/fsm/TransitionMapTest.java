@@ -170,6 +170,21 @@ class TransitionMapTest {
     }
 
     @Test
+    void commutativeFunctionTransitionsRunTheCommandForTheStateEnteredBothWays() {
+        // Each command is named after the state it was built for
+        final java.util.function.Function<State, Command> named = state -> Commands.none().withName(state.name());
+
+        map.addCommutativeTransition(List.of(State.A, State.B), State.C, named);
+        map.addCommutativeTransition(State.B, List.of(State.A), named);
+
+        assertEquals("C", map.getTransition(State.A, State.C).getCommand().getName());
+        assertEquals("A", map.getTransition(State.C, State.A).getCommand().getName());
+        assertEquals("B", map.getTransition(State.C, State.B).getCommand().getName());
+        assertEquals("A", map.getTransition(State.B, State.A).getCommand().getName());
+        assertEquals("B", map.getTransition(State.A, State.B).getCommand().getName());
+    }
+
+    @Test
     void outgoingAndIncomingTransitionsAreListed() {
         map.addDivergingTransition(State.A);
         map.addTransition(State.B, State.C, Commands.none());

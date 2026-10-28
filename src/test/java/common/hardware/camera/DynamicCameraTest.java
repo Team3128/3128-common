@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -27,6 +28,10 @@ class DynamicCameraTest {
 
     private static final AprilTagFieldLayout FIELD = AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltWelded);
 
+    private static int nextName = 0;
+    /** The camera from the last {@code estimatesFrom}, to check what it shows. */
+    private static DynamicCamera lastCamera;
+
     @BeforeAll
     static void startHal() {
         assertTrue(HAL.initialize(500, 0));
@@ -39,12 +44,18 @@ class DynamicCameraTest {
 
     /** Runs the vision sim and the cameras for a second, with the robot at {@code robotPose}. */
     private static List<Pose2d> estimatesFrom(Pose2d robotPose) {
+        return estimatesFrom(robotPose, camera -> camera.setThresholds(0, 10, 1));
+    }
+
+    /** Like {@link #estimatesFrom(Pose2d)}, with the camera set up by {@code setup}. */
+    private static List<Pose2d> estimatesFrom(Pose2d robotPose, Consumer<DynamicCamera> setup) {
         final List<Pose2d> estimates = new ArrayList<>();
-        final DynamicCamera camera = new DynamicCamera("DynamicCameraTest" + DynamicCamera.dynamicCameras.size(),
+        final DynamicCamera camera = new DynamicCamera("DynamicCameraTest" + nextName++,
             // Level with the tag, at the robot's center
             new Transform3d(0, 0, FIELD.getTags().get(0).pose.getZ(), new Rotation3d()),
             FIELD, (pose, time) -> estimates.add(pose));
-        camera.setThresholds(0, 10, 1);
+        setup.accept(camera);
+        lastCamera = camera;
 
         SimHooks.pauseTiming();
         for (int i = 0; i < 50; i++) {
@@ -68,6 +79,37 @@ class DynamicCameraTest {
         final Pose2d last = estimates.get(estimates.size() - 1);
         assertEquals(0, last.getTranslation().getDistance(robotPose.getTranslation()), 0.15);
         assertEquals(0, last.getRotation().minus(robotPose.getRotation()).getDegrees(), 5);
+
+        // It shows what it saw
+        assertEquals(last, lastCamera.estimatedPose);
+        assertTrue(lastCamera.withinDist);
+        assertEquals(2, lastCamera.distance, 0.15);
+    }
+
+    @Test
+    void pictureWithEveryTagFartherThanTheLimitIsIgnored() {
+        // 2 m from the first tag, where it sees it and its neighbors
+        final AprilTag tag = FIELD.getTags().get(0);
+        final Pose2d robotPose = tag.pose.toPose2d().transformBy(new Transform2d(2, 0, Rotation2d.k180deg));
+
+        // Only trusts tags within 1.5 m, and they're all farther
+        final List<Pose2d> estimates = estimatesFrom(robotPose, camera -> camera.setThresholds(0, 1.5, 1));
+
+        assertTrue(estimates.isEmpty());
+        assertFalse(lastCamera.withinDist);
+    }
+
+    @Test
+    void disabledCameraIsIgnored() {
+        final AprilTag tag = FIELD.getTags().get(0);
+        final Pose2d robotPose = tag.pose.toPose2d().transformBy(new Transform2d(2, 0, Rotation2d.k180deg));
+
+        final List<Pose2d> estimates = estimatesFrom(robotPose, camera -> {
+            camera.setThresholds(0, 10, 1);
+            camera.isDisabled = true;
+        });
+
+        assertTrue(estimates.isEmpty());
     }
 
     @Test

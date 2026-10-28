@@ -2,8 +2,6 @@ package common.utility.sysid;
 
 
 import common.hardware.motorcontroller.NAR_Motor;
-import common.hardware.motorcontroller.NAR_TalonFX;
-import common.utility.Log;
 import edu.wpi.first.units.measure.MutDistance;
 import edu.wpi.first.units.measure.MutLinearVelocity;
 import edu.wpi.first.units.measure.MutVoltage;
@@ -31,13 +29,12 @@ import static edu.wpi.first.wpilibj2.command.Commands.waitSeconds;
  * <li><b>Dynamic</b>: the voltage jumps straight to a step, so the mechanism accelerates hard.
  *     This measures kA.</li>
  * </ul>
+ * Each test stops after a timeout, 10 seconds unless you give one. For a mechanism with limited
+ * travel, like an arm or elevator, pick a timeout short enough that it can't reach the end of its
+ * travel, or cancel the test before it does.
  *
  * <p>The results go into the robot's log file. Open it in the SysId tool, which is part of
  * WPILib, to get the gains.
- *
- * <p>Known issue: WPILib's test commands keep running until something stops them, so
- * {@link #runSysId()} stays on the first test until you cancel it. Until that's fixed, stop each
- * test yourself, e.g. by releasing the button that runs it.
  */
 public class NAR_SysIdCommand {
 
@@ -51,8 +48,9 @@ public class NAR_SysIdCommand {
    private final MutLinearVelocity velocity = MetersPerSecond.mutable(0);
 
 
-
    /**
+    * Tests that each stop after 10 seconds.
+    *
     * @param rampRate Volts per second the quasistatic test's voltage rises by
     * @param stepVoltage Volts the dynamic test jumps to
     * @param setVoltage Drives the mechanism at a voltage, e.g. {@code v -> runVolts(v.in(Volts))}
@@ -60,8 +58,21 @@ public class NAR_SysIdCommand {
     * @param logMotor The motor to record
     */
    public NAR_SysIdCommand(double rampRate, double stepVoltage, Consumer<Voltage> setVoltage, Subsystem sub, NAR_Motor logMotor) {
+       this(rampRate, stepVoltage, 10, setVoltage, sub, logMotor);
+   }
+
+   /**
+    * @param rampRate Volts per second the quasistatic test's voltage rises by
+    * @param stepVoltage Volts the dynamic test jumps to
+    * @param timeoutSeconds How long each test runs before it stops
+    * @param setVoltage Drives the mechanism at a voltage, e.g. {@code v -> runVolts(v.in(Volts))}
+    * @param sub The subsystem the tests use, so nothing else drives it at the same time
+    * @param logMotor The motor to record
+    */
+   public NAR_SysIdCommand(double rampRate, double stepVoltage, double timeoutSeconds, Consumer<Voltage> setVoltage,
+                           Subsystem sub, NAR_Motor logMotor) {
        driveRoutine = new SysIdRoutine(
-           new SysIdRoutine.Config(Volts.of(rampRate).per(Second), Volts.of(stepVoltage), null),
+           new SysIdRoutine.Config(Volts.of(rampRate).per(Second), Volts.of(stepVoltage), Seconds.of(timeoutSeconds)),
            new SysIdRoutine.Mechanism(setVoltage, this::logMotors, sub));
        this.logMotor = logMotor;
    }
@@ -76,13 +87,10 @@ public class NAR_SysIdCommand {
            .linearPosition(position.mut_replace(logMotor.getPosition(), Meters))
            .linearVelocity(velocity.mut_replace(logMotor.getVelocity(), MetersPerSecond))
            .voltage(appliedVoltage.mut_replace(logMotor.getAppliedOutput() * 12, Volts));
-       Log.info("Debug Position", logMotor.getPosition());
-       Log.info("Debug Velocity", logMotor.getVelocity());
-       Log.info("Debug Voltage", logMotor.getAppliedOutput() * 12);
    }
 
 
-   /** All four tests in a row, with a second's pause between them. See the known issue above. */
+   /** All four tests in a row, with a second's pause between them. */
    public Command runSysId(){
        return sequence(
            driveRoutine.quasistatic(SysIdRoutine.Direction.kForward),
@@ -95,6 +103,3 @@ public class NAR_SysIdCommand {
        );
    }
 }
-
-
-

@@ -64,7 +64,10 @@ public abstract class NAR_Motor implements AutoCloseable {
          * @param statorLimit Most amps through the motor itself. This limits torque, so it stops
          *                    mechanisms pushing too hard against hard stops and game pieces.
          * @param supplyLimit Most amps the motor controller draws from the battery. This protects
-         *                    the battery and breakers.
+         *                    the battery and breakers. Sparks don't have a true supply limit, so on a
+         *                    Spark this sets REV's secondary current limit instead, which briefly cuts
+         *                    output when the motor's current goes over it; see
+         *                    {@link NAR_CANSpark#setSupplyLimit(int)}.
          * @param voltageCompensation Volts treated as full power, so output is the same as the
          *                            battery drains. Usually 12.
          * @param inverted Whether positive output spins it clockwise instead of counterclockwise,
@@ -661,7 +664,8 @@ public abstract class NAR_Motor implements AutoCloseable {
 
     /**
 	 * Sets the most amps the motor controller draws from the battery, to protect the battery and
-	 * breakers and avoid brownouts.
+	 * breakers and avoid brownouts. On a Spark this is REV's secondary current limit instead; see
+	 * {@link NAR_CANSpark#setSupplyLimit(int)}.
 	 * @param limit Amps
 	 */
     public abstract void setSupplyLimit(int limit);

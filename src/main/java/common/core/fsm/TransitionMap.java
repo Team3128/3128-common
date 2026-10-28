@@ -405,12 +405,13 @@ public class TransitionMap<S extends Enum<S>> {
     }
 
     /**
-     * Between each state in {@code start} and {@code end}, both ways, running the command
-     * {@code function} builds for {@code end}. Note: unlike the other function versions, coming
-     * back from {@code end} also runs {@code end}'s command, not the command for the state entered.
+     * Between each state in {@code start} and {@code end}, both ways, each running the command
+     * {@code function} builds for the state being entered.
      */
     public void addCommutativeTransition(List<S> start, S end, Function<S, Command> function) {
-        addCommutativeTransition(start, end, function.apply(end));
+        for (S outgoingState : start) {
+            addCommutativeTransition(outgoingState, end, function);
+        }
     }
 
     /** Between {@code start} and each state in {@code end}, both ways. Does nothing. */
@@ -441,12 +442,12 @@ public class TransitionMap<S extends Enum<S>> {
     }
 
     /**
-     * Between {@code start} and each state in {@code end}, both ways. Each pair runs the command
-     * {@code function} builds for the state in {@code end}, in both directions.
+     * Between {@code start} and each state in {@code end}, both ways, each running the command
+     * {@code function} builds for the state being entered.
      */
     public void addCommutativeTransition(S start, List<S> end, Function<S, Command> function) {
         for (S incomingState : end) {
-            addCommutativeTransition(start, incomingState, function.apply(incomingState));
+            addCommutativeTransition(start, incomingState, function);
         }
     }
 
