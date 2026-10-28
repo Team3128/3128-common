@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 
 class MotorSimModelTest {
 
@@ -116,6 +117,40 @@ class MotorSimModelTest {
 
         assertTrue(arm.getRotorRotations() < -1);
         assertEquals(0, turret.getRotorRotations(), 1e-9);
+    }
+
+    @Test
+    void pivotFallsAtTheSpeedWhereGravityBalancesBackEmf() {
+        final double gearing = 50, lengthMeters = 0.5, massKg = 3;
+        final PivotSimModel pivot = new PivotSimModel(KRAKEN, gearing, lengthMeters, massKg, -Math.PI / 2, Math.PI / 2, 0, true);
+
+        // Unpowered and shorted in brake mode, the motor resists in proportion to speed
+        final double moi = SingleJointedArmSim.estimateMOI(lengthMeters, massKg);
+        final double gravityAccel = massKg * 9.81 * lengthMeters / 2 / moi; // rad/s^2, when level
+        final double damping = gearing * gearing * KRAKEN.KtNMPerAmp / (KRAKEN.KvRadPerSecPerVolt * KRAKEN.rOhms * moi); // 1/s
+
+        final double seconds = 0.5;
+        run(pivot, 0, seconds);
+
+        // Falling from level: speed settles quickly, then stays almost constant, since the angle barely changes
+        final double radians = gravityAccel / damping * (seconds - (1 - Math.exp(-damping * seconds)) / damping);
+        // The fall slows slightly as cos(angle) drops; 1% covers it
+        assertEquals(-radians / (2 * Math.PI) * gearing, pivot.getRotorRotations(), 0.01 * radians / (2 * Math.PI) * gearing);
+    }
+
+    @Test
+    void wristFeelsGravityOnItsArmsAngleToo() {
+        // Both level relative to their arm, but one arm points straight up
+        final PivotSimModel onLevelArm = new PivotSimModel(KRAKEN, 50, 0.3, 1, -Math.PI, Math.PI, 0, true);
+        final PivotSimModel onUprightArm = new PivotSimModel(KRAKEN, 50, 0.3, 1, -Math.PI, Math.PI, 0, true);
+        onUprightArm.setParentAngle(() -> Math.PI / 2);
+
+        run(onLevelArm, 0, 0.5);
+        run(onUprightArm, 0, 0.5);
+
+        assertTrue(onLevelArm.getRotorRotations() < -0.1);
+        // Pointing straight up, so balanced
+        assertEquals(0, onUprightArm.getRotorRotations(), 1e-6);
     }
 
     @Test

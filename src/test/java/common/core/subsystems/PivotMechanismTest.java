@@ -1,6 +1,7 @@
 package common.core.subsystems;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -88,6 +89,83 @@ class PivotMechanismTest {
             arm(orientation, DEGREES_PER_MOTOR_ROTATION, motor);
             assertEquals(GEARING, motor.armRatio, TOLERANCE, orientation.name()); // kG follows the cosine
         }
+    }
+
+    /** A 0.2 m wrist on the same gearing, starting lined up with whatever it's mounted on. */
+    private static PivotMechanism wrist(Orientation orientation, MockMotor motor) {
+        final MotorConfig config = new MotorConfig(DEGREES_PER_MOTOR_ROTATION, 60, 40, false, Neutral.BRAKE);
+        return new PivotMechanism("PivotMechanismTest" + nextName++, orientation, config,
+            new PIDFFConfig(KP, 0, 0, 0, 0, 0, KG), 1, -90, 90, 0, Math.PI / 180, 0.2, 1, KRAKEN, motor);
+    }
+
+    @Test
+    void wristOnAnArmWorksOutKGFromBothAnglesOnTheRoboRio() {
+        final MockMotor armMotor = MockMotor.talonLike(1);
+        final MockMotor wristMotor = MockMotor.talonLike(2);
+        final PivotMechanism arm = arm(armMotor);
+        final PivotMechanism wrist = wrist(Orientation.FORWARD, wristMotor);
+
+        wrist.setParent(arm);
+
+        // The motor controller no longer applies kG, since it only knows the wrist's angle
+        assertEquals(0, wristMotor.nativeKG, TOLERANCE);
+        assertEquals(0, wristMotor.armRatio, TOLERANCE);
+
+        // Arm 30 degrees up, wrist another 30 degrees up from the arm
+        armMotor.rawPosition = 30 / DEGREES_PER_MOTOR_ROTATION;
+        wristMotor.rawPosition = 30 / DEGREES_PER_MOTOR_ROTATION;
+        wrist.setSetpoint(30);
+        wrist.periodic();
+
+        assertEquals(Math.toRadians(60), wrist.getRadiansAboveLevel(), 1e-9);
+        assertEquals(KG * Math.cos(Math.toRadians(60)), wristMotor.lastFeedforward, 1e-9);
+    }
+
+    @Test
+    void wristPoseMovesWithTheArm() {
+        final MockMotor armMotor = MockMotor.talonLike(1);
+        final MockMotor wristMotor = MockMotor.talonLike(2);
+        final PivotMechanism arm = arm(armMotor);
+        final PivotMechanism wrist = wrist(Orientation.FORWARD, wristMotor);
+        wrist.setParent(arm);
+
+        // The 0.5 m arm hangs from 0.5 m up, so the wrist's pivot starts on the ground below it
+        arm.setPivot(new Translation3d(0, 0, 0.5));
+        wrist.setPivot(Translation3d.kZero);
+        final Translation3d wristTipAtStart = new Translation3d(0, 0, -0.2);
+
+        // Arm level: the wrist, still lined up with it, sticks straight out past its end
+        armMotor.rawPosition = 0;
+        assertEquals(0, tipOf(wrist, wristTipAtStart).getDistance(new Translation3d(0.7, 0, 0.5)), 1e-6);
+
+        // Wrist turned 90 degrees up from the arm: it points straight up from the arm's end
+        wristMotor.rawPosition = 90 / DEGREES_PER_MOTOR_ROTATION;
+        assertEquals(0, tipOf(wrist, wristTipAtStart).getDistance(new Translation3d(0.5, 0, 0.7)), 1e-6);
+    }
+
+    /** Where a point on the mechanism, given at the starting position, is now. */
+    private static Translation3d tipOf(PivotMechanism mechanism, Translation3d pointAtStart) {
+        final Pose3d pose = mechanism.getComponentPose();
+        return pointAtStart.rotateBy(pose.getRotation()).plus(pose.getTranslation());
+    }
+
+    @Test
+    void wristMustSwingTheSameWayAsItsArm() {
+        final PivotMechanism arm = arm(MockMotor.talonLike(1));
+        final PivotMechanism wrist = wrist(Orientation.LEFT, MockMotor.talonLike(2));
+        assertThrows(IllegalArgumentException.class, () -> wrist.setParent(arm));
+    }
+
+    @Test
+    void hoodOnATurretKeepsItsGravityOnTheMotorController() {
+        final PivotMechanism turret = turret(MockMotor.talonLike(1));
+        final MockMotor hoodMotor = MockMotor.talonLike(2);
+        final PivotMechanism hood = wrist(Orientation.FORWARD, hoodMotor);
+
+        hood.setParent(turret);
+
+        assertEquals(GEARING, hoodMotor.armRatio, TOLERANCE);
+        assertEquals(KG, hoodMotor.nativeKG, TOLERANCE);
     }
 
     @Test

@@ -65,6 +65,8 @@ public abstract class MechanismBase extends SubsystemBase {
     private final Control controllerMode;
     /** Gearing to an arm when kG follows the arm's cosine; 0 when kG is constant. */
     private double motorRotationsPerArmRotation = 0;
+    /** False when kG is worked out on the roboRIO instead, in {@link #calculateFeedforward(double)}. */
+    private boolean kGOnController = true;
     /** Computes controller output from (measurement, setpoint), e.g. {@code pid::calculate}. */
     private final DoubleBinaryOperator feedback;
     /** Resets the controller's internal state, given the current measurement. */
@@ -172,9 +174,12 @@ public abstract class MechanismBase extends SubsystemBase {
      */
     public void applyGains() {
         if (controllerMode == null) return;
+        // kG worked out on the roboRIO mustn't be applied by the motor controller too
+        final PIDFFConfig sent = kGOnController ? gains
+            : new PIDFFConfig(gains.kP, gains.kI, gains.kD, gains.kS, gains.kV, gains.kA, () -> 0);
         for (NAR_Motor motor : commandedMotors) {
-            if (motorRotationsPerArmRotation > 0) motor.configArmClosedLoop(gains, motorRotationsPerArmRotation);
-            else motor.configClosedLoop(gains, controllerMode);
+            if (motorRotationsPerArmRotation > 0) motor.configArmClosedLoop(sent, motorRotationsPerArmRotation);
+            else motor.configClosedLoop(sent, controllerMode);
         }
     }
 
@@ -186,6 +191,17 @@ public abstract class MechanismBase extends SubsystemBase {
      */
     protected void useArmGravity(double motorRotationsPerArmRotation) {
         this.motorRotationsPerArmRotation = motorRotationsPerArmRotation;
+        applyGains();
+    }
+
+    /**
+     * Leaves kG out of what the motor controller applies, for when gravity depends on something
+     * it can't measure, e.g. a wrist's on the arm it's mounted on. Work kG out in
+     * {@link #calculateFeedforward(double)} instead; it's sent with each setpoint.
+     */
+    protected void useRoboRioGravity() {
+        motorRotationsPerArmRotation = 0;
+        kGOnController = false;
         applyGains();
     }
 
