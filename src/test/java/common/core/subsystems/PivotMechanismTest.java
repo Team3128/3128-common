@@ -7,7 +7,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import common.core.controllers.PIDFFConfig;
-import common.core.subsystems.PivotMechanism.Axis;
+import common.core.subsystems.PivotMechanism.Orientation;
 import common.hardware.motorcontroller.MockMotor;
 import common.hardware.motorcontroller.NAR_Motor.Control;
 import common.hardware.motorcontroller.NAR_Motor.MotorConfig;
@@ -37,42 +37,57 @@ class PivotMechanismTest {
         assertTrue(HAL.initialize(500, 0));
     }
 
-    private static PivotMechanism arm(double degreesPerEncoderRotation, MockMotor motor) {
+    private static PivotMechanism arm(Orientation orientation, double degreesPerEncoderRotation, MockMotor motor) {
         final MotorConfig config = new MotorConfig(degreesPerEncoderRotation, 60, 40, false, Neutral.BRAKE);
-        return new PivotMechanism("PivotMechanismTest" + nextName++, Axis.PITCH, config, new PIDFFConfig(KP, 0, 0, 0, 0, 0, KG),
+        return new PivotMechanism("PivotMechanismTest" + nextName++, orientation, config, new PIDFFConfig(KP, 0, 0, 0, 0, 0, KG),
             1, MIN, MAX, START, Math.PI / 180, 0.5, 3, KRAKEN, motor);
+    }
+
+    private static PivotMechanism arm(double degreesPerEncoderRotation, MockMotor motor) {
+        return arm(Orientation.FORWARD, degreesPerEncoderRotation, motor);
     }
 
     private static PivotMechanism arm(MockMotor motor) {
         return arm(DEGREES_PER_MOTOR_ROTATION, motor);
     }
 
+    @Test
+    void armSwingsUpToPointTheWayItsOrientationSays() {
+        final Translation3d pivot = new Translation3d(0.1, -0.2, 0.5);
+        final Translation3d[] directions = {
+            new Translation3d(1, 0, 0), new Translation3d(-1, 0, 0), new Translation3d(0, 1, 0), new Translation3d(0, -1, 0)};
+        final Orientation[] orientations = {Orientation.FORWARD, Orientation.BACKWARD, Orientation.LEFT, Orientation.RIGHT};
+
+        for (int i = 0; i < orientations.length; i++) {
+            final MockMotor motor = MockMotor.talonLike(1);
+            final PivotMechanism arm = arm(orientations[i], DEGREES_PER_MOTOR_ROTATION, motor);
+            arm.setPivot(pivot);
+
+            // From hanging straight down at the start to level
+            motor.rawPosition = 0;
+            final Pose3d pose = arm.getComponentPose();
+
+            // The tip of a 0.5 m arm starts below the pivot and ends up level with it
+            final Translation3d tipAtStart = pivot.plus(new Translation3d(0, 0, -0.5));
+            final Translation3d tip = tipAtStart.rotateBy(pose.getRotation()).plus(pose.getTranslation());
+            assertEquals(0, tip.getDistance(pivot.plus(directions[i].times(0.5))), 1e-6, orientations[i].name());
+        }
+    }
+
     /** A turret on the same gearing, starting facing forward with no kG. */
     private static PivotMechanism turret(MockMotor motor) {
         final MotorConfig config = new MotorConfig(DEGREES_PER_MOTOR_ROTATION, 60, 40, false, Neutral.BRAKE);
-        return new PivotMechanism("PivotMechanismTest" + nextName++, Axis.YAW, config, new PIDFFConfig(KP),
+        return new PivotMechanism("PivotMechanismTest" + nextName++, Orientation.TURRET, config, new PIDFFConfig(KP),
             1, -180, 180, 0, Math.PI / 180, 0.3, 5, KRAKEN, motor);
     }
 
     @Test
-    void sideArmHasGravityAndSwingsUpOverTheLeftSide() {
-        final MockMotor motor = MockMotor.talonLike(1);
-        final MotorConfig config = new MotorConfig(DEGREES_PER_MOTOR_ROTATION, 60, 40, false, Neutral.BRAKE);
-        final PivotMechanism arm = new PivotMechanism("PivotMechanismTest" + nextName++, Axis.ROLL, config,
-            new PIDFFConfig(KP, 0, 0, 0, 0, 0, KG), 1, MIN, MAX, START, Math.PI / 180, 0.5, 3, KRAKEN, motor);
-        final Translation3d pivot = new Translation3d(0, 0.3, 0.5);
-        arm.setPivot(pivot);
-
-        assertEquals(GEARING, motor.armRatio, TOLERANCE); // kG follows the cosine
-
-        // From hanging straight down at the start to level
-        motor.rawPosition = 0;
-        final Pose3d pose = arm.getComponentPose();
-
-        // The tip of a 0.5 m arm starts below the pivot and ends up to its left
-        final Translation3d tipAtStart = pivot.plus(new Translation3d(0, 0, -0.5));
-        final Translation3d tip = tipAtStart.rotateBy(pose.getRotation()).plus(pose.getTranslation());
-        assertEquals(0, tip.getDistance(pivot.plus(new Translation3d(0, 0.5, 0))), 1e-6);
+    void everyArmThatSwingsUpAndDownHasGravity() {
+        for (Orientation orientation : new Orientation[] {Orientation.FORWARD, Orientation.BACKWARD, Orientation.LEFT, Orientation.RIGHT}) {
+            final MockMotor motor = MockMotor.talonLike(1);
+            arm(orientation, DEGREES_PER_MOTOR_ROTATION, motor);
+            assertEquals(GEARING, motor.armRatio, TOLERANCE, orientation.name()); // kG follows the cosine
+        }
     }
 
     @Test

@@ -6,21 +6,25 @@ import common.hardware.motorcontroller.NAR_Motor.Control;
 import common.hardware.motorcontroller.NAR_Motor.MotorConfig;
 import common.hardware.motorcontroller.sim.PivotSimModel;
 import common.hardware.motorcontroller.sim.MotorSimModel;
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.system.plant.DCMotor;
 
 /**
  * Rotates to an angle and holds it: arms, wrists, shooter hoods, turrets.
  *
- * <p>PID and feedforward run on the motor controller. The {@link Axis} decides how gravity acts:
+ * <p>PID and feedforward run on the motor controller. The {@link Orientation} says which way it
+ * points at 0, which decides how gravity acts:
  * <ul>
- * <li>{@link Axis#PITCH} (arms, wrists, hoods) swings up and down over the front or back of the
- *     robot, and {@link Axis#ROLL} over its side. Angles follow WPILib: 0 is horizontal, pointing
- *     toward the front of the robot for PITCH or its left side for ROLL, and positive is up.
- *     Feedforward is kS plus kG times the cosine of the angle, so kG is the voltage to hold it level.</li>
- * <li>{@link Axis#YAW} (turrets) turns side to side. 0 is facing the front of the robot and
+ * <li>{@link Orientation#FORWARD}, {@link Orientation#BACKWARD}, {@link Orientation#LEFT} and
+ *     {@link Orientation#RIGHT} (arms, wrists, hoods) swing up and down. Angles follow WPILib: 0 is
+ *     level, pointing that way from the pivot, and positive is up. Feedforward is kS plus kG times
+ *     the cosine of the angle, so kG is the voltage to hold it level.</li>
+ * <li>{@link Orientation#TURRET} turns side to side. 0 is facing the front of the robot and
  *     positive is counterclockwise seen from above. Gravity doesn't act on it, so leave kG at 0.</li>
  * </ul>
  *
@@ -29,24 +33,35 @@ import edu.wpi.first.math.system.plant.DCMotor;
  */
 public class PivotMechanism extends MechanismBase {
 
-    /** The axis the mechanism rotates about. */
-    public enum Axis {
-        /** Side to side, so it swings up and down against gravity: arms, wrists, hoods. */
-        PITCH,
-        /** Front to back, so it swings up and down over the robot's side against gravity. */
-        ROLL,
-        /** Straight up, so it turns side to side with no gravity load: turrets. */
-        YAW
+    /** Which way the mechanism points at 0, and so the axis it rotates about. */
+    public enum Orientation {
+        // Each axis is the one a positive angle rotates about by the right-hand rule, so positive is up
+        /** Swings up and down over the front of the robot. */
+        FORWARD(0, -1, 0),
+        /** Swings up and down over the back of the robot. */
+        BACKWARD(0, 1, 0),
+        /** Swings up and down over the left side of the robot. */
+        LEFT(1, 0, 0),
+        /** Swings up and down over the right side of the robot. */
+        RIGHT(-1, 0, 0),
+        /** Turns side to side about a vertical axis, with no gravity load. */
+        TURRET(0, 0, 1);
+
+        private final Vector<N3> axis;
+
+        Orientation(double x, double y, double z) {
+            axis = VecBuilder.fill(x, y, z);
+        }
     }
 
-    private final Axis axis;
+    private final Orientation orientation;
     private final double startPosition;
     private final double radiansPerUnit;
     private Translation3d pivot = Translation3d.kZero;
 
     /**
      * @param name Name shown on Shuffleboard and in logs
-     * @param axis The axis it rotates about, which decides whether gravity acts on it
+     * @param orientation Which way it points at 0, which decides whether gravity acts on it
      * @param motorConfig Applied to every motor; its distance factor sets the position units
      * @param gains PID and feedforward gains, in volts per position unit
      * @param tolerance How close to the setpoint counts as {@link #atSetpoint()}
@@ -59,11 +74,11 @@ public class PivotMechanism extends MechanismBase {
      * @param motorType Model of one motor, e.g. {@code DCMotor.getKrakenX44(1)}; used only in simulation
      * @param motors Every motor on the mechanism. The first is the leader.
      */
-    public PivotMechanism(String name, Axis axis, MotorConfig motorConfig, PIDFFConfig gains, double tolerance,
+    public PivotMechanism(String name, Orientation orientation, MotorConfig motorConfig, PIDFFConfig gains, double tolerance,
                           double minPosition, double maxPosition, double startPosition, double radiansPerUnit,
                           double lengthMeters, double massKg, DCMotor motorType, NAR_Motor... motors) {
         super(gains, Control.Position, tolerance, startPosition, motorConfig, motors);
-        this.axis = axis;
+        this.orientation = orientation;
         this.startPosition = startPosition;
         this.radiansPerUnit = radiansPerUnit;
         setName(name);
@@ -72,8 +87,8 @@ public class PivotMechanism extends MechanismBase {
 
         // distanceFactor is position units per encoder rotation, and the encoder may be on the pivot's shaft
         final double encoderRotationsPerPivotRotation = 2 * Math.PI / (motorConfig.distanceFactor * radiansPerUnit);
-        // Gravity acts on anything rotating about a horizontal axis
-        final boolean gravity = axis != Axis.YAW;
+        // Gravity acts on anything that swings up and down
+        final boolean gravity = orientation != Orientation.TURRET;
         if (gravity) useArmGravity(encoderRotationsPerPivotRotation);
         final double gearing = encoderRotationsPerPivotRotation * motors[0].getMotorRotationsPerSensorRotation();
         motors[0].enableSim(new PivotSimModel(MotorSimModel.gearbox(motorType, motors.length), gearing, lengthMeters,
@@ -97,13 +112,7 @@ public class PivotMechanism extends MechanismBase {
     @Override
     public Pose3d getComponentPose() {
         final double radians = (getPosition() - startPosition) * radiansPerUnit;
-        final Rotation3d rotation = switch (axis) {
-            // Up, for something pointing forward, is a negative pitch
-            case PITCH -> new Rotation3d(0, -radians, 0);
-            // Up, for something pointing left, is a positive roll
-            case ROLL -> new Rotation3d(radians, 0, 0);
-            case YAW -> new Rotation3d(0, 0, radians);
-        };
+        final Rotation3d rotation = new Rotation3d(orientation.axis, radians);
         // Rotate about the pivot rather than the robot's origin
         return new Pose3d(pivot.minus(pivot.rotateBy(rotation)), rotation);
     }
