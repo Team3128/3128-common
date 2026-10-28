@@ -3,8 +3,10 @@ package common.hardware.motorcontroller.sim;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import edu.wpi.first.hal.HAL;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 
@@ -12,6 +14,12 @@ class MotorSimModelTest {
 
     private static final double PERIOD = 0.02; // seconds per robot loop
     private static final DCMotor KRAKEN = DCMotor.getKrakenX60(1);
+
+    @BeforeAll
+    static void startHal() {
+        // WPILib's sims read the battery voltage through the HAL, which crashes if it isn't started
+        assertTrue(HAL.initialize(500, 0));
+    }
 
     /** Applies a constant voltage for some time. */
     private static void run(MotorSimModel model, double volts, double seconds) {
