@@ -10,6 +10,7 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import org.java_websocket.WebSocket;
+import org.java_websocket.exceptions.WebsocketNotConnectedException;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
 import org.json.simple.JSONArray;
@@ -34,7 +35,7 @@ public class NarwhalDashboard extends WebSocketServer implements AutoCloseable {
     private final ArrayList<String> autoPrograms = new ArrayList<String>();
     private String selectedAuto;
 
-    private WebSocket conn;
+    private volatile WebSocket conn;
 
     private static NarwhalDashboard instance;
 
@@ -181,10 +182,17 @@ public class NarwhalDashboard extends WebSocketServer implements AutoCloseable {
      */
     @SuppressWarnings("unchecked")
     public void sendMessage(String message) {
-        if (conn == null) return;
+        WebSocket localConn = conn;
+
+        if (localConn == null) return;
         final JSONObject obj = new JSONObject();
         obj.put("Message", message);
-        conn.send(obj.toJSONString());
+        try {
+            localConn.send(obj.toJSONString());
+        } catch (Exception e) {
+            Log.info("Dashboard", e.toString());
+            conn.close();
+        }
     }
 
     /**
@@ -192,15 +200,22 @@ public class NarwhalDashboard extends WebSocketServer implements AutoCloseable {
      */
     @SuppressWarnings("unchecked")
     private void update() {
-        if (conn == null) return;
+        WebSocket localConn = conn;
 
-        if (conn.isOpen()) {
+        if (localConn == null) return;
+
+        if (localConn.isOpen()) {
             //Sends data as a JSON
             final JSONObject obj = new JSONObject();
             for (final String key : updateMap.keySet()) {
                 obj.put(key, updateMap.get(key).get());
             }
-            conn.send(obj.toJSONString());
+            try {
+                localConn.send(obj.toJSONString());
+            } catch (Exception e) {
+                Log.info("Dashboard", e.toString());
+                conn.close();
+            }
         }
     }
 

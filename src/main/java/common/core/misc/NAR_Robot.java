@@ -7,6 +7,7 @@ import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.NotifierJNI;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.IterativeRobotBase;
 import edu.wpi.first.wpilibj.Timer;
 
@@ -142,7 +143,11 @@ public class NAR_Robot extends IterativeRobotBase {
                 break;
             }
 
-            callback.func.run();
+            try {
+                callback.func.run();
+            } catch (Exception e) {
+                DriverStation.reportError(e.toString(), e.getStackTrace());
+            }
 
             callback.expirationTime += callback.period;
             m_callbacks.add(callback);
@@ -151,7 +156,11 @@ public class NAR_Robot extends IterativeRobotBase {
             while ((long) (m_callbacks.peek().expirationTime * 1e6) <= curTime) {
                 callback = m_callbacks.poll();
 
-                callback.func.run();
+                try {
+                    callback.func.run();
+                } catch (Exception e) {
+                    DriverStation.reportError(e.toString(), e.getStackTrace());
+                }
 
                 callback.expirationTime += callback.period;
                 m_callbacks.add(callback);
