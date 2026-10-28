@@ -1,5 +1,7 @@
 package common.hardware.motorcontroller.sim;
 
+import java.util.function.DoubleSupplier;
+
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 
@@ -14,7 +16,9 @@ public class LinearSimModel implements MotorSimModel {
     private final DCMotor motor;
     private final double motorRotationsPerMeter;
     private final double startMeters;
-    private final double gravityVolts;
+    /** Volts at the motor that would hold it pointing straight up against gravity. */
+    private final double verticalGravityVolts;
+    private DoubleSupplier inclineSine;
     private final ElevatorSim sim;
     private double appliedVolts;
 
@@ -35,11 +39,21 @@ public class LinearSimModel implements MotorSimModel {
         // as a 1:1 drum whose circumference is the distance moved per motor rotation.
         final double drumRadiusMeters = 1.0 / (2 * Math.PI * motorRotationsPerMeter);
         // ElevatorSim's gravity is all or nothing, so we model gravity ourselves: the part of the
-        // weight along the direction of travel is a constant load, which for a DC motor is the
-        // same as a constant voltage pushing back.
-        final double gravityTorque = massKg * GRAVITY * Math.sin(angleRadians) * drumRadiusMeters;
-        this.gravityVolts = gravityTorque / motor.KtNMPerAmp * motor.rOhms;
+        // weight along the direction of travel is a load, which for a DC motor is the same as a
+        // voltage pushing back.
+        final double verticalGravityTorque = massKg * GRAVITY * drumRadiusMeters;
+        this.verticalGravityVolts = verticalGravityTorque / motor.KtNMPerAmp * motor.rOhms;
+        final double sine = Math.sin(angleRadians);
+        this.inclineSine = () -> sine;
         this.sim = new ElevatorSim(motor, 1, massKg, drumRadiusMeters, minMeters, maxMeters, false, minMeters);
+    }
+
+    /**
+     * Makes the incline change, e.g. for a telescope on an arm.
+     * @param inclineSine The sine of the direction of travel's incline now
+     */
+    public void setInclineSine(DoubleSupplier inclineSine) {
+        this.inclineSine = inclineSine;
     }
 
     @Override public DCMotor getMotor() { return motor; }
@@ -47,7 +61,7 @@ public class LinearSimModel implements MotorSimModel {
     @Override
     public void update(double motorVolts, double dtSeconds) {
         appliedVolts = motorVolts;
-        sim.setInputVoltage(motorVolts - gravityVolts);
+        sim.setInputVoltage(motorVolts - verticalGravityVolts * inclineSine.getAsDouble());
         sim.update(dtSeconds);
     }
 

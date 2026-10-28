@@ -86,6 +86,19 @@ class MotorSimModelTest {
     }
 
     @Test
+    void sliderTiltedUpByWhatItsMountedOnFallsWithoutPower() {
+        final LinearSimModel telescope = new LinearSimModel(KRAKEN, 50, 2, 0, 0.3, 0);
+        run(telescope, 6, 0.2);
+        run(telescope, 0, 2); // let it coast to a stop
+        final double stopped = telescope.getRotorRotations();
+
+        telescope.setInclineSine(() -> 1); // the arm it's on swings straight up
+        run(telescope, 0, 1);
+
+        assertTrue(telescope.getRotorRotations() < stopped);
+    }
+
+    @Test
     void steeperInclineRisesSlower() {
         final LinearSimModel shallow = new LinearSimModel(KRAKEN, 50, 5, 0, 1, Math.toRadians(20));
         final LinearSimModel steep = new LinearSimModel(KRAKEN, 50, 5, 0, 1, Math.toRadians(80));

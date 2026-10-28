@@ -149,6 +149,83 @@ class PivotMechanismTest {
         return pointAtStart.rotateBy(pose.getRotation()).plus(pose.getTranslation());
     }
 
+    /** An elevator moving straight up 1 cm per motor rotation, measured in meters. */
+    private static LinearMechanism elevator(MockMotor motor) {
+        final MotorConfig config = new MotorConfig(0.01, 60, 40, false, Neutral.BRAKE);
+        return new LinearMechanism("PivotMechanismTest" + nextName++, config, new PIDFFConfig(KP), 0.01,
+            0, 1, 1, Math.PI / 2, 5, KRAKEN, motor);
+    }
+
+    @Test
+    void armOnAnElevatorRidesItUpAndKeepsItsGravityOnTheMotorController() {
+        final MockMotor elevatorMotor = MockMotor.talonLike(1);
+        final MockMotor armMotor = MockMotor.talonLike(2);
+        final LinearMechanism elevator = elevator(elevatorMotor);
+        final PivotMechanism arm = arm(armMotor);
+
+        arm.setParent(elevator);
+        arm.setPivot(new Translation3d(0, 0, 0.5));
+
+        // Lifting doesn't tilt the arm, so its cosine kG still works
+        assertEquals(GEARING, armMotor.armRatio, TOLERANCE);
+        assertEquals(KG, armMotor.nativeKG, TOLERANCE);
+
+        // Elevator up 0.3 m, arm level: the 0.5 m arm's tip is in front of its raised pivot
+        elevatorMotor.rawPosition = 0.3 / 0.01;
+        armMotor.rawPosition = 0;
+        assertEquals(0, tipOf(arm, new Translation3d(0, 0, 0)).getDistance(new Translation3d(0.5, 0, 0.8)), 1e-6);
+    }
+
+    /** A telescope along the arm, which hangs straight down at the start, measured in meters. */
+    private static LinearMechanism telescope(MockMotor motor) {
+        final MotorConfig config = new MotorConfig(0.01, 60, 40, false, Neutral.BRAKE);
+        return new LinearMechanism("PivotMechanismTest" + nextName++, config, new PIDFFConfig(KP, 0, 0, 0, 0, 0, KG),
+            0.01, 0, 1, 1, -Math.PI / 2, 2, KRAKEN, motor);
+    }
+
+    @Test
+    void telescopeOnAnArmWorksOutKGFromItsInclineOnTheRoboRio() {
+        final MockMotor armMotor = MockMotor.talonLike(1);
+        final MockMotor telescopeMotor = MockMotor.talonLike(2);
+        final PivotMechanism arm = arm(armMotor);
+        final LinearMechanism telescope = telescope(telescopeMotor);
+
+        telescope.setParent(arm);
+
+        // The motor controller no longer applies kG, since it can't see the arm's angle
+        assertEquals(0, telescopeMotor.nativeKG, TOLERANCE);
+
+        // Arm 30 degrees above level: half the telescope's weight pulls along it
+        armMotor.rawPosition = 30 / DEGREES_PER_MOTOR_ROTATION;
+        telescope.setSetpoint(0.2);
+        telescope.periodic();
+        assertEquals(0.5, telescope.getInclineSine(), 1e-9);
+        assertEquals(KG * 0.5, telescopeMotor.lastFeedforward, 1e-9);
+
+        // Arm level: none of it does
+        armMotor.rawPosition = 0;
+        assertEquals(0, telescope.getInclineSine(), 1e-9);
+    }
+
+    @Test
+    void wristOnATelescopeSwingsWithTheArmWhateverOrderTheyreMounted() {
+        final MockMotor armMotor = MockMotor.talonLike(1);
+        final MockMotor wristMotor = MockMotor.talonLike(3);
+        final PivotMechanism arm = arm(armMotor);
+        final LinearMechanism telescope = telescope(MockMotor.talonLike(2));
+        final PivotMechanism wrist = wrist(Orientation.FORWARD, wristMotor);
+
+        // Wrist first, before the telescope is on the arm
+        wrist.setParent(telescope);
+        assertEquals(KG, wristMotor.nativeKG, TOLERANCE); // nothing tilts it yet
+        telescope.setParent(arm);
+
+        assertEquals(0, wristMotor.nativeKG, TOLERANCE);
+        armMotor.rawPosition = 30 / DEGREES_PER_MOTOR_ROTATION;
+        wristMotor.rawPosition = 20 / DEGREES_PER_MOTOR_ROTATION;
+        assertEquals(Math.toRadians(50), wrist.getRadiansAboveLevel(), 1e-9);
+    }
+
     @Test
     void wristMustSwingTheSameWayAsItsArm() {
         final PivotMechanism arm = arm(MockMotor.talonLike(1));

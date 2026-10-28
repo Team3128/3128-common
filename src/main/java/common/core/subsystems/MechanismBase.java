@@ -16,6 +16,7 @@ import common.utility.shuffleboard.NAR_Shuffleboard;
 import common.utility.sysid.NAR_SysIdCommand;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
@@ -85,6 +86,9 @@ public abstract class MechanismBase extends SubsystemBase {
     private final Timer safetyTimer = new Timer();
     private MotorConfig motorConfig;
     private MechanismLog log;
+    /** What it's mounted on, for the 3D view; null if the robot itself. */
+    private MechanismBase parent;
+    private final List<MechanismBase> mounted = new ArrayList<>();
 
     protected BooleanSupplier debug;
     protected DoubleSupplier debugSetpoint;
@@ -497,11 +501,45 @@ public abstract class MechanismBase extends SubsystemBase {
     }
 
     /**
-     * Where the mechanism's moving part is, relative to where it starts, for AdvantageScope's 3D
-     * view. Export the robot's CAD with every mechanism at its starting position. Default is no
-     * movement, e.g. for rollers.
+     * Mounts this on another mechanism, e.g. an arm on an elevator, so its 3D pose moves with the
+     * parent's. Subclasses also handle anything else being mounted changes, e.g. gravity.
      */
-    public Pose3d getComponentPose() {
+    public void setParent(MechanismBase parent) {
+        if (this.parent != null) this.parent.mounted.remove(this);
+        this.parent = parent;
+        parent.mounted.add(this);
+        // What's mounted on this may depend on what this is mounted on, e.g. for gravity, so
+        // parents can be set in any order
+        for (MechanismBase child : List.copyOf(mounted)) {
+            child.setParent(this);
+        }
+    }
+
+    /** What it's mounted on; null if the robot itself. */
+    public MechanismBase getParent() {
+        return parent;
+    }
+
+    /**
+     * Whether moving this tilts what's mounted on it, changing how gravity acts on it: true for
+     * an arm, false for an elevator or turret, unless they're mounted on something that does.
+     */
+    public boolean tiltsWhatsMountedOnIt() {
+        return parent != null && parent.tiltsWhatsMountedOnIt();
+    }
+
+    /**
+     * Where the mechanism's moving part is, relative to where it starts, for AdvantageScope's 3D
+     * view. Export the robot's CAD with every mechanism at its starting position.
+     */
+    public final Pose3d getComponentPose() {
+        final Pose3d own = getOwnComponentPose();
+        // Move with the parent, as if attached to it
+        return parent == null ? own : parent.getComponentPose().transformBy(new Transform3d(own.getTranslation(), own.getRotation()));
+    }
+
+    /** How far it has moved from where it starts on its own, ignoring any parent. Default is none, e.g. for rollers. */
+    protected Pose3d getOwnComponentPose() {
         return Pose3d.kZero;
     }
 

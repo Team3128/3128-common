@@ -10,7 +10,6 @@ import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -32,7 +31,8 @@ import edu.wpi.first.math.system.plant.DCMotor;
  * <p>The mechanism is assumed to be at {@code startPosition} when the robot turns on, and the
  * encoder is reset to it.
  *
- * <p>For a wrist driven directly on an arm, or a hood on a turret, see {@link #setParent(PivotMechanism)}.
+ * <p>For a wrist driven directly on an arm, a hood on a turret, or an arm on an elevator, see
+ * {@link #setParent(MechanismBase)}.
  */
 public class PivotMechanism extends MechanismBase {
 
@@ -62,8 +62,8 @@ public class PivotMechanism extends MechanismBase {
     private final double radiansPerUnit;
     private final PivotSimModel simModel;
     private Translation3d pivot = Translation3d.kZero;
-    private PivotMechanism parent;
-    private boolean gravityFromParent = false;
+    /** The pivot underneath it swings with, so gravity acts on both their angles; null if none. */
+    private PivotMechanism gravityParent;
 
     /**
      * @param name Name shown on Shuffleboard and in logs
@@ -113,27 +113,43 @@ public class PivotMechanism extends MechanismBase {
     }
 
     /**
-     * Mounts this on another pivot, e.g. a wrist driven directly on an arm. Its position is then
-     * relative to the parent, with 0 lined up with it, and its 3D pose moves with the parent's.
+     * Mounts this on another mechanism, e.g. a wrist driven directly on an arm, an arm on an
+     * elevator, or a wrist on the end of a telescoping arm. Its 3D pose moves with the parent's.
      *
-     * <p>When both swing up and down the same way, gravity acts on the sum of their angles. The
-     * motor controller only knows this mechanism's angle, so kG is worked out on the roboRIO each
-     * loop instead and sent with the setpoint. On a turret, gravity isn't affected.
+     * <p>On another pivot, its position is relative to the parent, with 0 lined up with it. When
+     * it swings up and down the same way as the nearest pivot underneath it, with or without
+     * something sliding in between, gravity acts on the sum of their angles. The motor controller
+     * only knows this mechanism's angle, so kG is worked out on the roboRIO each loop instead and
+     * sent with the setpoint. A turret or elevator underneath doesn't change gravity.
      *
-     * @param parent What it's mounted on: a pivot with the same orientation, or a turret
+     * @param parent What it's mounted on
      */
-    public void setParent(PivotMechanism parent) {
-        final boolean sameWay = parent.orientation == orientation && orientation != Orientation.TURRET;
-        if (!sameWay && parent.orientation != Orientation.TURRET) {
-            throw new IllegalArgumentException(getName() + " must have the same orientation as " + parent.getName()
-                + " to be mounted on it");
-        }
-        this.parent = parent;
-        if (sameWay) {
-            gravityFromParent = true;
+    @Override
+    public void setParent(MechanismBase parent) {
+        super.setParent(parent);
+
+        // The nearest pivot underneath, through anything that only slides
+        MechanismBase below = parent;
+        while (below instanceof LinearMechanism) below = below.getParent();
+        if (below instanceof PivotMechanism pivotBelow && pivotBelow.orientation != Orientation.TURRET) {
+            if (pivotBelow.orientation != orientation) {
+                throw new IllegalArgumentException(getName() + " must have the same orientation as "
+                    + pivotBelow.getName() + " to be mounted on it");
+            }
+            gravityParent = pivotBelow;
             useRoboRioGravity();
-            simModel.setParentAngle(parent::getRadiansAboveLevel);
+            simModel.setParentAngle(pivotBelow::getRadiansAboveLevel);
         }
+    }
+
+    @Override
+    public boolean tiltsWhatsMountedOnIt() {
+        return orientation != Orientation.TURRET || super.tiltsWhatsMountedOnIt();
+    }
+
+    /** Which way it points at 0. */
+    public Orientation getOrientation() {
+        return orientation;
     }
 
     /**
@@ -142,27 +158,22 @@ public class PivotMechanism extends MechanismBase {
      */
     public double getRadiansAboveLevel() {
         final double own = getPosition() * radiansPerUnit;
-        return gravityFromParent ? own + parent.getRadiansAboveLevel() : own;
+        return gravityParent != null ? own + gravityParent.getRadiansAboveLevel() : own;
     }
 
     /** kG on the parent's angle plus this one's, when mounted on a parent that swings the same way. */
     @Override
     protected double calculateFeedforward(double error) {
         // Otherwise the motor controller already applies kG
-        return gravityFromParent ? gains.getkG() * Math.cos(getRadiansAboveLevel()) : 0;
+        return gravityParent != null ? gains.getkG() * Math.cos(getRadiansAboveLevel()) : 0;
     }
 
-    /**
-     * How far it has rotated from where it starts, for AdvantageScope's 3D view, rotating about
-     * the pivot from {@link #setPivot(Translation3d)} and moving with any parent.
-     */
+    /** How far it has rotated from where it starts, about the pivot from {@link #setPivot(Translation3d)}. */
     @Override
-    public Pose3d getComponentPose() {
+    protected Pose3d getOwnComponentPose() {
         final double radians = (getPosition() - startPosition) * radiansPerUnit;
         final Rotation3d rotation = new Rotation3d(orientation.axis, radians);
         // Rotate about the pivot rather than the robot's origin
-        final Pose3d pose = new Pose3d(pivot.minus(pivot.rotateBy(rotation)), rotation);
-        // Then move with the parent, as if attached to it
-        return parent == null ? pose : parent.getComponentPose().transformBy(new Transform3d(pose.getTranslation(), pose.getRotation()));
+        return new Pose3d(pivot.minus(pivot.rotateBy(rotation)), rotation);
     }
 }
