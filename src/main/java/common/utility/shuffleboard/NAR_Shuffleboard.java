@@ -10,6 +10,7 @@ import java.util.function.Supplier;
 // import com.ctre.phoenix.sensors.WPI_PigeonIMU;
 
 import common.core.misc.NAR_Robot;
+import common.utility.Log;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.networktables.NetworkTableValue;
@@ -166,14 +167,12 @@ public class NAR_Shuffleboard {
      * @return simple widget that can be modified
      */
     public static SimpleWidget addData(String tabName, String name, Supplier<Object> supply, int x, int y, int width, int height){
-        if(!tabs.containsKey(tabName)) { 
-            create_tab(tabName);
-            fillEntryPositions(x,y,width,height, tabName);
-        }
+        if(!tabs.containsKey(tabName)) create_tab(tabName);
         if(tabs.get(tabName).containsKey(name)) {
             tabs.get(tabName).get(name).m_supply = supply;
             return tabs.get(tabName).get(name).m_widget;
         }
+        placeWidget(tabName, name, x, y, width, height);
         SimpleWidget widget = Shuffleboard.getTab(tabName).add(name,supply.get()).withPosition(x, y).withSize(width, height);
         if(supply.get() instanceof Boolean) widget.withWidget(BuiltInWidgets.kBooleanBox);
         else widget.withWidget(BuiltInWidgets.kTextView);
@@ -194,14 +193,12 @@ public class NAR_Shuffleboard {
     * @return simple widget that can be modified
     */
     public static SimpleWidget addData(String tabName, String name, Object data, int x, int y, int width, int height) {
-        if(!tabs.containsKey(tabName)) {
-            create_tab(tabName);
-            fillEntryPositions(x,y,width,height,tabName);
-        }
+        if(!tabs.containsKey(tabName)) create_tab(tabName);
         if (tabs.get(tabName).containsKey(name)) {
             tabs.get(tabName).get(name).m_entry.setValue(data);
             return tabs.get(tabName).get(name).m_widget;
         }
+        placeWidget(tabName, name, x, y, width, height);
         SimpleWidget widget = Shuffleboard.getTab(tabName).add(name,data).withPosition(x, y).withSize(width,height).withWidget(BuiltInWidgets.kTextView);
         tabs.get(tabName).put(name, new WidgetInfo(widget,null));
         return widget;
@@ -236,11 +233,10 @@ public class NAR_Shuffleboard {
      */
     public static ComplexWidget addSendable(String tabName, String name, Sendable data, int x, int y, int width, int height) {
         try {
-            if(!tabs.containsKey(tabName)) {
-                create_tab(tabName);
-                fillEntryPositions(x, y, width, height, tabName);
-            }
-            return Shuffleboard.getTab(tabName).add(name, data).withPosition(x,y).withSize(width, height);
+            if(!tabs.containsKey(tabName)) create_tab(tabName);
+            final ComplexWidget widget = Shuffleboard.getTab(tabName).add(name, data).withPosition(x,y).withSize(width, height);
+            placeWidget(tabName, name, x, y, width, height);
+            return widget;
         }
         catch(Exception e) {
             e.printStackTrace();
@@ -277,16 +273,14 @@ public class NAR_Shuffleboard {
      */
     public static ComplexWidget addVideoStream(String tabName, String name, String cameraName, String URL, int x, int y, int width, int height) {
         try {
-            if (!tabs.containsKey(tabName)) {
-                create_tab(tabName);
-                fillEntryPositions(x, y, width, height, tabName);
-            }
+            if (!tabs.containsKey(tabName)) create_tab(tabName);
 
             ComplexWidget videoStream = Shuffleboard.getTab(tabName)
             .addCamera(name, cameraName, URL)
             .withProperties(Map.of("showControls", false))
             .withPosition(x, y)
-            .withSize(width, height);            
+            .withSize(width, height);
+            placeWidget(tabName, name, x, y, width, height);
             return videoStream;
         }
         catch(Exception e) {
@@ -465,21 +459,30 @@ public class NAR_Shuffleboard {
     }
 
     /**
-     * Fills widget position array for a given tab
-     * 
+     * Marks where a new widget goes on its tab, so autofill skips it, and warns if it's off the
+     * edge of the tab or on top of another widget.
+     *
+     * @param tabName the title of the tab
+     * @param name the name of the widget, for the warning
      * @param x x-coord of the widget
      * @param y y-coord of the widget
      * @param width width of the widget
      * @param height height of the widget
-     * @param tabName the title of the tab to select
      */
-    private static void fillEntryPositions(int x, int y, int width, int height, String tabName) {
-        if (x + width > WINDOW_WIDTH || y + height > WINDOW_HEIGHT) { throw new IllegalArgumentException("Widget Position Out of Bounds (" + x + "," + y + ") at Tab: " + tabName); }
+    private static void placeWidget(String tabName, String name, int x, int y, int width, int height) {
+        if (x < 0 || y < 0 || x + width > WINDOW_WIDTH || y + height > WINDOW_HEIGHT) {
+            Log.unusual("Shuffleboard", name + " at (" + x + "," + y + ") is off the edge of tab " + tabName);
+            return;
+        }
+        final boolean[][] taken = widgetPositions.get(tabName);
+        boolean overlaps = false;
         for (int i = x; i < x + width; i++) {
             for (int j = y; j < y + height; j++) {
-                if (widgetPositions.get(tabName)[i][j]) { throw new IllegalArgumentException("Widget Position Overlapping (" + i + "," + j + ") at Tab: " + tabName); }
-                widgetPositions.get(tabName)[i][j] = true;
+                overlaps |= taken[i][j];
+                taken[i][j] = true;
             }
         }
+        // A warning rather than an error, so a crowded tab doesn't stop the robot from starting
+        if (overlaps) Log.unusual("Shuffleboard", name + " at (" + x + "," + y + ") overlaps another widget on tab " + tabName);
     }
 }

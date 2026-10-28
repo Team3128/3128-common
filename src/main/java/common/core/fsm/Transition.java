@@ -1,5 +1,7 @@
 package common.core.fsm;
 
+import java.util.Objects;
+
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -40,8 +42,17 @@ public class Transition<T extends Enum<T>> {
         return currentState.equals(outgoingState) && nextState.equals(incomingState);
     }
 
-    public boolean equals(Transition<T> other) {
-        return isTransition(other.getOutgoingState(), other.getIncomingState());
+    /** Transitions are equal when they go between the same two states, whatever their commands. */
+    @Override
+    public boolean equals(Object other) {
+        return other instanceof Transition<?> transition
+            && outgoingState == transition.outgoingState
+            && incomingState == transition.incomingState;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(outgoingState, incomingState);
     }
 
     public String toString() {

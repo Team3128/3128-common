@@ -53,10 +53,12 @@ class NAR_XboxControllerTest {
     }
 
     @Test
-    void rightStickUpIsPositive() {
+    void bothSticksUpArePositive() {
         // WPILib reports up as negative
+        sim.setLeftY(-0.4);
         sim.setRightY(-0.6);
         sim.notifyNewData();
+        assertEquals(0.4, controller.getLeftY(), TOLERANCE);
         assertEquals(0.6, controller.getRightY(), TOLERANCE);
     }
 

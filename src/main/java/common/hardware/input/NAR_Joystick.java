@@ -71,7 +71,9 @@ public class NAR_Joystick {
 
     /**  
      * Returns the Joystick's throttle slider value
-     * @return Throttle on [0, 1] where 0 is throttle at bottom, 1 is throttle at top - Default lower bound is 0.3, upper bound is 0.8, so anything below 0.3 returns 0.3, anything above 0.8 returns 1. 
+     * @return Throttle on [0, 1] where 0 is throttle at bottom, 1 is throttle at top, limited to the bounds from
+     *         {@link #setThrottleBounds(double, double)}. By default they're 0.3 and 0.8, so anything below 0.3
+     *         returns 0.3 and anything above 0.8 returns 0.8.
     */
     public double getThrottle() {
         double mappedThrottle = MathUtil.clamp((1 - stick.getThrottle()) / 2, throttleLowerBound, throttleUpperBound);

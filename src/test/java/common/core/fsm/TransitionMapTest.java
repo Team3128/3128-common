@@ -1,6 +1,7 @@
 package common.core.fsm;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -186,7 +187,20 @@ class TransitionMapTest {
         assertEquals(State.B, transition.getIncomingState());
         assertTrue(transition.isTransition(State.A, State.B));
         assertFalse(transition.isTransition(State.B, State.A));
-        assertTrue(transition.equals(new Transition<>(State.A, State.B, Commands.none())));
         assertEquals("A -> B", transition.toString());
+    }
+
+    @Test
+    void transitionsBetweenTheSameStatesAreEqualEvenInCollections() {
+        final Transition<State> transition = new Transition<>(State.A, State.B);
+        final Transition<State> same = new Transition<>(State.A, State.B, Commands.none());
+
+        assertEquals(transition, same);
+        assertEquals(transition.hashCode(), same.hashCode());
+        assertNotEquals(transition, new Transition<>(State.B, State.A));
+        // Only an override of equals(Object) is used by collections
+        assertTrue(java.util.List.of(transition).contains(same));
+        assertEquals(1, java.util.Set.of(transition).size());
+        assertTrue(new java.util.HashSet<>(java.util.List.of(transition)).contains(same));
     }
 }
