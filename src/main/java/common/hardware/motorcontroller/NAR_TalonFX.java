@@ -477,6 +477,7 @@ public class NAR_TalonFX extends NAR_Motor {
 
     @Override
     public void close() {
+        disableSim();
         motor.close();
     }
 }

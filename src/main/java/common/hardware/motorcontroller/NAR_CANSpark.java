@@ -687,6 +687,7 @@ public class NAR_CANSpark extends NAR_Motor {
      */
     @Override
     public void close() {
+        disableSim();
         motor.close();
     }
 }

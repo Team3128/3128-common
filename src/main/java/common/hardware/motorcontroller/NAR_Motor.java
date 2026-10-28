@@ -227,6 +227,11 @@ public abstract class NAR_Motor implements AutoCloseable {
         simulatedMotors.add(this);
     }
 
+    /** Stops simulating this motor, e.g. when it's closed. */
+    protected void disableSim() {
+        simulatedMotors.remove(this);
+    }
+
     /**
      * Steps the physics of every motor with {@link #enableSim(MotorSimModel)}.
      * Call once per loop from {@code Robot.simulationPeriodic()}.
