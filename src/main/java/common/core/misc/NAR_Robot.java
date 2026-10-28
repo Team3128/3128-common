@@ -156,7 +156,11 @@ public class NAR_Robot extends IterativeRobotBase {
                 break;
             }
 
-            callback.func.run();
+            try {
+                callback.func.run();
+            } catch (Exception e) {
+                DriverStation.reportError(e.toString(), e.getStackTrace());
+            }
 
             callback.expirationTime += callback.period;
             m_callbacks.add(callback);
@@ -165,7 +169,11 @@ public class NAR_Robot extends IterativeRobotBase {
             while ((long) (m_callbacks.peek().expirationTime * 1e6) <= curTime) {
                 callback = m_callbacks.poll();
 
-                callback.func.run();
+                try {
+                    callback.func.run();
+                } catch (Exception e) {
+                    DriverStation.reportError(e.toString(), e.getStackTrace());
+                }
 
                 callback.expirationTime += callback.period;
                 m_callbacks.add(callback);
