@@ -9,6 +9,9 @@ import java.util.function.Supplier;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
+import org.photonvision.simulation.PhotonCameraSim;
+import org.photonvision.simulation.SimCameraProperties;
+import org.photonvision.simulation.VisionSystemSim;
 
 import common.utility.shuffleboard.NAR_Shuffleboard;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
@@ -19,6 +22,7 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.wpilibj.RobotBase;
 import org.photonvision.targeting.PhotonPipelineResult;
 
 public class DynamicCamera {
@@ -33,6 +37,19 @@ public class DynamicCamera {
     private PhotonPipelineResult result = new PhotonPipelineResult();
      private List<PhotonPipelineResult> resultList = new ArrayList<PhotonPipelineResult>();
      public boolean isDisabled = false;
+
+    /**
+     * How simulated cameras see: resolution, field of view, noise, frame rate and latency. Roughly
+     * an OV9281; change it before creating cameras to match yours.
+     */
+    public static SimCameraProperties simProperties = new SimCameraProperties()
+        .setCalibration(1280, 800, Rotation2d.fromDegrees(80))
+        .setCalibError(0.25, 0.08)
+        .setFPS(30)
+        .setAvgLatencyMs(30)
+        .setLatencyStdDevMs(5);
+    private static VisionSystemSim visionSim;
+    private PhotonCameraSim cameraSim;
 
     //dynamic camera related variables
     private final PhotonCamera photonCamera;
@@ -52,6 +69,7 @@ public class DynamicCamera {
         this.estConsumer = estConsumer;
         this.isDynamic = false;
 
+        startSimulation(robotToCam, tagLayout);
         dynamicCameras.add(this);
     }
 
@@ -67,6 +85,8 @@ public class DynamicCamera {
         this.offset = offset;
         this.angularOffset = angularOffset;
 
+        // Facing straight ahead until the first simulation update moves it with the turret
+        startSimulation(new Transform3d(offset, new Rotation3d()).plus(pivotToCam), tagLayout);
         dynamicCameras.add(this);
     }
 
@@ -111,6 +131,38 @@ public class DynamicCamera {
         this.minDistThreshold = newMinDistThreshold;
         this.maxDistThreshold = newMaxDistThreshold;
         this.ambiguityThreshold = newAmbiguityThreshold;
+    }
+
+    /**
+     * In simulation, gives this camera a PhotonVision sim camera that sees the field's AprilTags
+     * from where the robot is, so everything downstream runs as it would on the robot.
+     */
+    private void startSimulation(Transform3d robotToCam, AprilTagFieldLayout tagLayout) {
+        if (RobotBase.isReal()) return;
+        if (visionSim == null) {
+            visionSim = new VisionSystemSim("main");
+            visionSim.addAprilTags(tagLayout);
+        }
+        // With the tag layout, it also works out multi-tag poses like the coprocessor does
+        cameraSim = new PhotonCameraSim(photonCamera, simProperties, tagLayout);
+        // Drawing what the camera sees is slow; turn these on to watch it in a browser
+        cameraSim.enableRawStream(false);
+        cameraSim.enableProcessedStream(false);
+        visionSim.addCamera(cameraSim, robotToCam);
+    }
+
+    /**
+     * Moves the simulated cameras to where the robot is, and lets them see the AprilTags from
+     * there. Call every loop in {@code simulationPeriodic}, before {@link #periodic()} reads them.
+     * The field with what they see is on SmartDashboard under {@code VisionSystemSim-main}.
+     * @param robotPose Where the robot is on the field
+     */
+    public static void updateSimulation(Pose2d robotPose) {
+        if (visionSim == null) return;
+        for (final DynamicCamera dynamicCamera : dynamicCameras) {
+            if (dynamicCamera.isDynamic) visionSim.adjustCamera(dynamicCamera.cameraSim, dynamicCamera.getRobotToCam());
+        }
+        visionSim.update(robotPose);
     }
 
     public static void enable() {
