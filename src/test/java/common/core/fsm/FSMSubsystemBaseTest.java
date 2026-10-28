@@ -2,10 +2,12 @@ package common.core.fsm;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
@@ -19,6 +21,7 @@ import common.core.subsystems.LinearMechanism;
 import common.hardware.motorcontroller.MockMotor;
 import common.hardware.motorcontroller.NAR_Motor.MotorConfig;
 import common.hardware.motorcontroller.NAR_Motor.Neutral;
+import common.utility.shuffleboard.NAR_Shuffleboard;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.networktables.NetworkTableEntry;
@@ -210,5 +213,44 @@ class FSMSubsystemBaseTest {
         assertFalse(ran.get());
         assertEquals(TestState.SHOOT, fsm.getState());
         assertEquals(TestState.IDLE, fsm.getPreviousState());
+    }
+
+    /** Schedules {@code command} and runs the scheduler a few times, for commands made of several steps. */
+    private static void runToEnd(Command command) {
+        CommandScheduler.getInstance().schedule(command);
+        for (int i = 0; i < 5; i++) CommandScheduler.getInstance().run();
+    }
+
+    @Test
+    void commandsDoWhatTheirMethodsDo() {
+        final TestFSM fsm = fsm(map -> map.addTransition(TestState.IDLE, TestState.INTAKE, Commands.idle()));
+        final MockMotor motor = MockMotor.talonLike(1);
+        final LinearMechanism slider = new LinearMechanism("FSMSubsystemBaseTestCommands",
+            new MotorConfig(0.01, 60, 40, false, Neutral.BRAKE), new PIDFFConfig(20), 0.005, 0, 0.3, 1, 0, 2,
+            DCMotor.getKrakenX60(1), motor);
+        fsm.addMechanisms(slider);
+        assertEquals(List.of(slider), fsm.getMechanisms());
+
+        fsm.setStateCommand(TestState.INTAKE).initialize();
+        assertEquals(TestState.INTAKE, fsm.getState());
+        assertNotNull(fsm.getCurrentTransition());
+
+        // Reset puts the encoder back at the start
+        motor.rawPosition = 20;
+        runToEnd(fsm.resetCommand());
+        assertEquals(0, slider.getPosition(), 1e-9);
+
+        fsm.setState(TestState.IDLE);
+        runToEnd(fsm.stopCommand());
+        assertFalse(fsm.isTransitioning());
+    }
+
+    @Test
+    void stateMachineTabShowsEveryState() {
+        final TestFSM fsm = fsm(map -> {});
+        fsm.initShuffleboard();
+        NAR_Shuffleboard.update();
+        assertEquals("IDLE", NAR_Shuffleboard.getString(fsm.getName(), "Current State").get());
+        assertTrue(NAR_Shuffleboard.getBoolean(fsm.getName(), "IDLE").getAsBoolean());
     }
 }

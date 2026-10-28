@@ -88,4 +88,20 @@ class PIDFFConfigTest {
         assertEquals(7, config.getkG(), TOLERANCE);
         assertEquals(0.5, config.getkG_Function().getAsDouble(), TOLERANCE);
     }
+
+    @Test
+    void numberSettersReplaceEachGain() {
+        final PIDFFConfig config = new PIDFFConfig();
+        config.setkI(1);
+        config.setkD(2);
+        config.setkS(3);
+        config.setkV(4);
+        config.setkG(5);
+
+        assertEquals(1, config.getkI(), TOLERANCE);
+        assertEquals(2, config.getkD(), TOLERANCE);
+        assertEquals(3, config.getkS(), TOLERANCE);
+        assertEquals(4, config.getkV(), TOLERANCE);
+        assertEquals(5, config.getkG(), TOLERANCE);
+    }
 }

@@ -62,7 +62,11 @@ everything else on the first build.
 ```
 ./gradlew build      # compile and run the tests
 ./gradlew test       # just the tests
+./gradlew test jacocoTestReport   # the tests, plus a coverage report
 ```
+
+The coverage report, at `build/reports/jacoco/test/html/index.html`, shows which lines the tests
+run, so you can see what a change still needs tests for. Keep it above 90%.
 
 The tests in `src/test` cover the mechanisms, state machines, motor unit conversions,
 simulation physics, vision and dashboards, without needing a robot. Run them before committing

@@ -1,5 +1,6 @@
 package common.hardware.camera;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -21,6 +22,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj.simulation.SimHooks;
 
 /** Checks that a simulated camera sees the field's AprilTags and estimates where the robot is. */
@@ -123,6 +125,44 @@ class DynamicCameraTest {
         for (Pose2d estimate : estimates) {
             assertTrue(estimate.getTranslation().getDistance(robotPose.getTranslation()) < 0.5,
                 "anything it does see should still put the robot in the right place");
+        }
+    }
+
+    @Test
+    void turretCameraLooksWhereTheTurretPoints() {
+        // The robot faces away from the tag, but its turret is turned around to face it
+        final AprilTag tag = FIELD.getTags().get(0);
+        final Pose2d robotPose = tag.pose.toPose2d().transformBy(new Transform2d(2, 0, Rotation2d.kZero));
+        final List<Pose2d> estimates = new ArrayList<>();
+        final DynamicCamera camera = new DynamicCamera("DynamicCameraTest" + nextName++,
+            Transform3d.kZero, FIELD, (pose, time) -> estimates.add(pose),
+            new Translation3d(0, 0, tag.pose.getZ()), () -> Rotation2d.k180deg);
+        camera.setThresholds(0, 10, 0.2);
+
+        SimHooks.pauseTiming();
+        for (int i = 0; i < 50; i++) {
+            SimHooks.stepTiming(0.02);
+            DynamicCamera.updateSimulation(robotPose);
+            DynamicCamera.periodic();
+        }
+        DynamicCamera.dynamicCameras.remove(camera);
+
+        assertFalse(estimates.isEmpty(), "the turret camera should see the tag behind the robot");
+        final Pose2d last = estimates.get(estimates.size() - 1);
+        assertEquals(0, last.getTranslation().getDistance(robotPose.getTranslation()), 0.15);
+        assertDoesNotThrow(camera::initShuffleboard);
+    }
+
+    @Test
+    void visionCanBeTurnedOff() {
+        final AprilTag tag = FIELD.getTags().get(0);
+        final Pose2d robotPose = tag.pose.toPose2d().transformBy(new Transform2d(2, 0, Rotation2d.k180deg));
+
+        DynamicCamera.disable();
+        try {
+            assertTrue(estimatesFrom(robotPose).isEmpty());
+        } finally {
+            DynamicCamera.enable();
         }
     }
 }

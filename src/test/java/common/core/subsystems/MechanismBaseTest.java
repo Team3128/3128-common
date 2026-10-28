@@ -1,6 +1,8 @@
 package common.core.subsystems;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -19,12 +21,15 @@ import common.hardware.motorcontroller.MockMotor;
 import common.hardware.motorcontroller.NAR_Motor.Control;
 import common.hardware.motorcontroller.NAR_Motor.MotorConfig;
 import common.hardware.motorcontroller.NAR_Motor.Neutral;
+import common.utility.shuffleboard.NAR_Shuffleboard;
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.simulation.SimHooks;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
 /**
  * Behavior every mechanism shares, checked through a {@link LinearMechanism} (control loop on
@@ -51,6 +56,8 @@ class MechanismBaseTest {
     @AfterEach
     void restoreTime() {
         SimHooks.resumeTiming();
+        // Mechanisms register with the command scheduler, so other tests' scheduler runs would run them
+        CommandScheduler.getInstance().unregisterAllSubsystems();
     }
 
     /** Each mechanism gets its own Shuffleboard tab, so tests don't share widgets. */
@@ -321,6 +328,10 @@ class MechanismBaseTest {
         protected double calculateFeedforward(double pidOutput) {
             return FEEDFORWARD_VOLTS;
         }
+
+        void showController() {
+            addControllerWidget(new PIDController(KP, 0, 0), 0, 2, 1, 2);
+        }
     }
 
     @Test
@@ -359,5 +370,136 @@ class MechanismBaseTest {
         mechanism.disable();
         mechanism.setSetpoint(1);
         assertEquals(2, resets.get());
+    }
+
+    @Test
+    void roboRioControllerCanShowItsOwnWidget() {
+        final RioMechanism mechanism = new RioMechanism(MockMotor.talonLike(1), new AtomicInteger());
+        assertDoesNotThrow(mechanism::showController);
+    }
+
+    /** A mechanism with nothing added, whose loop runs on the motor controller. */
+    private static MechanismBase plain(Control mode, MockMotor motor) {
+        final MechanismBase mechanism = new MechanismBase(new PIDFFConfig(1), mode, 0.01, 0, CONFIG, motor) {};
+        mechanism.setName(uniqueName());
+        return mechanism;
+    }
+
+    @Test
+    void velocityMechanismMeasuresItsSpeed() {
+        final MockMotor motor = MockMotor.talonLike(1);
+        final MechanismBase mechanism = plain(Control.Velocity, motor);
+
+        mechanism.setSetpoint(1);
+        motor.rawVelocity = 6000; // RPM; 1 cm per rotation is 1 m/s
+
+        assertTrue(mechanism.atSetpoint());
+    }
+
+    @Test
+    void stopsOnceThereByDefault() {
+        final MockMotor motor = MockMotor.talonLike(1);
+        final MechanismBase mechanism = plain(Control.Position, motor);
+
+        mechanism.setSetpoint(0.1);
+        motor.rawPosition = 0.1 / METERS_PER_ROTATION;
+        mechanism.periodic();
+
+        assertFalse(mechanism.isEnabled());
+    }
+
+    @Test
+    void needsAtLeastOneMotor() {
+        assertThrows(IllegalArgumentException.class,
+            () -> new MechanismBase(new PIDFFConfig(), Control.Position, 0, 0, CONFIG) {});
+    }
+
+    @Test
+    void openLoopMechanismOnlyRuns() {
+        final MockMotor motor = MockMotor.talonLike(1);
+        final MechanismBase mechanism = new MechanismBase(CONFIG, motor) {};
+
+        mechanism.run(0.5);
+
+        assertEquals(0.5, motor.lastPercentOutput, TOLERANCE);
+        assertEquals(Pose3d.kZero, mechanism.getComponentPose());
+    }
+
+    @Test
+    void commandsDoWhatTheirMethodsDo() {
+        final MockMotor leader = MockMotor.talonLike(1);
+        final LinearMechanism slider = slider(leader);
+
+        slider.runCommand(0.3).initialize();
+        assertEquals(0.3, leader.lastPercentOutput, TOLERANCE);
+        slider.runVoltsCommand(6).initialize();
+        assertEquals(6, leader.lastVolts(), 1e-6);
+        slider.setSetpointCommand(0.2).initialize();
+        assertEquals(0.2, slider.getSetpoint(), TOLERANCE);
+        slider.resetCommand(0.1).initialize();
+        assertEquals(0.1, slider.getPosition(), TOLERANCE);
+        slider.resetCommand().initialize();
+        assertEquals(MIN, slider.getPosition(), TOLERANCE);
+        assertNotNull(slider.characterization(1, 2));
+    }
+
+    @Test
+    void hardwareHelpersReachEveryMotor() {
+        final MockMotor leader = MockMotor.talonLike(1);
+        final MockMotor follower = MockMotor.talonLike(2);
+        final LinearMechanism slider = slider(leader, follower);
+
+        slider.setStatorLimit(15);
+        assertEquals(15, leader.statorLimit);
+        assertEquals(15, follower.statorLimit);
+
+        slider.invertMotor(0);
+        assertTrue(leader.inverted);
+        assertSame(CONFIG, slider.getMotorConfig());
+    }
+
+    @Test
+    void safetyTimeoutCanBeShortened() {
+        final MockMotor leader = MockMotor.talonLike(1);
+        final LinearMechanism slider = slider(leader);
+        slider.setSafetyThresh(1);
+        SimHooks.pauseTiming();
+
+        slider.setSetpoint(0.2); // the encoder never moves
+        for (int i = 0; i < 60; i++) { // 1.2 seconds
+            SimHooks.stepTiming(0.02);
+            slider.periodic();
+        }
+
+        assertFalse(slider.isEnabled());
+    }
+
+    @Test
+    void tuningTabOverridesSetpointsWhileDebugging() {
+        final PIDFFConfig gains = new PIDFFConfig(20);
+        final LinearMechanism slider = slider(gains, MockMotor.talonLike(1));
+        slider.initShuffleboard();
+        final String tab = slider.getName();
+
+        // Typing a gain into its box changes it
+        NAR_Shuffleboard.getEntry(tab, "kS").getEntry().setDouble(0.7);
+        assertEquals(0.7, gains.getkS(), TOLERANCE);
+
+        // With DEBUG on, the Debug_Setpoint box overrides setpoints
+        NAR_Shuffleboard.getEntry(tab, "DEBUG").getEntry().setBoolean(true);
+        NAR_Shuffleboard.getEntry(tab, "Debug_Setpoint").getEntry().setDouble(0.1);
+        slider.setSetpoint(0.25);
+        assertEquals(0.1, slider.getSetpoint(), TOLERANCE);
+    }
+
+    @Test
+    void mountedOnARollerItsntTilted() {
+        final RollerMechanism roller = new RollerMechanism(uniqueName(), CONFIG, KRAKEN, 1, 0.001, MockMotor.talonLike(1));
+        final LinearMechanism slider = slider(MockMotor.talonLike(2));
+
+        slider.setParent(roller);
+
+        assertFalse(slider.tiltsWhatsMountedOnIt());
+        assertEquals(Pose3d.kZero, roller.getComponentPose());
     }
 }

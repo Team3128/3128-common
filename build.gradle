@@ -1,5 +1,6 @@
 plugins {
     id "java"
+    id "jacoco"
     id "edu.wpi.first.GradleRIO" version "2026.2.1"
 }
 
@@ -86,6 +87,21 @@ dependencies {
 test {
     useJUnitPlatform()
     systemProperty 'junit.jupiter.extensions.autodetection.enabled', 'true'
+}
+
+// Test coverage: ./gradlew test jacocoTestReport, then open build/reports/jacoco/test/html/index.html
+jacocoTestReport {
+    dependsOn test
+    reports {
+        xml.required = true
+        html.required = true
+    }
+    // NarwhalDashboard is moving to its own repository, so it isn't counted here
+    afterEvaluate {
+        classDirectories.setFrom(files(classDirectories.files.collect {
+            fileTree(dir: it, exclude: 'common/utility/narwhaldashboard/**')
+        }))
+    }
 }
 
 // Simulation configuration (e.g. environment variables).

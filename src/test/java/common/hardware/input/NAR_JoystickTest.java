@@ -81,4 +81,34 @@ class NAR_JoystickTest {
         assertTrue(joystick.getButton(1).getAsBoolean());
         assertFalse(joystick.getButton(2).getAsBoolean());
     }
+
+    @Test
+    void axesOutsideTheDeadbandReadTheirValueAndDeadbandsCanChange() {
+        sim.setX(0.5);
+        sim.setZ(-0.5);
+        sim.notifyNewData();
+        assertEquals(0.5, joystick.getX(), 1e-6);
+        assertEquals(-0.5, joystick.getZ(), 1e-6);
+
+        joystick.setXDeadband(0.6);
+        joystick.setYDeadband(0.6);
+        joystick.setZDeadband(0.6);
+        sim.setY(-0.5);
+        sim.notifyNewData();
+        assertEquals(0, joystick.getX(), 1e-6);
+        assertEquals(0, joystick.getY(), 1e-6);
+        assertEquals(0, joystick.getZ(), 1e-6);
+    }
+
+    @Test
+    void hatSwitchDirectionsAreButtons() {
+        sim.setPOVCount(1);
+        sim.setPOV(90);
+        sim.notifyNewData();
+
+        assertTrue(joystick.getRightPOVButton().getAsBoolean());
+        assertFalse(joystick.getUpPOVButton().getAsBoolean());
+        assertFalse(joystick.getDownPOVButton().getAsBoolean());
+        assertFalse(joystick.getLeftPOVButton().getAsBoolean());
+    }
 }

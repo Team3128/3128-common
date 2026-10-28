@@ -1,5 +1,6 @@
 package common.hardware.input;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -88,5 +89,38 @@ class NAR_XboxControllerTest {
 
         assertTrue(controller.getButton(XboxButton.kA).getAsBoolean());
         assertFalse(controller.getButton(XboxButton.kB).getAsBoolean());
+    }
+
+    @Test
+    void everyStickDeadbandCanChange() {
+        controller.setLeftYDeadband(0.6);
+        controller.setRightXDeadband(0.6);
+        controller.setRightYDeadband(0.6);
+        sim.setLeftY(-0.5);
+        sim.setRightX(0.5);
+        sim.setRightY(-0.5);
+        sim.notifyNewData();
+
+        assertEquals(0, controller.getLeftY(), TOLERANCE);
+        assertEquals(0, controller.getRightX(), TOLERANCE);
+        assertEquals(0, controller.getRightY(), TOLERANCE);
+    }
+
+    @Test
+    void dPadDirectionsAreButtons() {
+        sim.setPOV(180);
+        sim.notifyNewData();
+
+        assertTrue(controller.getDownPOVButton().getAsBoolean());
+        assertFalse(controller.getUpPOVButton().getAsBoolean());
+        assertFalse(controller.getRightPOVButton().getAsBoolean());
+        assertFalse(controller.getLeftPOVButton().getAsBoolean());
+    }
+
+    @Test
+    void vibratesAndShowsItsButtons() {
+        controller.startVibrate();
+        controller.stopVibrate();
+        assertDoesNotThrow(controller::initShuffleboard);
     }
 }

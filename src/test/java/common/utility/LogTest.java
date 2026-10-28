@@ -1,6 +1,7 @@
 package common.utility;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.ByteArrayOutputStream;
@@ -90,5 +91,28 @@ class LogTest {
         Log.profile("Startup", () -> ran[0] = true);
         assertTrue(ran[0]);
         assertTrue(printed().startsWith("[Info] [Startup] "));
+    }
+
+    @Test
+    void fatalErrorsIncludeExceptions() {
+        Log.fatal("Robot", "no gyro");
+        Log.fatalException("Robot", "couldn't load path", new IllegalStateException("missing file"));
+        Log.recoverable("Robot", null);
+
+        assertTrue(printed().contains("[Fatal] [Robot] no gyro"));
+        assertTrue(printed().contains("[Fatal] [Robot] couldn't load path -- IllegalStateException: missing file"));
+        assertTrue(printed().contains("[Recoverable] [Robot] null"));
+    }
+
+    @Test
+    void primaryDebugAndDividers() {
+        Log.logDebug = true;
+        Type.enable(Type.PRIMARY);
+        Log.debug("Robot", "detail");
+        Log.divider(5);
+        Type.disable(Type.PRIMARY);
+
+        assertEquals("[Debug] [Robot] detail\n-----\n", printed());
+        assertFalse(Type.PRIMARY.getEnabled());
     }
 }
