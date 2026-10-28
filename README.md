@@ -16,7 +16,6 @@ of starting from scratch.
 | `common.hardware.input` | Xbox controllers, joysticks and the team's button board. |
 | `common.core.misc` | `NAR_Robot`, the base for the robot's `Robot` class. |
 | `common.utility` | Console logging, Shuffleboard, NarwhalDashboard, pit system checks and SysId. |
-| `common.core.swerve` | The team's older swerve code. New robots use CTRE's generated swerve instead. |
 
 Every package has an overview in its `package-info.java`, and every class explains itself at the
 top of its file. Read the code in your editor, or open `doc/index.html` for the same comments as a
