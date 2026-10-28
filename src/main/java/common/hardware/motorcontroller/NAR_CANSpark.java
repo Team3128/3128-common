@@ -390,7 +390,8 @@ public class NAR_CANSpark extends NAR_Motor {
 		 if (RobotBase.isSimulation()) return REVLibError.kOk;
 
 		Timer.delay(0.5);
-		REVLibError status = motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
+		// Starts from the defaults and applies every setting, so nothing set elsewhere lingers, then saves it
+		REVLibError status = motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 		Timer.delay(0.5);
 		if (status == REVLibError.kOk) {
 			Log.info("Motors", "Burned flash for Spark Max " + motor.getDeviceId());
