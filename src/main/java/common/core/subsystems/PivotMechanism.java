@@ -62,7 +62,6 @@ public class PivotMechanism extends MechanismBase {
     private final Orientation orientation;
     private final double startPosition;
     private final double radiansPerUnit;
-    private final double massKg;
     private final double voltsPerNewtonMeter;
     private final PivotSimModel simModel;
     private Translation3d pivot = Translation3d.kZero;
@@ -81,10 +80,10 @@ public class PivotMechanism extends MechanismBase {
      * @param radiansPerUnit Radians per position unit, e.g. {@code Math.PI / 180} for degrees
      * @param lengthMeters Pivot to the far end of the moving part, with any telescope on it retracted; used
      *                     only in simulation
-     * @param massKg Mass of the moving part, not counting mechanisms mounted on it with
-     *               {@link #setParent(MechanismBase)}; used in simulation, and for gravity on a telescope it's
-     *               mounted on the end of
-     * @param motorType Model of one motor, e.g. {@code DCMotor.getKrakenX44(1)}; used only in simulation
+     * @param massKg Mass that moves, including everything mounted on it, e.g. the telescope and wrist on an
+     *               arm; used only in simulation
+     * @param motorType Model of one motor, e.g. {@code DCMotor.getKrakenX44(1)}; used in simulation, and to
+     *                  hold up what telescopes on it move out
      * @param motors Every motor on the mechanism. The first is the leader.
      */
     public PivotMechanism(String name, Orientation orientation, MotorConfig motorConfig, PIDFFConfig gains, double tolerance,
@@ -94,7 +93,6 @@ public class PivotMechanism extends MechanismBase {
         this.orientation = orientation;
         this.startPosition = startPosition;
         this.radiansPerUnit = radiansPerUnit;
-        this.massKg = massKg;
         setName(name);
         setInputRange(minPosition, maxPosition);
         setDisableAtSetpoint(false); // keep holding position
@@ -184,11 +182,6 @@ public class PivotMechanism extends MechanismBase {
         return kG + getExtensionGravityVolts();
     }
 
-    @Override
-    public double getMassKg() {
-        return massKg;
-    }
-
     /**
      * Volts to hold up the weight telescopes mounted on it have moved out from the pivot, compared
      * with them all retracted. Tune kG with every telescope on it retracted.
@@ -206,7 +199,7 @@ public class PivotMechanism extends MechanismBase {
         double torque = 0;
         for (MechanismBase mounted : mechanism.getMounted()) {
             if (mounted instanceof LinearMechanism telescope) {
-                final double weight = telescope.getMovingMassKg() * GRAVITY;
+                final double weight = telescope.getMassKg() * GRAVITY;
                 final Translation3d moved = telescope.getTravelDirection().times(telescope.getExtensionMeters());
                 // Moving a weight by `moved` changes gravity's torque by moved x (0, 0, -weight),
                 // wherever the pivot is; holding it takes the opposite

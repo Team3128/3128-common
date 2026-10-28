@@ -42,7 +42,8 @@ public class LinearMechanism extends MechanismBase {
      *                      {@link #getComponentPose()}
      * @param angleRadians Incline of travel when everything is at its starting position, 0 is horizontal and
      *                     pi/2 is straight up; used in simulation and {@link #getComponentPose()}
-     * @param massKg Mass that moves; used in simulation, and for gravity on an arm it's mounted on
+     * @param massKg Mass that moves, including everything mounted on it, e.g. a wrist on a telescope; used in
+     *               simulation, and for gravity on an arm it's mounted on
      * @param motorType Model of one motor, e.g. {@code DCMotor.getKrakenX60(1)}; used only in simulation
      * @param motors Every motor on the mechanism. The first is the leader.
      */
@@ -102,22 +103,9 @@ public class LinearMechanism extends MechanismBase {
         return (getPosition() - minPosition) * metersPerUnit;
     }
 
-    @Override
+    /** Mass moved when it extends, including everything mounted on it. */
     public double getMassKg() {
         return massKg;
-    }
-
-    /** Mass moved when it extends: its own, plus everything mounted on it. */
-    public double getMovingMassKg() {
-        return massKg + massMountedOn(this);
-    }
-
-    private static double massMountedOn(MechanismBase mechanism) {
-        double total = 0;
-        for (MechanismBase mounted : mechanism.getMounted()) {
-            total += mounted.getMassKg() + massMountedOn(mounted);
-        }
-        return total;
     }
 
     /** kG on the incline, when mounted on something that tilts it. */

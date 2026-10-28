@@ -217,7 +217,7 @@ class PivotMechanismTest {
         // Volts to hold one newton meter at the arm, through the 50:1 gearing
         final double voltsPerNewtonMeter = KRAKEN.rOhms / (GEARING * KRAKEN.KtNMPerAmp);
 
-        // Arm level, telescope 0.3 m out: its 2 kg is 0.3 m further from the pivot
+        // Arm level, telescope 0.3 m out: its 2 kg, with the wrist, is 0.3 m further from the pivot
         armMotor.rawPosition = 0;
         telescopeMotor.rawPosition = 0.3 / 0.01;
         assertEquals(2 * 9.81 * 0.3 * voltsPerNewtonMeter, arm.getExtensionGravityVolts(), 1e-9);
@@ -227,9 +227,9 @@ class PivotMechanismTest {
         arm.periodic();
         assertEquals(arm.getExtensionGravityVolts(), armMotor.lastFeedforward, 1e-9);
 
-        // A 1 kg wrist on the end goes out with it
+        // The telescope's mass already includes the wrist on its end, so mounting it changes nothing
         wrist(Orientation.FORWARD, MockMotor.talonLike(3)).setParent(telescope);
-        assertEquals(3 * 9.81 * 0.3 * voltsPerNewtonMeter, arm.getExtensionGravityVolts(), 1e-9);
+        assertEquals(2 * 9.81 * 0.3 * voltsPerNewtonMeter, arm.getExtensionGravityVolts(), 1e-9);
 
         // Arm straight up: extending moves the weight straight up, no further out
         armMotor.rawPosition = 90 / DEGREES_PER_MOTOR_ROTATION;

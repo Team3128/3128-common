@@ -526,11 +526,6 @@ public abstract class MechanismBase extends SubsystemBase {
         return Collections.unmodifiableList(mounted);
     }
 
-    /** Mass of the part that moves, if known, for gravity on what it's mounted on. Default is 0, e.g. for rollers. */
-    public double getMassKg() {
-        return 0;
-    }
-
     /**
      * Whether moving this tilts what's mounted on it, changing how gravity acts on it: true for
      * an arm, false for an elevator or turret, unless they're mounted on something that does.
