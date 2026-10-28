@@ -19,6 +19,15 @@ import edu.wpi.first.math.system.plant.DCMotor;
  * from {@code gains}; leave kG at 0 for a horizontal slider. The mechanism is assumed to be at {@code minPosition}
  * when the robot turns on.
  *
+ * <pre>{@code
+ * // A two-motor elevator measured in meters, 1.2 m of travel, carrying 8 kg
+ * elevator = new LinearMechanism("Elevator", ELEVATOR_CONFIG, ELEVATOR_GAINS, 0.01,
+ *     0, 1.2, 1, Math.PI / 2, 8, DCMotor.getKrakenX60(1),
+ *     new NAR_TalonFX(ELEVATOR_LEFT_ID), new NAR_TalonFX(ELEVATOR_RIGHT_ID));
+ * elevator.invertMotor(1); // the right motor faces the other way
+ * elevator.setSetpoint(0.8);
+ * }</pre>
+ *
  * <p>Mounted on an arm, e.g. a telescoping arm, see {@link #setParent(MechanismBase)}.
  */
 public class LinearMechanism extends MechanismBase {

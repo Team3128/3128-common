@@ -31,6 +31,13 @@ import edu.wpi.first.math.system.plant.DCMotor;
  * <p>The mechanism is assumed to be at {@code startPosition} when the robot turns on, and the
  * encoder is reset to it.
  *
+ * <pre>{@code
+ * // An arm in degrees that starts hanging straight down, can swing from -90 to 90, and weighs 4 kg
+ * arm = new PivotMechanism("Arm", Orientation.FORWARD, ARM_CONFIG, ARM_GAINS, 1,
+ *     -90, 90, -90, Math.PI / 180, 0.6, 4, DCMotor.getKrakenX60(1), new NAR_TalonFX(ARM_ID));
+ * arm.setSetpoint(45);
+ * }</pre>
+ *
  * <p>For a wrist driven directly on an arm, a hood on a turret, or an arm on an elevator, see
  * {@link #setParent(MechanismBase)}.
  */

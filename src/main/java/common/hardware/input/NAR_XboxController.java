@@ -7,14 +7,20 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 /**
- * Wrapper for the WPILib XboxController class.
+ * An Xbox controller, with a few things WPILib's {@code XboxController} doesn't do:
+ * <ul>
+ * <li>Sticks have a small deadband, so a stick that doesn't quite center reads 0.</li>
+ * <li>Up on either stick is positive. WPILib reports up as negative.</li>
+ * <li>Every button, including the triggers and the D-pad, is a {@link Trigger} you can bind
+ *     commands to: {@code controller.getButton(XboxButton.kA).onTrue(...)}.</li>
+ * </ul>
  * @since 2022 Rapid React
  * @author Arav Chadha, Mason Lam
  */
 public class NAR_XboxController extends XboxController {
 
     /**
-     * Enum to represent buttons
+     * Every button, plus the two triggers, which count as pressed once squeezed halfway.
      */
     public enum XboxButton {
         kLeftBumper(5, false),
@@ -30,7 +36,9 @@ public class NAR_XboxController extends XboxController {
         kLeftTrigger(2, true),
         kRightTrigger(3, true);
 
+        /** Its button number, or its axis number for a trigger. */
         private final int value;
+        /** Whether it's a trigger, read as an axis from 0 to 1, rather than a button. */
         private final boolean isAxis;
 
         private XboxButton(int value, boolean isAxis) {
@@ -62,6 +70,7 @@ public class NAR_XboxController extends XboxController {
             buttons.put(button, new Trigger(()-> getRawButton(button.value)));
         }
 
+        // The D-pad reports an angle: 0 for up, 90 for right, and so on in 45-degree steps
         povButtons = new Trigger[8];
         for (int i = 0; i < 8; i++) {
             final int n = i;
@@ -205,6 +214,7 @@ public class NAR_XboxController extends XboxController {
         setRumble(RumbleType.kBothRumble, 0);
     }
 
+    /** Adds a "Controller" Shuffleboard tab with a light for every button, for checking wiring and bindings. */
     public void initShuffleboard() {
         for(XboxButton button : buttons.keySet()) {
             NAR_Shuffleboard.addData("Controller", button.name(), ()-> buttons.get(button).getAsBoolean(), (button.ordinal() % 6), button.ordinal() / 6);

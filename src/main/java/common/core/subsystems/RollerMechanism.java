@@ -15,6 +15,18 @@ import edu.wpi.first.math.system.plant.DCMotor;
  * <p>Every roller can run open loop with {@link #run(double)} or {@link #runVolts(double)}.
  * Rollers built with a {@link VelocityControl} can also hold a velocity with
  * {@link #setSetpoint(double)}, and keep spinning until disabled or run open loop.
+ *
+ * <pre>{@code
+ * // An intake roller you just turn on and off
+ * intakeRoller = new RollerMechanism("IntakeRoller", ROLLER_CONFIG, DCMotor.getKrakenX60(1), 3,
+ *     RollerSimModel.solidCylinderMoi(0.5, 0.025), new NAR_TalonFX(ROLLER_ID));
+ * intakeRoller.run(0.8);
+ *
+ * // A flywheel that holds a speed, in rotations per second
+ * flywheel = new RollerMechanism("Flywheel", FLYWHEEL_CONFIG, VelocityControl.PID, FLYWHEEL_GAINS, 1,
+ *     DCMotor.getKrakenX60(1), 1, RollerSimModel.solidCylinderMoi(1.5, 0.05), new NAR_TalonFX(FLYWHEEL_ID));
+ * flywheel.setSetpoint(60);
+ * }</pre>
  */
 public class RollerMechanism extends MechanismBase {
 

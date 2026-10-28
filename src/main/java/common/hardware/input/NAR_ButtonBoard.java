@@ -4,7 +4,13 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 /**
- * Custom GenericHID class for team 3128's button board setup
+ * Team 3128's operator button board: 12 buttons and a joystick, read as 16 buttons you can bind
+ * commands to. Buttons 1 to 12 are the buttons; 13 to 16 are the joystick pushed all the way
+ * left, right, down and up.
+ *
+ * <pre>{@code
+ * buttonBoard.getButton(3).onTrue(superstructure.setStateCommand(SHOOT));
+ * }</pre>
  * @since 2023 Charged Up
  * @author Peter Ma, Arav Chadha, Mason Lam
  */
@@ -36,9 +42,8 @@ public class NAR_ButtonBoard {
     }
 
     /**
-     * Returns a button on the board
-     * @param i The ID of the button
-     * @return Trigger to store the command to run
+     * A button on the board, to bind commands to.
+     * @param i From 1 to 16; see the class comment for which is which
      */
     public Trigger getButton(int i) {
         return buttons[i-1];

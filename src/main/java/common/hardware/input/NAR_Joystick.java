@@ -5,7 +5,10 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 /**
- * Wrapper for the WPILib {@link Joystick} class. Works with Logitech Extreme 3D Pro and Thrustmaster T16000M.
+ * A flight-style joystick, like a Logitech Extreme 3D Pro or Thrustmaster T16000M. Like
+ * {@link NAR_XboxController}, its axes have a small deadband, forward is positive, and every button
+ * is a {@link edu.wpi.first.wpilibj2.command.button.Trigger} you can bind commands to. The throttle
+ * slider reads from 0 at the bottom to 1 at the top, limited to bounds you choose.
  * @author Daniel Wang, Arav Chadha, Mason Lam
  */
 public class NAR_Joystick {

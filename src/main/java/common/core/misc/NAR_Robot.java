@@ -14,17 +14,21 @@ import edu.wpi.first.wpilibj.IterativeRobotBase;
 import edu.wpi.first.wpilibj.Timer;
 
 /**
- * Team 3128's Custom Robot class
- *  
- * <p>NOTES:
+ * The base for Team 3128's {@code Robot} class. It works like WPILib's {@code TimedRobot}: extend
+ * it, and {@code robotPeriodic()}, {@code teleopPeriodic()} and the rest run every 20 ms.
+ *
+ * <p>On top of that, it:
  * <ul>
- * <li> NAR_Robot IS TimedRobot, just with QoL improvements.
- * <li> The NAR_Robot class is intended to be subclassed by a user creating a robot program.
- * <li> Periodic() functions from the base class are called on an interval by a Notifier instance.
+ * <li>Records a log file of everything on NetworkTables, the console and the Driver Station, for
+ *     AdvantageScope. It goes on a USB stick in the roboRIO if there is one.</li>
+ * <li>Saves every Spark's settings to flash once, right after {@code robotInit()}.</li>
+ * <li>Lets any class run something on a timer with {@link #addPeriodic(Runnable, double)}, e.g.
+ *     Shuffleboard updates every loop, without the robot code having to call it.</li>
  * </ul>
- * 
- * <p> ----------------------------------------------
- *  
+ *
+ * <p>Everything runs on one thread, in order, so code called from {@code addPeriodic} never runs
+ * at the same time as robot code.
+ *
  * @since 2023 Charged Up
  * @author Mason Lam, Wallim
  */

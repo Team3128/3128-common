@@ -27,13 +27,27 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 /**
- * Team 3128's Wrapper class for {@link Shuffleboard}
+ * Makes Shuffleboard widgets with one line each, and keeps them up to date.
+ *
+ * <ul>
+ * <li>{@code addData(tab, name, () -> value, x, y)} shows a value that updates every loop.</li>
+ * <li>{@code debug(...)} and {@code debugSwitch(...)} make boxes and switches you can change from
+ *     Shuffleboard; they return a supplier that reads the latest value.</li>
+ * <li>{@code addCommand(...)} makes a button that runs a command.</li>
+ * </ul>
+ *
+ * <p>Positions are on a grid, {@link #WINDOW_WIDTH} by {@link #WINDOW_HEIGHT} per tab, counting
+ * from 0 at the top left. A widget placed off the edge or on top of another one logs a warning.
+ * Adding a widget with a name that's already on the tab updates that widget rather than making a
+ * second one, so it's safe to call every loop.
+ *
  * @since 2022 Rapid React
  * @author Mason Lam, Arav Chadha, Peter Ma
  */
 @SuppressWarnings("unused")
 public class NAR_Shuffleboard {
 
+    // Every widget with a supplier is updated every loop
     static {
         NAR_Robot.addPeriodic(NAR_Shuffleboard::update, 0.02);
     }
@@ -41,7 +55,7 @@ public class NAR_Shuffleboard {
     private NAR_Shuffleboard() {}
 
     /**
-     * Storage class for NAR_Shuffleboard
+     * A widget, and where its value comes from.
      */
     private static class WidgetInfo {
         
@@ -61,16 +75,21 @@ public class NAR_Shuffleboard {
             m_entry = widget.getEntry();
         }
 
+        /** Shows the supplier's latest value; does nothing for a widget with a fixed value. */
         public void update() {
             if(m_supply == null) return;
             m_entry.setValue(m_supply.get());
         }
     }
 
+    /** How many widgets fit across a tab. */
     public static int WINDOW_WIDTH = 9;
+    /** How many widgets fit down a tab. */
     public static int WINDOW_HEIGHT = 4;
 
+    // Every widget, by tab and then by name
     private static final HashMap<String, HashMap<String, WidgetInfo>> tabs = new HashMap<String, HashMap<String,WidgetInfo>>();
+    // Which grid spots on each tab have a widget, so autofill and the overlap warning can tell
     private static final HashMap<String, boolean[][]> widgetPositions = new HashMap<String, boolean[][]>();
 
     private static SimpleWidget[] autoWidgets;

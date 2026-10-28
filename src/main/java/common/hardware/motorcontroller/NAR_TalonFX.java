@@ -37,14 +37,25 @@ import edu.wpi.first.wpilibj.Timer;
 
 import java.util.function.Supplier;
 
+/**
+ * A CTRE TalonFX motor controller, which drives Kraken X60, Kraken X44 and Falcon 500 motors,
+ * using Phoenix 6.
+ *
+ * <p>Every setting is kept in one {@code TalonFXConfiguration}. Changing a setting updates it and
+ * sends just that part to the Talon, retrying a few times if the Talon doesn't confirm.
+ *
+ * <p>The Talon's own control loops measure in rotations and rotations per second, output volts,
+ * and work in seconds. {@link NAR_Motor} converts gains and setpoints to and from your units.
+ */
 public class NAR_TalonFX extends NAR_Motor {
 
     private static int numFailedConfigs = 0;
 
+	/** How many times to try sending a setting before giving up. */
 	public static int maximumRetries = 5;
 
     /**
-	 * @return The number of failed configurations of the motor.
+	 * @return How many settings, across every Talon, never got through after all the retries.
 	 */
 	public static int getNumFailedConfigs() {
 		return numFailedConfigs;
@@ -58,16 +69,24 @@ public class NAR_TalonFX extends NAR_Motor {
     // private final VoltageConfigs voltageConfigs = new VoltageConfigs();
     // private final MotorOutputConfigs motorOutputConfigs = new MotorOutputConfigs();
     // private final Slot0Configs slot0Configs = new Slot0Configs();
+    /** Every setting for this Talon; parts of it are sent as they change. */
     TalonFXConfiguration configs = new TalonFXConfiguration();
     /** Rotor rotations per rotation the Talon reports, from SensorToMechanismRatio. */
     private double mechanismRatio = 1;
 
+    // Phoenix 6 "status signals": the latest values the Talon has reported. refresh() reads the
+    // newest one without waiting on the CAN bus.
     private final StatusSignal<Double> appliedOutput;
     private final StatusSignal<Current> stallCurrent;
     private final StatusSignal<Angle> position;
     private final StatusSignal<AngularVelocity> velocity;
     private final StatusSignal<Temperature> temperature;
 
+    /**
+     * @param deviceNumber The Talon's CAN ID
+     * @param canbusStr The CAN bus it's on: {@code "rio"} for the roboRIO's own, or a CANivore's name
+     * @param pidConfig PID gains to start with, in the Talon's own units
+     */
     public NAR_TalonFX(int deviceNumber, String canbusStr, PIDFFConfig pidConfig) {
         super(deviceNumber);
         Timer timer = new Timer();
@@ -83,24 +102,34 @@ public class NAR_TalonFX extends NAR_Motor {
         velocity = motor.getVelocity();
         temperature = motor.getDeviceTemp();
 
+        // Safe settings until a mechanism's MotorConfig replaces them
         enableVoltageCompensationNoApply(12);
         setCurrentLimitNoApply(NEO_STATOR_CurrentLimit, NEO_SUPPLY_CurrentLimit);
         apply();
         configPID(pidConfig);
     }
 
+    /**
+     * @param deviceNumber The Talon's CAN ID
+     * @param canbus The CAN bus it's on: {@code "rio"} for the roboRIO's own, or a CANivore's name
+     */
     public NAR_TalonFX(int deviceNumber, String canbus) {
         this(deviceNumber, canbus, new PIDFFConfig());
     }
 
+    /**
+     * A Talon on the CANivore named {@code "drivetrain"}. Use the other constructors for one on a
+     * different CAN bus.
+     * @param deviceNumber The Talon's CAN ID
+     */
     public NAR_TalonFX(int deviceNumber) {
         this(deviceNumber, "drivetrain");
     }
-    
+
     /**
-	 * Run the configuration until it succeeds or times out.
+	 * Sends a setting, trying up to {@link #maximumRetries} times until the Talon confirms it.
 	 *
-	 * @param config Lambda supplier returning the error state.
+	 * @param config Sends the setting and returns whether it worked
 	 */
 	private void configTalonFX(Supplier<StatusCode> config)
 	{
@@ -208,6 +237,11 @@ public class NAR_TalonFX extends NAR_Motor {
         motor.set(speed);
     }
 
+    /**
+     * Drives the motor at a voltage using FOC, a smarter way of switching the motor's coils that
+     * gets more torque and power out of Krakens and Falcons. Needs a Phoenix Pro license.
+     * @param voltage From -12 to 12
+     */
     public void setVoltageFOC(double voltage) {
         var voltageSetpoint = new VoltageOut(voltage)
             .withEnableFOC(true);
@@ -221,6 +255,11 @@ public class NAR_TalonFX extends NAR_Motor {
         motor.setControl(velocitySetpoint);
     }
 
+    /**
+     * Holds a speed using FOC (see {@link #setVoltageFOC(double)}).
+     * @param rpm Speed of the encoder in rotations per minute
+     * @param feedforward Extra volts
+     */
     public void setVelocityFOC(double rpm, double feedforward) {
         var velocitySetpoint = new VelocityVoltage(rpm / 60 / mechanismRatio)
             .withEnableFOC(true)
@@ -228,6 +267,11 @@ public class NAR_TalonFX extends NAR_Motor {
         motor.setControl(velocitySetpoint);
     }
 
+    /**
+     * Holds a speed using FOC (see {@link #setVoltageFOC(double)}).
+     * @param setpoint Speed in your units, like {@link #set(double, Control)}
+     * @param feedforward Extra volts
+     */
     public void setVelocityFOC2(double setpoint, double feedforward) {
         setVelocityFOC(setpoint / unitConversionFactor * timeConversionFactor, feedforward);
     }
@@ -239,6 +283,11 @@ public class NAR_TalonFX extends NAR_Motor {
         motor.setControl(positionSetpoint);
     }
 
+    /**
+     * Goes to a position using FOC (see {@link #setVoltageFOC(double)}).
+     * @param rotations Position of the encoder in rotations
+     * @param feedforward Extra volts
+     */
     public void setPositionFOC(double rotations, double feedforward) {
         var positionSetpoint = new PositionVoltage(rotations / mechanismRatio)
             .withEnableFOC(true)
@@ -350,17 +399,23 @@ public class NAR_TalonFX extends NAR_Motor {
         configs.CurrentLimits.SupplyCurrentLimitEnable = true;
     }
 
+    /** Sets both current limits at once, in amps; see {@link #setStatorLimit} and {@link #setSupplyLimit}. */
     public void setCurrentLimit(int statorLimit, int supplyLimit) {
         setCurrentLimitNoApply(statorLimit, supplyLimit);
         configTalonFX(()-> motor.getConfigurator().apply(configs.CurrentLimits));
     }
 
+    /** Stores both current limits, without sending them yet. */
     public void setCurrentLimitNoApply(int statorLimit, int supplyLimit) {
         configs.CurrentLimits.StatorCurrentLimit = statorLimit;
         configs.CurrentLimits.StatorCurrentLimitEnable = true;
         configs.CurrentLimits.SupplyCurrentLimit = supplyLimit;
         configs.CurrentLimits.SupplyCurrentLimitEnable = true;
     }
+
+    // optimizeBusUtilization() turns off every signal whose rate hasn't been set, so each of these
+    // only keeps the signals it lists. For example, a POSITION motor stops reporting its speed,
+    // current and temperature, and reading them gives their last reported values.
 
     @Override
     public void setDefaultStatusFrames() {
@@ -391,12 +446,14 @@ public class NAR_TalonFX extends NAR_Motor {
 		configTalonFX(()-> motor.optimizeBusUtilization());
 	}
 
+    /** Always RUNNING for now; it doesn't check whether the Talon is connected. */
     @Override
     public NarwhalDashboard.State getState() {
         return NarwhalDashboard.State.RUNNING;
     }
 
 
+    /** The Phoenix 6 {@code TalonFX}, for anything this class doesn't cover. */
     public TalonFX getMotor() {
         return motor;
     }

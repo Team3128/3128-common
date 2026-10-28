@@ -20,7 +20,14 @@ import common.utility.Log;
 import edu.wpi.first.util.function.BooleanConsumer;
 
 /**
- * Team 3128's {@link WebSocketServer} class, used to log robot data and select autos
+ * The server for NarwhalDashboard, Team 3128's own web dashboard. It sends robot data to the
+ * dashboard page, receives its button presses, and holds the list of autos to pick from.
+ *
+ * <p>It runs a WebSocket server on the robot (port 5805). Robot code registers values to show
+ * with {@link #addUpdate} and buttons with {@link #addButton}; the dashboard connects and
+ * exchanges JSON messages with it.
+ *
+ * <p>The server starts the first time {@link #getInstance()} is called.
  * @since Deep Space 2019
  * @author Mason Lam
  */
@@ -40,12 +47,14 @@ public class NarwhalDashboard extends WebSocketServer implements AutoCloseable {
 
     private static int PORT = 5805;
 
+    /** How a part of the robot is doing, shown as a colored light on the dashboard. */
     public enum State {
         RUNNING,
         PARTIALLY_RUNNING,
         DISCONNECTED
     }
 
+    /** The one dashboard server, started the first time this is called. */
     public static synchronized NarwhalDashboard getInstance() {
         if (instance == null) {
             startServer();
@@ -271,6 +280,7 @@ public class NarwhalDashboard extends WebSocketServer implements AutoCloseable {
         buttons.get(key).accept(down);
     }
 
+    /** Shows how a part of the robot is doing, e.g. a motor's {@code getState()}, as a light named {@code name}. */
     public void checkState(String name, Supplier<State> state) {
         addUpdate(name, ()-> state.get().toString());
     }

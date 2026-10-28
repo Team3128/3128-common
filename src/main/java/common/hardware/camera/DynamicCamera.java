@@ -25,11 +25,33 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.wpilibj.RobotBase;
 import org.photonvision.targeting.PhotonPipelineResult;
 
+/**
+ * A PhotonVision camera that spots AprilTags and works out where the robot is on the field.
+ *
+ * <p>Every loop, {@link #periodic()} reads each camera's new results, throws out targets that are
+ * too far, too close or too uncertain, works out the robot's position, and passes it to the
+ * drivetrain to blend into its odometry:
+ *
+ * <pre>{@code
+ * frontCamera = new DynamicCamera("FRONT",
+ *     new Transform3d(0.3, 0, 0.5, new Rotation3d(0, Math.toRadians(-20), 0)), // where it is on the robot
+ *     AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltWelded),
+ *     (pose, time) -> swerve.addVisionMeasurement(pose, time));
+ * }</pre>
+ *
+ * <p>A camera on a turret is "dynamic": use the constructor that takes the turret's position and
+ * angle, and it follows the turret as it turns.
+ *
+ * <p>In simulation, each camera sees simulated AprilTags from wherever the robot is (see
+ * {@link #updateSimulation(Pose2d)}), so vision code can be tested without a robot.
+ */
 public class DynamicCamera {
 
-    //static variables
+    /** Every camera created; {@link #periodic()} reads them all. */
     public static final LinkedList<DynamicCamera> dynamicCameras = new LinkedList<DynamicCamera>();
+    /** Whether {@link #periodic()} reads the cameras at all. */
     public static boolean enabled = true;
+    // These show on Shuffleboard but nothing updates them yet, so they keep their starting values
     public boolean withinDist = true;
     public Pose2d estimatedPose = new Pose2d();
     public Pose3d cameraPose = new Pose3d();
@@ -51,18 +73,30 @@ public class DynamicCamera {
     private static VisionSystemSim visionSim;
     private PhotonCameraSim cameraSim;
 
-    //dynamic camera related variables
     private final PhotonCamera photonCamera;
     private final PhotonPoseEstimator poseEstimator;
+    /** Gets each pose estimate and when it was taken, e.g. the drivetrain's addVisionMeasurement. */
     private final BiConsumer<Pose2d, Double> estConsumer;
+    /** Whether it's on a turret, so it moves relative to the robot. */
     private final boolean isDynamic;
+    // For a camera on a turret: from the turret's pivot to the camera, the robot's center to the
+    // pivot, and the turret's angle
     private Transform3d pivotToCam;
     private Translation3d offset;
     private Supplier<Rotation2d> angularOffset;
+    // Targets outside these limits are thrown out; distances in meters
     private double minDistThreshold = 0, maxDistThreshold = 100, ambiguityThreshold = 0.2;
 
-    // estConsumer sends estimated poses to the SwerveBase where they are factored into the robot's odometry
-    //not dynamic constructor
+    /**
+     * A camera fixed to the robot.
+     *
+     * @param cameraName Its name in PhotonVision
+     * @param robotToCam Where it is from the robot's center (meters, x forward, y left, z up), and
+     *                   which way it points, e.g. pitched down 20 degrees
+     * @param tagLayout Where the AprilTags are on this year's field
+     * @param estConsumer Gets each pose estimate and its timestamp, e.g. the drivetrain's
+     *                    {@code addVisionMeasurement}
+     */
     public DynamicCamera(String cameraName, Transform3d robotToCam, AprilTagFieldLayout tagLayout, BiConsumer<Pose2d, Double> estConsumer) {
         this.photonCamera = new PhotonCamera(cameraName);
         this.poseEstimator = new PhotonPoseEstimator(tagLayout, robotToCam);
@@ -73,8 +107,17 @@ public class DynamicCamera {
         dynamicCameras.add(this);
     }
 
-    //dynamic constructor
-
+    /**
+     * A camera on a turret, so it turns with it.
+     *
+     * @param cameraName Its name in PhotonVision
+     * @param pivotToCam Where it is from the turret's pivot, and which way it points, with the
+     *                   turret facing forward
+     * @param tagLayout Where the AprilTags are on this year's field
+     * @param estConsumer Gets each pose estimate and its timestamp
+     * @param offset Where the turret's pivot is from the robot's center, in meters
+     * @param angularOffset The turret's angle right now, counterclockwise from facing forward
+     */
     public DynamicCamera(String cameraName, Transform3d pivotToCam, AprilTagFieldLayout tagLayout, BiConsumer<Pose2d, Double> estConsumer, Translation3d offset, Supplier<Rotation2d> angularOffset) {
         this.photonCamera = new PhotonCamera(cameraName);
         this.poseEstimator = new PhotonPoseEstimator(tagLayout, pivotToCam);
@@ -90,20 +133,29 @@ public class DynamicCamera {
         dynamicCameras.add(this);
     }
 
+    /**
+     * Reads every camera's new results and sends a pose estimate for each one that has a usable
+     * target. Call it every loop, from {@code robotPeriodic()}.
+     */
     public static void periodic() {
         if (!enabled) return;
-      
-   
+
+
 
 
         for (final DynamicCamera dynamicCamera : dynamicCameras) {
             Optional<EstimatedRobotPose> curEst = Optional.empty();
 
+            // A turret camera has moved since last loop
             if (dynamicCamera.isDynamic) {
                 dynamicCamera.poseEstimator.setRobotToCameraTransform(dynamicCamera.getRobotToCam());
             }
 
+            // A camera can take several pictures between loops; use each one
             for (var result : dynamicCamera.photonCamera.getAllUnreadResults()) {
+                // Throw out targets too uncertain, too close or too far to trust. This only affects
+                // the single-tag estimate: the multi-tag one was already worked out on the camera's
+                // coprocessor from every tag it saw.
                 for (int i = 0; i < result.targets.size(); i++) {
                     if (result.targets.get(i).poseAmbiguity > dynamicCamera.ambiguityThreshold 
                     || result.targets.get(i).bestCameraToTarget.getTranslation().getNorm() < dynamicCamera.minDistThreshold 
@@ -114,7 +166,8 @@ public class DynamicCamera {
                     }                    
                 }
 
-                // prefer the multi-tag estimate, single-tag is only a fallback
+                // Seeing several tags at once pins the robot down much better than one, so use that
+                // when it can, and the clearest single tag otherwise
                 curEst = dynamicCamera.poseEstimator.estimateCoprocMultiTagPose(result);
                 if (curEst.isEmpty()) {
                     curEst = dynamicCamera.poseEstimator.estimateLowestAmbiguityPose(result);
@@ -127,6 +180,15 @@ public class DynamicCamera {
         }
     }
 
+    /**
+     * Sets which targets to trust. Tags far away or seen at a steep angle give less accurate
+     * positions, so it's often better to ignore them.
+     *
+     * @param newMinDistThreshold Ignore tags closer than this, in meters
+     * @param newMaxDistThreshold Ignore tags farther than this, in meters
+     * @param newAmbiguityThreshold Ignore tags whose ambiguity is above this, from 0 (certain) to
+     *                              1 (could be either of two positions); 0.2 is a common choice
+     */
     public void setThresholds(double newMinDistThreshold, double newMaxDistThreshold, double newAmbiguityThreshold) {
         this.minDistThreshold = newMinDistThreshold;
         this.maxDistThreshold = newMaxDistThreshold;
@@ -165,10 +227,12 @@ public class DynamicCamera {
         visionSim.update(robotPose);
     }
 
+    /** Turns vision back on for every camera. */
     public static void enable() {
         enabled = true;
     }
 
+    /** Stops using every camera's estimates, e.g. if they're making the robot's position jump. */
     public static void disable() {
         enabled = false;
     }
@@ -181,6 +245,7 @@ public class DynamicCamera {
         return robotToPivot.plus(pivotToCam);
     }
 
+    /** Adds a Shuffleboard tab for this camera. Most of its values aren't updated yet; see the fields. */
     public void initShuffleboard() {
         NAR_Shuffleboard.addData(photonCamera.getName(), "WithinDist", () -> withinDist, 2, 2, 1, 1);
         NAR_Shuffleboard.addData(photonCamera.getName(), "Estimated Pose X", () -> estimatedPose.getX(), 0, 0, 2, 1);

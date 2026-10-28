@@ -14,17 +14,37 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 
 /**
- * Team 3128's motor class replacement for {@link MotorController}
+ * One motor and its motor controller, whatever the brand. {@link NAR_TalonFX} and
+ * {@link NAR_CANSpark} fill in the details for CTRE and REV hardware, so the rest of the code can
+ * treat every motor the same way.
+ *
+ * <h2>Units</h2>
+ * A motor's encoder counts rotations of the motor. {@link MotorConfig} converts those into units
+ * that make sense for the mechanism, like meters or degrees, so {@link #getPosition()},
+ * {@link #getVelocity()} and {@link #set(double, Control)} all use your units.
+ *
+ * <h2>Settings</h2>
+ * Settings like current limits come in two versions: {@code setStatorLimit} sends the change to
+ * the motor controller right away, and {@code setStatorLimitNoApply} only stores it, so that
+ * {@link #configMotor(MotorConfig)} can send all of them at once with {@link #apply()}.
+ *
+ * <h2>Repeated commands</h2>
+ * {@link #set(double, Control, double)} skips a command identical to the last one, so calling it
+ * every loop with the same setpoint doesn't flood the CAN bus.
+ *
  * @since 2023 Charged Up
  * @author Mason Lam
  */
 public abstract class NAR_Motor implements AutoCloseable {
 
     /**
-     * Store conversion factors for motor
+     * The hardware settings for a motor: what units it measures in, how much current it may
+     * draw, which way is forward, and whether it brakes when stopped.
      */
     public static class MotorConfig {
+        /** Your position units per rotation of the encoder; see the constructor. */
         public final double distanceFactor;
+        /** How many of your time units are in a minute; see the constructor. */
         public final double timeFactor;
         public final int supplyLimit;
         public final int statorLimit;
@@ -34,15 +54,23 @@ public abstract class NAR_Motor implements AutoCloseable {
         public final StatusFrames statusFrames;
 
         /**
-         * Creates a new motor config
-         * @param distanceFactor Factor to multiply distance units by (per rotations) ie. input circumference for distance
-         * @param timeFactor Factor to multiply time units by (per minutes) ie. use 60 for seconds, 1 for minutes
-         * @param statorLimit The currentLimit for the stator
-         * @param supplyLimit The currentLimit for the motor controller
-         * @param voltageCompensation The voltage compensation for the motor
-         * @param inverted Whether or not the motor is inverted.
-         * @param mode Neutral mode for the motor.
-         * @param statusFrames Status frames for the motor.
+         * Creates a motor config.
+         *
+         * @param distanceFactor Your position units per rotation of the encoder, which is usually
+         *                       the motor. For an arm in degrees on a 50:1 gearbox, {@code 360.0 / 50};
+         *                       for an elevator in meters, the meters it rises per motor rotation.
+         * @param timeFactor How many of your time units are in a minute: 60 for speeds per second,
+         *                   1 for per minute.
+         * @param statorLimit Most amps through the motor itself. This limits torque, so it stops
+         *                    mechanisms pushing too hard against hard stops and game pieces.
+         * @param supplyLimit Most amps the motor controller draws from the battery. This protects
+         *                    the battery and breakers.
+         * @param voltageCompensation Volts treated as full power, so output is the same as the
+         *                            battery drains. Usually 12.
+         * @param inverted Whether positive output spins it clockwise instead of counterclockwise,
+         *                 looking at the motor's shaft.
+         * @param mode Whether it brakes or coasts when told to stop.
+         * @param statusFrames How often it reports its position and speed over CAN.
          */
         public MotorConfig(double distanceFactor, double timeFactor, int statorLimit, int supplyLimit, double voltageCompensation, boolean inverted, Neutral mode, StatusFrames statusFrames) {
             this.distanceFactor = distanceFactor;
@@ -55,30 +83,37 @@ public abstract class NAR_Motor implements AutoCloseable {
             this.statusFrames = statusFrames;
         }
 
+        /** A config with a 120 A supply limit. */
         public MotorConfig(double distanceFactor, double timeFactor, int statorLimit, double voltageCompensation, boolean inverted, Neutral mode, StatusFrames statusFrames) {
             this(distanceFactor, timeFactor, statorLimit, 120, voltageCompensation, inverted, mode, statusFrames);
         }
 
+        /** A config with a 120 A supply limit and 12 V compensation. */
         public MotorConfig(double distanceFactor, double timeFactor, int statorLimit, boolean inverted, Neutral mode, StatusFrames statusFrames) {
             this(distanceFactor, timeFactor, statorLimit, 120, 12, inverted, mode, statusFrames);
         }
 
+        /** A config with a 120 A supply limit, 12 V compensation and the default status frames. */
         public MotorConfig(double distanceFactor, double timeFactor, int statorLimit, boolean inverted, Neutral mode) {
             this(distanceFactor, timeFactor, statorLimit, 120, 12, inverted, mode, StatusFrames.DEFAULT);
         }
 
+        /** A copy that spins the other way. */
         public MotorConfig invert() {
             return new MotorConfig(this.distanceFactor, this.timeFactor, this.statorLimit, this.supplyLimit, this.voltageCompensation, !this.inverted, this.mode, this.statusFrames);
         }
 
+        /** A copy for a follower that spins the other way. */
         public MotorConfig invertFollower() {
             return new MotorConfig(this.distanceFactor, this.timeFactor, this.statorLimit, this.supplyLimit, this.voltageCompensation, !this.inverted, this.mode, StatusFrames.FOLLOWER);
         }
 
+        /** A copy for a follower, which reports less often since nothing reads it. */
         public MotorConfig follower() {
             return new MotorConfig(this.distanceFactor, this.timeFactor, this.statorLimit, this.supplyLimit, this.voltageCompensation, this.inverted, this.mode, StatusFrames.FOLLOWER);
         }
 
+        /** Every setting, with what it means, for printing at startup. */
         @Override
         public String toString() {
             // Strings can't change, so concat returns a new one that has to be kept
@@ -95,35 +130,51 @@ public abstract class NAR_Motor implements AutoCloseable {
         }
     }
 
+    /**
+     * How often a motor controller reports over CAN. Reporting only what's used, and only as
+     * often as needed, keeps the CAN bus from getting too busy.
+     */
     public enum StatusFrames {
+        /** Everything at moderate rates. */
         DEFAULT,
+        /** Position often, for mechanisms that move to positions. */
         POSITION,
+        /** Speed often, for flywheels and rollers. */
         VELOCITY,
+        /** Little, since nothing reads a follower. */
         FOLLOWER;
     }
 
     /**
-     * Motor control modes
+     * What {@link #set(double, Control)}'s value means.
      */
     public enum Control {
+        /** A fraction of full power, from -1 to 1. */
         PercentOutput,
+        /** A speed for the motor controller's control loop to hold, in your units. */
         Velocity,
+        /** A position for the motor controller's control loop to go to, in your units. */
         Position;
     }
 
 
     /**
-     * Motor states when no voltage is applied
+     * What a motor does when told to stop.
      */
     public enum Neutral {
+        /** Shorts the motor's windings so it resists turning: stops quickly and holds better. */
         BRAKE,
+        /** Lets it spin freely, e.g. for a flywheel that should slow down on its own. */
         COAST
     }
 
+    /** Motors that other motors copy with {@link #follow(NAR_Motor)}. */
     private static final HashSet<NAR_Motor> leaders = new HashSet<NAR_Motor>();
 
-    
 
+
+    // Followers that can't follow on their motor controller copy their leader's output here,
+    // every 0.1 seconds
     static {
         NAR_Robot.addPeriodic(()-> {
             for (final NAR_Motor leader : leaders) {
@@ -137,18 +188,23 @@ public abstract class NAR_Motor implements AutoCloseable {
 
     private final LinkedList<NAR_Motor> followers = new LinkedList<NAR_Motor>();
     private final int id;
+    // The last command sent, so an identical one can be skipped
     private double prevValue = 0;
     private Control prevMode = Control.PercentOutput;
     private double prevFeedForward = 0;
+    // The range that wraps around, e.g. 0 to 360 degrees, when continuous input is on
     private double minInput;
     private double maxInput;
     private double relativePosition = 0;
     private boolean isContinuous = false;
+    /** Your position units per encoder rotation; {@link MotorConfig#distanceFactor}. */
     protected double unitConversionFactor = 1;
+    /** Your time units per minute; {@link MotorConfig#timeFactor}. */
     protected double timeConversionFactor = 1;
     protected double motorRotationsPerSensorRotation = 1;
-    
 
+
+    /** @param id The motor controller's CAN ID */
     public NAR_Motor(int id){
         this.id = id;
     }
@@ -187,37 +243,39 @@ public abstract class NAR_Motor implements AutoCloseable {
     protected void simulationStep(double dtSeconds) {}
 
     /**
-     * Sets motor output power in volts
-     * @param volts The voltage of the motor from -12 to 12
+     * Drives the motor at a voltage, as a fraction of 12 V.
+     * @param volts From -12 to 12
      */
     public void setVolts(double volts) {
         set(volts / 12.0);
     }
 
     /**
-     * Sets motor output power
-     * @param output The speed of the motor from -1 to 1
+     * Drives the motor at a fraction of full power.
+     * @param output From -1 (full reverse) to 1 (full forward)
      */
     public void set(double output) {
         set(output, Control.PercentOutput);
     }
 
     /**
-     * Sets the motor state
-     * @param value Output of motor dependent on control mode
-     * @param mode Type of control mode
+     * Drives the motor at a power, or has its motor controller go to a position or hold a speed.
+     * @param value A fraction of full power, a position or a speed, depending on {@code mode}
+     * @param mode What {@code value} means
      */
     public void set(double value, Control mode) {
         set(value, mode, 0);
     }
 
     /**
-     * Sets the motor state with feedforward
-     * @param value Output of motor dependent on control mode
-     * @param mode Type of control mode
-     * @param feedForward Feedforward of motor measured in volts
+     * Like {@link #set(double, Control)}, adding volts of feedforward the motor controller can't
+     * work out itself. It sends the volts along with the setpoint every cycle of its loop.
+     * @param value A fraction of full power, a position or a speed, depending on {@code mode}
+     * @param mode What {@code value} means
+     * @param feedForward Extra volts; ignored for {@link Control#PercentOutput}
      */
     public void set(double value, Control mode, double feedForward) {
+        // Sending the same command again changes nothing, and takes up room on the CAN bus
         if (value == prevValue && mode == prevMode && feedForward == prevFeedForward) return;
         prevValue = value;
         prevMode = mode;
@@ -231,6 +289,7 @@ public abstract class NAR_Motor implements AutoCloseable {
                 break;
             case Position:
                 if (isContinuous) {
+                    // Go the short way around, e.g. from 350 to 10 degrees through 0, not back through 180
                     final double position = getRawPosition() * unitConversionFactor;
                     final double errorBound = (maxInput - minInput) / 2.0;
                     final double error = convertInput(value) - convertInput(position);
@@ -244,8 +303,8 @@ public abstract class NAR_Motor implements AutoCloseable {
     }
 
     /**
-     * Configures all major motor settings.
-     * @param config Motor settings.
+     * Applies every setting in {@code config} and sends them to the motor controller together.
+     * Mechanisms call this for each of their motors.
      */
     public void configMotor(MotorConfig config) {
         setUnitConversionFactor(config.distanceFactor);
@@ -275,14 +334,16 @@ public abstract class NAR_Motor implements AutoCloseable {
         Log.debug(Log.Type.MOTOR, "Motor (" + this.id + ")", config.toString());
     }
 
+    /** Sends every stored setting to the motor controller, after the {@code NoApply} methods. */
     public abstract void apply();
 
     /**
-	 * Set the PID values for the controller.
-	 * @param config PIDFFConfig containing kP, kI, and kD values.
+	 * Sends kP, kI and kD to the motor controller exactly as given, in its own units. Mechanisms
+	 * use {@link #configClosedLoop(PIDFFConfig, Control)} instead, which converts from your units.
 	 */
 	public abstract void configPID(PIDFFConfig config);
 
+    /** Stores kP, kI and kD like {@link #configPID(PIDFFConfig)}, without sending them yet. */
     public abstract void configPIDNoApply(PIDFFConfig config);
 
     /**
@@ -308,6 +369,12 @@ public abstract class NAR_Motor implements AutoCloseable {
         configClosedLoop(gains, Control.Position, motorRotationsPerArmRotation);
     }
 
+    /**
+     * Converts gains from your units to the motor controller's. Each motor controller has its own:
+     * a TalonFX measures in rotations and seconds and outputs volts, while a Spark measures in
+     * rotations and minutes and outputs a fraction of 12 V. kI and kD also depend on how often
+     * the motor controller's loop runs.
+     */
     private void configClosedLoop(PIDFFConfig gains, Control mode, double motorRotationsPerArmRotation) {
         // Comes first, since on a TalonFX it changes the motor controller's units
         setMechanismRatio(motorRotationsPerArmRotation > 0 ? motorRotationsPerArmRotation : 1);
@@ -362,22 +429,18 @@ public abstract class NAR_Motor implements AutoCloseable {
         return false;
     }
 
-    /**
-     * Wraps a measurement value to the min and max input
-     * @param value A measurement value
-     * @return The measurement value wrapped by the min and max input
-     */
+    /** Wraps a position into the continuous input range, if continuous input is on. */
     private double convertInput(double value) {
         return isContinuous ? MathUtil.inputModulus(value, minInput, maxInput) : value;
     }
 
-    /** Enables continuous input.
+    /**
+     * Treats {@code minInput} and {@code maxInput} as the same point, like 0 and 360 degrees, for
+     * something that can spin all the way around. Positions are then read within that range, and
+     * position setpoints take the shortest way around.
     *
-    * <p>Rather then using the max and min input range as constraints, the motor considers them to be the
-    * same point and automatically calculates the shortest route to the setpoint.
-    *
-    * @param minInput The minimum value expected from the input.
-    * @param maxInput The maximum value expected from the input.
+    * @param minInput One end of the range, e.g. 0
+    * @param maxInput The other end, e.g. 360
     */
     public void enableContinuousInput(double minInput, double maxInput) {
         this.minInput = Math.min(minInput, maxInput);
@@ -385,77 +448,75 @@ public abstract class NAR_Motor implements AutoCloseable {
         isContinuous = true;
     }
 
-    /**
-     * Changes the units the motor measures position in, ie. rotations degrees
-     * @param conversionFactor Conversion factor to change position units
-     */
+    /** Sets your position units per encoder rotation; see {@link MotorConfig#distanceFactor}. */
     public void setUnitConversionFactor(double conversionFactor) {
         this.unitConversionFactor = conversionFactor;
     }
 
-    /**
-     * Changes the units the motor measures time/velocity in, ie. rotations per minute rotations per second
-     * @param conversionFactor Conversion factor to change time units
-     */
+    /** Sets how many of your time units are in a minute; see {@link MotorConfig#timeFactor}. */
     public void setTimeConversionFactor(double conversionFactor) {
         this.timeConversionFactor = conversionFactor;
     }
 
     /**
-     * Resets the motor position
-     * @param position Motor position, default units - rotations
+     * Tells the encoder where it is now, e.g. 0 when the mechanism is against its starting hard stop.
+     * @param position In your units
      */
     public void resetPosition(double position) {
         resetRawPosition(position / unitConversionFactor);
     }
 
     /**
-     * Sets the motor inverted
-     * @param inverted Inverts the motor
+     * Sets which way it spins for positive output.
+     * @param inverted True for clockwise, looking at the shaft; false for counterclockwise
      */
     public abstract void setInverted(boolean inverted);
 
+    /** Stores the inversion like {@link #setInverted(boolean)}, without sending it yet. */
     public abstract void setInvertedNoApply(boolean inverted);
 
     /**
-     * Sets motor output power
-     * @param speed The speed of the motor from -1 to 1
+     * Drives the motor at a fraction of full power.
+     * @param speed From -1 to 1
      */
     protected abstract void setPercentOutput(double speed);
 
     /**
-     * Sets the motor output based on its velocity
-     * @param rpm Velocity of the motor in RPM
-     * @param feedForward Feedforward component measured in volts
+     * Has the motor controller hold a speed.
+     * @param rpm Speed of the encoder in rotations per minute
+     * @param feedForward Extra volts
      */
     protected abstract void setVelocity(double rpm, double feedForward);
 
     /**
-     * Sets motor output based on its position
-     * @param rotations Position of the motor in rotations
-     * @param feedForward Feedforward component measured in volts
+     * Has the motor controller go to a position.
+     * @param rotations Position of the encoder in rotations
+     * @param feedForward Extra volts
      */
     protected abstract void setPosition(double rotations, double feedForward);
 
+    /** Marks the current position as 0 for {@link #getRelativePosition()}, without changing the encoder. */
     public void resetRelativePosition() {
         this.relativePosition = getPosition();
     }
 
     /**
-     * Resets the motor position
-     * @param rotations Number of rotations
+     * Tells the encoder where it is now.
+     * @param rotations Position of the encoder in rotations
      */
     protected abstract void resetRawPosition(double rotations);
 
     /**
-     * Gets the motors current output
-     * @return Double measuring percent output from -1 to 1
+     * What the motor controller is putting out right now.
+     * @return A fraction of full power, from -1 to 1
      */
     public abstract double getAppliedOutput();
 
     /**
-     * Returns the current going to the motor, increasing values means the motor is stalling
-     * @return Double measuring the stall current of the motor
+     * Amps through the motor itself, its stator current. It jumps up when the motor is pushing
+     * hard without moving, e.g. against a hard stop or holding a game piece, which makes it handy
+     * for detecting those.
+     * @return Amps
      */
     public abstract double getStallCurrent();
 
@@ -481,47 +542,45 @@ public abstract class NAR_Motor implements AutoCloseable {
     }
 
     /**
-     * Returns the current motor position, default unit - rotations
-     * @return Double measuring motor position
+     * Where the encoder is, in your units, wrapped into the continuous input range if that's on.
      */
     public double getPosition() {
         final double position = getRawPosition() * unitConversionFactor;
         return convertInput(position);
     }
 
+    /** Position since the last {@link #resetRelativePosition()}, in your units. */
     public double getRelativePosition() {
         return getPosition() - this.relativePosition;
     }
 
     /**
-     * Returns the current motor velocity, default unit - RPM
-     * @return Double measuring motor velocity
+     * How fast the encoder is turning, in your units, e.g. meters per second.
      */
     public double getVelocity() {
         return getRawVelocity() * unitConversionFactor / timeConversionFactor;
     }
 
     /**
-     * Returns the motor position in rotations
-     * @return Double measuring motor position
+     * Where the encoder is, in rotations.
      */
     protected abstract double getRawPosition();
 
     /**
-     * Returns the current motor velocity in RPM
-     * @return Double measuring motor velocity
+     * How fast the encoder is turning, in rotations per minute.
      */
     protected abstract double getRawVelocity();
 
     /**
-     * Returns the Motor's temperature in celsius.
-     * @return The temperature in celsius.
+     * The motor's temperature in degrees Celsius. Motors slow down to protect themselves when
+     * they get too hot, usually around 100.
      */
     public abstract double getTemperature();
 
     /**
-     * Sets a motor's output based on the leader's
-     * @param leader The motor to follow
+     * Makes this motor copy {@code leader}'s output, from robot code every 0.1 seconds. Prefer
+     * {@link #followOnController(NAR_Motor, boolean)}, which is instant; mechanisms use it for you.
+     * @param leader The motor to copy
      */
     public void follow(NAR_Motor leader) {
         leader.followers.add(this);
@@ -531,9 +590,9 @@ public abstract class NAR_Motor implements AutoCloseable {
     }
 
     /**
-     * Sets a motor's output based on the leader's
-     * @param leader The motor to follow
-     * @param config Motor settings
+     * Like {@link #follow(NAR_Motor)}, also applying {@code config} with follower status frames.
+     * @param leader The motor to copy
+     * @param config Settings for this motor
      */
     public void follow(NAR_Motor leader, MotorConfig config) {
         leader.followers.add(this);
@@ -542,9 +601,8 @@ public abstract class NAR_Motor implements AutoCloseable {
     }
 
     /**
-     * Sets the motor's idle mode, its behavior when no voltage is applied
-     * Followers will follow the leader's idle mode
-     * @param mode Type of idle mode
+     * Sets whether it brakes or coasts when told to stop. Motors following it with
+     * {@link #follow(NAR_Motor)} get the same setting.
      */
     public void setNeutralMode(Neutral mode) {
         switch(mode) {
@@ -558,6 +616,7 @@ public abstract class NAR_Motor implements AutoCloseable {
         followers.forEach(follower -> follower.setNeutralMode(mode));
     }
 
+    /** Stores the neutral mode like {@link #setNeutralMode(Neutral)}, without sending it yet. */
     public void setNeutralModeNoApply(Neutral mode) {
         switch (mode) {
             case BRAKE:
@@ -570,73 +629,66 @@ public abstract class NAR_Motor implements AutoCloseable {
         followers.forEach(follower -> follower.setNeutralModeNoApply(mode));
     }
 
-    /**
-     * Sets the motor in brake mode
-     */
+    /** Makes it brake when stopped. */
     protected abstract void setBrakeMode();
 
     protected abstract void setBrakeModeNoApply();
 
-    /**
-     * Sets the motor in coast mode
-     */
+    /** Makes it coast when stopped. */
     protected abstract void setCoastMode();
 
     protected abstract void setCoastModeNoApply();
 
     /**
-     * Sets voltage compensation, keeps output consistent when battery is above x volts
-     * @param volts The max volts the motor goes too
+     * Sets the volts treated as full power, so the same output gives the same push as the battery
+     * drains, as long as the battery stays above it.
+     * @param volts Usually 12
      */
     public abstract void enableVoltageCompensation(double volts);
 
+    /** Stores the voltage compensation, without sending it yet. */
     public abstract void enableVoltageCompensationNoApply(double volts);
 
     /**
-	 * Sets the stator limit in Amps.
-	 * @param limit The current limit in Amps.
+	 * Sets the most amps through the motor itself, which limits its torque. Handy for pushing
+	 * gently against a hard stop or holding a game piece without crushing it.
+	 * @param limit Amps
 	 */
     public abstract void setStatorLimit(int limit);
 
+    /** Stores the stator limit, without sending it yet. */
     public abstract void setStatorLimitNoApply(int limit);
 
     /**
-	 * Sets the supply limit in Amps.
-	 * @param limit The current limit in Amps.
+	 * Sets the most amps the motor controller draws from the battery, to protect the battery and
+	 * breakers and avoid brownouts.
+	 * @param limit Amps
 	 */
     public abstract void setSupplyLimit(int limit);
 
+    /** Stores the supply limit, without sending it yet. */
     public abstract void setSupplyLimitNoApply(int limit);
 
     /**
-	 * Returns motor and motor controller functionality.
-	 * @return State of the motor controller and motor.
+	 * Whether the motor controller is connected and working, for the dashboard.
 	 */
     public abstract NarwhalDashboard.State getState();
 
-    /**
-     * Set the status frame rate to Team 3128's defaults
-     */
+    /** Reports at the team's default rates. */
     public abstract void setDefaultStatusFrames();
 
-    /**
-     * Set the status frame rate to Team 3128's for a position motor
-     */
+    /** Reports position often, for a mechanism that moves to positions. */
     public abstract void setPositionStatusFrames();
 
-    /**
-     * Set the status frame rate to Team 3128's for a velocity motor
-     */
+    /** Reports speed often, for a flywheel or roller. */
     public abstract void setVelocityStatusFrames();
 
-    /**
-     * Set the status frame rate to Team 3128's for a follower motor
-     */
+    /** Reports little, for a follower nothing reads. */
     public abstract void setFollowerStatusFrames();
 
     /**
-     * Returns the motor object controlling the motion
-     * @return The motor ie. SparkMax, TalonFX
+     * The vendor's own motor object, e.g. a {@code TalonFX} or {@code SparkMax}, for anything this
+     * class doesn't cover. Cast it to the right type.
      */
     public abstract Object getMotor();
 }

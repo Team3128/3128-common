@@ -29,29 +29,49 @@ import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 import static edu.wpi.first.wpilibj2.command.Commands.*;
 
 /**
- * Base class for a mechanism that drives its motors to a setpoint.
+ * What every mechanism has in common: one or more motors, driven to a setpoint, with logging,
+ * Shuffleboard tuning widgets and a safety timeout.
  *
- * <p>The control loop can run in one of two places:
+ * <p>You'll usually use one of its subclasses instead of this class itself:
+ * {@link LinearMechanism} for elevators and sliders, {@link PivotMechanism} for arms, wrists,
+ * hoods and turrets, and {@link RollerMechanism} for intakes and flywheels.
+ *
+ * <h2>Using a mechanism</h2>
  * <ul>
- * <li><b>On the motor controller</b> (the usual choice): the TalonFX or Spark runs PID at 1 kHz
- *     on its own encoder, e.g. Phoenix {@code PositionVoltage} or {@code VelocityVoltage}.
- *     Gains are given in this mechanism's units and converted for the motor controller.
+ * <li>{@link #setSetpoint(double)} moves it to a position or speed, in its own units (set by
+ *     {@code MotorConfig}), and keeps it there.</li>
+ * <li>{@link #run(double)} and {@link #runVolts(double)} drive it directly, without a setpoint.</li>
+ * <li>{@link #stop()} stops it; {@link #reset()} tells it it's at its starting position, e.g.
+ *     when it's against a hard stop.</li>
+ * </ul>
+ *
+ * <h2>Where the control loop runs</h2>
+ * A control loop measures the mechanism, compares it with the setpoint, and works out the volts
+ * to send (see {@link PIDFFConfig} for the gains). It can run in one of two places:
+ * <ul>
+ * <li><b>On the motor controller</b>, the usual choice. The TalonFX or Spark runs PID and
+ *     feedforward 1000 times a second on its own encoder, 50 times faster than robot code runs.
+ *     Gains are given in the mechanism's units and converted for the motor controller.
  *     <pre>{@code super(gains, Control.Position, TOLERANCE, HOME, MOTOR_CONFIG, motor);}</pre></li>
- * <li><b>On the roboRIO</b>, with a WPILib controller such as a {@code BangBangController},
- *     or when the measurement doesn't come from the motor's encoder, e.g. a gyro or camera.
- *     The controller is a pure {@code (measurement, setpoint) -> volts} calculator:
+ * <li><b>On the roboRIO</b>, for a WPILib controller like a {@code BangBangController}, or when the
+ *     measurement doesn't come from the motor's encoder, e.g. a gyro or camera. The controller
+ *     works out volts from {@code (measurement, setpoint)}:
  *     <pre>{@code super(gains, pid::calculate, m -> pid.reset(), gyro::getAngle, TOLERANCE, HOME, MOTOR_CONFIG, motor);}</pre></li>
  * </ul>
  *
- * <p>On the motor controller, feedforward runs there too: kS, kV, and kG either constant or
- * times the cosine of an arm's angle (see {@link #useArmGravity(double)}). On the roboRIO,
- * subclasses work it out in {@link #calculateFeedforward(double)}.
+ * <p>Anything the motor controller can't work out itself, like gravity on a wrist that depends on
+ * the arm it's on, goes in {@link #calculateFeedforward(double)}, which runs on the roboRIO and is
+ * sent along with each setpoint.
  *
- * <p>When several motors drive one mechanism, the first is the leader and the rest follow it
- * on the motor controller where possible. Only the leader runs the control loop.
+ * <h2>Several motors</h2>
+ * When several motors drive one mechanism, the first is the leader and the rest follow it on the
+ * motor controller where possible. Only the leader runs the control loop.
  *
- * <p>Every loop, the setpoint, measurement, volts, and each motor's current and temperature are
+ * <h2>Logging and 3D</h2>
+ * Every loop, the setpoint, measurement, volts, and each motor's current and temperature are
  * logged under {@code Mechanisms/<name>} in NetworkTables, for AdvantageScope.
+ * {@link #getComponentPose()} gives where its moving part is for AdvantageScope's 3D view, and
+ * {@link #setParent(MechanismBase)} mounts it on another mechanism, e.g. a wrist on an arm.
  */
 public abstract class MechanismBase extends SubsystemBase {
 
@@ -251,6 +271,10 @@ public abstract class MechanismBase extends SubsystemBase {
         return 0;
     }
 
+    /**
+     * Runs every robot loop (50 times a second). While a setpoint is active, it sends the setpoint
+     * to the motors, checks the safety timeout, and stops if it should once there. It always logs.
+     */
     @Override
     public void periodic() {
         if (enabled) {
@@ -268,6 +292,7 @@ public abstract class MechanismBase extends SubsystemBase {
                 }
             }
 
+            // Gives up if it hasn't been at the setpoint for too long, e.g. because it's jammed
             if (safetyTimer.hasElapsed(safetyThresh)) onSafetyTimeout();
             if (atSetpoint()) {
                 safetyTimer.restart();
@@ -284,25 +309,24 @@ public abstract class MechanismBase extends SubsystemBase {
     }
 
     /**
-     * Returns the MotorConfig object controlling the subsystem
-     *
-     * @return The MotorConfig
+     * The hardware settings every motor got: gearing, current limit, inversion and brake mode.
      */
     public MotorConfig getMotorConfig() {
         return motorConfig;
     }
 
     /**
-     * Sets the safetyThreshold to disable PID if setpoint is not reached
-     * @param timeSeconds The time in seconds for the safety threshold
+     * Sets how long it can go without being at its setpoint before it gives up and stops,
+     * e.g. because it's jammed. The clock restarts every time it reaches the setpoint.
+     * @param timeSeconds How long, in seconds; 5 by default
      */
     public void setSafetyThresh(double timeSeconds) {
         safetyThresh = timeSeconds;
     }
 
     /**
-     * Called when the safety timeout is reached.
-     * Disables the PID control and stops the motors.
+     * Called when the safety timeout runs out. Logs a warning and stops the motors. Override it
+     * to do something else.
      */
     public void onSafetyTimeout(){
         Log.unusual(getName(), "Safety Timeout Reached");
@@ -310,9 +334,11 @@ public abstract class MechanismBase extends SubsystemBase {
     }
 
     /**
-     * Sets the setpoint for the subsystem.
+     * Moves to {@code setpoint} and keeps the control loop running. It's limited to the range from
+     * {@link #setInputRange(double, double)}. While the Shuffleboard DEBUG switch is on, the
+     * Debug_Setpoint box is used instead.
      *
-     * @param setpoint the setpoint for the subsystem
+     * @param setpoint A position or speed, in this mechanism's units
      */
     public void setSetpoint(double setpoint) {
         enable();
@@ -321,14 +347,17 @@ public abstract class MechanismBase extends SubsystemBase {
         NAR_Shuffleboard.addData(getName(), "AtSetpoint", false, 1, 0);
     }
 
+    /**
+     * A command that calls {@link #setSetpoint(double)} and finishes right away, without waiting
+     * to get there. Follow it with {@code waitUntil(mechanism::atSetpoint)} to wait.
+     */
     public Command setSetpointCommand(double setpoint) {
         return runOnce(() -> setSetpoint(setpoint));
     }
 
     /**
-     * Sets whether PID control disables itself (stopping the motors) once
-     * {@link #atSetpoint()} is true. Defaults to true; set to false for mechanisms that must keep
-     * holding position, e.g. an elevator.
+     * Sets whether it stops once {@link #atSetpoint()} is true. Defaults to true, which suits a
+     * roller; set it to false for mechanisms that must keep holding, e.g. an elevator.
      */
     public void setDisableAtSetpoint(boolean disableAtSetpoint) {
         this.disableAtSetpoint = disableAtSetpoint;
@@ -343,25 +372,21 @@ public abstract class MechanismBase extends SubsystemBase {
         inputMax = max;
     }
 
-    /**
-     * Returns the current setpoint of the subsystem.
-     *
-     * @return The current setpoint
-     */
+    /** The last setpoint, after limiting it to the input range. */
     public double getSetpoint() {
         return setpointValue;
     }
 
-    /**
-     * Returns true if subsystem is at setpoint, false if not
-     *
-     * @return If subsystem is at setpoint
-     */
+    /** Whether the measurement is within the tolerance of the setpoint. */
     public boolean atSetpoint() {
         return Math.abs(measurement.getAsDouble() - setpointValue) < tolerance;
     }
 
-    /** Enables the PID control. Resets the controller if it was previously disabled. */
+    /**
+     * Starts the control loop, without changing the setpoint. {@link #setSetpoint(double)} calls
+     * this for you. A roboRIO controller is reset first if the loop wasn't already running, so it
+     * doesn't start with old leftovers like a built-up kI.
+     */
     public void enable() {
         if (controllerMode == null) {
             requireNonNullParam(feedback, "feedback", "MechanismBase.enable");
@@ -372,7 +397,7 @@ public abstract class MechanismBase extends SubsystemBase {
         Log.debug(Log.Type.CONTROLLER, getName(), "Enabled PID");
     }
 
-    /** Disables the PID control. If it was running, also stops the motors so they don't hold their last output. */
+    /** Stops the control loop. If it was running, the motors stop too, so they don't keep their last output. */
     public void disable() {
         if (enabled) {
             for (NAR_Motor motor : commandedMotors) {
@@ -383,19 +408,15 @@ public abstract class MechanismBase extends SubsystemBase {
         Log.debug(Log.Type.CONTROLLER, getName(), "Disabled PID");
     }
 
-    /**
-     * Returns whether the controller is enabled.
-     *
-     * @return Whether the controller is enabled.
-     */
+    /** Whether the control loop is running. */
     public boolean isEnabled() {
         return enabled;
     }
 
     /**
-     * Sets power to motors. Disables PID control.
+     * Drives the motors at a fraction of full power, stopping the control loop.
      *
-     * @param power The power to set the motors to between -1 and 1.
+     * @param power From -1 (full reverse) to 1 (full forward)
      */
     public void run(double power) {
         disable();
@@ -404,20 +425,16 @@ public abstract class MechanismBase extends SubsystemBase {
         }
     }
 
-    /**
-     * Sets power to motors.
-     *
-     * @param power The power to set the motors to between -1 and 1.
-     * @return Command to run power
-     */
+    /** A command that calls {@link #run(double)} and finishes right away; the motors keep running. */
     public Command runCommand(double power) {
         return runOnce(() -> run(power));
     }
 
     /**
-     * Sets voltage to motors. Disables PID control.
+     * Drives the motors at a voltage, stopping the control loop. Unlike {@link #run(double)}, the
+     * motor gets the same push however charged the battery is.
      *
-     * @param volts The voltage to set the motors to.
+     * @param volts From -12 to 12
      */
     public void runVolts(double volts) {
         disable();
@@ -426,40 +443,31 @@ public abstract class MechanismBase extends SubsystemBase {
         }
     }
 
-    /**
-     * Sets voltage to motors.
-     *
-     * @param volts The voltage to set the motors to.
-     */
+    /** A command that calls {@link #runVolts(double)} and finishes right away; the motors keep running. */
     public Command runVoltsCommand(double volts) {
         return runOnce(() -> runVolts(volts));
     }
 
-    /**
-     * Stops all motors.
-     */
+    /** Stops the control loop and the motors. */
     public void stop() {
         disable();
         run(0);
     }
 
     /**
-     * Resets every motor's position to the {@code resetPosition} given at construction.
+     * Tells the mechanism it's at its starting position, e.g. after pushing it against a hard
+     * stop, by setting every motor's encoder to the {@code resetPosition} given at construction.
      */
     public void reset() {
         reset(resetPosition);
     }
 
-    /**
-     * Resets every motor's position to the {@code resetPosition} given at construction.
-     */
+    /** A command that calls {@link #reset()}, e.g. for a re-zero button. */
     public Command resetCommand() {
         return runOnce(this::reset);
     }
 
-    /**
-     * Resets every motor's position to {@code position}.
-     */
+    /** Sets every motor's encoder to {@code position}, stopping the control loop. */
     public void reset(double position) {
         disable();
         for (NAR_Motor motor : motors) {
@@ -467,36 +475,22 @@ public abstract class MechanismBase extends SubsystemBase {
         }
     }
 
-    /**
-     * Resets every motor's position to {@code position}.
-     */
+    /** A command that calls {@link #reset(double)}. */
     public Command resetCommand(double position) {
         return runOnce(() -> reset(position));
     }
 
-    /**
-     * Get the position of the mechanism relative to its reset.
-     *
-     * @return The position of the first motor.
-     */
+    /** Where it is, in its own units, measured by the leader's encoder. */
     public double getPosition() {
         return motors[0].getPosition();
     }
 
-    /**
-     * Get the velocity of the mechanism.
-     *
-     * @return The velocity of the first motor.
-     */
+    /** How fast it's moving, in its own units, measured by the leader's encoder. */
     public double getVelocity() {
         return motors[0].getVelocity();
     }
 
-    /**
-     * Get the volts applied to the mechanism
-     *
-     * @return The volts applied to the first motor.
-     */
+    /** The volts the leader is putting out right now, from -12 to 12. */
     public double getVolts() {
         return motors[0].getAppliedOutput() * MAX_VOLTS;
     }
@@ -549,6 +543,13 @@ public abstract class MechanismBase extends SubsystemBase {
         return Pose3d.kZero;
     }
 
+    /**
+     * A SysId routine that drives the mechanism with rising and stepped voltages and records how
+     * it responds, so WPILib's SysId tool can work out its kS, kV, kA and kG. Give it room to move!
+     *
+     * @param rampRate Volts per second for the slowly rising test
+     * @param stepVoltage Volts for the sudden-step test
+     */
     public Command characterization(double rampRate, double stepVoltage) {
        NAR_SysIdCommand characterize = new NAR_SysIdCommand(rampRate, stepVoltage, (v) -> runVolts(v.in(Volts)), this, motors[0]);
        return characterize.runSysId();
@@ -562,6 +563,11 @@ public abstract class MechanismBase extends SubsystemBase {
         NAR_Shuffleboard.addSendable(getName(), "PID_Controller", controller, x, y, width, height).withWidget(BuiltInWidgets.kPIDController);
     }
 
+    /**
+     * Adds a Shuffleboard tab for tuning: the setpoint and measurement with graphs, boxes to type
+     * the feedforward gains, and buttons to run it. Turn on the DEBUG switch to use the buttons
+     * and the Debug_Setpoint box; while it's on, the box overrides every setpoint.
+     */
     public void initShuffleboard() {
         NAR_Shuffleboard.addData(getName(), "Enabled", this::isEnabled, 0, 0);
         NAR_Shuffleboard.addData(getName(), "AtSetpoint", this::atSetpoint, 1, 0);
@@ -580,6 +586,7 @@ public abstract class MechanismBase extends SubsystemBase {
         NAR_Shuffleboard.addCommand(getName(), "Enable", either(startEnd(() -> setSetpoint(debugSetpoint.getAsDouble()), this::disable), print("DEBUG NOT ON"), debug), 4, 0);
     }
 
+    /** A box and button to run it at a voltage, for testing direction and wiring. */
     private void runVoltsWidgets(BooleanSupplier debug, int x, int y) {
         final DoubleSupplier debugVoltage = NAR_Shuffleboard.debug(getName(), "Debug Volts", 0, x + 6, y + 3);
         NAR_Shuffleboard.addCommand(getName(), "Run Volts", either(startEnd(() -> runVolts(debugVoltage.getAsDouble()), this::stop), print("DEBUG NOT ON"), debug), x + 7, y + 3);
@@ -587,6 +594,7 @@ public abstract class MechanismBase extends SubsystemBase {
         NAR_Shuffleboard.addData(getName(), "Voltage", this::getVolts, x + 4, y + 3);
     }
 
+    /** Boxes for the feedforward gains, which the gains then read from, and a SysId button. */
     private void FFWidgets(int x, int y) {
         gains.setkS(NAR_Shuffleboard.debug(getName(), "kS", gains.getkS(), x, y + 2));
         gains.setkV(NAR_Shuffleboard.debug(getName(), "kV", gains.getkV(), x + 1, y + 2));

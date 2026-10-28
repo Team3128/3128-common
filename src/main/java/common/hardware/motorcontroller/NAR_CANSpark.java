@@ -42,7 +42,20 @@ import java.util.function.Supplier;
 import static common.hardware.motorcontroller.MotorControllerConstants.*;
 
 /**
- * Team 3128's streamlined {@link SparkBase} class.
+ * A REV Spark MAX or Spark Flex motor controller, which drives NEO, NEO 550 and NEO Vortex
+ * motors, using REVLib.
+ *
+ * <p>Every setting is kept in one {@code SparkBaseConfig}. Changing a setting updates it and sends
+ * it to the Spark without saving it; {@code NAR_Robot} saves every Spark's settings to flash once
+ * after startup, as REV recommends (see {@link #burnFlash()}).
+ *
+ * <p>The Spark's own control loops measure in rotations and rotations per minute, output a
+ * fraction of 12 V, and run every millisecond. {@link NAR_Motor} converts gains and setpoints to
+ * and from your units.
+ *
+ * <p>It can read either the motor's built-in encoder or an absolute encoder plugged into the
+ * Spark; see {@link EncoderType}.
+ *
  * @since 2023 Charged Up
  * @author Mason Lam
  */
@@ -50,12 +63,15 @@ public class NAR_CANSpark extends NAR_Motor {
 
 	private static int numFailedConfigs = 0;
 
+	/** How many times to try sending settings before giving up. */
 	public static int maximumRetries = 5;
 
+	/** Every Spark created, so they can all be saved to flash at once. */
 	public static final LinkedList<NAR_CANSpark> instances = new LinkedList<NAR_CANSpark>();
 
 	/**
-	 * Flashes all spark max's
+	 * Saves every Spark's settings to flash; see {@link #burnFlash()}. {@code NAR_Robot} calls
+	 * this once after {@code robotInit}.
 	 */
 	public static void burnFlashAll() {
 		for (final NAR_CANSpark spark : instances) {
@@ -64,14 +80,15 @@ public class NAR_CANSpark extends NAR_Motor {
 	}
 
 	/**
-	 * @return The number of failed configurations of the motor.
+	 * @return How many settings, across every Spark, never got through after all the retries.
 	 */
 	public static int getNumFailedConfigs() {
 		return numFailedConfigs;
 	}
 
 	/**
-	 * Team 3128's status frames
+	 * How often each of the Spark's status frames is sent, in milliseconds. Each frame carries
+	 * different data, e.g. frame 1 has velocity and frame 2 has position.
 	 */
 	public enum NAR_SparkMaxConfig {
 		DEFAULT(HIGH_PRIORITY, HIGH_PRIORITY, HIGH_PRIORITY, NO_PRIORITY, NO_PRIORITY, NO_PRIORITY, NO_PRIORITY),
@@ -93,18 +110,25 @@ public class NAR_CANSpark extends NAR_Motor {
 		}
 	}
 	/**
-	 * Type of encoder used
+	 * Which encoder the Spark reads.
 	 */
     public enum EncoderType {
+		/** The motor's built-in encoder. It starts at 0 every time the robot turns on. */
 		Relative,
+		/**
+		 * An absolute encoder, like a REV Through Bore, plugged into the Spark. It knows where it
+		 * is as soon as the robot turns on, from 0 to 1 rotation.
+		 */
 		Absolute
 	}
 
 	/**
-	 * Type of controller used
+	 * Which Spark it is.
 	 */
 	public enum ControllerType {
+		/** A Spark MAX, usually driving a NEO or NEO 550. */
 		CAN_SPARK_MAX,
+		/** A Spark Flex, usually driving a NEO Vortex. */
 		CAN_SPARK_FLEX
 	}
 	
@@ -144,6 +168,7 @@ public class NAR_CANSpark extends NAR_Motor {
 
 		motor.setCANMaxRetries(0);
 		configSpark(()-> motor.clearFaults());
+		// Safe settings until a mechanism's MotorConfig replaces them
 		enableVoltageCompensationNoApply(12.0);
 		setStatorLimitNoApply(motorType == MotorType.kBrushless ? NEO_STATOR_CurrentLimit : NEO_STATOR_550CurrentLimit);
 		setSupplyLimitNoApply(motorType == MotorType.kBrushless ? NEO_SUPPLY_CurrentLimit : NEO_SUPPLY_550CurrentLimit);
@@ -152,7 +177,9 @@ public class NAR_CANSpark extends NAR_Motor {
 
 		relativeEncoder = motor.getEncoder();
 		if (encoderType == EncoderType.Relative) {
-			//No clue what this does, but Mechanical Advantage does this so it must be good
+			// The Spark works out speed by averaging encoder readings. REV's defaults average over a
+			// long time, so the speed it reports lags tens of milliseconds behind the real one;
+			// these, from Mechanical Advantage, cut the lag
 			config.encoder.uvwAverageDepth(2);
 			config.encoder.uvwMeasurementPeriod(10);
 		}
@@ -268,18 +295,11 @@ public class NAR_CANSpark extends NAR_Motor {
 	}
 
 	/**
-	 * Sets the current limit in Amps.
+	 * Sets REV's "smart current limit": the Spark lowers its output to keep the motor's current
+	 * under this. NEOs draw huge spikes without one, which can damage the motor and the Spark, so
+	 * always set it.
 	 *
-	 * <p>The motor controller will reduce the controller voltage output to avoid surpassing this
-	 * limit. This limit is enabled by default and used for brushless only. This limit is highly
-	 * recommended when using the NEO brushless motor.
-	 *
-	 * <p>The NEO Brushless Motor has a low internal resistance, which can mean large current spikes
-	 * that could be enough to cause damage to the motor and controller. This current limit provides a
-	 * smarter strategy to deal with high current draws and keep the motor and controller operating in
-	 * a safe region.
-	 *
-	 * @param limit The current limit in Amps.
+	 * @param limit Amps
 	 */
 	@Override
 	public void setStatorLimit(int limit) {
@@ -287,37 +307,27 @@ public class NAR_CANSpark extends NAR_Motor {
 		configure();
 	}
 
+	/** Stores the smart current limit, without sending it yet. */
 	@Override
 	public void setStatorLimitNoApply(int limit) {
 		config.smartCurrentLimit(limit);
 	}
 
 	/**
-   * Sets the secondary current limit in Amps.
-   *
-   * <p>The motor controller will disable the output of the controller briefly if the current limit
-   * is exceeded to reduce the current. This limit is a simplified 'on/off' controller. This limit
-   * is enabled by default but is set higher than the default Smart Current Limit.
-   *
-   * <p>The time the controller is off after the current limit is reached is determined by the
-   * parameter limitCycles, which is the number of PWM cycles (20kHz). The recommended value is the
-   * default of 0 which is the minimum time and is part of a PWM cycle from when the over current is
-   * detected. This allows the controller to regulate the current close to the limit value.
-   *
-   * <p>The total time is set by the equation <code>
-   * t = (50us - t0) + 50us * limitCycles
-   * t = total off time after over current
-   * t0 = time from the start of the PWM cycle until over current is detected
-   * </code>
-   *
-   * @param limit The current limit in Amps.
-   */
+	 * Sets REV's "secondary current limit". Sparks don't have a true battery-side (supply) limit
+	 * like a TalonFX, so this is the closest thing: if the motor's current goes over it, the Spark
+	 * cuts its output for a moment. Keep it above {@link #setStatorLimit(int)}, which does the
+	 * everyday limiting.
+	 *
+	 * @param limit Amps
+	 */
 	@Override
 	public void setSupplyLimit(int limit) {
 		setSupplyLimitNoApply(limit);
 		configure();
 	}
 
+	/** Stores the secondary current limit, without sending it yet. */
 	@Override
 	public void setSupplyLimitNoApply(int limit) {
 		config.secondaryCurrentLimit(limit);
@@ -345,15 +355,18 @@ public class NAR_CANSpark extends NAR_Motor {
 		configure();
 	}
 
+	/**
+	 * Stores a frame's rate, without sending it yet.
+	 *
+	 * <p>Known bug: this ignores {@code frame} and always sets the position frame's rate, so
+	 * {@link #setStatusFrames} ends up setting only that, to the last frame's value.
+	 */
 	public void setPeriodicFramePeriodNoApply(PeriodicFrame frame, int periodMs) {
 		config.signals.primaryEncoderPositionPeriodMs(periodMs);
 	}
 
 	/**
-	 * Set the rate of transmission for periodic frames from the SPARK MAX
-	 *
-	 * <p>Each motor controller sends back status frames with different data at set rates. Use this
-	 * function to set to team 3128's preset rates.
+	 * Sets every frame's rate to one of the team's presets in {@link NAR_SparkMaxConfig}.
 	 */
 	public void setStatusFrames(NAR_SparkMaxConfig config) {
 		setPeriodicFramePeriodNoApply(PeriodicFrame.kStatus0, config.status0);
@@ -410,15 +423,17 @@ public class NAR_CANSpark extends NAR_Motor {
 	}
 
 	/**
-     * Sets a motor's output based on the leader's
-     * @param leader The motor to follow
-	 * @param invert Whether or not to invert motor output
+     * Makes this Spark copy another Spark's output on the Sparks themselves, so it follows
+     * instantly. Its own inversion setting is ignored while following.
+     * @param leader The Spark to copy
+	 * @param invert Whether to spin the opposite way to the leader
      */
 	public void follow(NAR_CANSpark leader, boolean invert) {
 		followNoApply(leader, invert);
 		configure();
 	}
 
+	/** Stores the follow setting, without sending it yet. */
 	public void followNoApply(NAR_CANSpark leader, boolean invert) {
 		config.follow(leader.motor, invert);
 	}
@@ -608,11 +623,13 @@ public class NAR_CANSpark extends NAR_Motor {
 		config.idleMode(IdleMode.kCoast);
 	}
 
+	/** REVLib's {@code SparkMax} or {@code SparkFlex}, for anything this class doesn't cover. */
 	@Override
     public SparkBase getMotor() {
         return motor;
     }
 
+	/** Every fault the Spark is reporting right now, like over-temperature or a sensor problem. */
 	public Faults getAllFaults() {
 		return motor.getFaults();
 	}
@@ -623,8 +640,8 @@ public class NAR_CANSpark extends NAR_Motor {
 	// }
 
 	/**
-	 * Returns motor and motor controller functionality.
-	 * @return State of the motor controller and motor.
+	 * RUNNING if the Spark has no faults, now or since it last cleared them, and its last command
+	 * worked; DISCONNECTED otherwise.
 	 */
 	public State getState() {
 		//To do add check for motors

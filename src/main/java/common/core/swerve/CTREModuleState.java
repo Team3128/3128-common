@@ -3,6 +3,10 @@ package common.core.swerve;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 
+/**
+ * Picks the quickest way for a swerve wheel to reach a direction. A wheel never needs to turn more
+ * than 90 degrees: driving backward is the same as turning around and driving forward.
+ */
 public class CTREModuleState {
 
     /**

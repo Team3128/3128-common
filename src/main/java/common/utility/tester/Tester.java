@@ -12,11 +12,25 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 
 /**
- * Team 3128's Tester utility class used to run system checks at competitions.
+ * Runs system checks in the pits: quick tests that each part of the robot works before a match.
+ *
+ * <p>A {@link SystemsTest} is one check: a command to run, and optionally a condition that must
+ * be true when it finishes for it to pass. Tests added under the same name form a {@link Test},
+ * which runs them in order and stops at the first failure. Each name gets a button and a
+ * pass/fail light on NarwhalDashboard.
+ *
+ * <pre>{@code
+ * Tester.getInstance().addTest("Intake", new SystemsTest("Extend",
+ *     intake.setStateCommand(INTAKE).andThen(waitSeconds(1)),
+ *     () -> intake.slider.atSetpoint()));
+ * }</pre>
  */
 public class Tester {
-    
-    /**System test */
+
+    /**
+     * One check: runs a command, and passes if it finishes without being interrupted and its pass
+     * condition is true at the end.
+     */
     public static class SystemsTest extends Command {
 
         protected String testName;
@@ -74,7 +88,10 @@ public class Tester {
         }
     }
 
-    /**Collection of tests to be run for a system */
+    /**
+     * A named group of checks for one part of the robot, run one after another. It stops at the
+     * first failure, and passes once every check has passed.
+     */
     public static class Test extends Command {
         private final ArrayList<SystemsTest> systemsTests;
         private final String name;
@@ -138,6 +155,7 @@ public class Tester {
             }
         }
 
+        // Watches the current check; when it passes, waits timeBetweenTests, then starts the next
         @Override
         public void execute() {
             if (systemsTests.size() == 0) return;
@@ -195,7 +213,7 @@ public class Tester {
         }
     }
 
-    /**Enum representing test states */
+    /** Where a test is up to. A test that hasn't run yet counts as FAILED. */
     public enum TestState {
         FAILED,
         RUNNING,
@@ -204,6 +222,7 @@ public class Tester {
 
     private static Tester instance;
 
+    /** The one Tester for the robot. */
     public static synchronized Tester getInstance() {
         if (instance == null) {
             instance = new Tester();
