@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.ArrayList;
 
 import common.utility.Log;
-import common.utility.narwhaldashboard.NarwhalDashboard;
+import common.utility.dashboard.Dashboard;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -17,7 +17,7 @@ import edu.wpi.first.wpilibj2.command.Subsystem;
  * <p>A {@link SystemsTest} is one check: a command to run, and optionally a condition that must
  * be true when it finishes for it to pass. Tests added under the same name form a {@link Test},
  * which runs them in order and stops at the first failure. Each name gets a button and a
- * pass/fail light on NarwhalDashboard.
+ * pass/fail value on the dashboard, under {@code Tests/} and {@code Test States/}.
  *
  * <pre>{@code
  * Tester.getInstance().addTest("Intake", new SystemsTest("Extend",
@@ -112,10 +112,8 @@ public class Tester {
             state = TestState.FAILED;
             curIndex = 0;
             passTimer = new Timer();
-            NarwhalDashboard.getInstance().addUpdate(name, ()-> state.toString());
-            NarwhalDashboard.getInstance().addButton(name, (boolean pressed) -> {
-                if (pressed) CommandScheduler.getInstance().schedule(this);
-            });
+            Dashboard.add("Tests/" + name, this);
+            Dashboard.add("Test States/" + name, ()-> state.toString());
         }
 
         /**

@@ -16,6 +16,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import common.core.misc.NAR_Robot;
+import common.hardware.motorcontroller.DeviceState;
 import common.utility.Log;
 import edu.wpi.first.util.function.BooleanConsumer;
 
@@ -39,20 +40,14 @@ public class NarwhalDashboard extends WebSocketServer implements AutoCloseable {
     private final HashMap<String, BooleanConsumer> buttons = new HashMap<String, BooleanConsumer>();
 
     private final ArrayList<String> autoPrograms = new ArrayList<String>();
-    private String selectedAuto;
+    // Set by the server's thread when the page picks an auto, read by the robot's
+    private volatile String selectedAuto;
 
     private WebSocket conn;
 
     private static NarwhalDashboard instance;
 
     private static int PORT = 5805;
-
-    /** How a part of the robot is doing, shown as a colored light on the dashboard. */
-    public enum State {
-        RUNNING,
-        PARTIALLY_RUNNING,
-        DISCONNECTED
-    }
 
     /** The one dashboard server, started the first time this is called. */
     public static synchronized NarwhalDashboard getInstance() {
@@ -281,7 +276,7 @@ public class NarwhalDashboard extends WebSocketServer implements AutoCloseable {
     }
 
     /** Shows how a part of the robot is doing, e.g. a motor's {@code getState()}, as a light named {@code name}. */
-    public void checkState(String name, Supplier<State> state) {
+    public void checkState(String name, Supplier<DeviceState> state) {
         addUpdate(name, ()-> state.get().toString());
     }
 

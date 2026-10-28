@@ -7,7 +7,6 @@ import common.core.controllers.PIDFFConfig;
 import common.core.misc.NAR_Robot;
 import common.hardware.motorcontroller.sim.MotorSimModel;
 import common.utility.Log;
-import common.utility.narwhaldashboard.NarwhalDashboard;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.RobotBase;
@@ -681,7 +680,7 @@ public abstract class NAR_Motor implements AutoCloseable {
     /**
 	 * Whether the motor controller is connected and working, for the dashboard.
 	 */
-    public abstract NarwhalDashboard.State getState();
+    public abstract DeviceState getState();
 
     /** Reports at the team's default rates. */
     public abstract void setDefaultStatusFrames();

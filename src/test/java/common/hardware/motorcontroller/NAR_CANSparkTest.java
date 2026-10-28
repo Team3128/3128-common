@@ -29,7 +29,6 @@ import common.hardware.motorcontroller.NAR_Motor.MotorConfig;
 import common.hardware.motorcontroller.NAR_Motor.Neutral;
 import common.hardware.motorcontroller.NAR_Motor.StatusFrames;
 import common.hardware.motorcontroller.sim.RollerSimModel;
-import common.utility.narwhaldashboard.NarwhalDashboard;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.simulation.DriverStationSim;
@@ -284,7 +283,7 @@ class NAR_CANSparkTest {
     @Test
     void healthAndSensorsAreAvailable() {
         final NAR_CANSpark spark = spark();
-        assertEquals(NarwhalDashboard.State.RUNNING, spark.getState());
+        assertEquals(DeviceState.RUNNING, spark.getState());
         assertNotNull(spark.getAllFaults());
         assertTrue(Double.isFinite(spark.getAppliedOutput()));
         assertTrue(Double.isFinite(spark.getStallCurrent()));

@@ -1,7 +1,6 @@
 package common.hardware.motorcontroller;
 
 import common.core.controllers.PIDFFConfig;
-import common.utility.narwhaldashboard.NarwhalDashboard;
 
 /**
  * A motor for unit tests. It records every command instead of talking to hardware, and its
@@ -284,8 +283,8 @@ public class MockMotor extends NAR_Motor {
     }
 
     @Override
-    public NarwhalDashboard.State getState() {
-        return NarwhalDashboard.State.RUNNING;
+    public DeviceState getState() {
+        return DeviceState.RUNNING;
     }
 
     @Override

@@ -32,7 +32,6 @@ import com.revrobotics.sim.SparkMaxSim;
 
 import common.core.controllers.PIDFFConfig;
 import common.utility.Log;
-import common.utility.narwhaldashboard.NarwhalDashboard.State;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.RobotController;
@@ -672,14 +671,14 @@ public class NAR_CANSpark extends NAR_Motor {
 	 * RUNNING if the Spark has no faults, now or since it last cleared them, and its last command
 	 * worked; DISCONNECTED otherwise.
 	 */
-	public State getState() {
+	public DeviceState getState() {
 		//To do add check for motors
 		if(!motor.hasActiveFault() 
 			&& !motor.hasStickyFault()
 			&& motor.getLastError() == REVLibError.kOk) {
-			return State.RUNNING;
+			return DeviceState.RUNNING;
 		}
-		return State.DISCONNECTED;
+		return DeviceState.DISCONNECTED;
 	}
 
 	/**

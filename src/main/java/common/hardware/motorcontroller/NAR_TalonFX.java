@@ -28,7 +28,6 @@ import com.ctre.phoenix6.sim.TalonFXSimState;
 
 import common.core.controllers.PIDFFConfig;
 import common.utility.Log;
-import common.utility.narwhaldashboard.NarwhalDashboard;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
@@ -460,13 +459,13 @@ public class NAR_TalonFX extends NAR_Motor {
      * fault, like overheating or a dropped CAN connection, and RUNNING otherwise.
      */
     @Override
-    public NarwhalDashboard.State getState() {
+    public DeviceState getState() {
         // Refreshing a signal the Talon has stopped sending gives an error instead of a value.
         // appliedOutput is always reported, whatever the status frames.
-        if (!appliedOutput.refresh().getStatus().isOK()) return NarwhalDashboard.State.DISCONNECTED;
+        if (!appliedOutput.refresh().getStatus().isOK()) return DeviceState.DISCONNECTED;
         // Each bit of the fault field is a different fault; 0 means none
-        if (faults.refresh().getValue() != 0) return NarwhalDashboard.State.PARTIALLY_RUNNING;
-        return NarwhalDashboard.State.RUNNING;
+        if (faults.refresh().getValue() != 0) return DeviceState.PARTIALLY_RUNNING;
+        return DeviceState.RUNNING;
     }
 
 

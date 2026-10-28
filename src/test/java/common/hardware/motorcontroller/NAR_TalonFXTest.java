@@ -30,7 +30,6 @@ import common.hardware.motorcontroller.NAR_Motor.MotorConfig;
 import common.hardware.motorcontroller.NAR_Motor.Neutral;
 import common.hardware.motorcontroller.NAR_Motor.StatusFrames;
 import common.hardware.motorcontroller.sim.RollerSimModel;
-import common.utility.narwhaldashboard.NarwhalDashboard;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.Timer;
@@ -272,7 +271,7 @@ class NAR_TalonFXTest {
         talon.setFollowerStatusFrames();
         waitForTalon();
 
-        assertEquals(NarwhalDashboard.State.RUNNING, talon.getState());
+        assertEquals(DeviceState.RUNNING, talon.getState());
         assertEquals(0, NAR_TalonFX.getNumFailedConfigs());
     }
 
