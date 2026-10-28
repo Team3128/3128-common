@@ -19,8 +19,9 @@ of starting from scratch.
 | `common.core.swerve` | The team's older swerve code. New robots use CTRE's generated swerve instead. |
 
 Every package has an overview in its `package-info.java`, and every class explains itself at the
-top of its file. Read the code in your editor, or build the Javadoc with `./gradlew javadoc` and
-open `build/docs/javadoc/index.html`.
+top of its file. Read the code in your editor, or open `doc/index.html` for the same comments as a
+website. To update `doc/` after changing comments, run `./gradlew javadoc` and copy
+`build/docs/javadoc` over it.
 
 ## A mechanism in a few lines
 

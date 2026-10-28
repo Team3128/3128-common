@@ -1,4 +1,3 @@
-common.core.commands
 common.core.controllers
 common.core.fsm
 common.core.misc
@@ -6,8 +5,8 @@ common.core.subsystems
 common.core.swerve
 common.hardware.camera
 common.hardware.input
-common.hardware.limelight
 common.hardware.motorcontroller
+common.hardware.motorcontroller.sim
 common.utility
 common.utility.narwhaldashboard
 common.utility.shuffleboard
