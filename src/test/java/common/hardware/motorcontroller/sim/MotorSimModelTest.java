@@ -101,13 +101,26 @@ class MotorSimModelTest {
 
     @Test
     void armStartsAtZeroRotorRotationsWhereverItStarts() {
-        final ArmSimModel arm = new ArmSimModel(KRAKEN, 50, 0.5, 3, -Math.PI / 2, Math.PI / 2, -Math.PI / 2);
+        final PivotSimModel arm = new PivotSimModel(KRAKEN, 50, 0.5, 3, -Math.PI / 2, Math.PI / 2, -Math.PI / 2, true);
         assertEquals(0, arm.getRotorRotations(), 1e-9);
     }
 
     @Test
+    void onlyAPivotWithGravityFallsWithoutPower() {
+        // Both start level
+        final PivotSimModel arm = new PivotSimModel(KRAKEN, 50, 0.5, 3, -Math.PI / 2, Math.PI / 2, 0, true);
+        final PivotSimModel turret = new PivotSimModel(KRAKEN, 50, 0.5, 3, -Math.PI, Math.PI, 0, false);
+
+        run(arm, 0, 0.5);
+        run(turret, 0, 0.5);
+
+        assertTrue(arm.getRotorRotations() < -1);
+        assertEquals(0, turret.getRotorRotations(), 1e-9);
+    }
+
+    @Test
     void armRisesWithPositiveVoltage() {
-        final ArmSimModel arm = new ArmSimModel(KRAKEN, 50, 0.5, 3, -Math.PI / 2, Math.PI / 2, -Math.PI / 2);
+        final PivotSimModel arm = new PivotSimModel(KRAKEN, 50, 0.5, 3, -Math.PI / 2, Math.PI / 2, -Math.PI / 2, true);
         run(arm, 6, 0.5);
         assertTrue(arm.getRotorRotations() > 0);
     }

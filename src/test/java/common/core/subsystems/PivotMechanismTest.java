@@ -7,6 +7,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import common.core.controllers.PIDFFConfig;
+import common.core.subsystems.PivotMechanism.Axis;
 import common.hardware.motorcontroller.MockMotor;
 import common.hardware.motorcontroller.NAR_Motor.Control;
 import common.hardware.motorcontroller.NAR_Motor.MotorConfig;
@@ -16,7 +17,7 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.system.plant.DCMotor;
 
-class ArmMechanismTest {
+class PivotMechanismTest {
 
     private static final double TOLERANCE = 1e-9;
     private static final DCMotor KRAKEN = DCMotor.getKrakenX60(1);
@@ -36,20 +37,52 @@ class ArmMechanismTest {
         assertTrue(HAL.initialize(500, 0));
     }
 
-    private static ArmMechanism arm(double degreesPerEncoderRotation, MockMotor motor) {
+    private static PivotMechanism arm(double degreesPerEncoderRotation, MockMotor motor) {
         final MotorConfig config = new MotorConfig(degreesPerEncoderRotation, 60, 40, false, Neutral.BRAKE);
-        return new ArmMechanism("ArmMechanismTest" + nextName++, config, new PIDFFConfig(KP, 0, 0, 0, 0, 0, KG),
+        return new PivotMechanism("PivotMechanismTest" + nextName++, Axis.PITCH, config, new PIDFFConfig(KP, 0, 0, 0, 0, 0, KG),
             1, MIN, MAX, START, Math.PI / 180, 0.5, 3, KRAKEN, motor);
     }
 
-    private static ArmMechanism arm(MockMotor motor) {
+    private static PivotMechanism arm(MockMotor motor) {
         return arm(DEGREES_PER_MOTOR_ROTATION, motor);
+    }
+
+    /** A turret on the same gearing, starting facing forward with no kG. */
+    private static PivotMechanism turret(MockMotor motor) {
+        final MotorConfig config = new MotorConfig(DEGREES_PER_MOTOR_ROTATION, 60, 40, false, Neutral.BRAKE);
+        return new PivotMechanism("PivotMechanismTest" + nextName++, Axis.YAW, config, new PIDFFConfig(KP),
+            1, -180, 180, 0, Math.PI / 180, 0.3, 5, KRAKEN, motor);
+    }
+
+    @Test
+    void turretHasNoGravityFeedforward() {
+        final MockMotor motor = MockMotor.talonLike(1);
+        turret(motor);
+        assertEquals(0, motor.armRatio, TOLERANCE); // kG isn't multiplied by a cosine
+        assertEquals(0, motor.nativeKG, TOLERANCE);
+    }
+
+    @Test
+    void turretPoseTurnsAboutThePivot() {
+        final MockMotor motor = MockMotor.talonLike(1);
+        final PivotMechanism turret = turret(motor);
+        final Translation3d pivot = new Translation3d(-0.1, 0.05, 0.4);
+        turret.setPivot(pivot);
+
+        // From facing forward to 90 degrees counterclockwise, facing left
+        motor.rawPosition = 90 / DEGREES_PER_MOTOR_ROTATION;
+        final Pose3d pose = turret.getComponentPose();
+
+        // The end of the barrel, 0.3 m in front of the pivot, ends up 0.3 m to its left
+        final Translation3d barrelAtStart = pivot.plus(new Translation3d(0.3, 0, 0));
+        final Translation3d barrel = barrelAtStart.rotateBy(pose.getRotation()).plus(pose.getTranslation());
+        assertEquals(0, barrel.getDistance(pivot.plus(new Translation3d(0, 0.3, 0))), 1e-6);
     }
 
     @Test
     void poseRotatesAboutThePivot() {
         final MockMotor motor = MockMotor.talonLike(1);
-        final ArmMechanism arm = arm(motor);
+        final PivotMechanism arm = arm(motor);
         final Translation3d pivot = new Translation3d(0.2, 0, 0.5);
         arm.setPivot(pivot);
 
@@ -84,14 +117,14 @@ class ArmMechanismTest {
     @Test
     void encoderStartsAtTheStartPosition() {
         final MockMotor motor = MockMotor.talonLike(1);
-        final ArmMechanism arm = arm(motor);
+        final PivotMechanism arm = arm(motor);
         assertEquals(START, arm.getPosition(), TOLERANCE);
     }
 
     @Test
     void setpointIsSentInMotorRotations() {
         final MockMotor motor = MockMotor.talonLike(1);
-        final ArmMechanism arm = arm(motor);
+        final PivotMechanism arm = arm(motor);
 
         arm.setSetpoint(45);
         arm.periodic();
@@ -102,7 +135,7 @@ class ArmMechanismTest {
 
     @Test
     void setpointIsLimitedToTheArmsTravel() {
-        final ArmMechanism arm = arm(MockMotor.talonLike(1));
+        final PivotMechanism arm = arm(MockMotor.talonLike(1));
         arm.setSetpoint(180);
         assertEquals(MAX, arm.getSetpoint(), TOLERANCE);
         arm.setSetpoint(-180);
@@ -112,7 +145,7 @@ class ArmMechanismTest {
     @Test
     void armKeepsHoldingAgainstGravityAtSetpoint() {
         final MockMotor motor = MockMotor.talonLike(1);
-        final ArmMechanism arm = arm(motor);
+        final PivotMechanism arm = arm(motor);
         arm.setSetpoint(START);
 
         arm.periodic();

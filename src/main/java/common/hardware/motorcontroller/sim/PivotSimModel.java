@@ -3,8 +3,11 @@ package common.hardware.motorcontroller.sim;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 
-/** A pivoting arm with gravity and hard stops. Angles are in radians, 0 is horizontal. */
-public class ArmSimModel implements MotorSimModel {
+/**
+ * Something that rotates to an angle between hard stops: an arm, hood, or turret. Angles are in
+ * radians; with gravity, 0 is horizontal.
+ */
+public class PivotSimModel implements MotorSimModel {
 
     private final DCMotor motor;
     private final double gearing;
@@ -12,21 +15,22 @@ public class ArmSimModel implements MotorSimModel {
     private final SingleJointedArmSim sim;
 
     /**
-     * @param motor The motor(s) driving the arm
-     * @param gearing Motor rotations per arm rotation
-     * @param lengthMeters Pivot to the end of the arm
-     * @param massKg Mass of the arm
+     * @param motor The motor(s) driving it
+     * @param gearing Motor rotations per pivot rotation
+     * @param lengthMeters Pivot to the far end of the moving part
+     * @param massKg Mass of the moving part
      * @param minRadians Lower hard stop
      * @param maxRadians Upper hard stop
-     * @param startRadians Where the arm is when the robot turns on
+     * @param startRadians Where it is when the robot turns on
+     * @param simulateGravity True when it swings up and down, false for a turret
      */
-    public ArmSimModel(DCMotor motor, double gearing, double lengthMeters, double massKg,
-                       double minRadians, double maxRadians, double startRadians) {
+    public PivotSimModel(DCMotor motor, double gearing, double lengthMeters, double massKg,
+                         double minRadians, double maxRadians, double startRadians, boolean simulateGravity) {
         this.motor = motor;
         this.gearing = gearing;
         this.startRadians = startRadians;
         this.sim = new SingleJointedArmSim(motor, gearing, SingleJointedArmSim.estimateMOI(lengthMeters, massKg),
-            lengthMeters, minRadians, maxRadians, true, startRadians);
+            lengthMeters, minRadians, maxRadians, simulateGravity, startRadians);
     }
 
     @Override public DCMotor getMotor() { return motor; }
