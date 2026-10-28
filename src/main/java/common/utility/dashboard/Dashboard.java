@@ -31,9 +31,11 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
  * <li>NarwhalDashboard, under the part of the name after the last {@code /}, which is the key its
  *     web page looks for.</li>
  * </ul>
- * This is the only class that knows how values reach a dashboard: retiring NarwhalDashboard, or
- * moving off SmartDashboard when WPILib removes it in 2027, should only change this class.
+ * This is the only class that knows how values reach a dashboard: retiring NarwhalDashboard (see
+ * its class comment for the plan), or moving off SmartDashboard when WPILib removes it in 2027,
+ * should only change this class.
  */
+@SuppressWarnings("deprecation") // NarwhalDashboard, until it's retired
 public class Dashboard {
 
     // Every value is updated every loop
@@ -53,7 +55,7 @@ public class Dashboard {
      */
     public static void add(String name, DoubleSupplier value) {
         updaters.put(name, () -> SmartDashboard.putNumber(name, value.getAsDouble()));
-        NarwhalDashboard.getInstance().addUpdate(narwhalKey(name), value::getAsDouble);
+        NarwhalDashboard.getInstance().addUpdate(narwhalDashboardKey(name), value::getAsDouble);
     }
 
     /**
@@ -63,7 +65,7 @@ public class Dashboard {
      */
     public static void add(String name, BooleanSupplier value) {
         updaters.put(name, () -> SmartDashboard.putBoolean(name, value.getAsBoolean()));
-        NarwhalDashboard.getInstance().addUpdate(narwhalKey(name), value::getAsBoolean);
+        NarwhalDashboard.getInstance().addUpdate(narwhalDashboardKey(name), value::getAsBoolean);
     }
 
     /**
@@ -73,7 +75,7 @@ public class Dashboard {
      */
     public static void add(String name, Supplier<String> value) {
         updaters.put(name, () -> SmartDashboard.putString(name, value.get()));
-        NarwhalDashboard.getInstance().addUpdate(narwhalKey(name), value::get);
+        NarwhalDashboard.getInstance().addUpdate(narwhalDashboardKey(name), value::get);
     }
 
     /**
@@ -83,7 +85,7 @@ public class Dashboard {
      */
     public static void add(String name, Command command) {
         add(name, (Sendable) command);
-        NarwhalDashboard.getInstance().addButton(narwhalKey(name), (boolean pressed) -> {
+        NarwhalDashboard.getInstance().addButton(narwhalDashboardKey(name), (boolean pressed) -> {
             if (pressed) CommandScheduler.getInstance().schedule(command);
         });
     }
@@ -115,16 +117,16 @@ public class Dashboard {
         }
         add(name, chooser);
 
-        final NarwhalDashboard narwhal = NarwhalDashboard.getInstance();
-        narwhal.addAutos(autos.keySet().toArray(new String[0]));
+        final NarwhalDashboard narwhalDashboard = NarwhalDashboard.getInstance();
+        narwhalDashboard.addAutos(autos.keySet().toArray(new String[0]));
         return () -> {
-            final String narwhalAuto = narwhal.getSelectedAuto();
-            return narwhalAuto != null ? autos.get(narwhalAuto) : chooser.getSelected();
+            final String narwhalDashboardAuto = narwhalDashboard.getSelectedAuto();
+            return narwhalDashboardAuto != null ? autos.get(narwhalDashboardAuto) : chooser.getSelected();
         };
     }
 
     /** The key NarwhalDashboard's web page knows a value by: the name after its last {@code /}. */
-    private static String narwhalKey(String name) {
+    private static String narwhalDashboardKey(String name) {
         return name.substring(name.lastIndexOf('/') + 1);
     }
 

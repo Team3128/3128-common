@@ -96,7 +96,7 @@ jacocoTestReport {
         xml.required = true
         html.required = true
     }
-    // NarwhalDashboard is moving to its own repository, so it isn't counted here
+    // NarwhalDashboard is being replaced by Elastic and will be deleted, so it isn't counted here
     afterEvaluate {
         classDirectories.setFrom(files(classDirectories.files.collect {
             fileTree(dir: it, exclude: 'common/utility/narwhaldashboard/**')

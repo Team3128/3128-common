@@ -31,6 +31,7 @@ loadScripts(document, 'script');</script>
 <li>Package</li>
 <li>Class</li>
 <li><a href="overview-tree.html">Tree</a></li>
+<li><a href="deprecated-list.html">Deprecated</a></li>
 <li class="nav-bar-cell1-rev">Index</li>
 <li><a href="help-doc.html#index">Help</a></li>
 </ul>
@@ -58,12 +59,38 @@ loadScripts(document, 'script');</script>
 </dd>
 <dt><a href="common/hardware/motorcontroller/NAR_CANSpark.NAR_SparkMaxConfig.html#ABSOLUTE" class="member-name-link">ABSOLUTE</a> - Enum constant in enum class common.hardware.motorcontroller.<a href="common/hardware/motorcontroller/NAR_CANSpark.NAR_SparkMaxConfig.html" title="enum class in common.hardware.motorcontroller">NAR_CANSpark.NAR_SparkMaxConfig</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="common/utility/dashboard/Dashboard.html#add(java.lang.String,edu.wpi.first.util.sendable.Sendable)" class="member-name-link">add(String, Sendable)</a> - Static method in class common.utility.dashboard.<a href="common/utility/dashboard/Dashboard.html" title="class in common.utility.dashboard">Dashboard</a></dt>
+<dd>
+<div class="block">Shows something WPILib already knows how to draw on Elastic, e.g.</div>
+</dd>
+<dt><a href="common/utility/dashboard/Dashboard.html#add(java.lang.String,edu.wpi.first.wpilibj2.command.Command)" class="member-name-link">add(String, Command)</a> - Static method in class common.utility.dashboard.<a href="common/utility/dashboard/Dashboard.html" title="class in common.utility.dashboard">Dashboard</a></dt>
+<dd>
+<div class="block">Shows a button that runs a command.</div>
+</dd>
+<dt><a href="common/utility/dashboard/Dashboard.html#add(java.lang.String,java.util.function.BooleanSupplier)" class="member-name-link">add(String, BooleanSupplier)</a> - Static method in class common.utility.dashboard.<a href="common/utility/dashboard/Dashboard.html" title="class in common.utility.dashboard">Dashboard</a></dt>
+<dd>
+<div class="block">Shows a true/false value that updates every loop.</div>
+</dd>
+<dt><a href="common/utility/dashboard/Dashboard.html#add(java.lang.String,java.util.function.DoubleSupplier)" class="member-name-link">add(String, DoubleSupplier)</a> - Static method in class common.utility.dashboard.<a href="common/utility/dashboard/Dashboard.html" title="class in common.utility.dashboard">Dashboard</a></dt>
+<dd>
+<div class="block">Shows a number that updates every loop.</div>
+</dd>
+<dt><a href="common/utility/dashboard/Dashboard.html#add(java.lang.String,java.util.function.Supplier)" class="member-name-link">add(String, Supplier&lt;String&gt;)</a> - Static method in class common.utility.dashboard.<a href="common/utility/dashboard/Dashboard.html" title="class in common.utility.dashboard">Dashboard</a></dt>
+<dd>
+<div class="block">Shows text that updates every loop.</div>
+</dd>
 <dt><a href="common/utility/narwhaldashboard/NarwhalDashboard.html#addAction(java.lang.String,java.util.function.Consumer)" class="member-name-link">addAction(String, Consumer&lt;String[]&gt;)</a> - Method in class common.utility.narwhaldashboard.<a href="common/utility/narwhaldashboard/NarwhalDashboard.html" title="class in common.utility.narwhaldashboard">NarwhalDashboard</a></dt>
 <dd>
+<div class="deprecation-block"><span class="deprecated-label">Deprecated.</span></div>
 <div class="block">Adds an action to be run on a message from the web server</div>
+</dd>
+<dt><a href="common/utility/dashboard/Dashboard.html#addAutoChooser(java.lang.String,java.lang.String,java.util.Map)" class="member-name-link">addAutoChooser(String, String, Map&lt;String, Command&gt;)</a> - Static method in class common.utility.dashboard.<a href="common/utility/dashboard/Dashboard.html" title="class in common.utility.dashboard">Dashboard</a></dt>
+<dd>
+<div class="block">Shows a dropdown for picking the auto.</div>
 </dd>
 <dt><a href="common/utility/narwhaldashboard/NarwhalDashboard.html#addAutos(java.lang.String...)" class="member-name-link">addAutos(String...)</a> - Method in class common.utility.narwhaldashboard.<a href="common/utility/narwhaldashboard/NarwhalDashboard.html" title="class in common.utility.narwhaldashboard">NarwhalDashboard</a></dt>
 <dd>
+<div class="deprecation-block"><span class="deprecated-label">Deprecated.</span></div>
 <div class="block">Adds an autonomous program to NarwhalDashboard's auto picker</div>
 </dd>
 <dt><a href="common/utility/shuffleboard/NAR_Shuffleboard.html#addAutos(java.lang.String%5B%5D)" class="member-name-link">addAutos(String[])</a> - Static method in class common.utility.shuffleboard.<a href="common/utility/shuffleboard/NAR_Shuffleboard.html" title="class in common.utility.shuffleboard">NAR_Shuffleboard</a></dt>
@@ -72,6 +99,7 @@ loadScripts(document, 'script');</script>
 </dd>
 <dt><a href="common/utility/narwhaldashboard/NarwhalDashboard.html#addButton(java.lang.String,edu.wpi.first.util.function.BooleanConsumer)" class="member-name-link">addButton(String, BooleanConsumer)</a> - Method in class common.utility.narwhaldashboard.<a href="common/utility/narwhaldashboard/NarwhalDashboard.html" title="class in common.utility.narwhaldashboard">NarwhalDashboard</a></dt>
 <dd>
+<div class="deprecation-block"><span class="deprecated-label">Deprecated.</span></div>
 <div class="block">Assigns an action to a NarwhalDashboard button</div>
 </dd>
 <dt><a href="common/utility/shuffleboard/NAR_Shuffleboard.html#addCommand(java.lang.String,java.lang.String,edu.wpi.first.wpilibj2.command.Command,int,int)" class="member-name-link">addCommand(String, String, Command, int, int)</a> - Static method in class common.utility.shuffleboard.<a href="common/utility/shuffleboard/NAR_Shuffleboard.html" title="class in common.utility.shuffleboard">NAR_Shuffleboard</a></dt>
@@ -345,10 +373,12 @@ loadScripts(document, 'script');</script>
 </dd>
 <dt><a href="common/utility/narwhaldashboard/NarwhalDashboard.html#addInit(java.lang.String,java.lang.Object)" class="member-name-link">addInit(String, Object)</a> - Method in class common.utility.narwhaldashboard.<a href="common/utility/narwhaldashboard/NarwhalDashboard.html" title="class in common.utility.narwhaldashboard">NarwhalDashboard</a></dt>
 <dd>
+<div class="deprecation-block"><span class="deprecated-label">Deprecated.</span></div>
 <div class="block">Sends an object to the web server on intialize</div>
 </dd>
 <dt><a href="common/utility/narwhaldashboard/NarwhalDashboard.html#addInit(java.lang.String,java.util.List)" class="member-name-link">addInit(String, List&lt;Object&gt;)</a> - Method in class common.utility.narwhaldashboard.<a href="common/utility/narwhaldashboard/NarwhalDashboard.html" title="class in common.utility.narwhaldashboard">NarwhalDashboard</a></dt>
 <dd>
+<div class="deprecation-block"><span class="deprecated-label">Deprecated.</span></div>
 <div class="block">Sends a list of objects to the web server on intialize</div>
 </dd>
 <dt><a href="common/core/fsm/TransitionMap.html#addMappedTransition(java.util.List)" class="member-name-link">addMappedTransition(List&lt;Pair&lt;S, S&gt;&gt;)</a> - Method in class common.core.fsm.<a href="common/core/fsm/TransitionMap.html" title="class in common.core.fsm">TransitionMap</a></dt>
@@ -449,6 +479,7 @@ loadScripts(document, 'script');</script>
 </dd>
 <dt><a href="common/utility/narwhaldashboard/NarwhalDashboard.html#addUpdate(java.lang.String,java.util.function.Supplier)" class="member-name-link">addUpdate(String, Supplier&lt;Object&gt;)</a> - Method in class common.utility.narwhaldashboard.<a href="common/utility/narwhaldashboard/NarwhalDashboard.html" title="class in common.utility.narwhaldashboard">NarwhalDashboard</a></dt>
 <dd>
+<div class="deprecation-block"><span class="deprecated-label">Deprecated.</span></div>
 <div class="block">Sends an object to the web server every update</div>
 </dd>
 <dt><a href="common/utility/shuffleboard/NAR_Shuffleboard.html#addVideoStream(java.lang.String,java.lang.String,java.lang.String,java.lang.String,int,int,int,int)" class="member-name-link">addVideoStream(String, String, String, String, int, int, int, int)</a> - Static method in class common.utility.shuffleboard.<a href="common/utility/shuffleboard/NAR_Shuffleboard.html" title="class in common.utility.shuffleboard">NAR_Shuffleboard</a></dt>
@@ -543,8 +574,9 @@ loadScripts(document, 'script');</script>
 <div class="block">A SysId routine that drives the mechanism with rising and stepped voltages and records how
  it responds, so WPILib's SysId tool can work out its kS, kV, kA and kG.</div>
 </dd>
-<dt><a href="common/utility/narwhaldashboard/NarwhalDashboard.html#checkState(java.lang.String,java.util.function.Supplier)" class="member-name-link">checkState(String, Supplier&lt;NarwhalDashboard.State&gt;)</a> - Method in class common.utility.narwhaldashboard.<a href="common/utility/narwhaldashboard/NarwhalDashboard.html" title="class in common.utility.narwhaldashboard">NarwhalDashboard</a></dt>
+<dt><a href="common/utility/narwhaldashboard/NarwhalDashboard.html#checkState(java.lang.String,java.util.function.Supplier)" class="member-name-link">checkState(String, Supplier&lt;DeviceState&gt;)</a> - Method in class common.utility.narwhaldashboard.<a href="common/utility/narwhaldashboard/NarwhalDashboard.html" title="class in common.utility.narwhaldashboard">NarwhalDashboard</a></dt>
 <dd>
+<div class="deprecation-block"><span class="deprecated-label">Deprecated.</span></div>
 <div class="block">Shows how a part of the robot is doing, e.g.</div>
 </dd>
 <dt><a href="common/core/misc/NAR_Robot.html#close()" class="member-name-link">close()</a> - Method in class common.core.misc.<a href="common/core/misc/NAR_Robot.html" title="class in common.core.misc">NAR_Robot</a></dt>
@@ -557,6 +589,7 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="common/utility/narwhaldashboard/NarwhalDashboard.html#close()" class="member-name-link">close()</a> - Method in class common.utility.narwhaldashboard.<a href="common/utility/narwhaldashboard/NarwhalDashboard.html" title="class in common.utility.narwhaldashboard">NarwhalDashboard</a></dt>
 <dd>
+<div class="deprecation-block"><span class="deprecated-label">Deprecated.</span></div>
 <div class="block">Closes the dashboard.</div>
 </dd>
 <dt><a href="common/hardware/motorcontroller/NAR_Motor.Neutral.html#COAST" class="member-name-link">COAST</a> - Enum constant in enum class common.hardware.motorcontroller.<a href="common/hardware/motorcontroller/NAR_Motor.Neutral.html" title="enum class in common.hardware.motorcontroller">NAR_Motor.Neutral</a></dt>
@@ -601,6 +634,11 @@ loadScripts(document, 'script');</script>
 <dt><a href="common/utility/package-summary.html">common.utility</a> - package common.utility</dt>
 <dd>
 <div class="block">Tools for seeing what the robot is doing and checking it works.</div>
+</dd>
+<dt><a href="common/utility/dashboard/package-summary.html">common.utility.dashboard</a> - package common.utility.dashboard</dt>
+<dd>
+<div class="block"><a href="common/utility/dashboard/Dashboard.html" title="class in common.utility.dashboard"><code>Dashboard</code></a>: puts robot values, autos and buttons on the
+ dashboard (Elastic and NarwhalDashboard) in one line each.</div>
 </dd>
 <dt><a href="common/utility/narwhaldashboard/package-summary.html">common.utility.narwhaldashboard</a> - package common.utility.narwhaldashboard</dt>
 <dd>&nbsp;</dd>
@@ -666,6 +704,10 @@ loadScripts(document, 'script');</script>
 </dl>
 <h2 class="title" id="I:D">D</h2>
 <dl class="index">
+<dt><a href="common/utility/dashboard/Dashboard.html" class="type-name-link" title="class in common.utility.dashboard">Dashboard</a> - Class in <a href="common/utility/dashboard/package-summary.html">common.utility.dashboard</a></dt>
+<dd>
+<div class="block">Puts robot values, buttons and the auto picker on the dashboard, in one line each.</div>
+</dd>
 <dt><a href="common/core/subsystems/MechanismBase.html#debug" class="member-name-link">debug</a> - Variable in class common.core.subsystems.<a href="common/core/subsystems/MechanismBase.html" title="class in common.core.subsystems">MechanismBase</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="common/utility/Log.html#debug(common.utility.Log.Type,java.lang.String,java.lang.String)" class="member-name-link">debug(Log.Type, String, String)</a> - Static method in class common.utility.<a href="common/utility/Log.html" title="class in common.utility">Log</a></dt>
@@ -696,6 +738,10 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Everything at moderate rates.</div>
 </dd>
+<dt><a href="common/hardware/motorcontroller/DeviceState.html" class="type-name-link" title="enum class in common.hardware.motorcontroller">DeviceState</a> - Enum Class in <a href="common/hardware/motorcontroller/package-summary.html">common.hardware.motorcontroller</a></dt>
+<dd>
+<div class="block">How a motor controller is doing, from <a href="common/hardware/motorcontroller/NAR_Motor.html#getState()"><code>NAR_Motor.getState()</code></a>, e.g.</div>
+</dd>
 <dt><a href="common/core/subsystems/MechanismBase.html#disable()" class="member-name-link">disable()</a> - Method in class common.core.subsystems.<a href="common/core/subsystems/MechanismBase.html" title="class in common.core.subsystems">MechanismBase</a></dt>
 <dd>
 <div class="block">Stops the control loop.</div>
@@ -714,8 +760,10 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Stops simulating this motor, e.g.</div>
 </dd>
-<dt><a href="common/utility/narwhaldashboard/NarwhalDashboard.State.html#DISCONNECTED" class="member-name-link">DISCONNECTED</a> - Enum constant in enum class common.utility.narwhaldashboard.<a href="common/utility/narwhaldashboard/NarwhalDashboard.State.html" title="enum class in common.utility.narwhaldashboard">NarwhalDashboard.State</a></dt>
-<dd>&nbsp;</dd>
+<dt><a href="common/hardware/motorcontroller/DeviceState.html#DISCONNECTED" class="member-name-link">DISCONNECTED</a> - Enum constant in enum class common.hardware.motorcontroller.<a href="common/hardware/motorcontroller/DeviceState.html" title="enum class in common.hardware.motorcontroller">DeviceState</a></dt>
+<dd>
+<div class="block">Not reporting, or reporting an error.</div>
+</dd>
 <dt><a href="common/hardware/camera/DynamicCamera.html#distance" class="member-name-link">distance</a> - Variable in class common.hardware.camera.<a href="common/hardware/camera/DynamicCamera.html" title="class in common.hardware.camera">DynamicCamera</a></dt>
 <dd>
 <div class="block">Meters to the nearest target that passed <a href="common/hardware/camera/DynamicCamera.html#setThresholds(double,double,double)"><code>DynamicCamera.setThresholds(double, double, double)</code></a> in the last picture.</div>
@@ -989,6 +1037,7 @@ loadScripts(document, 'script');</script>
 </dd>
 <dt><a href="common/utility/narwhaldashboard/NarwhalDashboard.html#getInstance()" class="member-name-link">getInstance()</a> - Static method in class common.utility.narwhaldashboard.<a href="common/utility/narwhaldashboard/NarwhalDashboard.html" title="class in common.utility.narwhaldashboard">NarwhalDashboard</a></dt>
 <dd>
+<div class="deprecation-block"><span class="deprecated-label">Deprecated.</span></div>
 <div class="block">The one dashboard server, started the first time this is called.</div>
 </dd>
 <dt><a href="common/utility/tester/Tester.html#getInstance()" class="member-name-link">getInstance()</a> - Static method in class common.utility.tester.<a href="common/utility/tester/Tester.html" title="class in common.utility.tester">Tester</a></dt>
@@ -1229,6 +1278,7 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="common/utility/narwhaldashboard/NarwhalDashboard.html#getSelectedAuto()" class="member-name-link">getSelectedAuto()</a> - Method in class common.utility.narwhaldashboard.<a href="common/utility/narwhaldashboard/NarwhalDashboard.html" title="class in common.utility.narwhaldashboard">NarwhalDashboard</a></dt>
 <dd>
+<div class="deprecation-block"><span class="deprecated-label">Deprecated.</span></div>
 <div class="block">Returns the selectedAuto on the web server</div>
 </dd>
 <dt><a href="common/utility/shuffleboard/NAR_Shuffleboard.html#getSelectedAutoName()" class="member-name-link">getSelectedAutoName()</a> - Static method in class common.utility.shuffleboard.<a href="common/utility/shuffleboard/NAR_Shuffleboard.html" title="class in common.utility.shuffleboard">NAR_Shuffleboard</a></dt>
@@ -1760,11 +1810,9 @@ loadScripts(document, 'script');</script>
 </dd>
 <dt><a href="common/utility/narwhaldashboard/NarwhalDashboard.html" class="type-name-link" title="class in common.utility.narwhaldashboard">NarwhalDashboard</a> - Class in <a href="common/utility/narwhaldashboard/package-summary.html">common.utility.narwhaldashboard</a></dt>
 <dd>
-<div class="block">The server for NarwhalDashboard, Team 3128's own web dashboard.</div>
-</dd>
-<dt><a href="common/utility/narwhaldashboard/NarwhalDashboard.State.html" class="type-name-link" title="enum class in common.utility.narwhaldashboard">NarwhalDashboard.State</a> - Enum Class in <a href="common/utility/narwhaldashboard/package-summary.html">common.utility.narwhaldashboard</a></dt>
-<dd>
-<div class="block">How a part of the robot is doing, shown as a colored light on the dashboard.</div>
+<div class="deprecation-block"><span class="deprecated-label">Deprecated.</span>
+<div class="deprecation-comment">Use <a href="common/utility/dashboard/Dashboard.html" title="class in common.utility.dashboard"><code>Dashboard</code></a>, which shows everything on Elastic.</div>
+</div>
 </dd>
 <dt><a href="common/hardware/motorcontroller/MotorControllerConstants.html#NEO_STATOR_550CurrentLimit" class="member-name-link">NEO_STATOR_550CurrentLimit</a> - Static variable in class common.hardware.motorcontroller.<a href="common/hardware/motorcontroller/MotorControllerConstants.html" title="class in common.hardware.motorcontroller">MotorControllerConstants</a></dt>
 <dd>&nbsp;</dd>
@@ -1780,15 +1828,21 @@ loadScripts(document, 'script');</script>
 <h2 class="title" id="I:O">O</h2>
 <dl class="index">
 <dt><a href="common/utility/narwhaldashboard/NarwhalDashboard.html#onClose(org.java_websocket.WebSocket,int,java.lang.String,boolean)" class="member-name-link">onClose(WebSocket, int, String, boolean)</a> - Method in class common.utility.narwhaldashboard.<a href="common/utility/narwhaldashboard/NarwhalDashboard.html" title="class in common.utility.narwhaldashboard">NarwhalDashboard</a></dt>
-<dd>&nbsp;</dd>
+<dd>
+<div class="deprecation-block"><span class="deprecated-label">Deprecated.</span></div>
+&nbsp;</dd>
 <dt><a href="common/utility/narwhaldashboard/NarwhalDashboard.html#onError(org.java_websocket.WebSocket,java.lang.Exception)" class="member-name-link">onError(WebSocket, Exception)</a> - Method in class common.utility.narwhaldashboard.<a href="common/utility/narwhaldashboard/NarwhalDashboard.html" title="class in common.utility.narwhaldashboard">NarwhalDashboard</a></dt>
-<dd>&nbsp;</dd>
+<dd>
+<div class="deprecation-block"><span class="deprecated-label">Deprecated.</span></div>
+&nbsp;</dd>
 <dt><a href="common/utility/narwhaldashboard/NarwhalDashboard.html#onMessage(org.java_websocket.WebSocket,java.lang.String)" class="member-name-link">onMessage(WebSocket, String)</a> - Method in class common.utility.narwhaldashboard.<a href="common/utility/narwhaldashboard/NarwhalDashboard.html" title="class in common.utility.narwhaldashboard">NarwhalDashboard</a></dt>
 <dd>
+<div class="deprecation-block"><span class="deprecated-label">Deprecated.</span></div>
 <div class="block">Called when a message from the web server is sent</div>
 </dd>
 <dt><a href="common/utility/narwhaldashboard/NarwhalDashboard.html#onOpen(org.java_websocket.WebSocket,org.java_websocket.handshake.ClientHandshake)" class="member-name-link">onOpen(WebSocket, ClientHandshake)</a> - Method in class common.utility.narwhaldashboard.<a href="common/utility/narwhaldashboard/NarwhalDashboard.html" title="class in common.utility.narwhaldashboard">NarwhalDashboard</a></dt>
 <dd>
+<div class="deprecation-block"><span class="deprecated-label">Deprecated.</span></div>
 <div class="block">Called after connecting to the web server</div>
 </dd>
 <dt><a href="common/core/subsystems/MechanismBase.html#onSafetyTimeout()" class="member-name-link">onSafetyTimeout()</a> - Method in class common.core.subsystems.<a href="common/core/subsystems/MechanismBase.html" title="class in common.core.subsystems">MechanismBase</a></dt>
@@ -1796,7 +1850,9 @@ loadScripts(document, 'script');</script>
 <div class="block">Called when the safety timeout runs out.</div>
 </dd>
 <dt><a href="common/utility/narwhaldashboard/NarwhalDashboard.html#onStart()" class="member-name-link">onStart()</a> - Method in class common.utility.narwhaldashboard.<a href="common/utility/narwhaldashboard/NarwhalDashboard.html" title="class in common.utility.narwhaldashboard">NarwhalDashboard</a></dt>
-<dd>&nbsp;</dd>
+<dd>
+<div class="deprecation-block"><span class="deprecated-label">Deprecated.</span></div>
+&nbsp;</dd>
 <dt><a href="common/core/fsm/FSMSubsystemBase.html#overrideState(S)" class="member-name-link">overrideState(S)</a> - Method in class common.core.fsm.<a href="common/core/fsm/FSMSubsystemBase.html" title="class in common.core.fsm">FSMSubsystemBase</a></dt>
 <dd>
 <div class="block">Changes the state without running any transition or checking it's allowed.</div>
@@ -1804,8 +1860,10 @@ loadScripts(document, 'script');</script>
 </dl>
 <h2 class="title" id="I:P">P</h2>
 <dl class="index">
-<dt><a href="common/utility/narwhaldashboard/NarwhalDashboard.State.html#PARTIALLY_RUNNING" class="member-name-link">PARTIALLY_RUNNING</a> - Enum constant in enum class common.utility.narwhaldashboard.<a href="common/utility/narwhaldashboard/NarwhalDashboard.State.html" title="enum class in common.utility.narwhaldashboard">NarwhalDashboard.State</a></dt>
-<dd>&nbsp;</dd>
+<dt><a href="common/hardware/motorcontroller/DeviceState.html#PARTIALLY_RUNNING" class="member-name-link">PARTIALLY_RUNNING</a> - Enum constant in enum class common.hardware.motorcontroller.<a href="common/hardware/motorcontroller/DeviceState.html" title="enum class in common.hardware.motorcontroller">DeviceState</a></dt>
+<dd>
+<div class="block">Connected, but reporting a fault.</div>
+</dd>
 <dt><a href="common/utility/tester/Tester.SystemsTest.html#passCondition" class="member-name-link">passCondition</a> - Variable in class common.utility.tester.<a href="common/utility/tester/Tester.SystemsTest.html" title="class in common.utility.tester">Tester.SystemsTest</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="common/utility/tester/Tester.TestState.html#PASSED" class="member-name-link">PASSED</a> - Enum constant in enum class common.utility.tester.<a href="common/utility/tester/Tester.TestState.html" title="enum class in common.utility.tester">Tester.TestState</a></dt>
@@ -2007,8 +2065,10 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">A command that calls <a href="common/core/subsystems/MechanismBase.html#run(double)"><code>MechanismBase.run(double)</code></a> and finishes right away; the motors keep running.</div>
 </dd>
-<dt><a href="common/utility/narwhaldashboard/NarwhalDashboard.State.html#RUNNING" class="member-name-link">RUNNING</a> - Enum constant in enum class common.utility.narwhaldashboard.<a href="common/utility/narwhaldashboard/NarwhalDashboard.State.html" title="enum class in common.utility.narwhaldashboard">NarwhalDashboard.State</a></dt>
-<dd>&nbsp;</dd>
+<dt><a href="common/hardware/motorcontroller/DeviceState.html#RUNNING" class="member-name-link">RUNNING</a> - Enum constant in enum class common.hardware.motorcontroller.<a href="common/hardware/motorcontroller/DeviceState.html" title="enum class in common.hardware.motorcontroller">DeviceState</a></dt>
+<dd>
+<div class="block">Connected, with no faults.</div>
+</dd>
 <dt><a href="common/utility/tester/Tester.TestState.html#RUNNING" class="member-name-link">RUNNING</a> - Enum constant in enum class common.utility.tester.<a href="common/utility/tester/Tester.TestState.html" title="enum class in common.utility.tester">Tester.TestState</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="common/utility/sysid/NAR_SysIdCommand.html#runSysId()" class="member-name-link">runSysId()</a> - Method in class common.utility.sysid.<a href="common/utility/sysid/NAR_SysIdCommand.html" title="class in common.utility.sysid">NAR_SysIdCommand</a></dt>
@@ -2034,6 +2094,7 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="common/utility/narwhaldashboard/NarwhalDashboard.html#sendMessage(java.lang.String)" class="member-name-link">sendMessage(String)</a> - Method in class common.utility.narwhaldashboard.<a href="common/utility/narwhaldashboard/NarwhalDashboard.html" title="class in common.utility.narwhaldashboard">NarwhalDashboard</a></dt>
 <dd>
+<div class="deprecation-block"><span class="deprecated-label">Deprecated.</span></div>
 <div class="block">Sends a message to console.log on Narwhal Dashboard.</div>
 </dd>
 <dt><a href="common/hardware/motorcontroller/NAR_Motor.html#set(double)" class="member-name-link">set(double)</a> - Method in class common.hardware.motorcontroller.<a href="common/hardware/motorcontroller/NAR_Motor.html" title="class in common.hardware.motorcontroller">NAR_Motor</a></dt>
@@ -2239,6 +2300,7 @@ loadScripts(document, 'script');</script>
 </dd>
 <dt><a href="common/utility/narwhaldashboard/NarwhalDashboard.html#setPort(int)" class="member-name-link">setPort(int)</a> - Static method in class common.utility.narwhaldashboard.<a href="common/utility/narwhaldashboard/NarwhalDashboard.html" title="class in common.utility.narwhaldashboard">NarwhalDashboard</a></dt>
 <dd>
+<div class="deprecation-block"><span class="deprecated-label">Deprecated.</span></div>
 <div class="block">Sets the IP address' port number</div>
 </dd>
 <dt><a href="common/hardware/motorcontroller/NAR_CANSpark.html#setPosition(double,double)" class="member-name-link">setPosition(double, double)</a> - Method in class common.hardware.motorcontroller.<a href="common/hardware/motorcontroller/NAR_CANSpark.html" title="class in common.hardware.motorcontroller">NAR_CANSpark</a></dt>
@@ -2643,6 +2705,10 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Returns the enum constant of this class with the specified name.</div>
 </dd>
+<dt><a href="common/hardware/motorcontroller/DeviceState.html#valueOf(java.lang.String)" class="member-name-link">valueOf(String)</a> - Static method in enum class common.hardware.motorcontroller.<a href="common/hardware/motorcontroller/DeviceState.html" title="enum class in common.hardware.motorcontroller">DeviceState</a></dt>
+<dd>
+<div class="block">Returns the enum constant of this class with the specified name.</div>
+</dd>
 <dt><a href="common/hardware/motorcontroller/NAR_CANSpark.ControllerType.html#valueOf(java.lang.String)" class="member-name-link">valueOf(String)</a> - Static method in enum class common.hardware.motorcontroller.<a href="common/hardware/motorcontroller/NAR_CANSpark.ControllerType.html" title="enum class in common.hardware.motorcontroller">NAR_CANSpark.ControllerType</a></dt>
 <dd>
 <div class="block">Returns the enum constant of this class with the specified name.</div>
@@ -2671,10 +2737,6 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Returns the enum constant of this class with the specified name.</div>
 </dd>
-<dt><a href="common/utility/narwhaldashboard/NarwhalDashboard.State.html#valueOf(java.lang.String)" class="member-name-link">valueOf(String)</a> - Static method in enum class common.utility.narwhaldashboard.<a href="common/utility/narwhaldashboard/NarwhalDashboard.State.html" title="enum class in common.utility.narwhaldashboard">NarwhalDashboard.State</a></dt>
-<dd>
-<div class="block">Returns the enum constant of this class with the specified name.</div>
-</dd>
 <dt><a href="common/utility/tester/Tester.TestState.html#valueOf(java.lang.String)" class="member-name-link">valueOf(String)</a> - Static method in enum class common.utility.tester.<a href="common/utility/tester/Tester.TestState.html" title="enum class in common.utility.tester">Tester.TestState</a></dt>
 <dd>
 <div class="block">Returns the enum constant of this class with the specified name.</div>
@@ -2690,6 +2752,11 @@ the order they are declared.</div>
 the order they are declared.</div>
 </dd>
 <dt><a href="common/hardware/input/NAR_XboxController.XboxButton.html#values()" class="member-name-link">values()</a> - Static method in enum class common.hardware.input.<a href="common/hardware/input/NAR_XboxController.XboxButton.html" title="enum class in common.hardware.input">NAR_XboxController.XboxButton</a></dt>
+<dd>
+<div class="block">Returns an array containing the constants of this enum class, in
+the order they are declared.</div>
+</dd>
+<dt><a href="common/hardware/motorcontroller/DeviceState.html#values()" class="member-name-link">values()</a> - Static method in enum class common.hardware.motorcontroller.<a href="common/hardware/motorcontroller/DeviceState.html" title="enum class in common.hardware.motorcontroller">DeviceState</a></dt>
 <dd>
 <div class="block">Returns an array containing the constants of this enum class, in
 the order they are declared.</div>
@@ -2725,11 +2792,6 @@ the order they are declared.</div>
 the order they are declared.</div>
 </dd>
 <dt><a href="common/utility/Log.Type.html#values()" class="member-name-link">values()</a> - Static method in enum class common.utility.<a href="common/utility/Log.Type.html" title="enum class in common.utility">Log.Type</a></dt>
-<dd>
-<div class="block">Returns an array containing the constants of this enum class, in
-the order they are declared.</div>
-</dd>
-<dt><a href="common/utility/narwhaldashboard/NarwhalDashboard.State.html#values()" class="member-name-link">values()</a> - Static method in enum class common.utility.narwhaldashboard.<a href="common/utility/narwhaldashboard/NarwhalDashboard.State.html" title="enum class in common.utility.narwhaldashboard">NarwhalDashboard.State</a></dt>
 <dd>
 <div class="block">Returns an array containing the constants of this enum class, in
 the order they are declared.</div>

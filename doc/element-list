@@ -7,6 +7,7 @@ common.hardware.input
 common.hardware.motorcontroller
 common.hardware.motorcontroller.sim
 common.utility
+common.utility.dashboard
 common.utility.narwhaldashboard
 common.utility.shuffleboard
 common.utility.sysid

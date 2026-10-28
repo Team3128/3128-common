@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 
+@SuppressWarnings("deprecation") // NarwhalDashboard, until it's retired
 class DashboardTest {
 
     private static final double TOLERANCE = 1e-9;
@@ -96,14 +97,14 @@ class DashboardTest {
     }
 
     @Test
-    void pressingANarwhalButtonSchedulesItsCommandByTheLastPartOfItsName() {
+    void pressingANarwhalDashboardButtonSchedulesItsCommandByTheLastPartOfItsName() {
         DriverStationSim.setEnabled(true);
         DriverStationSim.notifyNewData();
         final Command command = Commands.idle();
-        Dashboard.add("DashboardTest/NarwhalButton", command);
+        Dashboard.add("DashboardTest/NarwhalDashboardButton", command);
 
         // What NarwhalDashboard's page sends when the button is pressed
-        NarwhalDashboard.getInstance().onMessage(null, "button:NarwhalButton:true");
+        NarwhalDashboard.getInstance().onMessage(null, "button:NarwhalDashboardButton:true");
 
         assertTrue(command.isScheduled());
         CommandScheduler.getInstance().cancelAll();
@@ -112,7 +113,7 @@ class DashboardTest {
     }
 
     @Test
-    void autoChooserPicksTheDefaultUntilNarwhalPicksAnother() {
+    void autoChooserPicksTheDefaultUntilNarwhalDashboardPicksAnother() {
         final Command first = Commands.none().withName("First");
         final Command second = Commands.none().withName("Second");
         final LinkedHashMap<String, Command> autos = new LinkedHashMap<>();

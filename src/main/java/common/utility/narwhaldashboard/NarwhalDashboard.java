@@ -29,9 +29,29 @@ import edu.wpi.first.util.function.BooleanConsumer;
  * exchanges JSON messages with it.
  *
  * <p>The server starts the first time {@link #getInstance()} is called.
+ *
+ * <h2>Being replaced by Elastic</h2>
+ * The team is moving to Elastic, the dashboard that comes with WPILib, so there's no web page or
+ * server of our own to maintain. Robot code doesn't call this class: it uses
+ * {@link common.utility.dashboard.Dashboard}, which sends everything to both Elastic and here
+ * until the switch is done. To finish it:
+ * <ol>
+ * <li>In the robot project, lay out Elastic with the drivers, export the layout to
+ *     {@code src/main/deploy/elastic-layout.json}, and add
+ *     {@code WebServer.start(5800, Filesystem.getDeployDirectory().getPath())} to the
+ *     {@code Robot} constructor, so any laptop can load it with File, Download from Robot.</li>
+ * <li>Once the drivers only use Elastic, delete this package, the NarwhalDashboard lines in
+ *     {@code Dashboard}, and in {@code build.gradle} the Java-WebSocket and json-simple
+ *     dependencies (nothing else uses them) and the coverage exclusion for this package.</li>
+ * <li>In the robot project, rename the dashboard values from this page's keys ({@code robotX},
+ *     {@code voltage}, ...) to names that read well in Elastic.</li>
+ * </ol>
+ *
+ * @deprecated Use {@link common.utility.dashboard.Dashboard}, which shows everything on Elastic.
  * @since Deep Space 2019
  * @author Mason Lam
  */
+@Deprecated
 public class NarwhalDashboard extends WebSocketServer implements AutoCloseable {
     private final HashMap<String, List<Object>> initMap = new HashMap<String, List<Object>>();
     private final HashMap<String, Supplier<Object>> updateMap = new HashMap<String, Supplier<Object>>();
