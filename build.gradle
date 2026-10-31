@@ -4,9 +4,16 @@ plugins {
     id "edu.wpi.first.GradleRIO" version "2026.2.1"
 }
 
+// The release workflow overrides this with the tag being released
+version = LibraryVersion
+
 java {
     sourceCompatibility = JavaVersion.VERSION_17
     targetCompatibility = JavaVersion.VERSION_17
+
+    // The release workflow uploads these alongside the main jar
+    withJavadocJar()
+    withSourcesJar()
 }
 
 def ROBOT_MAIN_CLASS = ""

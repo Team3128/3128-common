@@ -29,7 +29,7 @@ jobs:
         cache: gradle
 
     - name: Build 3128-common
-      run: './gradlew build'
+      run: './gradlew build -PLibraryVersion=${{ steps.getTag.outputs.tag }}'
 
     - name: Upload 3128-common Jar
       id: upload-release-asset 
