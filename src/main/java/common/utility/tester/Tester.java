@@ -5,18 +5,32 @@ import java.util.HashMap;
 import java.util.ArrayList;
 
 import common.utility.Log;
-import common.utility.narwhaldashboard.NarwhalDashboard;
+import common.utility.dashboard.Dashboard;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 
 /**
- * Team 3128's Tester utility class used to run system checks at competitions.
+ * Runs system checks in the pits: quick tests that each part of the robot works before a match.
+ *
+ * <p>A {@link SystemsTest} is one check: a command to run, and optionally a condition that must
+ * be true when it finishes for it to pass. Tests added under the same name form a {@link Test},
+ * which runs them in order and stops at the first failure. Each name has a button and a
+ * pass/fail value on the dashboard, under {@code Tests/} and {@code Test States/}.
+ *
+ * <pre>{@code
+ * Tester.getInstance().addTest("Intake", new SystemsTest("Extend",
+ *     intake.setStateCommand(INTAKE).andThen(waitSeconds(1)),
+ *     () -> intake.slider.atSetpoint()));
+ * }</pre>
  */
 public class Tester {
-    
-    /**System test */
+
+    /**
+     * One check, which runs a command and passes if the command finishes without being interrupted
+     * and its pass condition is true at the end.
+     */
     public static class SystemsTest extends Command {
 
         protected String testName;
@@ -24,19 +38,19 @@ public class Tester {
         protected BooleanSupplier passCondition;
         protected TestState testState;
         /**
-         * Creates a new System Test.
-         * @param testName Name of the test.
-         * @param command Command to be run for the test.
+         * Creates a system test.
+         * @param testName The name of the test.
+         * @param command The command to run for the test.
          */
         public SystemsTest(String testName, Command command) {
             this(testName, command, ()-> true);
         }
 
         /**
-         * Creates a new System Test.
-         * @param testName Name of the test.
-         * @param command Command to be run for the test.
-         * @param passCondition Condition for the test to pass.
+         * Creates a system test.
+         * @param testName The name of the test.
+         * @param command The command to run for the test.
+         * @param passCondition The condition required for the test to pass.
          */
         public SystemsTest(String testName, Command command, BooleanSupplier passCondition) {
             this.testName = testName;
@@ -74,7 +88,10 @@ public class Tester {
         }
     }
 
-    /**Collection of tests to be run for a system */
+    /**
+     * A named group of checks for one part of the robot, run in sequence. It stops at the
+     * first failure, and passes once every check has passed.
+     */
     public static class Test extends Command {
         private final ArrayList<SystemsTest> systemsTests;
         private final String name;
@@ -86,7 +103,7 @@ public class Tester {
 
         /**
          * Creates a test for a specific system.
-         * @param name Name of the test or system.
+         * @param name The name of the test or system.
          */
         private Test(String name) {
             systemsTests = new ArrayList<SystemsTest>();
@@ -95,23 +112,21 @@ public class Tester {
             state = TestState.FAILED;
             curIndex = 0;
             passTimer = new Timer();
-            NarwhalDashboard.getInstance().addUpdate(name, ()-> state.toString());
-            NarwhalDashboard.getInstance().addButton(name, (boolean pressed) -> {
-                if (pressed) CommandScheduler.getInstance().schedule(this);
-            });
+            Dashboard.add("Tests/" + name, this);
+            Dashboard.add("Test States/" + name, ()-> state.toString());
         }
 
         /**
-         * Adds a larger system test to be run.
-         * @param test Test for the robot.
+         * Adds a larger system test to run.
+         * @param test The test to add.
          */
         public void addTest(Test test) {
             systemsTests.add(new SystemsTest(test.getName(), test, ()-> test.state == TestState.PASSED));
         }
 
         /**
-         * Adds a System test to be run.
-         * @param test A System test for the system.
+         * Adds a system test to run.
+         * @param test The system test to add.
          */
         public void addTest(SystemsTest test) {
             systemsTests.add(test);
@@ -138,6 +153,7 @@ public class Tester {
             }
         }
 
+        /** Monitors the current check; when it passes, waits timeBetweenTests, then starts the next check. */
         @Override
         public void execute() {
             if (systemsTests.size() == 0) return;
@@ -179,7 +195,7 @@ public class Tester {
         }
 
         /**
-         * Returns whether or not the test has passed, failed, or is running.
+         * Returns whether the test has passed, has failed, or is running.
          * @return The current state of the test.
          */
         public TestState getTestState() {
@@ -187,15 +203,15 @@ public class Tester {
         }
 
         /**
-         * Sets the time between each test.
-         * @param time Time between tests.
+         * Sets the time between tests.
+         * @param time The time between tests.
          */
         public void setTimeBetweenTests(double time) {
             timeBetweenTests = time;
         }
     }
 
-    /**Enum representing test states */
+    /** The status of a test. A test that has not run counts as FAILED. */
     public enum TestState {
         FAILED,
         RUNNING,
@@ -204,6 +220,7 @@ public class Tester {
 
     private static Tester instance;
 
+    /** The single Tester for the robot. */
     public static synchronized Tester getInstance() {
         if (instance == null) {
             instance = new Tester();
@@ -218,9 +235,9 @@ public class Tester {
     }
 
     /**
-     * Adds a Systems test to be run for a system.
-     * @param name Name of the test or system.
-     * @param test Systems test to be added.
+     * Adds a system test to run for a system.
+     * @param name The name of the test or system.
+     * @param test The system test to add.
      */
     public void addTest(String name, SystemsTest test) {
         if (!systemTests.containsKey(name)) {
@@ -230,9 +247,9 @@ public class Tester {
     }
 
     /**
-     * Adds a Systems test to be run for a system.
-     * @param name Name of the test or system.
-     * @param test Systems test to be added.
+     * Adds a system test to run for a system.
+     * @param name The name of the test or system.
+     * @param test The system test to add.
      */
     public void addTest(String name, Test test) {
         if (!systemTests.containsKey(name)) {
@@ -242,9 +259,9 @@ public class Tester {
     }
 
     /**
-     * Returns a Test for the robot.
-     * @param name Name of the test or system.
-     * @return A Test.
+     * Returns a test for the robot.
+     * @param name The name of the test or system.
+     * @return The test.
      */
     public Test getTest(String name) {
         return systemTests.get(name);
@@ -252,8 +269,8 @@ public class Tester {
     }
 
     /**
-     * Runs the Systems tests for a system.
-     * @param name Name of the test or system.
+     * Runs the system tests for a system.
+     * @param name The name of the test or system.
      */
     public void runTest(String name) {
         CommandScheduler.getInstance().schedule(systemTests.get(name));

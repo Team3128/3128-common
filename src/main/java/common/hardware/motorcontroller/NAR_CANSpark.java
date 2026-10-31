@@ -25,20 +25,38 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.SparkBase.Faults;
 import com.revrobotics.PersistMode;
 import com.revrobotics.ResetMode;
+import com.revrobotics.sim.SparkAbsoluteEncoderSim;
+import com.revrobotics.sim.SparkFlexSim;
+import com.revrobotics.spark.FeedbackSensor;
+import com.revrobotics.sim.SparkMaxSim;
 
 import common.core.controllers.PIDFFConfig;
 import common.utility.Log;
-import common.utility.narwhaldashboard.NarwhalDashboard.State;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.RobotController;
 
 import java.util.function.Supplier;
 
 import static common.hardware.motorcontroller.MotorControllerConstants.*;
 
 /**
- * Team 3128's streamlined {@link SparkBase} class.
+ * A REV Spark MAX or Spark Flex motor controller, which drives NEO, NEO 550 and NEO Vortex
+ * motors, using REVLib.
+ *
+ * <p>All settings are kept in one {@code SparkBaseConfig}. Changing a setting updates that object
+ * and sends it to the Spark without saving it; {@code NAR_Robot} saves every Spark's settings to flash once
+ * after startup, as REV recommends (see {@link #burnFlash()}).
+ *
+ * <p>The Spark's own control loops measure in rotor rotations and RPM (the encoders have no
+ * conversion factor), output a fraction of the 12 V compensation voltage, and run every
+ * millisecond without scaling kI and kD by the period, matching WPILib SysId's REV presets.
+ * Feedforward gains are in volts. {@link NAR_Motor} converts gains and setpoints to and from the
+ * configured units.
+ *
+ * <p>This class can read either the motor's built-in encoder or an absolute encoder connected to the
+ * Spark; see {@link EncoderType}.
+ *
  * @since 2023 Charged Up
  * @author Mason Lam
  */
@@ -46,12 +64,15 @@ public class NAR_CANSpark extends NAR_Motor {
 
 	private static int numFailedConfigs = 0;
 
+	/** The number of attempts to send settings before failing. */
 	public static int maximumRetries = 5;
 
+	/** Every Spark created, so that all of them can be saved to flash at once. */
 	public static final LinkedList<NAR_CANSpark> instances = new LinkedList<NAR_CANSpark>();
 
 	/**
-	 * Flashes all spark max's
+	 * Saves every Spark's settings to flash; see {@link #burnFlash()}. {@code NAR_Robot} calls
+	 * this once after {@code robotInit}.
 	 */
 	public static void burnFlashAll() {
 		for (final NAR_CANSpark spark : instances) {
@@ -60,21 +81,30 @@ public class NAR_CANSpark extends NAR_Motor {
 	}
 
 	/**
-	 * @return The number of failed configurations of the motor.
+	 * @return The number of settings, across every Spark, that failed after all retries.
 	 */
 	public static int getNumFailedConfigs() {
 		return numFailedConfigs;
 	}
 
 	/**
-	 * Team 3128's status frames
+	 * The period of each of the Spark's status frames, in milliseconds:
+	 * <ul>
+	 * <li>0: output and faults</li>
+	 * <li>1: velocity, current, temperature and voltage</li>
+	 * <li>2: position</li>
+	 * <li>3: an analog sensor</li>
+	 * <li>4: an alternate encoder</li>
+	 * <li>5 and 6: an absolute encoder's position and velocity</li>
+	 * </ul>
+	 * Frame 1 is never turned off, since every mechanism logs its motors' current and temperature.
 	 */
 	public enum NAR_SparkMaxConfig {
 		DEFAULT(HIGH_PRIORITY, HIGH_PRIORITY, HIGH_PRIORITY, NO_PRIORITY, NO_PRIORITY, NO_PRIORITY, NO_PRIORITY),
-		FOLLOWER(HIGH_PRIORITY, NO_PRIORITY, NO_PRIORITY, NO_PRIORITY, NO_PRIORITY, NO_PRIORITY, NO_PRIORITY),
-		POSITION(HIGH_PRIORITY, NO_PRIORITY, HIGH_PRIORITY, NO_PRIORITY, NO_PRIORITY, NO_PRIORITY, NO_PRIORITY),
-		VELOCITY(HIGH_PRIORITY, HIGH_PRIORITY, NO_PRIORITY, NO_PRIORITY, NO_PRIORITY, NO_PRIORITY, NO_PRIORITY),
-		ABSOLUTE(HIGH_PRIORITY, NO_PRIORITY, NO_PRIORITY, NO_PRIORITY, NO_PRIORITY, HIGH_PRIORITY, HIGH_PRIORITY);
+		FOLLOWER(HIGH_PRIORITY, MEDIUM_PRIORITY, NO_PRIORITY, NO_PRIORITY, NO_PRIORITY, NO_PRIORITY, NO_PRIORITY),
+		POSITION(HIGH_PRIORITY, MEDIUM_PRIORITY, HIGH_PRIORITY, NO_PRIORITY, NO_PRIORITY, NO_PRIORITY, NO_PRIORITY),
+		VELOCITY(HIGH_PRIORITY, HIGH_PRIORITY, LOW_PRIORITY, NO_PRIORITY, NO_PRIORITY, NO_PRIORITY, NO_PRIORITY),
+		ABSOLUTE(HIGH_PRIORITY, MEDIUM_PRIORITY, NO_PRIORITY, NO_PRIORITY, NO_PRIORITY, HIGH_PRIORITY, HIGH_PRIORITY);
 
 		public final int status0, status1, status2, status3, status4, status5, status6;
 
@@ -89,18 +119,25 @@ public class NAR_CANSpark extends NAR_Motor {
 		}
 	}
 	/**
-	 * Type of encoder used
+	 * The encoder that the Spark reads.
 	 */
     public enum EncoderType {
+		/** The motor's built-in encoder, which starts at 0 every time the robot turns on. */
 		Relative,
+		/**
+		 * An absolute encoder, such as a REV Through Bore, connected to the Spark. Its position is
+		 * known as soon as the robot turns on, from 0 to 1 rotation.
+		 */
 		Absolute
 	}
 
 	/**
-	 * Type of controller used
+	 * The Spark model.
 	 */
 	public enum ControllerType {
+		/** A Spark MAX, usually driving a NEO or NEO 550. */
 		CAN_SPARK_MAX,
+		/** A Spark Flex, usually driving a NEO Vortex. */
 		CAN_SPARK_FLEX
 	}
 	
@@ -111,13 +148,18 @@ public class NAR_CANSpark extends NAR_Motor {
 	private final SparkClosedLoopController controller;
     private final SparkBase motor;
 	private final SparkBaseConfig config;
+	private SparkMaxSim maxSim;
+	private SparkFlexSim flexSim;
+	private SparkAbsoluteEncoderSim absoluteSim;
+	/** Absolute encoder rotations when the simulation model was at zero. */
+	private double absoluteSimOffset = 0;
 
     /**
-	 * Create a new object to control a SPARK motor
+	 * Creates an object that controls a SPARK motor.
 	 *
 	 * @param deviceNumber The device ID.
-	 * @param controllerType The type of controller used, ie. CAN_SPARK_MAX or CAN_SPARK_FLEX
-	 * @param encoderType The type of encoder used, ie. relative build in encoder or absolute encoder
+	 * @param controllerType The type of controller, either CAN_SPARK_MAX or CAN_SPARK_FLEX
+	 * @param encoderType The type of encoder, either the built-in relative encoder or an absolute encoder
 	 * 		connected by an adapter.
 	 * @param motorType The motor type connected to the controller. Brushless motor wires must be connected
 	 *     	to their matching colors and the hall sensor must be plugged in. Brushed motors must be
@@ -135,6 +177,7 @@ public class NAR_CANSpark extends NAR_Motor {
 
 		motor.setCANMaxRetries(0);
 		configSpark(()-> motor.clearFaults());
+		// Safe settings until a mechanism's MotorConfig replaces them
 		enableVoltageCompensationNoApply(12.0);
 		setStatorLimitNoApply(motorType == MotorType.kBrushless ? NEO_STATOR_CurrentLimit : NEO_STATOR_550CurrentLimit);
 		setSupplyLimitNoApply(motorType == MotorType.kBrushless ? NEO_SUPPLY_CurrentLimit : NEO_SUPPLY_550CurrentLimit);
@@ -143,30 +186,34 @@ public class NAR_CANSpark extends NAR_Motor {
 
 		relativeEncoder = motor.getEncoder();
 		if (encoderType == EncoderType.Relative) {
-			//No clue what this does, but Mechanical Advantage does this so it must be good
+			// The Spark calculates speed by averaging encoder readings. REV's defaults average over a
+			// long period, so the reported speed lags the real speed by tens of milliseconds;
+			// these values, from Mechanical Advantage, reduce the lag
 			config.encoder.uvwAverageDepth(2);
 			config.encoder.uvwMeasurementPeriod(10);
 		}
 		else {
+			absoluteEncoder = motor.getAbsoluteEncoder();
 			config.absoluteEncoder.averageDepth(2);
+			// Reads in RPM, as the built-in encoder does
 			config.absoluteEncoder.velocityConversionFactor(60);
+			config.closedLoop.feedbackSensor(FeedbackSensor.kAbsoluteEncoder);
 		}
 
 		controller = motor.getClosedLoopController();
 		configPIDNoApply(PIDconfig);
-		// configure();
 		instances.add(this);
     }
 
     /**
-	 * Create a new object to control a SPARK motor
+	 * Creates an object that controls a SPARK motor.
 	 *
 	 * @param deviceNumber The device ID.
-	 * @param controllerType The type of controller used, ie. CAN_SPARK_MAX or CAN_SPARK_FLEX
+	 * @param controllerType The type of controller, either CAN_SPARK_MAX or CAN_SPARK_FLEX
      * @param motorType The motor type connected to the controller. Brushless motor wires must be connected
 	 *     	to their matching colors and the hall sensor must be plugged in. Brushed motors must be
 	 *     	connected to the Red and Black terminals only.
-	 * @param encoderType The type of encoder used, ie. relative build in encoder or absolute encoder
+	 * @param encoderType The type of encoder, either the built-in relative encoder or an absolute encoder
 	 * 		connected by an adapter.
 	 */
 	public NAR_CANSpark(int deviceNumber, ControllerType controllerType, MotorType motorType, EncoderType encoderType) {
@@ -174,10 +221,10 @@ public class NAR_CANSpark extends NAR_Motor {
 	}
 
     /**
-	 * Create a new object to control a SPARK motor
+	 * Creates an object that controls a SPARK motor.
 	 *
 	 * @param deviceNumber The device ID.
-	 * @param controllerType The type of controller used, ie. CAN_SPARK_MAX or CAN_SPARK_FLEX
+	 * @param controllerType The type of controller, either CAN_SPARK_MAX or CAN_SPARK_FLEX
      * @param motorType The motor type connected to the controller. Brushless motor wires must be connected
 	 *     	to their matching colors and the hall sensor must be plugged in. Brushed motors must be
 	 *     	connected to the Red and Black terminals only.
@@ -187,17 +234,17 @@ public class NAR_CANSpark extends NAR_Motor {
 	}
     
     /**
-	 * Create a new object to control a SPARK motor
+	 * Creates an object that controls a SPARK motor.
 	 *
 	 * @param deviceNumber The device ID.
-	 * @param controllerType The type of controller used, ie. CAN_SPARK_MAX or CAN_SPARK_FLEX
+	 * @param controllerType The type of controller, either CAN_SPARK_MAX or CAN_SPARK_FLEX
 	 */
 	public NAR_CANSpark(int deviceNumber, ControllerType controllerType) {
 		this(deviceNumber, controllerType, MotorType.kBrushless);
 	}
 
 	/**
-	 * Create a new object to control a SPARK MAX motor
+	 * Creates an object that controls a SPARK MAX motor.
 	 *
 	 * @param deviceNumber The device ID.
 	 */
@@ -206,7 +253,7 @@ public class NAR_CANSpark extends NAR_Motor {
 	}
 
 	/**
-	 * Run the configuration until it succeeds or times out.
+	 * Runs the configuration until it succeeds or times out.
 	 *
 	 * @param config Lambda supplier returning the error state.
 	 */
@@ -228,8 +275,12 @@ public class NAR_CANSpark extends NAR_Motor {
 		configure();
 	}
 
+	/**
+	 * Sends the settings to the Spark without saving them, as REV recommends for changes after
+	 * startup, because saving is slow and wears the flash. {@link #burnFlash()} saves them once at startup.
+	 */
 	public void configure() {
-		motor.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
+		configSpark(() -> motor.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters));
 	}
 
 	@Override
@@ -251,18 +302,11 @@ public class NAR_CANSpark extends NAR_Motor {
 	}
 
 	/**
-	 * Sets the current limit in Amps.
+	 * Sets REV's "smart current limit": the Spark lowers its output to keep the motor's current
+	 * below this value. NEOs draw large current spikes without a limit, which can damage the motor and
+	 * the Spark, so this limit should always be set.
 	 *
-	 * <p>The motor controller will reduce the controller voltage output to avoid surpassing this
-	 * limit. This limit is enabled by default and used for brushless only. This limit is highly
-	 * recommended when using the NEO brushless motor.
-	 *
-	 * <p>The NEO Brushless Motor has a low internal resistance, which can mean large current spikes
-	 * that could be enough to cause damage to the motor and controller. This current limit provides a
-	 * smarter strategy to deal with high current draws and keep the motor and controller operating in
-	 * a safe region.
-	 *
-	 * @param limit The current limit in Amps.
+	 * @param limit Amps
 	 */
 	@Override
 	public void setStatorLimit(int limit) {
@@ -270,47 +314,37 @@ public class NAR_CANSpark extends NAR_Motor {
 		configure();
 	}
 
+	/** Stores the smart current limit without sending it. */
 	@Override
 	public void setStatorLimitNoApply(int limit) {
 		config.smartCurrentLimit(limit);
 	}
 
 	/**
-   * Sets the secondary current limit in Amps.
-   *
-   * <p>The motor controller will disable the output of the controller briefly if the current limit
-   * is exceeded to reduce the current. This limit is a simplified 'on/off' controller. This limit
-   * is enabled by default but is set higher than the default Smart Current Limit.
-   *
-   * <p>The time the controller is off after the current limit is reached is determined by the
-   * parameter limitCycles, which is the number of PWM cycles (20kHz). The recommended value is the
-   * default of 0 which is the minimum time and is part of a PWM cycle from when the over current is
-   * detected. This allows the controller to regulate the current close to the limit value.
-   *
-   * <p>The total time is set by the equation <code>
-   * t = (50us - t0) + 50us * limitCycles
-   * t = total off time after over current
-   * t0 = time from the start of the PWM cycle until over current is detected
-   * </code>
-   *
-   * @param limit The current limit in Amps.
-   */
+	 * Sets REV's "secondary current limit". Sparks do not have a true supply limit
+	 * as a TalonFX does, so this is the closest equivalent: if the motor's current exceeds it, the Spark
+	 * briefly cuts its output. Keep it above {@link #setStatorLimit(int)}, which performs the
+	 * primary limiting.
+	 *
+	 * @param limit Amps
+	 */
 	@Override
 	public void setSupplyLimit(int limit) {
 		setSupplyLimitNoApply(limit);
 		configure();
 	}
 
+	/** Stores the secondary current limit without sending it. */
 	@Override
 	public void setSupplyLimitNoApply(int limit) {
 		config.secondaryCurrentLimit(limit);
 	}
 
     /**
-	 * Set the rate of transmission for periodic frames from the SPARK MAX
+	 * Sets the transmission rate of periodic frames from the SPARK MAX.
 	 *
-	 * <p>Each motor controller sends back status frames with different data at set rates. Use this
-	 * function to change the default rates.
+	 * <p>Each motor controller sends status frames with different data at set rates. This method
+	 * changes the default rates.
 	 * 
 	 * <p><b>Status 0</b>: Applied Output, Faults, Sticky Faults, isFollower
 	 * <p><b>Status 1</b>: Motor Velocity, Motor Temperature, Motor Voltage, Motor Current
@@ -320,23 +354,47 @@ public class NAR_CANSpark extends NAR_Motor {
 	 * <p><b>Status 5</b>: Duty Cycle Absolute Encoder Position, Duty Cycle Absolute Encoder Absolute Angle
 	 * <p><b>Status 6</b>: Duty Cycle Absolute Encoder Velocity, Duty Cycle Absolute Encoder Frequency
 	 * 
-	 * @param frame Which type of {@link PeriodicFrame} to change the period of
-	 * @param periodMs Period in ms for the given frame.
+	 * @param frame The {@link PeriodicFrame} to change
+	 * @param periodMs The period for the given frame, in milliseconds.
 	 */
 	public void setPeriodicFramePeriod(PeriodicFrame frame, int periodMs) {
 		setPeriodicFramePeriodNoApply(frame, periodMs);
 		configure();
 	}
 
+	/**
+	 * Stores a frame's rate without sending it. REVLib sets rates per signal rather than per
+	 * frame, so this sets every signal the frame carries. Frame 4, an alternate encoder, is not
+	 * supported and is ignored.
+	 */
 	public void setPeriodicFramePeriodNoApply(PeriodicFrame frame, int periodMs) {
-		config.signals.primaryEncoderPositionPeriodMs(periodMs);
+		switch (frame) {
+			case kStatus0:
+				config.signals.appliedOutputPeriodMs(periodMs).faultsPeriodMs(periodMs);
+				break;
+			case kStatus1:
+				config.signals.primaryEncoderVelocityPeriodMs(periodMs).motorTemperaturePeriodMs(periodMs)
+					.busVoltagePeriodMs(periodMs).outputCurrentPeriodMs(periodMs);
+				break;
+			case kStatus2:
+				config.signals.primaryEncoderPositionPeriodMs(periodMs);
+				break;
+			case kStatus3:
+				config.signals.analogVoltagePeriodMs(periodMs).analogVelocityPeriodMs(periodMs).analogPositionPeriodMs(periodMs);
+				break;
+			case kStatus5:
+				config.signals.absoluteEncoderPositionPeriodMs(periodMs);
+				break;
+			case kStatus6:
+				config.signals.absoluteEncoderVelocityPeriodMs(periodMs);
+				break;
+			default:
+				break;
+		}
 	}
 
 	/**
-	 * Set the rate of transmission for periodic frames from the SPARK MAX
-	 *
-	 * <p>Each motor controller sends back status frames with different data at set rates. Use this
-	 * function to set to team 3128's preset rates.
+	 * Sets every frame's rate to one of the team's presets in {@link NAR_SparkMaxConfig}.
 	 */
 	public void setStatusFrames(NAR_SparkMaxConfig config) {
 		setPeriodicFramePeriodNoApply(PeriodicFrame.kStatus0, config.status0);
@@ -370,14 +428,19 @@ public class NAR_CANSpark extends NAR_Motor {
 	}
 
 	/**
-	 * Burns all settings to flash; stores settings between power cycles
+	 * Resets the Spark to its defaults, applies every setting, and saves them to flash, so that it retains
+	 * them after a reboot, for example, after a brownout. REV recommends doing this once at startup;
+	 * {@code NAR_Robot} does so for every Spark after {@code robotInit}.
 	 */
 	public REVLibError burnFlash() {
-		 if (RobotBase.isSimulation()) return REVLibError.kOk;
+		if (RobotBase.isSimulation()) return REVLibError.kOk;
 
-		Timer.delay(0.5);
-		REVLibError status = motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
-		Timer.delay(0.5);
+		// configure() waits for the Spark to confirm, so no pause is needed around it
+		REVLibError status = REVLibError.kOk;
+		for (int i = 0; i < maximumRetries; i++) {
+			status = motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+			if (status == REVLibError.kOk) break;
+		}
 		if (status == REVLibError.kOk) {
 			Log.info("Motors", "Burned flash for Spark Max " + motor.getDeviceId());
 		} else {
@@ -388,17 +451,61 @@ public class NAR_CANSpark extends NAR_Motor {
 	}
 
 	/**
-     * Sets a motor's output based on the leader's
-     * @param leader The motor to follow
-	 * @param invert Whether or not to invert motor output
+     * Makes this Spark copy another Spark's output on the Sparks themselves, so that it follows
+     * instantly. Its own inversion setting is ignored while following.
+     * @param leader The Spark to follow
+	 * @param invert Whether to spin opposite to the leader
      */
 	public void follow(NAR_CANSpark leader, boolean invert) {
 		followNoApply(leader, invert);
 		configure();
 	}
 
+	/** Stores the follow setting without sending it. */
 	public void followNoApply(NAR_CANSpark leader, boolean invert) {
 		config.follow(leader.motor, invert);
+	}
+
+	@Override
+	protected void configNativeClosedLoop(Control mode, double kP, double kI, double kD,
+										  double kS, double kV, double kG, double motorRotationsPerArmRotation) {
+		final boolean arm = motorRotationsPerArmRotation > 0;
+		config.closedLoop.p(kP).i(kI).d(kD);
+		config.closedLoop.feedForward
+			.kS(kS)
+			.kV(kV)
+			.kG(arm ? 0 : kG)
+			.kCos(arm ? kG : 0)
+			// Converts encoder rotations to arm rotations
+			.kCosRatio(arm ? 1 / motorRotationsPerArmRotation : 1);
+		configure();
+	}
+
+	@Override
+	protected double getNativePositionRotations() {
+		return 1;
+	}
+
+	@Override
+	protected double getNativeVelocityRPM() {
+		return 1;
+	}
+
+	@Override
+	protected double getNativeOutputVolts() {
+		return 12;
+	}
+
+	@Override
+	protected double getNativeTimeSeconds() {
+		return 0.001;
+	}
+
+	@Override
+	public boolean followOnController(NAR_Motor leader, boolean opposeLeader) {
+		if (!(leader instanceof NAR_CANSpark spark)) return false;
+		follow(spark, opposeLeader);
+		return true;
 	}
 
 	@Override
@@ -448,13 +555,18 @@ public class NAR_CANSpark extends NAR_Motor {
 
 	@Override
 	public double getTorque() {
-		if(motor instanceof SparkFlex) return DCMotor.getNEO(1).withReduction(unitConversionFactor).getTorque(getStallCurrent());
-		return DCMotor.getNeoVortex(1).withReduction(unitConversionFactor).getTorque(getStallCurrent());
+		// A Spark Flex drives a NEO Vortex; a Spark MAX is assumed to drive a NEO
+		final DCMotor neo = motor instanceof SparkFlex ? DCMotor.getNeoVortex(1) : DCMotor.getNEO(1);
+		return neo.getTorque(getStallCurrent());
 	}
 	
 	@Override
 	public void resetRawPosition(double rotations) {
 		if (encoderType == EncoderType.Relative) relativeEncoder.setPosition(rotations);
+		// An absolute encoder already knows its position, but not in simulation, so the starting offset is stored
+		else if (RobotBase.isSimulation()) {
+			absoluteSimOffset = rotations - getSimRotorRotations() / motorRotationsPerSensorRotation;
+		}
 	}
 
     @Override
@@ -466,6 +578,37 @@ public class NAR_CANSpark extends NAR_Motor {
     public double getRawVelocity() {
         return encoderType == EncoderType.Relative ? relativeEncoder.getVelocity() : absoluteEncoder.getVelocity();
     }
+
+	/**
+	 * Follows REV's SparkSim pattern. The built-in encoder has no conversion factor, so iterate()
+	 * takes rotor RPM. An absolute encoder is moved by the motor's motion divided by
+	 * {@link #setMotorRotationsPerSensorRotation(double)}.
+	 */
+	@Override
+	protected void simulationStep(double dtSeconds) {
+		final double busVolts = RobotController.getBatteryVoltage();
+		if (motor instanceof SparkFlex flex) {
+			if (flexSim == null) flexSim = new SparkFlexSim(flex, simModel.getMotor());
+			simModel.update(flexSim.getAppliedOutput() * busVolts, dtSeconds);
+			flexSim.iterate(simModel.getRotorRPS() * 60.0, busVolts, dtSeconds);
+			if (encoderType == EncoderType.Absolute && absoluteSim == null) absoluteSim = new SparkAbsoluteEncoderSim(flex);
+		} else {
+			if (maxSim == null) maxSim = new SparkMaxSim((SparkMax) motor, simModel.getMotor());
+			simModel.update(maxSim.getAppliedOutput() * busVolts, dtSeconds);
+			maxSim.iterate(simModel.getRotorRPS() * 60.0, busVolts, dtSeconds);
+			if (encoderType == EncoderType.Absolute && absoluteSim == null) absoluteSim = new SparkAbsoluteEncoderSim((SparkMax) motor);
+		}
+
+		if (absoluteSim != null) {
+			// In the encoder's units after its conversion factors: rotations and RPM
+			absoluteSim.setPosition(absoluteSimOffset + simModel.getRotorRotations() / motorRotationsPerSensorRotation);
+			absoluteSim.setVelocity(simModel.getRotorRPS() * 60.0 / motorRotationsPerSensorRotation);
+		}
+	}
+
+	private double getSimRotorRotations() {
+		return simModel == null ? 0 : simModel.getRotorRotations();
+	}
 
 	@Override
 	public double getTemperature() {
@@ -505,39 +648,37 @@ public class NAR_CANSpark extends NAR_Motor {
 		config.idleMode(IdleMode.kCoast);
 	}
 
+	/** Returns REVLib's {@code SparkMax} or {@code SparkFlex}, for functionality this class does not cover. */
 	@Override
     public SparkBase getMotor() {
         return motor;
     }
 
+	/** Returns every fault the Spark is currently reporting, such as over-temperature or a sensor problem. */
 	public Faults getAllFaults() {
 		return motor.getFaults();
 	}
 
-	//TODO: Eval necessity
-	// public boolean getFault(int fault) {
-	// 	return motor.getFault(fault);
-	// }
-
 	/**
-	 * Returns motor and motor controller functionality.
-	 * @return State of the motor controller and motor.
+	 * Returns RUNNING if the Spark has no faults, current or sticky, and its last command
+	 * succeeded; otherwise DISCONNECTED.
 	 */
-	public State getState() {
-		//To do add check for motors
+	public DeviceState getState() {
+		// TODO: Add a check for motors.
 		if(!motor.hasActiveFault() 
 			&& !motor.hasStickyFault()
 			&& motor.getLastError() == REVLibError.kOk) {
-			return State.RUNNING;
+			return DeviceState.RUNNING;
 		}
-		return State.DISCONNECTED;
+		return DeviceState.DISCONNECTED;
 	}
 
 	/**
-     * Closes the spark.
+     * Closes the Spark.
      */
     @Override
     public void close() {
+        disableSim();
         motor.close();
     }
 }

@@ -1,11 +1,19 @@
 plugins {
     id "java"
+    id "jacoco"
     id "edu.wpi.first.GradleRIO" version "2026.2.1"
 }
+
+// The release workflow overrides this with the tag being released
+version = LibraryVersion
 
 java {
     sourceCompatibility = JavaVersion.VERSION_17
     targetCompatibility = JavaVersion.VERSION_17
+
+    // The release workflow uploads these alongside the main jar
+    withJavadocJar()
+    withSourcesJar()
 }
 
 def ROBOT_MAIN_CLASS = ""
@@ -86,6 +94,21 @@ dependencies {
 test {
     useJUnitPlatform()
     systemProperty 'junit.jupiter.extensions.autodetection.enabled', 'true'
+}
+
+// Test coverage: ./gradlew test jacocoTestReport, then open build/reports/jacoco/test/html/index.html
+jacocoTestReport {
+    dependsOn test
+    reports {
+        xml.required = true
+        html.required = true
+    }
+    // NarwhalDashboard is being replaced by Elastic and will be deleted, so it isn't counted here
+    afterEvaluate {
+        classDirectories.setFrom(files(classDirectories.files.collect {
+            fileTree(dir: it, exclude: 'common/utility/narwhaldashboard/**')
+        }))
+    }
 }
 
 // Simulation configuration (e.g. environment variables).
