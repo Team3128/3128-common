@@ -21,7 +21,7 @@ class MechanismLog {
     private final DoublePublisher volts;
     private final BooleanPublisher enabled;
     private final BooleanPublisher atSetpoint;
-    // One value per motor, leader first, so a follower that stops pulling current stands out
+    /** One value per motor, leader first, so a follower that stops pulling current stands out. */
     private final DoubleArrayPublisher currents;
     private final DoubleArrayPublisher temperatures;
 

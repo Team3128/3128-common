@@ -1,6 +1,6 @@
 package common.hardware.motorcontroller;
 
-/** How a motor controller is doing, from {@link NAR_Motor#getState()}, e.g. for a light on the dashboard. */
+/** The health of a motor controller, from {@link NAR_Motor#getState()}, for example, for a dashboard indicator. */
 public enum DeviceState {
     /** Connected, with no faults. */
     RUNNING,

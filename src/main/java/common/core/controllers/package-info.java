@@ -1,5 +1,4 @@
 /**
- * Control loop gains. {@link common.core.controllers.PIDFFConfig} holds a mechanism's PID and
- * feedforward gains, and explains what each one does.
+ * Control loop gains. See {@code README.md} in this folder for what each gain does.
  */
 package common.core.controllers;

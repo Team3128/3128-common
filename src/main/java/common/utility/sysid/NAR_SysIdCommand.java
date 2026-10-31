@@ -19,21 +19,21 @@ import static edu.wpi.first.wpilibj2.command.Commands.waitSeconds;
 
 
 /**
- * Runs WPILib's SysId tests on a mechanism and records the results, so the SysId tool can work
- * out its feedforward gains (kS, kV, kA, kG) for you.
+ * Runs WPILib's SysId tests on a mechanism and records the results, so that the SysId tool can
+ * calculate its feedforward gains (kS, kV, kA, kG).
  *
- * <p>SysId runs two kinds of test, each forward and backward:
+ * <p>SysId runs two kinds of test, each in both directions:
  * <ul>
  * <li><b>Quasistatic</b>: the voltage rises slowly, so the mechanism barely accelerates. This
  *     measures kS and kV.</li>
- * <li><b>Dynamic</b>: the voltage jumps straight to a step, so the mechanism accelerates hard.
+ * <li><b>Dynamic</b>: the voltage steps immediately to a set value, so the mechanism accelerates quickly.
  *     This measures kA.</li>
  * </ul>
- * Each test stops after a timeout, 10 seconds unless you give one. For a mechanism with limited
- * travel, like an arm or elevator, pick a timeout short enough that it can't reach the end of its
+ * Each test stops after a timeout, 10 seconds by default. For a mechanism with limited
+ * travel, such as an arm or elevator, choose a timeout short enough that it cannot reach the end of its
  * travel, or cancel the test before it does.
  *
- * <p>The results go into the robot's log file. Open it in the SysId tool, which is part of
+ * <p>The results are stored in the robot's log file. Open that file in the SysId tool, which is part of
  * WPILib, to get the gains.
  */
 public class NAR_SysIdCommand {
@@ -42,19 +42,19 @@ public class NAR_SysIdCommand {
    private SysIdRoutine driveRoutine;
    /** The motor whose position, speed and voltage are recorded. */
    private NAR_Motor logMotor;
-   // Reused every loop, to avoid making new objects 50 times a second
+   /** Reused every loop, as are the next two fields, to avoid allocating objects 50 times a second. */
    private final MutVoltage appliedVoltage = Volts.mutable(0);
    private final MutDistance position = Meters.mutable(0);
    private final MutLinearVelocity velocity = MetersPerSecond.mutable(0);
 
 
    /**
-    * Tests that each stop after 10 seconds.
+    * Creates tests that each stop after 10 seconds.
     *
-    * @param rampRate Volts per second the quasistatic test's voltage rises by
-    * @param stepVoltage Volts the dynamic test jumps to
-    * @param setVoltage Drives the mechanism at a voltage, e.g. {@code v -> runVolts(v.in(Volts))}
-    * @param sub The subsystem the tests use, so nothing else drives it at the same time
+    * @param rampRate The rate at which the quasistatic test's voltage rises, in volts per second
+    * @param stepVoltage The voltage of the dynamic test's step
+    * @param setVoltage Drives the mechanism at a voltage, for example, {@code v -> runVolts(v.in(Volts))}
+    * @param sub The subsystem the tests require, so that nothing else drives it at the same time
     * @param logMotor The motor to record
     */
    public NAR_SysIdCommand(double rampRate, double stepVoltage, Consumer<Voltage> setVoltage, Subsystem sub, NAR_Motor logMotor) {
@@ -62,11 +62,11 @@ public class NAR_SysIdCommand {
    }
 
    /**
-    * @param rampRate Volts per second the quasistatic test's voltage rises by
-    * @param stepVoltage Volts the dynamic test jumps to
-    * @param timeoutSeconds How long each test runs before it stops
-    * @param setVoltage Drives the mechanism at a voltage, e.g. {@code v -> runVolts(v.in(Volts))}
-    * @param sub The subsystem the tests use, so nothing else drives it at the same time
+    * @param rampRate The rate at which the quasistatic test's voltage rises, in volts per second
+    * @param stepVoltage The voltage of the dynamic test's step
+    * @param timeoutSeconds The duration of each test before it stops
+    * @param setVoltage Drives the mechanism at a voltage, for example, {@code v -> runVolts(v.in(Volts))}
+    * @param sub The subsystem the tests require, so that nothing else drives it at the same time
     * @param logMotor The motor to record
     */
    public NAR_SysIdCommand(double rampRate, double stepVoltage, double timeoutSeconds, Consumer<Voltage> setVoltage,
@@ -79,8 +79,8 @@ public class NAR_SysIdCommand {
 
 
    /**
-    * Records the motor's position, speed and voltage, every loop while a test runs. They're
-    * labeled meters, but they're in the mechanism's own units; SysId's gains come out in those.
+    * Records the motor's position, speed and voltage every loop while a test runs. The values are
+    * labeled as meters, but they are in the mechanism's own units, and SysId's gains use those units.
     */
    public void logMotors(SysIdRoutineLog log){
        log.motor("mod0-motor")
@@ -90,7 +90,7 @@ public class NAR_SysIdCommand {
    }
 
 
-   /** All four tests in a row, with a second's pause between them. */
+   /** Returns a command that runs all four tests in sequence, with a one-second pause between them. */
    public Command runSysId(){
        return sequence(
            driveRoutine.quasistatic(SysIdRoutine.Direction.kForward),

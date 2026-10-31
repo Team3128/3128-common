@@ -1,45 +1,59 @@
 package common.hardware.motorcontroller;
 
 /**
- * Numbers the motor classes share: encoder resolutions, how often motor controllers report over
- * CAN, and default current limits. Should not be changed.
+ * Values shared by the motor classes: encoder resolutions, CAN report rates and default current
+ * limits. These should not be changed.
  * @since 2022 Rapid React
- * @author Mason Lam (Blame this guy for any wrong numbers)
+ * @author Mason Lam
  */
 public class MotorControllerConstants {
 
-    // Encoder counts per rotation, and conversions to the old Phoenix 5 and REV native units
-    public static final double FALCON_ENCODER_RESOLUTION = 2048; // CPR
-    public static final double RPM_TO_FALCON = FALCON_ENCODER_RESOLUTION / 600; //Nu/100ms
-    public static final double MAG_ENCODER_RESOLUTION = 4096; // CPR
+    /** Falcon encoder counts per rotation. */
+    public static final double FALCON_ENCODER_RESOLUTION = 2048;
+    /** Converts RPM to Phoenix 5 native units per 100 ms on a Falcon. */
+    public static final double RPM_TO_FALCON = FALCON_ENCODER_RESOLUTION / 600;
+    /** CTRE Mag Encoder counts per rotation. */
+    public static final double MAG_ENCODER_RESOLUTION = 4096;
+    /** Talon SRX encoder counts per rotation. */
     public static final double TALONSRX_ENCODER_RESOLUTION = 4096;
+    /** Converts RPM to Phoenix 5 native units per 100 ms on a Talon SRX. */
     public static final double RPM_TO_TALONSRX = TALONSRX_ENCODER_RESOLUTION / 600;
 
-    public static final double SPARKMAX_ENCODER_RESOLUTION = 42; // CPR
-    public static final double SPARKMAX_RPM_TO_NUpS = SPARKMAX_ENCODER_RESOLUTION / 60; // rotations/min -> counts/sec
+    /** NEO built-in encoder counts per rotation. */
+    public static final double SPARKMAX_ENCODER_RESOLUTION = 42;
+    /** Converts RPM to encoder counts per second on a NEO. */
+    public static final double SPARKMAX_RPM_TO_NUpS = SPARKMAX_ENCODER_RESOLUTION / 60;
 
-    // Milliseconds between reports over CAN: smaller is more often. NO_PRIORITY is about every
-    // 30 seconds, which is as close to off as a Spark allows.
+    /** Milliseconds between CAN reports: about every 30 seconds, the closest a Spark allows to off. */
     public static final int NO_PRIORITY = 32000;
+    /** Milliseconds between CAN reports. */
     public static final int LOW_PRIORITY = 250;
+    /** Milliseconds between CAN reports. */
     public static final int MEDIUM_PRIORITY = 100;
+    /** Milliseconds between CAN reports. */
     public static final int HIGH_PRIORITY = 20;
+    /** Milliseconds between CAN reports. */
     public static final int MAX_PRIORITY = 10;
 
-    // The same rates as reports per second (hertz), for Phoenix 6, which takes a frequency
+    /** {@link #MAX_PRIORITY} in hertz, for Phoenix 6. */
     public static final double MAX_PRIORITY_FREQ = 1.0 / (MAX_PRIORITY / 1000.0);
+    /** {@link #HIGH_PRIORITY} in hertz, for Phoenix 6. */
     public static final double HIGH_PRIORITY_FREQ = 1.0 / (HIGH_PRIORITY / 1000.0);
+    /** {@link #MEDIUM_PRIORITY} in hertz, for Phoenix 6. */
     public static final double MEDIUM_PRIORITY_FREQ = 1.0 / (MEDIUM_PRIORITY / 1000.0);
+    /** {@link #LOW_PRIORITY} in hertz, for Phoenix 6. */
     public static final double LOW_PRIORITY_FREQ = 1.0 / (LOW_PRIORITY / 1000.0);
 
     /** How long to wait for a Spark to answer a setting, in milliseconds. */
-    public static final int canSparkMaxTimeout = 500; //ms
+    public static final int canSparkMaxTimeout = 500;
 
-    // Starting current limits, until a mechanism's MotorConfig sets its own. TalonFXs use the
-    // NEO numbers too.
-    public static final int NEO_STATOR_CurrentLimit = 40; //amps
-    public static final int NEO_STATOR_550CurrentLimit = 20; //amps
+    /** Default stator current limit in amps, until a {@code MotorConfig} sets one. Also used for TalonFXs. */
+    public static final int NEO_STATOR_CurrentLimit = 40;
+    /** Default stator current limit in amps for a NEO 550. */
+    public static final int NEO_STATOR_550CurrentLimit = 20;
 
-    public static final int NEO_SUPPLY_CurrentLimit = 120; //amps
-    public static final int NEO_SUPPLY_550CurrentLimit = 40; //amps
+    /** Default supply current limit in amps, until a {@code MotorConfig} sets one. Also used for TalonFXs. */
+    public static final int NEO_SUPPLY_CurrentLimit = 120;
+    /** Default supply current limit in amps for a NEO 550. */
+    public static final int NEO_SUPPLY_550CurrentLimit = 40;
 }

@@ -4,7 +4,7 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 
-/** Something that just spins: a roller, flywheel, or kicker. */
+/** A mechanism that only spins: a roller, flywheel, or kicker. */
 public class RollerSimModel implements MotorSimModel {
 
     private final DCMotor motor;
@@ -12,9 +12,9 @@ public class RollerSimModel implements MotorSimModel {
     private final DCMotorSim sim;
 
     /**
-     * @param motor The motor(s) driving the roller, e.g. {@code DCMotor.getKrakenX60(2)} for two motors
+     * @param motor The motor(s) driving the roller, for example, {@code DCMotor.getKrakenX60(2)} for two motors
      * @param gearing Motor rotations per roller rotation
-     * @param moiKgMetersSq Moment of inertia of the roller, see {@link #solidCylinderMoi(double, double)}
+     * @param moiKgMetersSq Moment of inertia of the roller; see {@link #solidCylinderMoi(double, double)}
      */
     public RollerSimModel(DCMotor motor, double gearing, double moiKgMetersSq) {
         this.motor = motor;
@@ -23,21 +23,21 @@ public class RollerSimModel implements MotorSimModel {
     }
 
     /**
-     * Moment of inertia of a solid cylinder spinning about its axis.
+     * Returns the moment of inertia of a solid cylinder spinning about its axis.
      * @param massKg Mass in kilograms
      * @param radiusMeters Radius in meters
-     * @return Inertia in kg*m^2
+     * @return Moment of inertia in kg*m^2
      */
     public static double solidCylinderMoi(double massKg, double radiusMeters) {
         return 0.5 * massKg * radiusMeters * radiusMeters;
     }
 
     /**
-     * Moment of inertia of a tube spinning about its axis, e.g. a polycarb or aluminum roller.
+     * Returns the moment of inertia of a tube spinning about its axis, for example, a polycarbonate or aluminum roller.
      * @param massKg Mass in kilograms
      * @param innerRadiusMeters Inner radius in meters
      * @param outerRadiusMeters Outer radius in meters
-     * @return Inertia in kg*m^2
+     * @return Moment of inertia in kg*m^2
      */
     public static double hollowCylinderMoi(double massKg, double innerRadiusMeters, double outerRadiusMeters) {
         return 0.5 * massKg * (innerRadiusMeters * innerRadiusMeters + outerRadiusMeters * outerRadiusMeters);

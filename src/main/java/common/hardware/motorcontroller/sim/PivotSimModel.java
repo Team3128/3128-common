@@ -6,13 +6,14 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 
 /**
- * Something that rotates to an angle between hard stops: an arm, wrist, hood, or turret. Angles
+ * A mechanism that rotates to an angle between hard stops: an arm, wrist, hood, or turret. Angles
  * are in radians; with gravity, 0 is level.
  */
 public class PivotSimModel implements MotorSimModel {
 
-    private static final double GRAVITY = 9.81; // m/s^2
-    // Gravity changes with the angle, so it's recalculated several times per robot loop
+    /** Acceleration due to gravity, in m/s^2. */
+    private static final double GRAVITY = 9.81;
+    /** Gravity changes with the angle, so it is recalculated several times per robot loop. */
     private static final int STEPS_PER_UPDATE = 10;
 
     private final DCMotor motor;
@@ -27,14 +28,14 @@ public class PivotSimModel implements MotorSimModel {
     private double appliedVolts;
 
     /**
-     * @param motor The motor(s) driving it
+     * @param motor The motor(s) driving the mechanism
      * @param gearing Motor rotations per pivot rotation
-     * @param lengthMeters Pivot to the far end of the moving part
+     * @param lengthMeters Distance from the pivot to the far end of the moving part
      * @param massKg Mass of the moving part
      * @param minRadians Lower hard stop
      * @param maxRadians Upper hard stop
-     * @param startRadians Where it is when the robot turns on
-     * @param simulateGravity True when it swings up and down, false for a turret
+     * @param startRadians The angle when the robot turns on
+     * @param simulateGravity True when the mechanism swings up and down, false for a turret
      */
     public PivotSimModel(DCMotor motor, double gearing, double lengthMeters, double massKg,
                          double minRadians, double maxRadians, double startRadians, boolean simulateGravity) {
@@ -42,9 +43,9 @@ public class PivotSimModel implements MotorSimModel {
         this.gearing = gearing;
         this.startRadians = startRadians;
         this.simulateGravity = simulateGravity;
-        // SingleJointedArmSim's gravity only knows its own angle, so we model gravity ourselves to
+        // SingleJointedArmSim's gravity knows only its own angle, so gravity is modeled here to
         // include a parent's: the weight acting at the middle of the moving part is a load torque,
-        // which for a DC motor is the same as a voltage pushing back.
+        // which for a DC motor is equivalent to a back voltage.
         final double levelGravityTorque = massKg * GRAVITY * lengthMeters / 2 / gearing;
         this.levelGravityVolts = levelGravityTorque / motor.KtNMPerAmp * motor.rOhms;
         this.sim = new SingleJointedArmSim(motor, gearing, SingleJointedArmSim.estimateMOI(lengthMeters, massKg),
@@ -52,7 +53,7 @@ public class PivotSimModel implements MotorSimModel {
     }
 
     /**
-     * Mounts this on another pivot that swings the same way, e.g. a wrist on an arm, so gravity
+     * Mounts this model on another pivot that swings in the same plane, for example, a wrist on an arm, so that gravity
      * acts on the sum of their angles.
      * @param parentRadians The parent's angle above level
      */
@@ -61,8 +62,8 @@ public class PivotSimModel implements MotorSimModel {
     }
 
     /**
-     * Adds a load from something mounted on it, e.g. what a telescope on an arm has moved out.
-     * @param extraGravityVolts Volts at the motor that would hold that load
+     * Adds a load from a mounted mechanism, for example, the extension of a telescope on an arm.
+     * @param extraGravityVolts Volts at the motor that would hold the load
      */
     public void setExtraGravityVolts(DoubleSupplier extraGravityVolts) {
         this.extraGravityVolts = extraGravityVolts;
@@ -73,7 +74,7 @@ public class PivotSimModel implements MotorSimModel {
     @Override
     public void update(double motorVolts, double dtSeconds) {
         appliedVolts = motorVolts;
-        // Comes from other mechanisms' positions, which don't change until they're updated too
+        // Derived from other mechanisms' positions, which do not change until they are also updated
         final double extraVolts = extraGravityVolts.getAsDouble();
         for (int i = 0; i < STEPS_PER_UPDATE; i++) {
             final double gravityVolts = simulateGravity
@@ -89,7 +90,7 @@ public class PivotSimModel implements MotorSimModel {
 
     @Override
     public double getCurrentAmps() {
-        // Computed from the real applied voltage, since the sim's input has gravity subtracted
+        // Calculated from the real applied voltage, because the sim's input has gravity subtracted
         return motor.getCurrent(getRotorRPS() * 2 * Math.PI, appliedVolts);
     }
 }

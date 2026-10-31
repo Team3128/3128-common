@@ -15,17 +15,17 @@ import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.system.plant.DCMotor;
 
 /**
- * Rotates to an angle and holds it: arms, wrists, shooter hoods, turrets.
+ * Rotates to an angle and holds that angle: arms, wrists, shooter hoods, turrets.
  *
- * <p>PID and feedforward run on the motor controller. The {@link Orientation} says which way it
- * points at 0, which decides how gravity acts:
+ * <p>PID and feedforward run on the motor controller. The {@link Orientation} defines the direction
+ * of the mechanism at 0, which determines how gravity acts:
  * <ul>
  * <li>{@link Orientation#FORWARD}, {@link Orientation#BACKWARD}, {@link Orientation#LEFT} and
  *     {@link Orientation#RIGHT} (arms, wrists, hoods) swing up and down. Angles follow WPILib: 0 is
- *     level, pointing that way from the pivot, and positive is up. Feedforward is kS plus kG times
- *     the cosine of the angle, so kG is the voltage to hold it level.</li>
+ *     level, pointing in that direction from the pivot, and positive is up. Feedforward is kS plus kG multiplied by
+ *     the cosine of the angle, so kG is the voltage required to hold the mechanism level.</li>
  * <li>{@link Orientation#TURRET} turns side to side. 0 is facing the front of the robot and
- *     positive is counterclockwise seen from above. Gravity doesn't act on it, so leave kG at 0.</li>
+ *     positive is counterclockwise viewed from above. Gravity does not act on it, so kG should be 0.</li>
  * </ul>
  *
  * <p>The mechanism is assumed to be at {@code startPosition} when the robot turns on, and the
@@ -43,9 +43,11 @@ import edu.wpi.first.math.system.plant.DCMotor;
  */
 public class PivotMechanism extends MechanismBase {
 
-    /** Which way the mechanism points at 0, and so the axis it rotates about. */
+    /**
+     * The direction of the mechanism at 0, and therefore the axis of rotation. Each axis follows the
+     * right-hand rule for a positive angle, so positive is up.
+     */
     public enum Orientation {
-        // Each axis is the one a positive angle rotates about by the right-hand rule, so positive is up
         /** Swings up and down over the front of the robot. */
         FORWARD(0, -1, 0),
         /** Swings up and down over the back of the robot. */
@@ -64,7 +66,8 @@ public class PivotMechanism extends MechanismBase {
         }
     }
 
-    private static final double GRAVITY = 9.81; // m/s^2
+    /** Acceleration due to gravity, in m/s^2. */
+    private static final double GRAVITY = 9.81;
 
     private final Orientation orientation;
     private final double startPosition;
@@ -72,26 +75,26 @@ public class PivotMechanism extends MechanismBase {
     private final double voltsPerNewtonMeter;
     private final PivotSimModel simModel;
     private Translation3d pivot = Translation3d.kZero;
-    /** The pivot underneath it swings with, so gravity acts on both their angles; null if none. */
+    /** The pivot beneath this one that it swings with, so gravity acts on both angles; null if none. */
     private PivotMechanism gravityParent;
 
     /**
      * @param name Name shown on Shuffleboard and in logs
-     * @param orientation Which way it points at 0, which decides whether gravity acts on it
-     * @param motorConfig Applied to every motor; its distance factor sets the position units
+     * @param orientation The direction at 0, which determines whether gravity acts on the mechanism
+     * @param motorConfig Configuration applied to every motor; its distance factor sets the position units
      * @param gains PID and feedforward gains, in volts per position unit
-     * @param tolerance How close to the setpoint counts as {@link #atSetpoint()}
+     * @param tolerance The distance from the setpoint within which {@link #atSetpoint()} is true
      * @param minPosition Lowest allowed setpoint
      * @param maxPosition Highest allowed setpoint
-     * @param startPosition Where it is when the robot turns on
-     * @param radiansPerUnit Radians per position unit, e.g. {@code Math.PI / 180} for degrees
-     * @param lengthMeters Pivot to the far end of the moving part, with any telescope on it retracted; used
+     * @param startPosition The position when the robot turns on
+     * @param radiansPerUnit Radians per position unit, for example, {@code Math.PI / 180} for degrees
+     * @param lengthMeters Distance from the pivot to the far end of the moving part, with any telescope retracted; used
      *                     only in simulation
-     * @param massKg Mass that moves, including everything mounted on it, e.g. the telescope and wrist on an
+     * @param massKg Moving mass, including everything mounted on it, for example, the telescope and wrist on an
      *               arm; used only in simulation
-     * @param motorType Model of one motor, e.g. {@code DCMotor.getKrakenX44(1)}; used in simulation, and to
-     *                  hold up what telescopes on it move out
-     * @param motors Every motor on the mechanism. The first is the leader.
+     * @param motorType Model of a single motor, for example, {@code DCMotor.getKrakenX44(1)}; used in simulation, and to
+     *                  hold up the load moved out by telescopes on the mechanism
+     * @param motors Every motor on the mechanism. The first motor is the leader.
      */
     public PivotMechanism(String name, Orientation orientation, MotorConfig motorConfig, PIDFFConfig gains, double tolerance,
                           double minPosition, double maxPosition, double startPosition, double radiansPerUnit,
@@ -102,16 +105,15 @@ public class PivotMechanism extends MechanismBase {
         this.radiansPerUnit = radiansPerUnit;
         setName(name);
         setInputRange(minPosition, maxPosition);
-        setDisableAtSetpoint(false); // keep holding position
+        setDisableAtSetpoint(false);
 
         // distanceFactor is position units per encoder rotation, and the encoder may be on the pivot's shaft
         final double encoderRotationsPerPivotRotation = 2 * Math.PI / (motorConfig.distanceFactor * radiansPerUnit);
-        // Gravity acts on anything that swings up and down
         final boolean gravity = orientation != Orientation.TURRET;
         if (gravity) useArmGravity(encoderRotationsPerPivotRotation);
         final double gearing = encoderRotationsPerPivotRotation * motors[0].getMotorRotationsPerSensorRotation();
         final DCMotor gearbox = MotorSimModel.gearbox(motorType, motors.length);
-        // When it's holding still, a torque at the pivot takes this many volts
+        // While holding still, a torque at the pivot requires this many volts
         voltsPerNewtonMeter = gearbox.rOhms / (gearing * gearbox.KtNMPerAmp);
         simModel = new PivotSimModel(gearbox, gearing, lengthMeters,
             massKg, minPosition * radiansPerUnit, maxPosition * radiansPerUnit, startPosition * radiansPerUnit,
@@ -122,30 +124,30 @@ public class PivotMechanism extends MechanismBase {
     }
 
     /**
-     * Sets where the pivot is, in meters from the robot's origin with everything at its starting
-     * position, for {@link #getComponentPose()}. Take it from CAD.
+     * Sets the position of the pivot, in meters from the robot's origin with every mechanism at its starting
+     * position, for {@link #getComponentPose()}. The value should come from CAD.
      */
     public void setPivot(Translation3d pivot) {
         this.pivot = pivot;
     }
 
     /**
-     * Mounts this on another mechanism, e.g. a wrist driven directly on an arm, an arm on an
-     * elevator, or a wrist on the end of a telescoping arm. Its 3D pose moves with the parent's.
+     * Mounts this mechanism on another, for example, a wrist driven directly on an arm, an arm on an
+     * elevator, or a wrist on the end of a telescoping arm. Its 3D pose moves with the parent.
      *
-     * <p>On another pivot, its position is relative to the parent, with 0 lined up with it. When
-     * it swings up and down the same way as the nearest pivot underneath it, with or without
-     * something sliding in between, gravity acts on the sum of their angles. The motor controller
-     * only knows this mechanism's angle, so kG is worked out on the roboRIO each loop instead and
-     * sent with the setpoint. A turret or elevator underneath doesn't change gravity.
+     * <p>On another pivot, its position is relative to the parent, with 0 aligned with the parent. When
+     * it swings in the same plane as the nearest pivot beneath it, with or without a sliding
+     * mechanism between them, gravity acts on the sum of their angles. The motor controller
+     * knows only this mechanism's angle, so kG is calculated on the roboRIO each loop and
+     * sent with the setpoint. A turret or elevator beneath it does not change gravity.
      *
-     * @param parent What it's mounted on
+     * @param parent The mechanism on which this one is mounted
      */
     @Override
     public void setParent(MechanismBase parent) {
         super.setParent(parent);
 
-        // The nearest pivot underneath, through anything that only slides
+        // The nearest pivot beneath this one, through any purely sliding mechanisms
         MechanismBase below = parent;
         while (below instanceof LinearMechanism) below = below.getParent();
         if (below instanceof PivotMechanism pivotBelow && pivotBelow.orientation != Orientation.TURRET) {
@@ -164,13 +166,13 @@ public class PivotMechanism extends MechanismBase {
         return orientation != Orientation.TURRET || super.tiltsWhatsMountedOnIt();
     }
 
-    /** Which way it points at 0. */
+    /** Returns the direction of the mechanism at 0. */
     public Orientation getOrientation() {
         return orientation;
     }
 
     /**
-     * The angle above level in radians, including the angle of any parent it swings with. For a
+     * Returns the angle above level in radians, including the angle of any parent it swings with. For a
      * turret, the angle counterclockwise from the front of the robot.
      */
     public double getRadiansAboveLevel() {
@@ -179,8 +181,8 @@ public class PivotMechanism extends MechanismBase {
     }
 
     /**
-     * kG on the parent's angle plus this one's, when mounted on a parent that swings the same way,
-     * plus the extra to hold up anything telescopes mounted on it have moved out.
+     * Returns kG on the sum of this angle and the parent's, when mounted on a parent that swings in the same plane,
+     * plus the voltage required to hold up the load moved out by telescopes mounted on this mechanism.
      */
     @Override
     protected double calculateFeedforward(double error) {
@@ -190,26 +192,26 @@ public class PivotMechanism extends MechanismBase {
     }
 
     /**
-     * Volts to hold up the weight telescopes mounted on it have moved out from the pivot, compared
-     * with them all retracted. Tune kG with every telescope on it retracted.
+     * Returns the volts required to hold up the weight that mounted telescopes have moved out from the pivot,
+     * compared with all of them retracted. kG should be tuned with every telescope retracted.
      */
     public double getExtensionGravityVolts() {
-        // The axis it rotates about, which tilts with anything it's mounted on
+        // The axis of rotation, which tilts with the parent
         final Rotation3d tilt = getParent() == null ? Rotation3d.kZero : getParent().getComponentPose().getRotation();
         final Translation3d axis = new Translation3d(orientation.axis.get(0), orientation.axis.get(1), orientation.axis.get(2))
             .rotateBy(tilt);
         return holdingTorqueFromExtension(this, axis) * voltsPerNewtonMeter;
     }
 
-    /** Torque about {@code axis} to hold up what telescopes mounted on {@code mechanism} have moved out. */
+    /** Returns the torque about {@code axis} required to hold up the load telescopes on {@code mechanism} have moved out. */
     private static double holdingTorqueFromExtension(MechanismBase mechanism, Translation3d axis) {
         double torque = 0;
         for (MechanismBase mounted : mechanism.getMounted()) {
             if (mounted instanceof LinearMechanism telescope) {
                 final double weight = telescope.getMassKg() * GRAVITY;
                 final Translation3d moved = telescope.getTravelDirection().times(telescope.getExtensionMeters());
-                // Moving a weight by `moved` changes gravity's torque by moved x (0, 0, -weight),
-                // wherever the pivot is; holding it takes the opposite
+                // Moving a weight by `moved` changes the torque from gravity by moved x (0, 0, -weight),
+                // regardless of the pivot location; holding it requires the opposite
                 torque += weight * (moved.getY() * axis.getX() - moved.getX() * axis.getY());
             }
             torque += holdingTorqueFromExtension(mounted, axis);
@@ -217,7 +219,7 @@ public class PivotMechanism extends MechanismBase {
         return torque;
     }
 
-    /** How far it has rotated from where it starts, about the pivot from {@link #setPivot(Translation3d)}. */
+    /** Returns the rotation from the starting position, about the pivot from {@link #setPivot(Translation3d)}. */
     @Override
     protected Pose3d getOwnComponentPose() {
         final double radians = (getPosition() - startPosition) * radiansPerUnit;

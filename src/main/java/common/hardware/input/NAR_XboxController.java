@@ -7,12 +7,12 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 /**
- * An Xbox controller, with a few things WPILib's {@code XboxController} doesn't do:
+ * An Xbox controller with several additions to WPILib's {@code XboxController}:
  * <ul>
- * <li>Sticks have a small deadband, so a stick that doesn't quite center reads 0.</li>
+ * <li>Sticks have a small deadband, so a stick that does not fully center reads 0.</li>
  * <li>Up on either stick is positive. WPILib reports up as negative.</li>
- * <li>Every button, including the triggers and the D-pad, is a {@link Trigger} you can bind
- *     commands to: {@code controller.getButton(XboxButton.kA).onTrue(...)}.</li>
+ * <li>Every button, including the triggers and the D-pad, is a {@link Trigger} to which commands
+ *     can be bound: {@code controller.getButton(XboxButton.kA).onTrue(...)}.</li>
  * </ul>
  * @since 2022 Rapid React
  * @author Arav Chadha, Mason Lam
@@ -20,7 +20,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 public class NAR_XboxController extends XboxController {
 
     /**
-     * Every button, plus the two triggers, which count as pressed once squeezed halfway.
+     * Every button, plus the two triggers, which count as pressed when squeezed halfway.
      */
     public enum XboxButton {
         kLeftBumper(5, false),
@@ -36,9 +36,9 @@ public class NAR_XboxController extends XboxController {
         kLeftTrigger(2, true),
         kRightTrigger(3, true);
 
-        /** Its button number, or its axis number for a trigger. */
+        /** The button number, or the axis number for a trigger. */
         private final int value;
-        /** Whether it's a trigger, read as an axis from 0 to 1, rather than a button. */
+        /** Whether this is a trigger, read as an axis from 0 to 1, rather than a button. */
         private final boolean isAxis;
 
         private XboxButton(int value, boolean isAxis) {
@@ -56,8 +56,8 @@ public class NAR_XboxController extends XboxController {
     private Trigger[] povButtons;
 
     /**
-     * Creates an XboxController object
-     * @param port Port on driver station for controller
+     * Creates an Xbox controller.
+     * @param port The Driver Station port of the controller
      */
     public NAR_XboxController(int port) {
         super(port);
@@ -79,50 +79,50 @@ public class NAR_XboxController extends XboxController {
     }
 
     /**
-     * Returns the XboxController Button
-     * @param button Type of button.
-     * @return Trigger object to add commands to.
+     * Returns a button on the controller.
+     * @param button The button.
+     * @return A trigger to which commands can be bound
      */
     public Trigger getButton(XboxButton button) {
         return buttons.get(button);
     }
 
     /**
-     * Returns a POV button on the controller
-     * @param index The angle of the POV button in increments of 45 degrees, positive direction is clockwise
-     * @return Trigger to store the command to run
+     * Returns a POV button on the controller.
+     * @param index The angle of the POV button in increments of 45 degrees, clockwise positive
+     * @return A trigger to which commands can be bound
      */
     public Trigger getPOVButton(int index) {
         return povButtons[index];
     }
 
     /**
-     * Returns the 0 degree or top POV button.
-     * @return Trigger object to add commands to.
+     * Returns the 0-degree (top) POV button.
+     * @return A trigger to which commands can be bound
      */
     public Trigger getUpPOVButton() {
         return getPOVButton(0);
     }
 
     /**
-     * Returns the 90 degree or right POV button.
-     * @return Trigger object to add commands to.
+     * Returns the 90-degree (right) POV button.
+     * @return A trigger to which commands can be bound
      */
     public Trigger getRightPOVButton() {
         return getPOVButton(2);
     }
 
     /**
-     * Returns the 180 degree or bottom POV button.
-     * @return Trigger object to add commands to.
+     * Returns the 180-degree (bottom) POV button.
+     * @return A trigger to which commands can be bound
      */
     public Trigger getDownPOVButton() {
         return getPOVButton(4);
     }
 
     /**
-     * Returns the 270 degree or left POV button.
-     * @return Trigger object to add commands to.
+     * Returns the 270-degree (left) POV button.
+     * @return A trigger to which commands can be bound
      */
     public Trigger getLeftPOVButton() {
         return getPOVButton(6);
@@ -130,7 +130,7 @@ public class NAR_XboxController extends XboxController {
 
     /**
      * Returns the x-axis value of the right joystick.
-     * @return Right joystick X on [-1, 1], -1 is left, 1 is right.
+     * @return Right joystick X on [-1, 1], where -1 is left and 1 is right.
      */
     @Override
     public double getRightX() {
@@ -139,7 +139,7 @@ public class NAR_XboxController extends XboxController {
 
     /**
      * Returns the y-axis value of the right joystick.
-     * @return Right joystick Y on [-1, 1], -1 is down, 1 is up.
+     * @return Right joystick Y on [-1, 1], where -1 is down and 1 is up.
      */
     @Override
     public double getRightY() {
@@ -148,7 +148,7 @@ public class NAR_XboxController extends XboxController {
 
     /**
      * Returns the x-axis value of the left joystick.
-     * @return Left joystick X on [-1, 1], -1 is left, 1 is right.
+     * @return Left joystick X on [-1, 1], where -1 is left and 1 is right.
      */
     @Override
     public double getLeftX() {
@@ -157,7 +157,7 @@ public class NAR_XboxController extends XboxController {
 
     /**
      * Returns the y-axis value of the left joystick.
-     * @return Left joystick Y on [-1, 1], -1 is down, 1 is up.
+     * @return Left joystick Y on [-1, 1], where -1 is down and 1 is up.
      */
     @Override
     public double getLeftY() {
@@ -167,7 +167,7 @@ public class NAR_XboxController extends XboxController {
     /**
      * Sets the horizontal deadband value for the right joystick.
      * <p>Deadband reduces noise by requiring input above a certain threshold.
-     * @param deadband Value for deadband to be set to
+     * @param deadband The deadband value
      */
     public void setRightXDeadband(double deadband) {
         rightXDeadband = deadband;
@@ -176,7 +176,7 @@ public class NAR_XboxController extends XboxController {
     /**
      * Sets the vertical deadband value for the right joystick.
      * <p>Deadband reduces noise by requiring input above a certain threshold.
-     * @param deadband Value for deadband to be set to
+     * @param deadband The deadband value
      */
     public void setRightYDeadband(double deadband) {
         rightYDeadband = deadband;
@@ -185,7 +185,7 @@ public class NAR_XboxController extends XboxController {
     /**
      * Sets the horizontal deadband value for the left joystick.
      * <p>Deadband reduces noise by requiring input above a certain threshold.
-     * @param deadband Value for deadband to be set to
+     * @param deadband The deadband value
      */
     public void setLeftXDeadband(double deadband) {
         leftXDeadband = deadband;
@@ -194,27 +194,27 @@ public class NAR_XboxController extends XboxController {
     /**
      * Sets the vertical deadband value for the left joystick.
      * <p>Deadband reduces noise by requiring input above a certain threshold.
-     * @param deadband Value for deadband to be set to
+     * @param deadband The deadband value
      */
     public void setLeftYDeadband(double deadband) {
         leftYDeadband = deadband;
     }
 
     /**
-     * Vibrates the controller
+     * Vibrates the controller.
      */
     public void startVibrate() {
         setRumble(RumbleType.kBothRumble, 0.8);
     }
 
     /**
-     * Stops vibrating the controller
+     * Stops vibrating the controller.
      */
     public void stopVibrate() {
         setRumble(RumbleType.kBothRumble, 0);
     }
 
-    /** Adds a "Controller" Shuffleboard tab with a light for every button, for checking wiring and bindings. */
+    /** Adds a "Controller" Shuffleboard tab with an indicator for every button, for checking wiring and bindings. */
     public void initShuffleboard() {
         for(XboxButton button : buttons.keySet()) {
             NAR_Shuffleboard.addData("Controller", button.name(), ()-> buttons.get(button).getAsBoolean(), (button.ordinal() % 6), button.ordinal() / 6);

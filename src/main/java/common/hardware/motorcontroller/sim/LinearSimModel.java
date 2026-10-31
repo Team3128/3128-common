@@ -6,17 +6,18 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 
 /**
- * Something that moves in a straight line between hard stops, at any incline:
- * a slider (0 degrees), an elevator (90 degrees), or anything in between.
+ * A mechanism that moves in a straight line between hard stops, at any incline:
+ * a slider (0 degrees), an elevator (90 degrees), or anything between.
  */
 public class LinearSimModel implements MotorSimModel {
 
-    private static final double GRAVITY = 9.81; // m/s^2
+    /** Acceleration due to gravity, in m/s^2. */
+    private static final double GRAVITY = 9.81;
 
     private final DCMotor motor;
     private final double motorRotationsPerMeter;
     private final double startMeters;
-    /** Volts at the motor that would hold it pointing straight up against gravity. */
+    /** Volts at the motor that would hold the mechanism pointing straight up against gravity. */
     private final double verticalGravityVolts;
     private DoubleSupplier inclineSine;
     private final ElevatorSim sim;
@@ -25,8 +26,8 @@ public class LinearSimModel implements MotorSimModel {
     /**
      * @param motor The motor(s) driving the mechanism
      * @param motorRotationsPerMeter Motor rotations to move the mechanism one meter
-     * @param massKg Mass that moves
-     * @param minMeters Lower hard stop, also where the mechanism starts
+     * @param massKg Moving mass
+     * @param minMeters Lower hard stop, also the starting position
      * @param maxMeters Upper hard stop
      * @param angleRadians Incline of the direction of travel: 0 is horizontal, pi/2 is straight up
      */
@@ -35,12 +36,12 @@ public class LinearSimModel implements MotorSimModel {
         this.motor = motor;
         this.motorRotationsPerMeter = motorRotationsPerMeter;
         this.startMeters = minMeters;
-        // ElevatorSim only depends on the ratio of gearing to drum radius, so model the drive
+        // ElevatorSim depends only on the ratio of gearing to drum radius, so the drive is modeled
         // as a 1:1 drum whose circumference is the distance moved per motor rotation.
         final double drumRadiusMeters = 1.0 / (2 * Math.PI * motorRotationsPerMeter);
-        // ElevatorSim's gravity is all or nothing, so we model gravity ourselves: the part of the
-        // weight along the direction of travel is a load, which for a DC motor is the same as a
-        // voltage pushing back.
+        // ElevatorSim's gravity is all or nothing, so gravity is modeled here: the portion of the
+        // weight along the direction of travel is a load, which for a DC motor is equivalent to a
+        // back voltage.
         final double verticalGravityTorque = massKg * GRAVITY * drumRadiusMeters;
         this.verticalGravityVolts = verticalGravityTorque / motor.KtNMPerAmp * motor.rOhms;
         final double sine = Math.sin(angleRadians);
@@ -49,8 +50,8 @@ public class LinearSimModel implements MotorSimModel {
     }
 
     /**
-     * Makes the incline change, e.g. for a telescope on an arm.
-     * @param inclineSine The sine of the direction of travel's incline now
+     * Sets the incline, for example, for a telescope on an arm.
+     * @param inclineSine The sine of the current incline of travel
      */
     public void setInclineSine(DoubleSupplier inclineSine) {
         this.inclineSine = inclineSine;
@@ -70,7 +71,7 @@ public class LinearSimModel implements MotorSimModel {
 
     @Override
     public double getCurrentAmps() {
-        // Computed from the real applied voltage, since the sim's input has gravity subtracted
+        // Calculated from the real applied voltage, because the sim's input has gravity subtracted
         return motor.getCurrent(getRotorRPS() * 2 * Math.PI, appliedVolts);
     }
 }

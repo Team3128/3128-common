@@ -23,30 +23,17 @@ import edu.wpi.first.util.function.BooleanConsumer;
 
 /**
  * The server for NarwhalDashboard, Team 3128's own web dashboard. It sends robot data to the
- * dashboard page, receives its button presses, and holds the list of autos to pick from.
+ * dashboard page, receives its button presses, and holds the list of selectable autos.
  *
- * <p>It runs a WebSocket server on the robot (port 5805). Robot code registers values to show
+ * <p>It runs a WebSocket server on the robot (port 5805). Robot code registers values to display
  * with {@link #addUpdate} and buttons with {@link #addButton}; the dashboard connects and
  * exchanges JSON messages with it.
  *
  * <p>The server starts the first time {@link #getInstance()} is called.
  *
- * <h2>Being replaced by Elastic</h2>
- * The team is moving to Elastic, the dashboard that comes with WPILib, so there's no web page or
- * server of our own to maintain. Robot code doesn't call this class: it uses
- * {@link common.utility.dashboard.Dashboard}, which sends everything to both Elastic and here
- * until the switch is done. To finish it:
- * <ol>
- * <li>In the robot project, lay out Elastic with the drivers, export the layout to
- *     {@code src/main/deploy/elastic-layout.json}, and add
- *     {@code WebServer.start(5800, Filesystem.getDeployDirectory().getPath())} to the
- *     {@code Robot} constructor, so any laptop can load it with File, Download from Robot.</li>
- * <li>Once the drivers only use Elastic, delete this package, the NarwhalDashboard lines in
- *     {@code Dashboard}, and in {@code build.gradle} the Java-WebSocket and json-simple
- *     dependencies (nothing else uses them) and the coverage exclusion for this package.</li>
- * <li>In the robot project, rename the dashboard values from this page's keys ({@code robotX},
- *     {@code voltage}, ...) to names that read well in Elastic.</li>
- * </ol>
+ * <p>This class is being replaced by Elastic. Robot code should use
+ * {@link common.utility.dashboard.Dashboard} instead of calling it directly. See
+ * {@code README.md} in the {@code utility} package for the plan.
  *
  * @deprecated Use {@link common.utility.dashboard.Dashboard}, which shows everything on Elastic.
  * @since Deep Space 2019
@@ -61,7 +48,7 @@ public class NarwhalDashboard extends WebSocketServer implements AutoCloseable {
     private final HashMap<String, BooleanConsumer> buttons = new HashMap<String, BooleanConsumer>();
 
     private final ArrayList<String> autoPrograms = new ArrayList<String>();
-    // Set by the server's thread when the page picks an auto, read by the robot's
+    /** Set by the server thread when the page selects an auto, and read by the robot thread. */
     private volatile String selectedAuto;
 
     private volatile WebSocket conn;
@@ -70,7 +57,7 @@ public class NarwhalDashboard extends WebSocketServer implements AutoCloseable {
 
     private static int PORT = 5805;
 
-    /** The one dashboard server, started the first time this is called. */
+    /** Returns the single dashboard server, starting it on the first call. */
     public static synchronized NarwhalDashboard getInstance() {
         if (instance == null) {
             startServer();
@@ -79,8 +66,8 @@ public class NarwhalDashboard extends WebSocketServer implements AutoCloseable {
     }
 
     /**
-     * Starts the NarwhalDashboard server. This opens it up to be able to be
-     * connected to by client devices (the DS Laptop, a tablet controller, etc) and
+     * Starts the NarwhalDashboard server, allowing client devices (the Driver Station laptop or a
+     * tablet, for example) to connect, and
      * begins streaming data.
      */
     private static void startServer() {
@@ -97,17 +84,17 @@ public class NarwhalDashboard extends WebSocketServer implements AutoCloseable {
     }
 
     /**
-     * Sets the IP address' port number
-     * @param port the port number
+     * Sets the port number.
+     * @param port The port number
      */
     public static void setPort(int port) {
         PORT = port;
     }
 
     /**
-     * Creates a new NarwhalDashboard server
-     * @param port the port number
-     * @throws UnknownHostException invalid IP address
+     * Creates a NarwhalDashboard server.
+     * @param port The port number
+     * @throws UnknownHostException If the IP address is invalid
      */
     private NarwhalDashboard(int port) throws UnknownHostException {
         super(new InetSocketAddress(port));
@@ -115,15 +102,15 @@ public class NarwhalDashboard extends WebSocketServer implements AutoCloseable {
     }
 
     /**
-     * Returns the selectedAuto on the web server
-     * @return A string containing an auto
+     * Returns the auto selected on the web page.
+     * @return The name of the selected auto
      */
     public String getSelectedAuto() {
         return selectedAuto;
     }
 
     /**
-     * Initializes NarwhalDashboard autos and buttons
+     * Initializes NarwhalDashboard autos and buttons.
      */
     private void initDashboard() {
         addUpdate("selectedAuto", ()-> selectedAuto);
@@ -132,26 +119,26 @@ public class NarwhalDashboard extends WebSocketServer implements AutoCloseable {
     }
 
     /**
-     * Sends a list of objects to the web server on intialize
-     * @param key Name of the objects on dashboard
-     * @param objects List of objects added
+     * Sends a list of objects to the web page on initialization.
+     * @param key The name of the objects on the dashboard
+     * @param objects The objects to add
      */
     public void addInit(String key, List<Object> objects) {
         initMap.put(key, objects);
     }
 
     /**
-     * Sends an object to the web server on intialize
-     * @param key Name of the object on dashboard
-     * @param object - Object added
+     * Sends an object to the web page on initialization.
+     * @param key The name of the object on the dashboard
+     * @param object The object to add
      */
     public void addInit(String key, Object object) {
         addInit(key, Arrays.asList(object));
     }
     /**
-     * Adds an autonomous program to NarwhalDashboard's auto picker
+     * Adds an autonomous program to NarwhalDashboard's auto chooser.
      * 
-     * @param names - The human-readable name of the autonomous program
+     * @param names The human-readable names of the autonomous programs
      */
     public void addAutos(String... names) {
         autoPrograms.addAll(Arrays.asList(names));
@@ -159,9 +146,9 @@ public class NarwhalDashboard extends WebSocketServer implements AutoCloseable {
     }
 
     /** 
-     * Called after connecting to the web server
-	 * @param conn The WebSocket instance this event is occuring on.
-	 * @param handshake The handshake of the websocket instance
+     * Called after a client connects to the web server.
+	 * @param conn The WebSocket instance on which this event occurred
+	 * @param handshake The handshake of the WebSocket instance
 	 */
     @SuppressWarnings("unchecked")
     @Override
@@ -171,16 +158,13 @@ public class NarwhalDashboard extends WebSocketServer implements AutoCloseable {
         this.conn = conn;
 
         final JSONObject obj = new JSONObject();
-        //Sends every object to NarwhalDashboard on initialize
         for (final String key : initMap.keySet()) {
             final List<Object> values = initMap.get(key);
-            //Sends a singular object
             if (values.size() <= 1) {
                 obj.put(key, values.get(0));
                 continue;
             }
 
-            //Sends a list of objects
             final JSONArray arr = new JSONArray();
             for (final Object value : values) {
                 arr.add(value);
@@ -192,17 +176,17 @@ public class NarwhalDashboard extends WebSocketServer implements AutoCloseable {
     }
 
     /**
-     * Sends an object to the web server every update
-     * @param key Name of the object
-     * @param obj Object added
+     * Sends an object to the web page on every update.
+     * @param key The name of the object
+     * @param obj The object to add
      */
     public void addUpdate(String key, Supplier<Object> obj) {
         updateMap.put(key, obj);
     }
 
     /**
-     * Sends a message to console.log on Narwhal Dashboard.
-     * @param message Message to be logged on dashboard
+     * Sends a message to console.log on NarwhalDashboard.
+     * @param message The message to log
      */
     @SuppressWarnings("unchecked")
     public void sendMessage(String message) {
@@ -220,7 +204,7 @@ public class NarwhalDashboard extends WebSocketServer implements AutoCloseable {
     }
 
     /**
-     * Updates NarwhalDashboard sending data to the web server
+     * Sends updated data to the web page.
      */
     @SuppressWarnings("unchecked")
     private void update() {
@@ -229,7 +213,6 @@ public class NarwhalDashboard extends WebSocketServer implements AutoCloseable {
         if (localConn == null) return;
 
         if (localConn.isOpen()) {
-            //Sends data as a JSON
             final JSONObject obj = new JSONObject();
             for (final String key : updateMap.keySet()) {
                 obj.put(key, updateMap.get(key).get());
@@ -244,32 +227,32 @@ public class NarwhalDashboard extends WebSocketServer implements AutoCloseable {
     }
 
     /**
-     * Adds an action to be run on a message from the web server
-     * @param key Name of the action
-     * @param action - Action to be run
+     * Adds an action to run when a message arrives from the web page.
+     * @param key The name of the action
+     * @param action The action to run
      */
     public void addAction(String key, Consumer<String[]> action) {
         actionMap.put(key, action);
     }
 
     /**
-     * Assigns an action to a NarwhalDashboard button
-     * @param key Name of the button
-     * @param button Action to be run on button press
+     * Assigns an action to a NarwhalDashboard button.
+     * @param key The name of the button
+     * @param button The action to run when the button is pressed
      */
     public void addButton(String key, BooleanConsumer button) {
         buttons.put(key, button);
     }
 
     /**
-	 * Called when a message from the web server is sent
-	 * @param conn The WebSocket instance this event is occurring on.
-	 * @param message The UTF-8 decoded message that was received.
+	 * Called when a message arrives from the web page.
+	 * @param conn The WebSocket instance on which this event occurred
+	 * @param message The UTF-8 decoded message
 	 */
     @Override
     public void onMessage(WebSocket conn, String message) {
         Log.info("NarwhalDashboard", message);
-        //Message format category + key + value or category + value, example auto:"exampleAuto"
+        // Message format: category:key:value or category:value, for example, auto:"exampleAuto"
         final String[] parts = message.split(":");
 
         if (!actionMap.containsKey(parts[0])) return;
@@ -280,8 +263,8 @@ public class NarwhalDashboard extends WebSocketServer implements AutoCloseable {
     }
 
     /**
-     * Selects the auto
-     * @param autoName Name of the auto
+     * Selects the auto.
+     * @param autoName The name of the auto
      */
     private void selectAuto(String autoName) {
         if (autoName == null) {
@@ -298,9 +281,9 @@ public class NarwhalDashboard extends WebSocketServer implements AutoCloseable {
     }
 
     /**
-     * Changes a button state
-     * @param key Name of the button
-     * @param down State of the button
+     * Changes the state of a button.
+     * @param key The name of the button
+     * @param down The state of the button
      */
     private void updateButton(String key, boolean down) {
         if (!buttons.containsKey(key)) {
@@ -310,7 +293,7 @@ public class NarwhalDashboard extends WebSocketServer implements AutoCloseable {
         buttons.get(key).accept(down);
     }
 
-    /** Shows how a part of the robot is doing, e.g. a motor's {@code getState()}, as a light named {@code name}. */
+    /** Displays the health of a part of the robot, for example, a motor's {@code getState()}, as an indicator named {@code name}. */
     public void checkState(String name, Supplier<DeviceState> state) {
         addUpdate(name, ()-> state.get().toString());
     }

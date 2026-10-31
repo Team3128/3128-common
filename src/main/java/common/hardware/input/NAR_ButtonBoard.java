@@ -4,8 +4,8 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 /**
- * Team 3128's operator button board: 12 buttons and a joystick, read as 16 buttons you can bind
- * commands to. Buttons 1 to 12 are the buttons; 13 to 16 are the joystick pushed all the way
+ * Team 3128's operator button board: 12 buttons and a joystick, read as 16 buttons to which commands
+ * can be bound. Buttons 1 to 12 are the physical buttons; 13 to 16 are the joystick fully deflected
  * left, right, down and up.
  *
  * <pre>{@code
@@ -21,14 +21,14 @@ public class NAR_ButtonBoard {
     private Trigger[] buttons;
 
     /**
-     * Creates a new button board object.
-     * @param port The port on DriverStation the button board is connected to.
+     * Creates a button board.
+     * @param port The Driver Station port to which the button board is connected.
      */
     public NAR_ButtonBoard(int port) {
         buttons = new Trigger[16];
         device = new GenericHID(port);
 
-        // 2023 buttonBoard has 12 buttons & 4 axis direction
+        // The 2023 button board has 12 buttons and 4 axis directions
         for (int i = 0; i < 12; i++) {
             int buttonId = i;
             buttons[buttonId] = new Trigger(() -> device.getRawButton(buttonId + 1)); 
@@ -42,8 +42,8 @@ public class NAR_ButtonBoard {
     }
 
     /**
-     * A button on the board, to bind commands to.
-     * @param i From 1 to 16; see the class comment for which is which
+     * Returns a button on the board, to which commands can be bound.
+     * @param i From 1 to 16; see the class comment for the mapping
      */
     public Trigger getButton(int i) {
         return buttons[i-1];

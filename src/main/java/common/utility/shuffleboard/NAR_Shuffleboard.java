@@ -7,7 +7,6 @@ import java.util.function.DoubleSupplier;
 import java.util.function.LongSupplier;
 import java.util.function.Supplier;
 
-// import com.ctre.phoenix.sensors.WPI_PigeonIMU;
 
 import common.core.misc.NAR_Robot;
 import common.utility.Log;
@@ -27,19 +26,19 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 /**
- * Makes Shuffleboard widgets with one line each, and keeps them up to date.
+ * Creates Shuffleboard widgets in a single call each and keeps them up to date.
  *
  * <ul>
  * <li>{@code addData(tab, name, () -> value, x, y)} shows a value that updates every loop.</li>
- * <li>{@code debug(...)} and {@code debugSwitch(...)} make boxes and switches you can change from
+ * <li>{@code debug(...)} and {@code debugSwitch(...)} create boxes and switches that can be changed from
  *     Shuffleboard; they return a supplier that reads the latest value.</li>
- * <li>{@code addCommand(...)} makes a button that runs a command.</li>
+ * <li>{@code addCommand(...)} creates a button that runs a command.</li>
  * </ul>
  *
- * <p>Positions are on a grid, {@link #WINDOW_WIDTH} by {@link #WINDOW_HEIGHT} per tab, counting
- * from 0 at the top left. A widget placed off the edge or on top of another one logs a warning.
- * Adding a widget with a name that's already on the tab updates that widget rather than making a
- * second one, so it's safe to call every loop.
+ * <p>Positions are on a grid of {@link #WINDOW_WIDTH} by {@link #WINDOW_HEIGHT} per tab, counting
+ * from 0 at the top left. A widget placed off the edge or on top of another logs a warning.
+ * Adding a widget with a name already on the tab updates that widget rather than creating a
+ * second one, so these methods are safe to call every loop.
  *
  * @since 2022 Rapid React
  * @author Mason Lam, Arav Chadha, Peter Ma
@@ -47,7 +46,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 @SuppressWarnings("unused")
 public class NAR_Shuffleboard {
 
-    // Every widget with a supplier is updated every loop
     static {
         NAR_Robot.addPeriodic(NAR_Shuffleboard::update, 0.02);
     }
@@ -55,7 +53,7 @@ public class NAR_Shuffleboard {
     private NAR_Shuffleboard() {}
 
     /**
-     * A widget, and where its value comes from.
+     * A widget and the source of its value.
      */
     private static class WidgetInfo {
         
@@ -64,10 +62,10 @@ public class NAR_Shuffleboard {
         private GenericEntry m_entry;
         
         /**
-         * Creates a new WidgetInfo
+         * Creates a WidgetInfo.
          *
-         * @param widget widget containing the entry 
-         * @param supply supplier updating the entry
+         * @param widget The widget containing the entry
+         * @param supply The supplier updating the entry
          */
         public WidgetInfo(SimpleWidget widget, Supplier<Object> supply){
             m_widget = widget;
@@ -75,21 +73,21 @@ public class NAR_Shuffleboard {
             m_entry = widget.getEntry();
         }
 
-        /** Shows the supplier's latest value; does nothing for a widget with a fixed value. */
+        /** Displays the supplier's latest value; has no effect for a widget with a fixed value. */
         public void update() {
             if(m_supply == null) return;
             m_entry.setValue(m_supply.get());
         }
     }
 
-    /** How many widgets fit across a tab. */
+    /** The number of widgets that fit across a tab. */
     public static int WINDOW_WIDTH = 9;
-    /** How many widgets fit down a tab. */
+    /** The number of widgets that fit down a tab. */
     public static int WINDOW_HEIGHT = 4;
 
-    // Every widget, by tab and then by name
+    /** Every widget, by tab and then by name. */
     private static final HashMap<String, HashMap<String, WidgetInfo>> tabs = new HashMap<String, HashMap<String,WidgetInfo>>();
-    // Which grid spots on each tab have a widget, so autofill and the overlap warning can tell
+    /** Which grid spots on each tab have a widget, for autofill and the overlap warning. */
     private static final HashMap<String, boolean[][]> widgetPositions = new HashMap<String, boolean[][]>();
 
     private static SimpleWidget[] autoWidgets;
@@ -100,9 +98,9 @@ public class NAR_Shuffleboard {
     private static boolean shouldUpdate = true;
     
     /**
-     * Creates a new tab
+     * Creates a tab.
      *
-     * @param tabName the title of the new tab
+     * @param tabName The title of the new tab
      */
     private static void create_tab(String tabName) {
         tabs.put(tabName, new HashMap<String,WidgetInfo>());
@@ -110,12 +108,12 @@ public class NAR_Shuffleboard {
     }
 
     /**
-     * Displays a value in Shuffleboard (Only used for autofill)
+     * Displays a value in Shuffleboard, at the next open position.
      *
-     * @param tabName the title of the tab to select
-     * @param name the name of the widget
-     * @param data the value to display
-     * @return SimpleWidget that can be modified
+     * @param tabName The title of the tab
+     * @param name The name of the widget
+     * @param data The value to display
+     * @return The SimpleWidget, which can be modified
      */
     public static SimpleWidget addData(String tabName, String name, Object data) {
         if(!tabs.containsKey(tabName)) create_tab(tabName);
@@ -128,12 +126,12 @@ public class NAR_Shuffleboard {
     }
 
     /**
-     * Displays a value in Shuffleboard (Only used for autofill)
+     * Displays a value in Shuffleboard, at the next open position.
      *
-     * @param tabName the title of the tab to select
-     * @param name the name of the widget
-     * @param supply the value to display
-     * @return SimpleWidget that can be modified
+     * @param tabName The title of the tab
+     * @param name The name of the widget
+     * @param supply The value to display
+     * @return The SimpleWidget, which can be modified
      */
     public static SimpleWidget addData(String tabName, String name, Supplier<Object> supply) {
         if(!tabs.containsKey(tabName)) create_tab(tabName);
@@ -146,44 +144,44 @@ public class NAR_Shuffleboard {
     }
 
     /**
-     * Displays a value in Shuffleboard
+     * Displays a value in Shuffleboard.
      *
-     * @param tabName the title of the tab to select
-     * @param name the name of the widget
-     * @param data the value to display
-     * @param x coord of the widget starting from 0
-     * @param y coord of the widget starting from 0
-     * @return SimpleWidget that can be modified
+     * @param tabName The title of the tab
+     * @param name The name of the widget
+     * @param data The value to display
+     * @param x X coordinate of the widget, starting from 0
+     * @param y Y coordinate of the widget, starting from 0
+     * @return The SimpleWidget, which can be modified
      */
     public static SimpleWidget addData(String tabName, String name, Object data, int x, int y) {
         return addData(tabName, name, data, x, y, 1, 1);
     }
 
     /**
-     * Displays an updating value in Shuffleboard
+     * Displays an updating value in Shuffleboard.
      * 
-     * @param tabName the title of the tab to select
-     * @param name the name of the widget
-     * @param supply object supplier to constantly update value
-     * @param x coord of the widget starting from 0
-     * @param y coord of the widget starting from 0
-     * @return SimpleWidget that can be modified
+     * @param tabName The title of the tab
+     * @param name The name of the widget
+     * @param supply The supplier that updates the value
+     * @param x X coordinate of the widget, starting from 0
+     * @param y Y coordinate of the widget, starting from 0
+     * @return The SimpleWidget, which can be modified
      */
     public static SimpleWidget addData(String tabName, String name, Supplier<Object> supply, int x, int y) {
         return addData(tabName, name, supply, x, y, 1, 1);
     }
 
     /**
-     * Displays an updating value in Shuffleboard
+     * Displays an updating value in Shuffleboard.
      * 
-     * @param tabName the title of the tab to select
-     * @param name the name of the widget
-     * @param supply object supplier to constantly update value
-     * @param x -coord of the widget starting from 0
-     * @param y -coord of the widget starting from 0
-     * @param width -of the widget
-     * @param height -of the widget
-     * @return simple widget that can be modified
+     * @param tabName The title of the tab
+     * @param name The name of the widget
+     * @param supply The supplier that updates the value
+     * @param x X coordinate of the widget, starting from 0
+     * @param y Y coordinate of the widget, starting from 0
+     * @param width Width of the widget
+     * @param height Height of the widget
+     * @return The SimpleWidget, which can be modified
      */
     public static SimpleWidget addData(String tabName, String name, Supplier<Object> supply, int x, int y, int width, int height){
         if(!tabs.containsKey(tabName)) create_tab(tabName);
@@ -200,16 +198,16 @@ public class NAR_Shuffleboard {
     }
 
     /**
-    * Displays a value in Shuffleboard
+    * Displays a value in Shuffleboard.
     *
-    * @param tabName the title of the tab to select
-    * @param name the name of the widget
-    * @param data value to display
-    * @param x -coord of the widget starting from 0
-    * @param y -coord of the widget starting from 0
-    * @param width -of the widget
-    * @param height -of the widget
-    * @return simple widget that can be modified
+    * @param tabName The title of the tab
+    * @param name The name of the widget
+    * @param data The value to display
+    * @param x X coordinate of the widget, starting from 0
+    * @param y Y coordinate of the widget, starting from 0
+    * @param width Width of the widget
+    * @param height Height of the widget
+    * @return The SimpleWidget, which can be modified
     */
     public static SimpleWidget addData(String tabName, String name, Object data, int x, int y, int width, int height) {
         if(!tabs.containsKey(tabName)) create_tab(tabName);
@@ -224,31 +222,30 @@ public class NAR_Shuffleboard {
     }
 
     /**
-     * Displays sendable values, like subsystems and command, works on all classes that extend sendable
+     * Displays a sendable value, such as a subsystem or command. Works on all classes that extend Sendable.
      * 
-     * @param tabName the title of the tab to select
-     * @param name the name of the widget
-     * @param data sendable value to display
-     * @param x x-coord of the widget
-     * @param y y-coord of the widget
-     * @return sendable widget that can be modified
+     * @param tabName The title of the tab
+     * @param name The name of the widget
+     * @param data The sendable value to display
+     * @param x X coordinate of the widget
+     * @param y Y coordinate of the widget
+     * @return The ComplexWidget, which can be modified
      */
     public static ComplexWidget addSendable(String tabName, String name, Sendable data, int x, int y) {
         if (data instanceof SubsystemBase) return addSendable(tabName, name, data, x, y, 2, 1);
         if (data instanceof PIDController) return addSendable(tabName, name, data, x, y, 1, 2);
-        // if (data instanceof WPI_PigeonIMU) return addSendable(tabName, name, data, x, y, 2, 2);
-        return addSendable(tabName, name, data, x, y, 1, 1); // Default width and height
+        return addSendable(tabName, name, data, x, y, 1, 1);
     }
 
     /**
-     * Displays sendable values, like subsystems and command, works on all classes that extend sendable
+     * Displays a sendable value, such as a subsystem or command. Works on all classes that extend Sendable.
      * 
-     * @param tabName the title of the tab to select
-     * @param name the name of the widget
-     * @param data sendable value to display
-     * @param x x-coord of the widget
-     * @param y y-coord of the widget
-     * @return sendable widget that can be modified
+     * @param tabName The title of the tab
+     * @param name The name of the widget
+     * @param data The sendable value to display
+     * @param x X coordinate of the widget
+     * @param y Y coordinate of the widget
+     * @return The ComplexWidget, which can be modified
      */
     public static ComplexWidget addSendable(String tabName, String name, Sendable data, int x, int y, int width, int height) {
         try {
@@ -264,31 +261,31 @@ public class NAR_Shuffleboard {
     }
 
     /**
-     * Displays Commaned Buttons and Triggers
+     * Displays a command as a button.
      * 
-     * @param tabName the title of the tab to select
-     * @param name the name of the widget
-     * @param command command to display
-     * @param x x-coord of the widget
-     * @param y y-coord of the widget
-     * @return sendable widget that can be modified
+     * @param tabName The title of the tab
+     * @param name The name of the widget
+     * @param command The command to display
+     * @param x X coordinate of the widget
+     * @param y Y coordinate of the widget
+     * @return The ComplexWidget, which can be modified
      */
     public static ComplexWidget addCommand(String tabName, String name, Command command, int x, int y) {
         return addSendable(tabName, name, command, x, y, 1, 1).withWidget(BuiltInWidgets.kCommand);
     }
 
     /**
-     * Adds video stream to shuffleboard
+     * Adds a video stream to Shuffleboard.
      * 
-     * @param tabName the title of the tab to select
-     * @param name the name of the widget
-     * @param cameraName sendable value to display
-     * @param URL x-coord of the widget
-     * @param x coord of the widget
-     * @param y coord of the widget
-     * @param width y-coord of the widget
-     * @param height y-coord of the widget
-     * @return sendable widget that can be modified
+     * @param tabName The title of the tab
+     * @param name The name of the widget
+     * @param cameraName The name of the camera
+     * @param URL The URL of the stream
+     * @param x X coordinate of the widget
+     * @param y Y coordinate of the widget
+     * @param width Width of the widget
+     * @param height Height of the widget
+     * @return The ComplexWidget, which can be modified
      */
     public static ComplexWidget addVideoStream(String tabName, String name, String cameraName, String URL, int x, int y, int width, int height) {
         try {
@@ -309,9 +306,9 @@ public class NAR_Shuffleboard {
     }
 
     /**
-     * Displays auto paths on Shuffleboard and updates selected auto
+     * Displays auto paths on Shuffleboard and updates the selected auto.
      * 
-     * @param autos a String array with all auto names
+     * @param autos The names of all autos
      */
     public static void addAutos(String[] autos) {
         autoNames = autos;
@@ -326,13 +323,13 @@ public class NAR_Shuffleboard {
         for (int i = 0; i < autoNames.length; i++) { 
             autoWidgets[i] = autoLayout.add(autoNames[i], false).withWidget("Toggle Button");
         }
-        addData("Autos", "Auto", ()-> (updateAutoSelection() == null) ? "null" : updateAutoSelection(), 2, 0); // Continuously runs updateAutoSelection()
+        addData("Autos", "Auto", ()-> (updateAutoSelection() == null) ? "null" : updateAutoSelection(), 2, 0);
     }
 
     /**
-     * Updates selectedAutoName and shuffleboard auto selection layout
+     * Updates selectedAutoName and the Shuffleboard auto selection layout.
      * 
-     * @param autos a String array with all auto names
+     * @param autos The names of all autos
      */
     private static String updateAutoSelection() {
         boolean isSelected = false;
@@ -353,7 +350,7 @@ public class NAR_Shuffleboard {
     }
 
     /**
-     * Gets selectedAutoName
+     * Returns selectedAutoName.
      * 
      */
     public static String getSelectedAutoName() {
@@ -361,13 +358,13 @@ public class NAR_Shuffleboard {
     }
 
     /**
-     * Creates a debug text view widget, allows user to edit variable from Shuffleboard
+     * Creates a debug text widget, allowing a variable to be edited from Shuffleboard.
      * 
-     * @param tabName the title of the tab to select
-     * @param name the name of the widget
-     * @param Default starting value for the widget
-     * @param x x-coord of the widget
-     * @param y y-coord of the widget
+     * @param tabName The title of the tab
+     * @param name The name of the widget
+     * @param Default The starting value for the widget
+     * @param x X coordinate of the widget
+     * @param y Y coordinate of the widget
      * @return DoubleSupplier containing the value in the widget
      */
     public static DoubleSupplier debug(String tabName, String name, double Default, int x, int y) {
@@ -376,13 +373,13 @@ public class NAR_Shuffleboard {
     }
 
     /**
-     * Creates a debug switch widget, allows user to edit variable from Shuffleboard
+     * Creates a debug switch widget, allowing a variable to be edited from Shuffleboard.
      * 
-     * @param tabName the title of the tab to select
-     * @param name the name of the widget
-     * @param Default starting value for the widget
-     * @param x x-coord of the widget
-     * @param y y-coord of the widget
+     * @param tabName The title of the tab
+     * @param name The name of the widget
+     * @param Default The starting value for the widget
+     * @param x X coordinate of the widget
+     * @param y Y coordinate of the widget
      * @return BooleanSupplier containing the value in the widget
      */
     public static BooleanSupplier debugSwitch(String tabName, String name, boolean Default, int x, int y) {
@@ -391,13 +388,13 @@ public class NAR_Shuffleboard {
     }
 
     /**
-     * Creates a debug button widget, allows user to edit variable from Shuffleboard
+     * Creates a debug button widget, allowing a variable to be edited from Shuffleboard.
      * 
-     * @param tabName the title of the tab to select
-     * @param name the name of the widget
-     * @param Default starting value for the widget
-     * @param x x-coord of the widget
-     * @param y y-coord of the widget
+     * @param tabName The title of the tab
+     * @param name The name of the widget
+     * @param Default The starting value for the widget
+     * @param x X coordinate of the widget
+     * @param y Y coordinate of the widget
      * @return BooleanSupplier containing the value in the widget
      */
     public static BooleanSupplier debugButton(String tabName, String name, boolean Default, int x, int y) {
@@ -406,10 +403,10 @@ public class NAR_Shuffleboard {
     }
 
     /**
-     * Get the value reference of a widget storing longs.
+     * Returns a reference to the value of a widget storing longs.
      * 
-     * @param tabName the title of the tab to select
-     * @param name the name of the widget
+     * @param tabName The title of the tab
+     * @param name The name of the widget
      * @return LongSupplier referencing the widget
      */
     public static LongSupplier getLong(String tabName, String name){
@@ -418,10 +415,10 @@ public class NAR_Shuffleboard {
     }
 
     /**
-     * Get the value reference of a widget storing doubles.
+     * Returns a reference to the value of a widget storing doubles.
      * 
-     * @param tabName the title of the tab to select
-     * @param name the name of the widget
+     * @param tabName The title of the tab
+     * @param name The name of the widget
      * @return DoubleSupplier referencing the widget
      */
     public static DoubleSupplier getDouble(String tabName, String name){
@@ -430,10 +427,10 @@ public class NAR_Shuffleboard {
     }
 
     /**
-     * Get the value reference of a widget storing booleans.
+     * Returns a reference to the value of a widget storing Booleans.
      * 
-     * @param tabName the title of the tab to select
-     * @param name the name of the widget
+     * @param tabName The title of the tab
+     * @param name The name of the widget
      * @return BooleanSupplier referencing the widget
      */
     public static BooleanSupplier getBoolean(String tabName, String name){
@@ -442,10 +439,10 @@ public class NAR_Shuffleboard {
     }
 
     /**
-     * Get the value reference of a widget storing Strings.
+     * Returns a reference to the value of a widget storing Strings.
      * 
-     * @param tabName the title of the tab to select
-     * @param name the name of the widget
+     * @param tabName The title of the tab
+     * @param name The name of the widget
      * @return StringSupplier referencing the widget
      */
     public static Supplier<String> getString(String tabName, String name){
@@ -454,10 +451,10 @@ public class NAR_Shuffleboard {
     }
 
     /**
-     * Get the Simple Widget object from an widget
+     * Returns the SimpleWidget object for a widget.
      * 
-     * @param tabName the title of the tab to select
-     * @param name the name of the widget
+     * @param tabName The title of the tab
+     * @param name The name of the widget
      * @return SimpleWidget stored in the widget
      */
     public static SimpleWidget getEntry(String tabName,String name) {
@@ -465,7 +462,7 @@ public class NAR_Shuffleboard {
     }
 
     /**
-     * Updates every widget
+     * Updates every widget.
      */
     public static void update() {
         if (!shouldUpdate) return;
@@ -478,15 +475,15 @@ public class NAR_Shuffleboard {
     }
 
     /**
-     * Marks where a new widget goes on its tab, so autofill skips it, and warns if it's off the
+     * Records the position of a new widget on its tab so that autofill skips it, and logs a warning if it is off the
      * edge of the tab or on top of another widget.
      *
-     * @param tabName the title of the tab
-     * @param name the name of the widget, for the warning
-     * @param x x-coord of the widget
-     * @param y y-coord of the widget
-     * @param width width of the widget
-     * @param height height of the widget
+     * @param tabName The title of the tab
+     * @param name The name of the widget, for the warning
+     * @param x X coordinate of the widget
+     * @param y Y coordinate of the widget
+     * @param width Width of the widget
+     * @param height Height of the widget
      */
     private static void placeWidget(String tabName, String name, int x, int y, int width, int height) {
         if (x < 0 || y < 0 || x + width > WINDOW_WIDTH || y + height > WINDOW_HEIGHT) {
@@ -501,7 +498,7 @@ public class NAR_Shuffleboard {
                 taken[i][j] = true;
             }
         }
-        // A warning rather than an error, so a crowded tab doesn't stop the robot from starting
+        // A warning rather than an error, so that a crowded tab does not prevent the robot from starting
         if (overlaps) Log.unusual("Shuffleboard", name + " at (" + x + "," + y + ") overlaps another widget on tab " + tabName);
     }
 }

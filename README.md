@@ -8,19 +8,33 @@ of starting from scratch.
 
 | Package | What it's for |
 |---|---|
-| `common.core.subsystems` | **Mechanisms.** `LinearMechanism` (elevators, sliders), `PivotMechanism` (arms, wrists, hoods, turrets) and `RollerMechanism` (intakes, flywheels). Start here. |
-| `common.core.fsm` | **State machines.** Subsystems with named states like NEUTRAL and INTAKE, and rules for moving between them. |
-| `common.core.controllers` | `PIDFFConfig`, which holds a mechanism's gains and explains what each one does. |
-| `common.hardware.motorcontroller` | TalonFX and Spark motor controllers behind one interface, plus physics models for simulation. |
-| `common.hardware.camera` | PhotonVision cameras that find AprilTags and correct the robot's position. |
-| `common.hardware.input` | Xbox controllers, joysticks and the team's button board. |
+| [`common.core.subsystems`](src/main/java/common/core/subsystems/README.md) | **Mechanisms.** `LinearMechanism` (elevators, sliders), `PivotMechanism` (arms, wrists, hoods, turrets) and `RollerMechanism` (intakes, flywheels). Start here. |
+| [`common.core.fsm`](src/main/java/common/core/fsm/README.md) | **State machines.** Subsystems with named states like NEUTRAL and INTAKE, and rules for moving between them. |
+| [`common.core.controllers`](src/main/java/common/core/controllers/README.md) | `PIDFFConfig`, which holds a mechanism's gains. Its guide explains what each gain does. |
+| [`common.hardware.motorcontroller`](src/main/java/common/hardware/motorcontroller/README.md) | TalonFX and Spark motor controllers behind one interface, plus physics models for simulation. |
+| [`common.hardware.camera`](src/main/java/common/hardware/camera/README.md) | PhotonVision cameras that find AprilTags and correct the robot's position. |
+| [`common.hardware.input`](src/main/java/common/hardware/input/README.md) | Xbox controllers, joysticks and the team's button board. |
 | `common.core.misc` | `NAR_Robot`, the base for the robot's `Robot` class. |
-| `common.utility` | Console logging, the dashboard (Elastic), Shuffleboard, pit system checks and SysId. NarwhalDashboard is still here while the team switches to Elastic. |
+| [`common.utility`](src/main/java/common/utility/README.md) | Console logging, the dashboard (Elastic), Shuffleboard, pit system checks and SysId. NarwhalDashboard is still here while the team switches to Elastic. |
 
-Every package has an overview in its `package-info.java`, and every class explains itself at the
-top of its file. Read the code in your editor, or open `doc/index.html` for the same comments as a
-website. To update `doc/` after changing comments, run `./gradlew javadoc` and copy
-`build/docs/javadoc` over it.
+## Documentation
+
+Each package folder has a `README.md` that GitHub shows below the file list. Those guides explain
+concepts and how the classes fit together. Javadoc on classes and methods describes what each one
+does, and appears when you hover over a name in your editor.
+
+When you change code, keep the documentation with it:
+
+- **Concepts and walkthroughs** go in the package's `README.md`.
+- **What a class, method or field does** goes in a `/** Javadoc */` comment above it, including
+  units and side effects.
+- **Why a line of code is the way it is** goes in a `//` comment on the line above, only when the
+  code cannot show it, such as a hardware quirk or a physics derivation. Do not restate what the
+  code does.
+- Do not leave commented-out code. Git keeps the history.
+- Write comments formally: complete third-person sentences such as "Returns the current position",
+  with no contractions and no "you". Name the subject rather than writing "it" where the subject
+  is unclear.
 
 ## A mechanism in a few lines
 
@@ -51,7 +65,7 @@ The robot project pins the exact commit of 3128-common it was built with. After 
 3128-common, commit there first, then commit the new submodule commit in the robot project.
 
 Older robot projects got it from JitPack instead, through the `3128-common.json` vendordep in this
-repository. The notes in `build.gradle` explain how to make a release for that.
+repository.
 
 ## Building and testing
 
