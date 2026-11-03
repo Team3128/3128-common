@@ -466,8 +466,7 @@ public class NAR_Shuffleboard {
      */
     public static void update() {
         if (!shouldUpdate) return;
-        for(final String tab : tabs.keySet()){
-            final HashMap<String, WidgetInfo> entries = tabs.get(tab);
+        for(final HashMap<String, WidgetInfo> entries : tabs.values()){
             for(final WidgetInfo entry : entries.values()){
                 entry.update();
             }

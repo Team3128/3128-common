@@ -566,11 +566,10 @@ public class TransitionMap<S extends Enum<S>> {
     /** Returns the whole map as a grid with one row per outgoing state, for debugging. */
     @Override
     public String toString() {
-        String out = "Adjacency Map " + enumType.getCanonicalName();
+        StringBuilder out = new StringBuilder("Adjacency Map " + enumType.getCanonicalName());
         for(Object[] row : adjacencyMap) {
-            out = out + "\n";
-            out = out + Arrays.toString(row);
+            out.append('\n').append(Arrays.toString(row));
         }
-        return out;
+        return out.toString();
     }
 }
