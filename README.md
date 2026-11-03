@@ -14,7 +14,7 @@ of starting from scratch.
 | [`common.hardware.motorcontroller`](src/main/java/common/hardware/motorcontroller/README.md) | TalonFX and Spark motor controllers behind one interface, plus physics models for simulation. |
 | [`common.hardware.camera`](src/main/java/common/hardware/camera/README.md) | PhotonVision cameras that find AprilTags and correct the robot's position. |
 | [`common.hardware.input`](src/main/java/common/hardware/input/README.md) | Xbox controllers, joysticks and the team's button board. |
-| `common.core.misc` | `NAR_Robot`, the base for the robot's `Robot` class. |
+| `common.core.misc` | `NAR_Robot`, the base for the robot's `Robot` class, and `AllianceUtil`, which reads the alliance and flips field positions to it. |
 | [`common.utility`](src/main/java/common/utility/README.md) | Console logging, the dashboard (Elastic), Shuffleboard, pit system checks and SysId. NarwhalDashboard is still here while the team switches to Elastic. |
 
 ## Documentation
