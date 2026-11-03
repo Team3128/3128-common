@@ -84,7 +84,8 @@ public class NAR_TalonFX extends NAR_Motor {
 	}
 
     /** While true, settings are only stored, and {@link #finishSetupAll()} sends them. */
-    private static boolean deferringSetup = false;
+    // Volatile because this class also runs a background thread
+    private static volatile boolean deferringSetup = false;
     /** Talons with settings waiting for {@link #finishSetupAll()}, in the order they were created. */
     private static final List<NAR_TalonFX> deferredTalons = new ArrayList<>();
 
