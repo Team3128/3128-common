@@ -6,9 +6,11 @@ import static common.hardware.motorcontroller.MotorControllerConstants.MEDIUM_PR
 import static common.hardware.motorcontroller.MotorControllerConstants.NEO_STATOR_CurrentLimit;
 import static common.hardware.motorcontroller.MotorControllerConstants.NEO_SUPPLY_CurrentLimit;
 
+import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.StatusSignal;
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.PositionVoltage;
@@ -31,6 +33,14 @@ import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.wpilibj.RobotController;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 
 /**
@@ -38,7 +48,9 @@ import java.util.function.Supplier;
  * using Phoenix 6.
  *
  * <p>All settings are kept in one {@code TalonFXConfiguration}. Changing a setting updates that object and
- * sends the changed section to the Talon, retrying if the Talon does not confirm it.
+ * sends the changed section to the Talon, retrying if the Talon does not confirm it. While a
+ * {@link common.core.misc.NAR_Robot} starts up, settings are instead stored and sent together; see
+ * {@link #deferSetup()}.
  *
  * <p>The Talon's own control loops measure in rotations and rotations per second, output volts,
  * and work in seconds. {@link NAR_Motor} converts gains and setpoints to and from the configured units.
@@ -51,17 +63,68 @@ import java.util.function.Supplier;
  */
 public class NAR_TalonFX extends NAR_Motor {
 
-    private static int numFailedConfigs = 0;
+    // Settings can fail on the background thread too
+    private static final AtomicInteger numFailedConfigs = new AtomicInteger();
 
 	/** The number of attempts to send a setting before failing. */
 	public static int maximumRetries = 5;
+
+    /** Sends settings for every Talon one at a time, in order, off the robot thread. */
+    private static final ExecutorService BACKGROUND_CONFIGS = Executors.newSingleThreadExecutor(runnable -> {
+        final Thread thread = new Thread(runnable, "TalonFX configs");
+        thread.setDaemon(true);
+        return thread;
+    });
 
     /**
 	 * @return The number of settings, across every Talon, that failed after all retries.
 	 */
 	public static int getNumFailedConfigs() {
-		return numFailedConfigs;
+		return numFailedConfigs.get();
 	}
+
+    /** While true, settings are only stored, and {@link #finishSetupAll()} sends them. */
+    private static boolean deferringSetup = false;
+    /** Talons with settings waiting for {@link #finishSetupAll()}, in the order they were created. */
+    private static final List<NAR_TalonFX> deferredTalons = new ArrayList<>();
+
+    /**
+     * Stores every Talon's settings instead of sending them, until {@link #finishSetupAll()}. Each
+     * setting is a blocking call that waits for the Talon, so sending them together instead of one
+     * at a time shortens startup. {@link common.core.misc.NAR_Robot} calls both.
+     */
+    public static void deferSetup() {
+        deferringSetup = true;
+    }
+
+    /**
+     * Sends every setting stored since {@link #deferSetup()}: one configuration per Talon, one call per
+     * status signal rate for every Talon together, then encoder positions, which need the Talon's
+     * gearing to be set first. Afterwards, settings are sent as they change.
+     */
+    public static void finishSetupAll() {
+        if (!deferringSetup) return;
+        deferringSetup = false;
+
+        for (NAR_TalonFX talon : deferredTalons) {
+            talon.configTalonFX(() -> talon.motor.getConfigurator().apply(talon.configs));
+        }
+
+        sendFrequencies(deferredTalons);
+
+        for (NAR_TalonFX talon : deferredTalons) {
+            if (talon.pendingRotorRotations == null) continue;
+            final double rotations = talon.pendingRotorRotations;
+            talon.configTalonFX(() -> talon.motor.setPosition(rotations / talon.mechanismRatio));
+        }
+
+        for (NAR_TalonFX talon : deferredTalons) {
+            talon.pendingFrequencies.clear();
+            talon.pendingRotorRotations = null;
+            talon.awaitingSetup = false;
+        }
+        deferredTalons.clear();
+    }
 
     private final TalonFX motor;
 
@@ -78,6 +141,13 @@ public class NAR_TalonFX extends NAR_Motor {
     private final StatusSignal<AngularVelocity> velocity;
     private final StatusSignal<Temperature> temperature;
     private final StatusSignal<Integer> faults;
+
+    /** Whether this Talon is in {@link #deferredTalons}. */
+    private boolean awaitingSetup = false;
+    /** Status signal rates in hertz, waiting for {@link #finishSetupAll()}. */
+    private final Map<BaseStatusSignal, Double> pendingFrequencies = new LinkedHashMap<>();
+    /** An encoder position in rotor rotations, waiting for {@link #finishSetupAll()}, or null. */
+    private Double pendingRotorRotations = null;
 
     /**
      * @param deviceNumber The Talon's CAN ID
@@ -99,8 +169,8 @@ public class NAR_TalonFX extends NAR_Motor {
         // Safe settings until a mechanism's MotorConfig replaces them
         enableVoltageCompensationNoApply(12);
         setCurrentLimitNoApply(NEO_STATOR_CurrentLimit, NEO_SUPPLY_CurrentLimit);
+        configPIDNoApply(pidConfig);
         apply();
-        configPID(pidConfig);
     }
 
     /**
@@ -127,6 +197,11 @@ public class NAR_TalonFX extends NAR_Motor {
 	 */
 	private void configTalonFX(Supplier<StatusCode> config)
 	{
+		sendWithRetries(config, "Failed to configure Talon FX " + motor.getDeviceID());
+	}
+
+	private static void sendWithRetries(Supplier<StatusCode> config, String failureMessage)
+	{
 		for (int i = 0; i < maximumRetries; i++)
 		{
 			if (config.get() == StatusCode.OK)
@@ -134,19 +209,38 @@ public class NAR_TalonFX extends NAR_Motor {
 				return;
 			}
 		}
-		numFailedConfigs ++;
-		Log.recoverable("Motors", "Failed to configure Talon FX " + motor.getDeviceID());
+		numFailedConfigs.incrementAndGet();
+		Log.recoverable("Motors", failureMessage);
 	}
+
+    /**
+     * Sends part of {@link #configs}, or during {@link #deferSetup()}, leaves it for
+     * {@link #finishSetupAll()}, which sends the whole configuration at once.
+     */
+    private void sendConfig(Supplier<StatusCode> config) {
+        if (deferSetupHere()) return;
+        configTalonFX(config);
+    }
+
+    /** Returns true, and queues this Talon for {@link #finishSetupAll()}, if setup is deferred. */
+    private boolean deferSetupHere() {
+        if (!deferringSetup) return false;
+        if (!awaitingSetup) {
+            awaitingSetup = true;
+            deferredTalons.add(this);
+        }
+        return true;
+    }
 
     @Override
     public void apply() {
-        configTalonFX(() -> motor.getConfigurator().apply(configs));
+        sendConfig(() -> motor.getConfigurator().apply(configs));
     }
 
     @Override
     public void configPID(PIDFFConfig config) {
         configPIDNoApply(config);
-        configTalonFX(()-> motor.getConfigurator().apply(configs.Slot0));
+        sendConfig(()-> motor.getConfigurator().apply(configs.Slot0));
     }
 
     @Override
@@ -170,7 +264,7 @@ public class NAR_TalonFX extends NAR_Motor {
         configs.Slot0.StaticFeedforwardSign = mode == Control.Position
             ? StaticFeedforwardSignValue.UseClosedLoopSign
             : StaticFeedforwardSignValue.UseVelocitySign;
-        configTalonFX(()-> motor.getConfigurator().apply(configs.Slot0));
+        sendConfig(()-> motor.getConfigurator().apply(configs.Slot0));
     }
 
     /**
@@ -181,7 +275,7 @@ public class NAR_TalonFX extends NAR_Motor {
     protected void setMechanismRatio(double motorRotationsPerMechanismRotation) {
         mechanismRatio = motorRotationsPerMechanismRotation;
         configs.Feedback.SensorToMechanismRatio = mechanismRatio;
-        configTalonFX(()-> motor.getConfigurator().apply(configs.Feedback));
+        sendConfig(()-> motor.getConfigurator().apply(configs.Feedback));
     }
 
     @Override
@@ -217,7 +311,7 @@ public class NAR_TalonFX extends NAR_Motor {
     @Override
     public void setInverted(boolean inverted) {
         setInvertedNoApply(inverted);
-        configTalonFX(()-> motor.getConfigurator().apply(configs.MotorOutput));
+        sendConfig(()-> motor.getConfigurator().apply(configs.MotorOutput));
     }
 
     @Override
@@ -290,6 +384,11 @@ public class NAR_TalonFX extends NAR_Motor {
 
     @Override
     protected void resetRawPosition(double rotations) {
+        // The Talon converts with its own SensorToMechanismRatio, which isn't sent until setup finishes
+        if (deferSetupHere()) {
+            pendingRotorRotations = rotations;
+            return;
+        }
         motor.setPosition(rotations / mechanismRatio);
     }
 
@@ -337,7 +436,7 @@ public class NAR_TalonFX extends NAR_Motor {
     @Override
     protected void setBrakeMode() {
         setBrakeModeNoApply();
-        configTalonFX(()-> motor.getConfigurator().apply(configs.MotorOutput));
+        sendConfig(()-> motor.getConfigurator().apply(configs.MotorOutput));
     }
 
     @Override
@@ -348,7 +447,7 @@ public class NAR_TalonFX extends NAR_Motor {
     @Override
     protected void setCoastMode() {
         setCoastModeNoApply();
-        configTalonFX(()-> motor.getConfigurator().apply(configs.MotorOutput));
+        sendConfig(()-> motor.getConfigurator().apply(configs.MotorOutput));
     }
 
     @Override
@@ -359,7 +458,7 @@ public class NAR_TalonFX extends NAR_Motor {
     @Override
     public void enableVoltageCompensation(double volts) {
         enableVoltageCompensationNoApply(volts);
-        configTalonFX(()-> motor.getConfigurator().apply(configs.Voltage));
+        sendConfig(()-> motor.getConfigurator().apply(configs.Voltage));
     }
 
     @Override
@@ -371,7 +470,21 @@ public class NAR_TalonFX extends NAR_Motor {
     @Override
     public void setStatorLimit(int limit) {
         setStatorLimitNoApply(limit);
-        configTalonFX(()-> motor.getConfigurator().apply(configs.CurrentLimits));
+        sendConfig(()-> motor.getConfigurator().apply(configs.CurrentLimits));
+    }
+
+    /**
+     * Like {@link #setStatorLimit}, but sends the limit from a background thread so the robot loop
+     * doesn't wait up to 100 ms per attempt for the Talon to confirm it. Use this when changing the
+     * limit during a match. Limits sent this way reach the Talon in the order they were set.
+     * @param limit Amps
+     */
+    public void setStatorLimitInBackground(int limit) {
+        setStatorLimitNoApply(limit);
+        if (deferSetupHere()) return;
+        // A copy, so later changes on the robot thread don't race with this send
+        final CurrentLimitsConfigs currentLimits = configs.CurrentLimits.clone();
+        BACKGROUND_CONFIGS.execute(() -> configTalonFX(() -> motor.getConfigurator().apply(currentLimits)));
     }
 
     @Override
@@ -383,7 +496,7 @@ public class NAR_TalonFX extends NAR_Motor {
     @Override
     public void setSupplyLimit(int limit) {
         setSupplyLimitNoApply(limit);
-        configTalonFX(()-> motor.getConfigurator().apply(configs.CurrentLimits));
+        sendConfig(()-> motor.getConfigurator().apply(configs.CurrentLimits));
     }
 
     @Override
@@ -395,7 +508,7 @@ public class NAR_TalonFX extends NAR_Motor {
     /** Sets both current limits at once, in amps; see {@link #setStatorLimit} and {@link #setSupplyLimit}. */
     public void setCurrentLimit(int statorLimit, int supplyLimit) {
         setCurrentLimitNoApply(statorLimit, supplyLimit);
-        configTalonFX(()-> motor.getConfigurator().apply(configs.CurrentLimits));
+        sendConfig(()-> motor.getConfigurator().apply(configs.CurrentLimits));
     }
 
     /** Stores both current limits without sending them. */
@@ -430,14 +543,40 @@ public class NAR_TalonFX extends NAR_Motor {
     /** Sets how often each signal is reported, in hertz, and turns off every signal not listed. */
     private void setSignalFrequencies(double appliedOutputHz, double positionHz, double velocityHz,
                                       double currentHz, double temperatureHz) {
-        configTalonFX(()-> appliedOutput.setUpdateFrequency(appliedOutputHz));
-        configTalonFX(()-> position.setUpdateFrequency(positionHz));
-        configTalonFX(()-> velocity.setUpdateFrequency(velocityHz));
-        configTalonFX(()-> stallCurrent.setUpdateFrequency(currentHz));
-        configTalonFX(()-> temperature.setUpdateFrequency(temperatureHz));
+        pendingFrequencies.clear();
+        pendingFrequencies.put(appliedOutput, appliedOutputHz);
+        pendingFrequencies.put(position, positionHz);
+        pendingFrequencies.put(velocity, velocityHz);
+        pendingFrequencies.put(stallCurrent, currentHz);
+        pendingFrequencies.put(temperature, temperatureHz);
         // Used by getState(), which the dashboard checks
-        configTalonFX(()-> faults.setUpdateFrequency(LOW_PRIORITY_FREQ));
-        configTalonFX(()-> motor.optimizeBusUtilization());
+        pendingFrequencies.put(faults, LOW_PRIORITY_FREQ);
+        if (deferSetupHere()) return;
+
+        sendFrequencies(List.of(this));
+        pendingFrequencies.clear();
+    }
+
+    /**
+     * Sends the {@link #pendingFrequencies} of each Talon, with one call per rate for all of them,
+     * then turns off every signal not given a rate.
+     */
+    private static void sendFrequencies(List<NAR_TalonFX> talons) {
+        final Map<Double, List<BaseStatusSignal>> signalsByHz = new TreeMap<>();
+        final List<NAR_TalonFX> optimized = new ArrayList<>();
+        for (NAR_TalonFX talon : talons) {
+            if (talon.pendingFrequencies.isEmpty()) continue;
+            talon.pendingFrequencies.forEach((signal, hz) ->
+                signalsByHz.computeIfAbsent(hz, unused -> new ArrayList<>()).add(signal));
+            optimized.add(talon);
+        }
+        signalsByHz.forEach((hz, signals) -> sendWithRetries(
+            () -> BaseStatusSignal.setUpdateFrequencyForAll(hz, signals),
+            "Failed to set the " + hz + " Hz status signals"));
+        // Phoenix has no single call for this; optimizeBusUtilizationForAll also does one Talon at a time
+        for (NAR_TalonFX talon : optimized) {
+            talon.configTalonFX(() -> talon.motor.optimizeBusUtilization());
+        }
     }
 
     /**

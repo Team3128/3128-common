@@ -3,6 +3,7 @@ package common.core.misc;
 import java.util.PriorityQueue;
 
 import common.hardware.motorcontroller.NAR_CANSpark;
+import common.hardware.motorcontroller.NAR_TalonFX;
 import common.utility.Log;
 import edu.wpi.first.hal.DriverStationJNI;
 import edu.wpi.first.hal.HAL;
@@ -22,6 +23,8 @@ import edu.wpi.first.wpilibj.Timer;
  * <ul>
  * <li>Records a log file of NetworkTables, the console and the Driver Station for AdvantageScope,
  *     on a USB stick in the roboRIO if one is present.</li>
+ * <li>Sends every TalonFX's settings together, immediately after {@code robotInit()}, instead of
+ *     one at a time as the robot is built, which shortens startup.</li>
  * <li>Saves every Spark's settings to flash once, immediately after {@code robotInit()}.</li>
  * <li>Allows any class to schedule periodic work with {@link #addPeriodic(Runnable, double)}, for
  *     example, Shuffleboard updates, without the robot code having to call it.</li>
@@ -105,6 +108,8 @@ public class NAR_Robot extends IterativeRobotBase {
      */
     protected NAR_Robot(double period) {
         super(period);
+        // Before the subclass builds any motors; startCompetition() sends their settings
+        NAR_TalonFX.deferSetup();
         m_startTime = Timer.getFPGATimestamp();
 
         DataLogManager.start();
@@ -130,6 +135,7 @@ public class NAR_Robot extends IterativeRobotBase {
     public void startCompetition() {
         
         robotInit();
+        NAR_TalonFX.finishSetupAll();
         // Every Spark is configured at this point, so each one's settings are saved once, as REV recommends
         NAR_CANSpark.burnFlashAll();
 

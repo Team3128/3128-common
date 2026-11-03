@@ -57,6 +57,8 @@ class NAR_TalonFXTest {
 
     @AfterEach
     void closeTalons() {
+        // So a failed test can't leave the next one deferring its settings
+        NAR_TalonFX.finishSetupAll();
         created.forEach(NAR_TalonFX::close);
         DriverStationSim.setEnabled(false);
         DriverStationSim.notifyNewData();
@@ -117,6 +119,22 @@ class NAR_TalonFXTest {
         assertEquals(25, config.CurrentLimits.StatorCurrentLimit, TOLERANCE);
         assertEquals(35, config.CurrentLimits.SupplyCurrentLimit, TOLERANCE);
         assertEquals(NeutralModeValue.Brake, config.MotorOutput.NeutralMode);
+    }
+
+    @Test
+    void backgroundStatorLimitsArriveInOrder() {
+        final NAR_TalonFX talon = talon();
+        talon.setSupplyLimit(30);
+        talon.setStatorLimitInBackground(50);
+        talon.setStatorLimitInBackground(5);
+
+        // Each send can wait up to 100 ms for the simulated Talon
+        Timer.delay(0.5);
+        final TalonFXConfiguration config = readBack(talon);
+        assertEquals(5, config.CurrentLimits.StatorCurrentLimit, TOLERANCE);
+        assertTrue(config.CurrentLimits.StatorCurrentLimitEnable);
+        // The rest of the section is sent too, unchanged
+        assertEquals(30, config.CurrentLimits.SupplyCurrentLimit, TOLERANCE);
     }
 
     @Test
@@ -249,6 +267,42 @@ class NAR_TalonFXTest {
         talon.resetPosition(1);
         waitForTalon();
         assertEquals(1, talon.getPosition(), 1e-3);
+    }
+
+    @Test
+    void deferredSetupSendsEverythingAtTheEnd() {
+        // The simulated Talons keep their settings between runs, so each starts from a known one
+        final NAR_TalonFX positionTalon = talon();
+        final NAR_TalonFX velocityTalon = talon();
+        positionTalon.setStatorLimit(77);
+        velocityTalon.setStatorLimit(77);
+
+        NAR_TalonFX.deferSetup();
+        positionTalon.configMotor(new MotorConfig(0.5, 60, 33, false, Neutral.COAST, StatusFrames.POSITION));
+        positionTalon.setStatorLimitInBackground(20);
+        positionTalon.resetPosition(1);
+        velocityTalon.configMotor(new MotorConfig(1, 60, 44, true, Neutral.BRAKE, StatusFrames.VELOCITY));
+
+        Timer.delay(0.3);
+        assertEquals(77, readBack(positionTalon).CurrentLimits.StatorCurrentLimit, TOLERANCE);
+        assertEquals(77, readBack(velocityTalon).CurrentLimits.StatorCurrentLimit, TOLERANCE);
+
+        NAR_TalonFX.finishSetupAll();
+        waitForTalon();
+
+        TalonFXConfiguration config = readBack(positionTalon);
+        assertEquals(20, config.CurrentLimits.StatorCurrentLimit, TOLERANCE);
+        assertEquals(NeutralModeValue.Coast, config.MotorOutput.NeutralMode);
+        assertEquals(1, positionTalon.getPosition(), 1e-3);
+
+        // The simulated Talon reports every signal at 50 Hz whatever it's given, so rates can't be checked here
+        config = readBack(velocityTalon);
+        assertEquals(44, config.CurrentLimits.StatorCurrentLimit, TOLERANCE);
+        assertEquals(InvertedValue.Clockwise_Positive, config.MotorOutput.Inverted);
+
+        // Afterwards, settings are sent as they change
+        positionTalon.setStatorLimit(25);
+        assertEquals(25, readBack(positionTalon).CurrentLimits.StatorCurrentLimit, TOLERANCE);
     }
 
     @Test
