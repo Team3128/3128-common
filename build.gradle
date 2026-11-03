@@ -2,6 +2,8 @@ plugins {
     id "java"
     id "jacoco"
     id "edu.wpi.first.GradleRIO" version "2026.2.1"
+    id "net.ltgt.errorprone" version "5.2.0"
+    id "com.github.spotbugs" version "6.5.13"
 }
 
 // The release workflow overrides this with the tag being released
@@ -83,6 +85,9 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter:5.10.1'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
+    // 2.42.0 is the last Error Prone release that runs on JDK 17
+    errorprone 'com.google.errorprone:error_prone_core:2.42.0'
+
     implementation wpi.java.deps.wpilib()
     implementation wpi.java.vendor.java()
 	implementation group: 'gov.nist.math', name: 'jama', version: '1.0.3'
@@ -94,6 +99,27 @@ dependencies {
 test {
     useJUnitPlatform()
     systemProperty 'junit.jupiter.extensions.autodetection.enabled', 'true'
+}
+
+// Static analysis. Error Prone runs on every compile and fails the build on errors.
+// SpotBugs runs with ./gradlew build and fails it on any finding: build/reports/spotbugs/main.html
+// To silence a finding that isn't a real problem, add it to config/spotbugs-exclude.xml with a comment saying why.
+tasks.withType(JavaCompile).configureEach {
+    options.errorprone.disableWarningsInGeneratedCode = true
+}
+
+spotbugs {
+    excludeFilter = file('config/spotbugs-exclude.xml')
+}
+
+tasks.named('spotbugsMain') {
+    reports {
+        html { required = true }
+    }
+}
+
+tasks.named('spotbugsTest') {
+    enabled = false
 }
 
 // Test coverage: ./gradlew test jacocoTestReport, then open build/reports/jacoco/test/html/index.html
