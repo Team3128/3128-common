@@ -14,6 +14,9 @@ import edu.wpi.first.wpilibj.Timer;
  * <li>{@link #fatal}: the robot cannot operate correctly. Also shown on the Driver Station.</li>
  * <li>{@link #recoverable}: something failed, but the robot continues. Also shown on the
  *     Driver Station.</li>
+ * <li>{@link #fatalException} and {@link #recoverableException}: the same, for a caught exception,
+ *     with its stack trace. Use these rather than {@code printStackTrace} or
+ *     {@code DriverStation.reportError}.</li>
  * <li>{@link #unusual}: an unexpected condition, probably a bug, that caused no failure.</li>
  * <li>{@link #info}: useful information, for example, "Intake ready".</li>
  * <li>{@link #debug}: detail useful only for troubleshooting; hidden unless enabled.</li>
@@ -104,13 +107,11 @@ public class Log {
 	 * exception's name, message and stack trace. Also shown on the Driver Station.
 	 */
 	public static void fatalException(String category, String userMessage, Exception exception) {
-		String exceptionMessage = String.format("%s -- %s: %s", userMessage, exception.getClass().getSimpleName(),
-				exception.getMessage());
+		String exceptionMessage = describe(userMessage, exception);
 		log("Fatal", category, exceptionMessage);
 
-		exception.printStackTrace();
-
-		DriverStation.reportError("Fatal Error: " + exceptionMessage, true);
+		// Prints the exception's stack trace to the console as well
+		DriverStation.reportError("Fatal Error: " + exceptionMessage, exception.getStackTrace());
 	}
 
 	/**
@@ -125,6 +126,19 @@ public class Log {
 
 		DriverStation.reportError("Error: " + (message == null ? "null" : message), true);
 
+	}
+
+	/**
+	 * Logs an exception that may stop one feature while the robot as a whole continues working, with
+	 * the given message and the exception's name, message and stack trace. Also shown on the Driver
+	 * Station.
+	 */
+	public static void recoverableException(String category, String userMessage, Exception exception) {
+		String exceptionMessage = describe(userMessage, exception);
+		log("Recoverable", category, exceptionMessage);
+
+		// Prints the exception's stack trace to the console as well
+		DriverStation.reportError("Error: " + exceptionMessage, exception.getStackTrace());
 	}
 
 	/**
@@ -188,6 +202,10 @@ public class Log {
 	/** Prints a line of dashes to separate sections of the console. */
 	public static void divider(int length) {
 		System.out.println("-".repeat(length));
+	}
+
+	private static String describe(String userMessage, Exception exception) {
+		return String.format("%s -- %s: %s", userMessage, exception.getClass().getSimpleName(), exception.getMessage());
 	}
 
 	private static void log(String severity, String category, String message) {

@@ -79,7 +79,7 @@ public class NarwhalDashboard extends WebSocketServer implements AutoCloseable {
 
             Log.info("NarwhalDashboard", "Server has started on port " + PORT);
         } catch (UnknownHostException e) {
-            e.printStackTrace();
+            Log.recoverableException("NarwhalDashboard", "Server failed to start", e);
         }
     }
 
@@ -198,7 +198,7 @@ public class NarwhalDashboard extends WebSocketServer implements AutoCloseable {
         try {
             localConn.send(obj.toJSONString());
         } catch (Exception e) {
-            Log.info("Dashboard", e.toString());
+            Log.recoverable("NarwhalDashboard", "Failed to send to the web page: " + e);
             conn.close();
         }
     }
@@ -220,7 +220,7 @@ public class NarwhalDashboard extends WebSocketServer implements AutoCloseable {
             try {
                 localConn.send(obj.toJSONString());
             } catch (Exception e) {
-                Log.info("Dashboard", e.toString());
+                Log.recoverable("NarwhalDashboard", "Failed to send to the web page: " + e);
                 conn.close();
             }
         }
@@ -300,7 +300,7 @@ public class NarwhalDashboard extends WebSocketServer implements AutoCloseable {
 
     @Override
     public void onError(WebSocket conn, Exception ex) {
-        ex.printStackTrace();
+        Log.recoverableException("NarwhalDashboard", "Connection error", ex);
     }
 
     @Override

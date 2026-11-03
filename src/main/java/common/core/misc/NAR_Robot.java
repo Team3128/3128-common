@@ -3,6 +3,7 @@ package common.core.misc;
 import java.util.PriorityQueue;
 
 import common.hardware.motorcontroller.NAR_CANSpark;
+import common.utility.Log;
 import edu.wpi.first.hal.DriverStationJNI;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.NotifierJNI;
@@ -138,6 +139,7 @@ public class NAR_Robot extends IterativeRobotBase {
 
 
         // Tell the Driver Station that the robot is ready to be enabled
+        // The same banner WPILib prints, so it is deliberately not a Log message
         System.out.println("********** Robot program startup complete **********");
         DriverStationJNI.observeUserProgramStarting();
 
@@ -157,7 +159,7 @@ public class NAR_Robot extends IterativeRobotBase {
             try {
                 callback.func.run();
             } catch (Exception e) {
-                DriverStation.reportError(e.toString(), e.getStackTrace());
+                Log.recoverableException("Robot", "A periodic function failed", e);
             }
 
             callback.expirationTime += callback.period;
@@ -169,7 +171,7 @@ public class NAR_Robot extends IterativeRobotBase {
                 try {
                     callback.func.run();
                 } catch (Exception e) {
-                    DriverStation.reportError(e.toString(), e.getStackTrace());
+                    Log.recoverableException("Robot", "A periodic function failed", e);
                 }
 
                 callback.expirationTime += callback.period;

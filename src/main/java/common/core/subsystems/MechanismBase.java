@@ -545,13 +545,13 @@ public abstract class MechanismBase extends SubsystemBase {
         FFWidgets(1, 0);
         runVoltsWidgets(debug, 1, 0);
 
-        NAR_Shuffleboard.addCommand(getName(), "Enable", either(startEnd(() -> setSetpoint(debugSetpoint.getAsDouble()), this::disable), print("DEBUG NOT ON"), debug), 4, 0);
+        NAR_Shuffleboard.addCommand(getName(), "Enable", either(startEnd(() -> setSetpoint(debugSetpoint.getAsDouble()), this::disable), runOnce(() -> Log.info(getName(), "Turn on DEBUG to use this button")), debug), 4, 0);
     }
 
     /** Adds a box and button to run the mechanism at a voltage, for testing direction and wiring. */
     private void runVoltsWidgets(BooleanSupplier debug, int x, int y) {
         final DoubleSupplier debugVoltage = NAR_Shuffleboard.debug(getName(), "Debug Volts", 0, x + 6, y + 3);
-        NAR_Shuffleboard.addCommand(getName(), "Run Volts", either(startEnd(() -> runVolts(debugVoltage.getAsDouble()), this::stop), print("DEBUG NOT ON"), debug), x + 7, y + 3);
+        NAR_Shuffleboard.addCommand(getName(), "Run Volts", either(startEnd(() -> runVolts(debugVoltage.getAsDouble()), this::stop), runOnce(() -> Log.info(getName(), "Turn on DEBUG to use this button")), debug), x + 7, y + 3);
         NAR_Shuffleboard.addData(getName(), "Running", () -> debug.getAsBoolean() && getVolts() > 0, x + 5, y + 3);
         NAR_Shuffleboard.addData(getName(), "Voltage", this::getVolts, x + 4, y + 3);
     }

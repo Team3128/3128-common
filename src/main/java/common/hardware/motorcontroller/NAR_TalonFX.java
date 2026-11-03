@@ -135,7 +135,7 @@ public class NAR_TalonFX extends NAR_Motor {
 			}
 		}
 		numFailedConfigs ++;
-		Log.info("Motors", "Failed to configure Talon FX " + motor.getDeviceID());
+		Log.recoverable("Motors", "Failed to configure Talon FX " + motor.getDeviceID());
 	}
 
     @Override

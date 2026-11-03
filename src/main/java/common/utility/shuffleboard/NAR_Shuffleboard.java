@@ -255,7 +255,7 @@ public class NAR_Shuffleboard {
             return widget;
         }
         catch(Exception e) {
-            e.printStackTrace();
+            Log.recoverableException("Shuffleboard", "Failed to add " + name + " to tab " + tabName, e);
             return null;
         }
     }
@@ -300,7 +300,7 @@ public class NAR_Shuffleboard {
             return videoStream;
         }
         catch(Exception e) {
-            e.printStackTrace();
+            Log.recoverableException("Shuffleboard", "Failed to add " + name + " to tab " + tabName, e);
             return null;
         }
     }

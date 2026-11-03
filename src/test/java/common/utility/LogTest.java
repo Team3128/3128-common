@@ -105,6 +105,13 @@ class LogTest {
     }
 
     @Test
+    void recoverableErrorsIncludeExceptions() {
+        Log.recoverableException("Camera", "update failed", new IllegalStateException("no target"));
+
+        assertTrue(printed().contains("[Recoverable] [Camera] update failed -- IllegalStateException: no target"));
+    }
+
+    @Test
     void primaryDebugAndDividers() {
         Log.logDebug = true;
         Type.enable(Type.PRIMARY);
