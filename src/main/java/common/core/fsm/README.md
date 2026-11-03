@@ -48,7 +48,8 @@ public class Intake extends FSMSubsystemBase<IntakeStates> {
 
 `intake.setState(IntakeStates.INTAKE)` then runs the transition's command. Requesting a move that is
 not in the map does nothing and logs a warning, which keeps a subsystem from doing something
-unplanned, such as extending an arm through the robot.
+unplanned, such as extending an arm through the robot. Requesting the state the subsystem is
+already in also does nothing, but quietly, so pressing a button twice is not reported as a problem.
 
 The current state is published to NetworkTables under `StateMachines/<name>` whenever it changes, so
 it can be followed in AdvantageScope or a log file.

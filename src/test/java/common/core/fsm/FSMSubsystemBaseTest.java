@@ -123,6 +123,21 @@ class FSMSubsystemBaseTest {
     }
 
     @Test
+    void requestForTheCurrentStateLeavesTheRunningTransitionAlone() {
+        final Command slowTransition = Commands.idle();
+        final TestFSM fsm = fsm(map -> map.addTransition(TestState.IDLE, TestState.INTAKE, slowTransition));
+        fsm.setState(TestState.INTAKE);
+        final Transition<TestState> requested = fsm.getRequestTransition();
+
+        fsm.setState(TestState.INTAKE);
+
+        assertTrue(slowTransition.isScheduled());
+        assertEquals(TestState.INTAKE, fsm.getState());
+        assertEquals(TestState.IDLE, fsm.getPreviousState());
+        assertSame(requested, fsm.getRequestTransition());
+    }
+
+    @Test
     void nullStateIsIgnored() {
         final TestFSM fsm = fsm(map -> map.addTransition(TestState.IDLE, TestState.INTAKE, Commands.none()));
 

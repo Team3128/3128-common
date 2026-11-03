@@ -107,6 +107,8 @@ public abstract class FSMSubsystemBase<S extends Enum<S>> extends SubsystemBase 
      * Moves to {@code nextState} by running the transition registered for it, if one exists.
      *
      * <ul>
+     * <li>If {@code nextState} is already the current state, nothing happens and a transition
+     *     still running is left to finish. Use {@link #overrideState} first to run a state's transition again.</li>
      * <li>If the transition is not allowed, the state does not change and a warning is logged.</li>
      * <li>If a transition is still running, it is cancelled and the new transition starts.</li>
      * <li>The state changes as soon as the transition starts, not when its command finishes.
@@ -124,6 +126,12 @@ public abstract class FSMSubsystemBase<S extends Enum<S>> extends SubsystemBase 
 
         if(nextState == null) {
             Log.recoverable(getName(), "Null state requested");
+            return;
+        }
+
+        // Not a transition, since the map has none from a state to itself; often a button pressed twice
+        if(nextState == currentState) {
+            Log.debug(Log.Type.STATE_MACHINE_SECONDARY, getName(), "Already in " + nextState.name() + ", ignoring request");
             return;
         }
 
