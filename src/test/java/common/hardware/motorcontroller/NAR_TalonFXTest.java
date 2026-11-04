@@ -12,6 +12,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.Follower;
@@ -70,11 +71,18 @@ class NAR_TalonFXTest {
         return talon;
     }
 
-    /** What the Talon itself has, read back from it. */
+    /**
+     * What the Talon itself has, read back from it. The simulated Talon can be slow to answer on a
+     * busy machine, such as a CI runner, and a read that times out leaves every setting at its default.
+     */
     private static TalonFXConfiguration readBack(NAR_TalonFX talon) {
         final TalonFXConfiguration config = new TalonFXConfiguration();
-        talon.getMotor().getConfigurator().refresh(config);
-        return config;
+        StatusCode status = StatusCode.OK;
+        for (int attempt = 0; attempt < 5; attempt++) {
+            status = talon.getMotor().getConfigurator().refresh(config, 0.5);
+            if (status.isOK()) return config;
+        }
+        throw new AssertionError("Could not read the Talon's settings: " + status);
     }
 
     /** Waits for the simulated Talon to report new values. */
