@@ -2,27 +2,37 @@ package common.core.misc;
 
 import java.util.PriorityQueue;
 
+import common.hardware.motorcontroller.NAR_CANSpark;
+import common.hardware.motorcontroller.NAR_TalonFX;
+import common.utility.Log;
 import edu.wpi.first.hal.DriverStationJNI;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.NotifierJNI;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.IterativeRobotBase;
 import edu.wpi.first.wpilibj.Timer;
 
 /**
- * Team 3128's Custom Robot class
- *  
- * <p>NOTES:
+ * Base class for Team 3128's {@code Robot} class. It behaves like WPILib's {@code TimedRobot}:
+ * subclasses override {@code robotPeriodic()}, {@code teleopPeriodic()} and similar methods, which run every 20 ms.
+ *
+ * <p>It also:
  * <ul>
- * <li> NAR_Robot IS TimedRobot, just with QoL improvements.
- * <li> The NAR_Robot class is intended to be subclassed by a user creating a robot program.
- * <li> Periodic() functions from the base class are called on an interval by a Notifier instance.
+ * <li>Records a log file of NetworkTables, the console and the Driver Station for AdvantageScope,
+ *     on a USB stick in the roboRIO if one is present.</li>
+ * <li>Sends every TalonFX's settings together, immediately after {@code robotInit()}, instead of
+ *     one at a time as the robot is built, which shortens startup.</li>
+ * <li>Saves every Spark's settings to flash once, immediately after {@code robotInit()}.</li>
+ * <li>Allows any class to schedule periodic work with {@link #addPeriodic(Runnable, double)}, for
+ *     example, Shuffleboard updates, without the robot code having to call it.</li>
  * </ul>
- * 
- * <p> ----------------------------------------------
- *  
+ *
+ * <p>Everything runs on one thread, in order, so code called from {@code addPeriodic} never runs
+ * at the same time as robot code.
+ *
  * @since 2023 Charged Up
  * @author Mason Lam, Wallim
  */
@@ -35,7 +45,7 @@ public class NAR_Robot extends IterativeRobotBase {
         public double expirationTime;
 
         /**
-         * Construct a callback container.
+         * Constructs a callback container.
          *
          * @param func             The callback to run.
          * @param startTimeSeconds The common starting point for all callback scheduling
@@ -55,8 +65,8 @@ public class NAR_Robot extends IterativeRobotBase {
 
         @Override
         public boolean equals(Object rhs) {
-            if (rhs instanceof Callback) {
-                return Double.compare(expirationTime, ((Callback) rhs).expirationTime) == 0;
+            if (rhs instanceof Callback other) {
+                return Double.compare(expirationTime, other.expirationTime) == 0;
             }
             return false;
         }
@@ -76,8 +86,7 @@ public class NAR_Robot extends IterativeRobotBase {
 
     public static final double kDefaultPeriod = 0.02;
 
-    // The C pointer to the notifier object. We don't use it directly, it is
-    // just passed to the JNI bindings.
+    /** Handle to the native notifier, passed to the JNI bindings. */
     private final int m_notifier = NotifierJNI.initializeNotifier();
 
     private static double m_startTime;
@@ -85,19 +94,28 @@ public class NAR_Robot extends IterativeRobotBase {
     private static final PriorityQueue<Callback> m_callbacks = new PriorityQueue<>();
 
 
-    /** Constructor for TimedRobot. */
+    /** Creates a robot with the default 20 ms period. */
     protected NAR_Robot() {
         this(kDefaultPeriod);
     }
 
     /**
-     * Constructor for TimedRobot.
+     * Creates a robot and starts recording NetworkTables, console output and Driver Station inputs
+     * to a .wpilog file, on a USB stick in the roboRIO if one is present, or in {@code logs/} in
+     * simulation.
      *
      * @param period Period in seconds.
      */
+    // The start time is static so that any class can call addPeriodic; only one robot is ever created
+    @SuppressWarnings("StaticAssignmentInConstructor")
     protected NAR_Robot(double period) {
         super(period);
+        // Before the subclass builds any motors; startCompetition() sends their settings
+        NAR_TalonFX.deferSetup();
         m_startTime = Timer.getFPGATimestamp();
+
+        DataLogManager.start();
+        DriverStation.startDataLog(DataLogManager.getLog());
 
 
         addPeriodic(this::loopFunc, period);
@@ -114,25 +132,28 @@ public class NAR_Robot extends IterativeRobotBase {
         NotifierJNI.cleanNotifier(m_notifier);
     }
 
-    /** Provide an alternate "main loop" via startCompetition(). */
+    /** Provides an alternate main loop through {@code startCompetition()}. */
     @Override
     public void startCompetition() {
         
         robotInit();
+        NAR_TalonFX.finishSetupAll();
+        // Every Spark is configured at this point, so each one's settings are saved once, as REV recommends
+        NAR_CANSpark.burnFlashAll();
 
         if (isSimulation()) {
             simulationInit();
         }
 
 
-        // Tell the DS that the robot is ready to be enabled
+        // Tell the Driver Station that the robot is ready to be enabled
+        // The same banner WPILib prints, so it is deliberately not a Log message
         System.out.println("********** Robot program startup complete **********");
         DriverStationJNI.observeUserProgramStarting();
 
-        // Loop forever, calling the appropriate mode-dependent function
         while (true) {
-            // We don't have to check there's an element in the queue first because
-            // there's always at least one (the constructor adds one). It's reenqueued
+            // The queue does not need an emptiness check because it always holds at least one element (the
+            // constructor adds one), and each element is re-enqueued
             // at the end of the loop.
             var callback = m_callbacks.poll();
 
@@ -146,20 +167,19 @@ public class NAR_Robot extends IterativeRobotBase {
             try {
                 callback.func.run();
             } catch (Exception e) {
-                DriverStation.reportError(e.toString(), e.getStackTrace());
+                Log.recoverableException("Robot", "A periodic function failed", e);
             }
 
             callback.expirationTime += callback.period;
             m_callbacks.add(callback);
 
-            // Process all other callbacks that are ready to run
             while ((long) (m_callbacks.peek().expirationTime * 1e6) <= curTime) {
                 callback = m_callbacks.poll();
 
                 try {
                     callback.func.run();
                 } catch (Exception e) {
-                    DriverStation.reportError(e.toString(), e.getStackTrace());
+                    Log.recoverableException("Robot", "A periodic function failed", e);
                 }
 
                 callback.expirationTime += callback.period;
@@ -175,10 +195,10 @@ public class NAR_Robot extends IterativeRobotBase {
     }
 
     /**
-     * Add a callback to run at a specific period.
+     * Adds a callback to run at a specific period.
      *
      * <p>
-     * This is scheduled on TimedRobot's Notifier, so TimedRobot and the callback
+     * This is scheduled on the robot's Notifier, so the robot loop and the callback
      * run
      * synchronously. Interactions between them are thread-safe.
      *
@@ -190,10 +210,10 @@ public class NAR_Robot extends IterativeRobotBase {
     }
 
     /**
-     * Add a callback to run at a specific period with a starting time offset.
+     * Adds a callback to run at a specific period with a starting time offset.
      *
      * <p>
-     * This is scheduled on TimedRobot's Notifier, so TimedRobot and the callback
+     * This is scheduled on the robot's Notifier, so the robot loop and the callback
      * run
      * synchronously. Interactions between them are thread-safe.
      *
@@ -202,7 +222,7 @@ public class NAR_Robot extends IterativeRobotBase {
      * @param offsetSeconds The offset from the common starting time in seconds.
      *                      This is useful for
      *                      scheduling a callback in a different timeslot relative
-     *                      to TimedRobot.
+     *                      to the robot loop.
      */
     public static void addPeriodic(Runnable callback, double periodSeconds, double offsetSeconds) {
         m_callbacks.add(new Callback(callback, m_startTime, periodSeconds, offsetSeconds));

@@ -1,11 +1,21 @@
 plugins {
     id "java"
+    id "jacoco"
     id "edu.wpi.first.GradleRIO" version "2026.2.1"
+    id "net.ltgt.errorprone" version "5.2.0"
+    id "com.github.spotbugs" version "6.5.13"
 }
+
+// The release workflow overrides this with the tag being released
+version = LibraryVersion
 
 java {
     sourceCompatibility = JavaVersion.VERSION_17
     targetCompatibility = JavaVersion.VERSION_17
+
+    // The release workflow uploads these alongside the main jar
+    withJavadocJar()
+    withSourcesJar()
 }
 
 def ROBOT_MAIN_CLASS = ""
@@ -75,17 +85,85 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter:5.10.1'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
+    // 2.42.0 is the last Error Prone release that runs on JDK 17
+    errorprone 'com.google.errorprone:error_prone_core:2.42.0'
+
     implementation wpi.java.deps.wpilib()
     implementation wpi.java.vendor.java()
-	implementation group: 'gov.nist.math', name: 'jama', version: '1.0.3'
+	implementation 'gov.nist.math:jama:1.0.3'
 
 	implementation 'org.java-websocket:Java-WebSocket:1.4.1'
-    implementation group: 'com.googlecode.json-simple', name: 'json-simple', version: '1.1.1'
 }
 
 test {
     useJUnitPlatform()
     systemProperty 'junit.jupiter.extensions.autodetection.enabled', 'true'
+}
+
+// Static analysis. Error Prone runs on every compile and fails the build on errors.
+// SpotBugs runs with ./gradlew build and fails it on any finding: build/reports/spotbugs/main.html
+// To silence a finding that isn't a real problem, add it to config/spotbugs-exclude.xml with a comment saying why.
+tasks.withType(JavaCompile).configureEach {
+    options.errorprone.disableWarningsInGeneratedCode = true
+}
+
+spotbugs {
+    excludeFilter = file('config/spotbugs-exclude.xml')
+}
+
+tasks.named('spotbugsMain') {
+    reports {
+        html { required = true }
+    }
+}
+
+tasks.named('spotbugsTest') {
+    enabled = false
+}
+
+// Test coverage: ./gradlew test jacocoTestReport, then open build/reports/jacoco/test/html/index.html
+// NarwhalDashboard is being replaced by Elastic and will be deleted, so it isn't counted
+def coverageExcludes = ['common/utility/narwhaldashboard/**']
+
+jacocoTestReport {
+    dependsOn test
+    reports {
+        xml.required = true
+        html.required = true
+    }
+    afterEvaluate {
+        classDirectories.setFrom(files(classDirectories.files.collect {
+            fileTree(dir: it, exclude: coverageExcludes)
+        }))
+    }
+}
+
+// ./gradlew check (and build) fails if overall coverage drops below these floors. New code is
+// held to a higher bar on pull requests: see the diff coverage step in .github/workflows/test.yml.
+// Raise these as coverage improves; don't lower them to get a change in.
+jacocoTestCoverageVerification {
+    dependsOn test
+    violationRules {
+        rule {
+            limit {
+                counter = 'LINE'
+                minimum = 0.95
+            }
+            limit {
+                counter = 'BRANCH'
+                minimum = 0.85
+            }
+        }
+    }
+    afterEvaluate {
+        classDirectories.setFrom(files(classDirectories.files.collect {
+            fileTree(dir: it, exclude: coverageExcludes)
+        }))
+    }
+}
+
+tasks.named('check') {
+    dependsOn jacocoTestCoverageVerification
 }
 
 // Simulation configuration (e.g. environment variables).
@@ -112,4 +190,10 @@ wpi.java.configureTestTasks(test)
 // Configure string concat to always inline compile
 tasks.withType(JavaCompile) {
     options.compilerArgs.add '-XDstringConcat=inline'
+}
+
+// Documentation here is a summary sentence, such as "Returns the current kS", rather than a tag for
+// every parameter and return value, so doclint's "missing" group is off. Its other checks stay on.
+tasks.withType(Javadoc).configureEach {
+    options.addStringOption('Xdoclint:all,-missing', '-quiet')
 }

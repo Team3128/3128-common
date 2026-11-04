@@ -1,0 +1,68 @@
+name: Tests
+
+# Runs the unit tests on every push and pull request; the check fails if any test fails, if
+# overall coverage drops below the floors in build.gradle, or if new code isn't covered.
+# Warning: use no tabs when editing this file
+
+on:
+  push:
+  pull_request:
+
+env:
+  # Share of changed lines (compared with the base branch) that tests must run
+  DIFF_COVERAGE_MIN: 90
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v5
+        with:
+          # Diff coverage compares against the base branch, so it needs the full history
+          fetch-depth: 0
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v5
+        with:
+          distribution: 'temurin'
+          java-version: 17
+          cache: 'gradle'
+
+      - name: Run tests and check overall coverage
+        run: './gradlew test jacocoTestReport jacocoTestCoverageVerification'
+
+      - name: Set up Python
+        if: (success() || failure()) && hashFiles('build/reports/jacoco/test/jacocoTestReport.xml') != ''
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      # Fails if fewer than DIFF_COVERAGE_MIN percent of the lines this branch adds or changes
+      # are run by tests. The per-file report, with the uncovered line numbers, goes to the
+      # job summary. Pushes compare against main; on main itself there is nothing to compare.
+      - name: Check coverage of new code
+        if: (success() || failure()) && hashFiles('build/reports/jacoco/test/jacocoTestReport.xml') != ''
+        run: |
+          pip install --quiet diff-cover==9.2.0
+          diff-cover build/reports/jacoco/test/jacocoTestReport.xml \
+            --compare-branch=origin/${{ github.base_ref || 'main' }} \
+            --src-roots src/main/java \
+            --fail-under=$DIFF_COVERAGE_MIN \
+            --markdown-report diff-coverage.md
+        env:
+          PYTHONDONTWRITEBYTECODE: 1
+
+      - name: Add coverage report to summary
+        if: success() || failure()
+        run: |
+          [ -f diff-coverage.md ] && cat diff-coverage.md >> "$GITHUB_STEP_SUMMARY" || true
+
+      - name: Upload test and coverage reports
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: Test Report
+          path: |
+            ./build/reports/tests/test/
+            ./build/reports/jacoco/test/html/
