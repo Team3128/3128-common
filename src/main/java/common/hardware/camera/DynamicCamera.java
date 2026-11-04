@@ -1,7 +1,8 @@
 package common.hardware.camera;
  import java.util.ArrayList;
  import java.util.List;
-import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
@@ -49,7 +50,7 @@ import org.photonvision.targeting.PhotonTrackedTarget;
 public class DynamicCamera {
 
     /** Every camera created; {@link #periodic()} reads all of them. */
-    public static final LinkedList<DynamicCamera> dynamicCameras = new LinkedList<DynamicCamera>();
+    public static final List<DynamicCamera> dynamicCameras = new ArrayList<>();
     /** Whether {@link #periodic()} reads the cameras. */
     public static boolean enabled = true;
     /** Whether the last frame had any target that passed {@link #setThresholds}. */

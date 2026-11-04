@@ -1,7 +1,9 @@
 package common.hardware.motorcontroller;
 
+import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
 
 import common.core.controllers.PIDFFConfig;
 import common.core.misc.NAR_Robot;
@@ -112,9 +114,9 @@ public abstract class NAR_Motor implements AutoCloseable {
             output = output.concat("\n Stator Limit: " + statorLimit + ". \tThe maximum current applied to the stator is " + statorLimit + " amps. Max torque limited.");
             output = output.concat("\n Supply Limit: " + supplyLimit + ". \tThe maximum current applied to the motor is " + supplyLimit + " amps.");
             output = output.concat("\n Voltage Compensation: " + voltageCompensation + ". \tThe maximum voltage applied to the motor is " + voltageCompensation + " volts.");
-            output = output.concat("\n Inversion: " + inverted + ". \t" + (inverted ? ("Clockwise is positive angular displacement.") : ("Counter-Clockwise is positive angular displacement.")));
-            output = output.concat("\n Neutral Mode: " + mode.name() + ". \tWhen no output is applied the motor will " + mode.name().toLowerCase() + ".");
-            output = output.concat("\n Status Frames: " + statusFrames.name() + ". \tThe motor will send status frames consistent with a " + statusFrames.name().toLowerCase() + " motor.");
+            output = output.concat("\n Inversion: " + inverted + ". \t" + (inverted ? "Clockwise is positive angular displacement." : "Counter-Clockwise is positive angular displacement."));
+            output = output.concat("\n Neutral Mode: " + mode.name() + ". \tWhen no output is applied the motor will " + mode.name().toLowerCase(Locale.ROOT) + ".");
+            output = output.concat("\n Status Frames: " + statusFrames.name() + ". \tThe motor will send status frames consistent with a " + statusFrames.name().toLowerCase(Locale.ROOT) + " motor.");
             return output;
         }
     }
@@ -176,7 +178,7 @@ public abstract class NAR_Motor implements AutoCloseable {
         }, 0.1);
     }
 
-    private final LinkedList<NAR_Motor> followers = new LinkedList<NAR_Motor>();
+    private final List<NAR_Motor> followers = new ArrayList<>();
     private final int id;
     /** The last value sent, so an identical command can be skipped. */
     private double prevValue = 0;
@@ -202,7 +204,7 @@ public abstract class NAR_Motor implements AutoCloseable {
         this.id = id;
     }
 
-    private static final LinkedList<NAR_Motor> simulatedMotors = new LinkedList<NAR_Motor>();
+    private static final List<NAR_Motor> simulatedMotors = new ArrayList<>();
     protected MotorSimModel simModel;
 
     /**
@@ -279,13 +281,9 @@ public abstract class NAR_Motor implements AutoCloseable {
         prevMode = mode;
         prevFeedForward = feedForward;
         switch(mode) {
-            case PercentOutput:
-                setPercentOutput(MathUtil.clamp(value, -1, 1));
-                break;
-            case Velocity:
-                setVelocity(value / unitConversionFactor * timeConversionFactor, feedForward);
-                break;
-            case Position:
+            case PercentOutput -> setPercentOutput(MathUtil.clamp(value, -1, 1));
+            case Velocity -> setVelocity(value / unitConversionFactor * timeConversionFactor, feedForward);
+            case Position -> {
                 if (isContinuous) {
                     // Take the shortest path, for example, from 350 to 10 degrees through 0, not back through 180
                     final double position = getRawPosition() * unitConversionFactor;
@@ -293,10 +291,10 @@ public abstract class NAR_Motor implements AutoCloseable {
                     final double error = convertInput(value) - convertInput(position);
                     final double delta = MathUtil.inputModulus(error, -errorBound, errorBound);
                     setPosition((position + delta) / unitConversionFactor, feedForward);
-                    break;
+                } else {
+                    setPosition(value / unitConversionFactor, feedForward);
                 }
-                setPosition(value / unitConversionFactor, feedForward);
-                break;
+            }
         }
     }
 
@@ -313,18 +311,10 @@ public abstract class NAR_Motor implements AutoCloseable {
         enableVoltageCompensationNoApply(config.voltageCompensation);
         setNeutralModeNoApply(config.mode);
         switch(config.statusFrames) {
-            case DEFAULT:
-                setDefaultStatusFrames();
-                break;
-            case POSITION:
-                setPositionStatusFrames();
-                break;
-            case VELOCITY:
-                setVelocityStatusFrames();
-                break;
-            case FOLLOWER:
-                setFollowerStatusFrames();
-                break;
+            case DEFAULT -> setDefaultStatusFrames();
+            case POSITION -> setPositionStatusFrames();
+            case VELOCITY -> setVelocityStatusFrames();
+            case FOLLOWER -> setFollowerStatusFrames();
         }
 
         apply();
@@ -603,12 +593,8 @@ public abstract class NAR_Motor implements AutoCloseable {
      */
     public void setNeutralMode(Neutral mode) {
         switch(mode) {
-            case BRAKE:
-                setBrakeMode();
-                break;
-            case COAST:
-                setCoastMode();
-                break;
+            case BRAKE -> setBrakeMode();
+            case COAST -> setCoastMode();
         }
         followers.forEach(follower -> follower.setNeutralMode(mode));
     }
@@ -616,12 +602,8 @@ public abstract class NAR_Motor implements AutoCloseable {
     /** Stores the neutral mode as {@link #setNeutralMode(Neutral)} does, without sending it. */
     public void setNeutralModeNoApply(Neutral mode) {
         switch (mode) {
-            case BRAKE:
-                setBrakeModeNoApply();
-                break;
-            case COAST:
-                setCoastModeNoApply();
-                break;
+            case BRAKE -> setBrakeModeNoApply();
+            case COAST -> setCoastModeNoApply();
         }
         followers.forEach(follower -> follower.setNeutralModeNoApply(mode));
     }

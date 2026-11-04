@@ -90,10 +90,9 @@ dependencies {
 
     implementation wpi.java.deps.wpilib()
     implementation wpi.java.vendor.java()
-	implementation group: 'gov.nist.math', name: 'jama', version: '1.0.3'
+	implementation 'gov.nist.math:jama:1.0.3'
 
 	implementation 'org.java-websocket:Java-WebSocket:1.4.1'
-    implementation group: 'com.googlecode.json-simple', name: 'json-simple', version: '1.1.1'
 }
 
 test {
@@ -161,4 +160,10 @@ wpi.java.configureTestTasks(test)
 // Configure string concat to always inline compile
 tasks.withType(JavaCompile) {
     options.compilerArgs.add '-XDstringConcat=inline'
+}
+
+// Documentation here is a summary sentence, such as "Returns the current kS", rather than a tag for
+// every parameter and return value, so doclint's "missing" group is off. Its other checks stay on.
+tasks.withType(Javadoc).configureEach {
+    options.addStringOption('Xdoclint:all,-missing', '-quiet')
 }

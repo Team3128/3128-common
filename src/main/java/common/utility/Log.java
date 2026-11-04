@@ -54,8 +54,10 @@ public class Log {
 		MOTOR(3),
 		VISION(1);
 
+		// Robot code turns types on and off while running, which is the point of this enum
+		@SuppressWarnings("ImmutableEnumChecker")
 		private boolean enabled;
-		private int level;
+		private final int level;
 
 		private Type(int level) {
 			this.enabled = false;

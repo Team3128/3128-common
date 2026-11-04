@@ -67,14 +67,14 @@ public class NAR_Shuffleboard {
          * @param widget The widget containing the entry
          * @param supply The supplier updating the entry
          */
-        public WidgetInfo(SimpleWidget widget, Supplier<Object> supply){
+        WidgetInfo(SimpleWidget widget, Supplier<Object> supply){
             m_widget = widget;
             m_supply = supply;
             m_entry = widget.getEntry();
         }
 
         /** Displays the supplier's latest value; has no effect for a widget with a fixed value. */
-        public void update() {
+        void update() {
             if(m_supply == null) return;
             m_entry.setValue(m_supply.get());
         }
@@ -328,8 +328,6 @@ public class NAR_Shuffleboard {
 
     /**
      * Updates selectedAutoName and the Shuffleboard auto selection layout.
-     * 
-     * @param autos The names of all autos
      */
     private static String updateAutoSelection() {
         boolean isSelected = false;

@@ -8,7 +8,6 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -33,7 +32,9 @@ class TransitionMapShortcutsTest {
     private static final List<State> CD = List.of(State.C, State.D);
 
     /** Each command is named after the state it was built for. */
-    private static final Function<State, Command> NAMED = state -> Commands.none().withName(state.name());
+    private static Command named(State state) {
+        return Commands.none().withName(state.name());
+    }
 
     @BeforeAll
     static void startHal() {
@@ -73,7 +74,7 @@ class TransitionMapShortcutsTest {
         final Set<String> ab = set("A -> B");
         assertEquals(ab, moves(map -> map.addTransition(State.A, State.B, () -> {})));
         assertEquals(ab, moves(map -> map.addTransition(State.A, State.B, Commands.none())));
-        assertEquals(ab, moves(map -> map.addTransition(State.A, State.B, NAMED)));
+        assertEquals(ab, moves(map -> map.addTransition(State.A, State.B, TransitionMapShortcutsTest::named)));
         assertEquals(set("A -> B", "B -> C"), moves(map -> map.addTransitions(
             new Transition<>(State.A, State.B), new Transition<>(State.B, State.C))));
     }
@@ -84,7 +85,7 @@ class TransitionMapShortcutsTest {
         assertEquals(pairs, moves(map -> map.addCorrespondenceTransitions(AB, CD)));
         assertEquals(pairs, moves(map -> map.addCorrespondenceTransitions(AB, CD, () -> {})));
         assertEquals(pairs, moves(map -> map.addCorrespondenceTransitions(AB, CD, Commands.none())));
-        assertEquals(pairs, moves(map -> map.addCorrespondenceTransitions(AB, CD, NAMED)));
+        assertEquals(pairs, moves(map -> map.addCorrespondenceTransitions(AB, CD, TransitionMapShortcutsTest::named)));
     }
 
     @Test
@@ -93,31 +94,31 @@ class TransitionMapShortcutsTest {
         final Set<String> intoA = everyMove(ALL, List.of(State.A));
         assertEquals(intoA, moves(map -> map.addConvergingTransition(State.A)));
         assertEquals(intoA, moves(map -> map.addConvergingTransition(State.A, () -> {})));
-        assertEquals(intoA, moves(map -> map.addConvergingTransition(State.A, NAMED)));
+        assertEquals(intoA, moves(map -> map.addConvergingTransition(State.A, TransitionMapShortcutsTest::named)));
 
         // From some states into one
         final Set<String> abIntoC = everyMove(AB, List.of(State.C));
         assertEquals(abIntoC, moves(map -> map.addConvergingTransition(AB, State.C)));
         assertEquals(abIntoC, moves(map -> map.addConvergingTransition(AB, State.C, () -> {})));
-        assertEquals(abIntoC, moves(map -> map.addConvergingTransition(AB, State.C, NAMED)));
+        assertEquals(abIntoC, moves(map -> map.addConvergingTransition(AB, State.C, TransitionMapShortcutsTest::named)));
 
         // From every state into each of several
         final Set<String> intoCD = everyMove(ALL, CD);
         assertEquals(intoCD, moves(map -> map.addConvergingTransition(CD)));
         assertEquals(intoCD, moves(map -> map.addConvergingTransition(CD, () -> {})));
-        assertEquals(intoCD, moves(map -> map.addConvergingTransition(CD, NAMED)));
+        assertEquals(intoCD, moves(map -> map.addConvergingTransition(CD, TransitionMapShortcutsTest::named)));
 
         // From some states into each of several
         final Set<String> abIntoCD = everyMove(AB, CD);
         assertEquals(abIntoCD, moves(map -> map.addConvergingTransition(AB, CD)));
         assertEquals(abIntoCD, moves(map -> map.addConvergingTransition(AB, CD, () -> {})));
-        assertEquals(abIntoCD, moves(map -> map.addConvergingTransition(AB, CD, NAMED)));
+        assertEquals(abIntoCD, moves(map -> map.addConvergingTransition(AB, CD, TransitionMapShortcutsTest::named)));
     }
 
     @Test
     void convergingFunctionsBuildTheCommandForTheStateEntered() {
         final TransitionMap<State> map = new TransitionMap<>(State.class);
-        map.addConvergingTransition(AB, CD, NAMED);
+        map.addConvergingTransition(AB, CD, TransitionMapShortcutsTest::named);
         assertEquals("C", commandFor(map, State.A, State.C));
         assertEquals("D", commandFor(map, State.B, State.D));
     }
@@ -129,26 +130,26 @@ class TransitionMapShortcutsTest {
         assertEquals(fromA, moves(map -> map.addDivergingTransition(State.A)));
         assertEquals(fromA, moves(map -> map.addDivergingTransition(State.A, () -> {})));
         assertEquals(fromA, moves(map -> map.addDivergingTransition(State.A, Commands.none())));
-        assertEquals(fromA, moves(map -> map.addDivergingTransition(State.A, NAMED)));
+        assertEquals(fromA, moves(map -> map.addDivergingTransition(State.A, TransitionMapShortcutsTest::named)));
 
         // From one state to some
         final Set<String> aToCD = everyMove(List.of(State.A), CD);
         assertEquals(aToCD, moves(map -> map.addDivergingTransition(State.A, CD)));
         assertEquals(aToCD, moves(map -> map.addDivergingTransition(State.A, CD, () -> {})));
-        assertEquals(aToCD, moves(map -> map.addDivergingTransition(State.A, CD, NAMED)));
+        assertEquals(aToCD, moves(map -> map.addDivergingTransition(State.A, CD, TransitionMapShortcutsTest::named)));
 
         // From several states to every other
         final Set<String> fromAB = everyMove(AB, ALL);
         assertEquals(fromAB, moves(map -> map.addDivergingTransition(AB)));
         assertEquals(fromAB, moves(map -> map.addDivergingTransition(AB, () -> {})));
         assertEquals(fromAB, moves(map -> map.addDivergingTransition(AB, Commands.none())));
-        assertEquals(fromAB, moves(map -> map.addDivergingTransition(AB, NAMED)));
+        assertEquals(fromAB, moves(map -> map.addDivergingTransition(AB, TransitionMapShortcutsTest::named)));
 
         // From several states to some
         final Set<String> abToCD = everyMove(AB, CD);
         assertEquals(abToCD, moves(map -> map.addDivergingTransition(AB, CD)));
         assertEquals(abToCD, moves(map -> map.addDivergingTransition(AB, CD, () -> {})));
-        assertEquals(abToCD, moves(map -> map.addDivergingTransition(AB, CD, NAMED)));
+        assertEquals(abToCD, moves(map -> map.addDivergingTransition(AB, CD, TransitionMapShortcutsTest::named)));
     }
 
     @Test
@@ -156,7 +157,7 @@ class TransitionMapShortcutsTest {
         final Set<String> ab = set("A -> B", "B -> A");
         assertEquals(ab, moves(map -> map.addCommutativeTransition(State.A, State.B, () -> {})));
         assertEquals(ab, moves(map -> map.addCommutativeTransition(State.A, State.B, () -> {}, () -> {})));
-        assertEquals(ab, moves(map -> map.addCommutativeTransition(State.A, State.B, NAMED)));
+        assertEquals(ab, moves(map -> map.addCommutativeTransition(State.A, State.B, TransitionMapShortcutsTest::named)));
 
         final Set<String> abWithC = set("A -> C", "C -> A", "B -> C", "C -> B");
         assertEquals(abWithC, moves(map -> map.addCommutativeTransition(AB, State.C)));
@@ -186,7 +187,7 @@ class TransitionMapShortcutsTest {
         final List<Pair<State, State>> pairs = List.of(Pair.of(State.A, State.D), Pair.of(State.C, State.B));
         final Set<String> expected = set("A -> D", "C -> B");
         assertEquals(expected, moves(map -> map.addMappedTransition(pairs, () -> {})));
-        assertEquals(expected, moves(map -> map.addMappedTransition(pairs, NAMED)));
+        assertEquals(expected, moves(map -> map.addMappedTransition(pairs, TransitionMapShortcutsTest::named)));
     }
 
     @Test
@@ -197,7 +198,7 @@ class TransitionMapShortcutsTest {
         assertEquals(expected, moves(map -> map.addUndefinedState(State.D, State.A, () -> {})));
         assertEquals(expected, moves(map -> map.addUndefinedState(State.D, State.A, () -> {}, () -> {})));
         assertEquals(expected, moves(map -> map.addUndefinedState(State.D, State.A, Commands.none())));
-        assertEquals(expected, moves(map -> map.addUndefinedState(State.D, State.A, NAMED)));
+        assertEquals(expected, moves(map -> map.addUndefinedState(State.D, State.A, TransitionMapShortcutsTest::named)));
     }
 
     @Test

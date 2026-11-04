@@ -54,8 +54,8 @@ public class PIDFFConfig {
      * @param kP Volts per unit of error.
      * @param kI Volts per unit of error, per second.
      * @param kD Volts per unit/second of change in error.
-     * @param kS Volts to overcome friction.
      * @param kS Volts required to overcome friction.
+     * @param kV Volts per unit/second of speed.
      * @param kG Volts required to hold the mechanism against gravity.
      */
     public PIDFFConfig(double kP, double kI, double kD, double kS, double kV, double kG) {
@@ -183,30 +183,22 @@ public class PIDFFConfig {
         return kD;
     }
 
-    /**
-     * @return The current kS, the volts required to overcome friction.
-     */
+    /** Returns the current kS, the volts required to overcome friction. */
     public double getkS() {
         return kS.getAsDouble();
     }
 
-    /**
-     * @return The current kV, the volts per unit/second of speed.
-     */
+    /** Returns the current kV, the volts per unit/second of speed. */
     public double getkV() {
         return kV.getAsDouble();
     }
 
-    /**
-     * @return The current kA, the volts per unit/second^2 of acceleration.
-     */
+    /** Returns the current kA, the volts per unit/second^2 of acceleration. */
     public double getkA() {
         return kA.getAsDouble();
     }
 
-    /**
-     * @return The current kG, the volts required to hold the mechanism against gravity.
-     */
+    /** Returns the current kG, the volts required to hold the mechanism against gravity. */
     public double getkG() {
         return kG.getAsDouble();
     }

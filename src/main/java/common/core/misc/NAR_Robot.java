@@ -65,8 +65,8 @@ public class NAR_Robot extends IterativeRobotBase {
 
         @Override
         public boolean equals(Object rhs) {
-            if (rhs instanceof Callback) {
-                return Double.compare(expirationTime, ((Callback) rhs).expirationTime) == 0;
+            if (rhs instanceof Callback other) {
+                return Double.compare(expirationTime, other.expirationTime) == 0;
             }
             return false;
         }
@@ -106,6 +106,8 @@ public class NAR_Robot extends IterativeRobotBase {
      *
      * @param period Period in seconds.
      */
+    // The start time is static so that any class can call addPeriodic; only one robot is ever created
+    @SuppressWarnings("StaticAssignmentInConstructor")
     protected NAR_Robot(double period) {
         super(period);
         // Before the subclass builds any motors; startCompetition() sends their settings

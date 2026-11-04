@@ -1,6 +1,7 @@
 package common.hardware.motorcontroller;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.revrobotics.spark.SparkBase;
 import com.revrobotics.spark.SparkFlex;
@@ -68,7 +69,7 @@ public class NAR_CANSpark extends NAR_Motor {
 	public static int maximumRetries = 5;
 
 	/** Every Spark created, so that all of them can be saved to flash at once. */
-	public static final LinkedList<NAR_CANSpark> instances = new LinkedList<NAR_CANSpark>();
+	public static final List<NAR_CANSpark> instances = new ArrayList<>();
 
 	/**
 	 * Saves every Spark's settings to flash; see {@link #burnFlash()}. {@code NAR_Robot} calls
@@ -80,9 +81,7 @@ public class NAR_CANSpark extends NAR_Motor {
 		}
 	}
 
-	/**
-	 * @return The number of settings, across every Spark, that failed after all retries.
-	 */
+	/** Returns the number of settings, across every Spark, that failed after all retries. */
 	public static int getNumFailedConfigs() {
 		return numFailedConfigs;
 	}
@@ -369,27 +368,14 @@ public class NAR_CANSpark extends NAR_Motor {
 	 */
 	public void setPeriodicFramePeriodNoApply(PeriodicFrame frame, int periodMs) {
 		switch (frame) {
-			case kStatus0:
-				config.signals.appliedOutputPeriodMs(periodMs).faultsPeriodMs(periodMs);
-				break;
-			case kStatus1:
-				config.signals.primaryEncoderVelocityPeriodMs(periodMs).motorTemperaturePeriodMs(periodMs)
-					.busVoltagePeriodMs(periodMs).outputCurrentPeriodMs(periodMs);
-				break;
-			case kStatus2:
-				config.signals.primaryEncoderPositionPeriodMs(periodMs);
-				break;
-			case kStatus3:
-				config.signals.analogVoltagePeriodMs(periodMs).analogVelocityPeriodMs(periodMs).analogPositionPeriodMs(periodMs);
-				break;
-			case kStatus5:
-				config.signals.absoluteEncoderPositionPeriodMs(periodMs);
-				break;
-			case kStatus6:
-				config.signals.absoluteEncoderVelocityPeriodMs(periodMs);
-				break;
-			default:
-				break;
+			case kStatus0 -> config.signals.appliedOutputPeriodMs(periodMs).faultsPeriodMs(periodMs);
+			case kStatus1 -> config.signals.primaryEncoderVelocityPeriodMs(periodMs).motorTemperaturePeriodMs(periodMs)
+				.busVoltagePeriodMs(periodMs).outputCurrentPeriodMs(periodMs);
+			case kStatus2 -> config.signals.primaryEncoderPositionPeriodMs(periodMs);
+			case kStatus3 -> config.signals.analogVoltagePeriodMs(periodMs).analogVelocityPeriodMs(periodMs).analogPositionPeriodMs(periodMs);
+			case kStatus5 -> config.signals.absoluteEncoderPositionPeriodMs(periodMs);
+			case kStatus6 -> config.signals.absoluteEncoderVelocityPeriodMs(periodMs);
+			default -> { }
 		}
 	}
 
@@ -510,8 +496,8 @@ public class NAR_CANSpark extends NAR_Motor {
 
 	@Override
 	public void follow(NAR_Motor leader) {
-		if (leader instanceof NAR_CANSpark) {
-			follow((NAR_CANSpark) leader, false);
+		if (leader instanceof NAR_CANSpark spark) {
+			follow(spark, false);
 			return;
 		}
 		super.follow(leader);
@@ -663,6 +649,7 @@ public class NAR_CANSpark extends NAR_Motor {
 	 * Returns RUNNING if the Spark has no faults, current or sticky, and its last command
 	 * succeeded; otherwise DISCONNECTED.
 	 */
+	@Override
 	public DeviceState getState() {
 		// TODO: Add a check for motors.
 		if(!motor.hasActiveFault() 

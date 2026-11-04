@@ -113,10 +113,10 @@ class TesterTest {
     }
 
     /**
-     * Runs the command scheduler long enough for {@code test} to finish. A group counts as
+     * Runs the command scheduler long enough for the test being run to finish. A group counts as
      * finished before it starts, so this runs a fixed number of loops.
      */
-    private static void runUntilDone(Tester.Test test) {
+    private static void runUntilDone() {
         for (int i = 0; i < 20; i++) {
             CommandScheduler.getInstance().run();
         }
@@ -132,7 +132,7 @@ class TesterTest {
         group.setTimeBetweenTests(0);
 
         tester.runTest("Intake group");
-        runUntilDone(group);
+        runUntilDone();
 
         assertEquals(List.of("Extend", "Spin"), ran);
         assertEquals(TestState.PASSED, group.getTestState());
@@ -147,7 +147,7 @@ class TesterTest {
         final Tester.Test group = tester.getTest("Shooter group");
 
         CommandScheduler.getInstance().schedule(group);
-        runUntilDone(group);
+        runUntilDone();
 
         assertEquals(List.of("Spin up"), ran);
         assertEquals(TestState.FAILED, group.getTestState());
@@ -161,7 +161,7 @@ class TesterTest {
         final Tester.Test robot = tester.getTest("Whole robot");
 
         CommandScheduler.getInstance().schedule(robot);
-        runUntilDone(robot);
+        runUntilDone();
 
         assertEquals(TestState.PASSED, robot.getTestState());
     }

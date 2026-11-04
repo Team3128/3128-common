@@ -76,9 +76,7 @@ public class NAR_TalonFX extends NAR_Motor {
         return thread;
     });
 
-    /**
-	 * @return The number of settings, across every Talon, that failed after all retries.
-	 */
+    /** Returns the number of settings, across every Talon, that failed after all retries. */
 	public static int getNumFailedConfigs() {
 		return numFailedConfigs.get();
 	}
@@ -176,10 +174,10 @@ public class NAR_TalonFX extends NAR_Motor {
 
     /**
      * @param deviceNumber The Talon's CAN ID
-     * @param canbus The CAN bus name: {@code "rio"} for the roboRIO's bus, or a CANivore's name
+     * @param canBus The CAN bus name: {@code "rio"} for the roboRIO's bus, or a CANivore's name
      */
-    public NAR_TalonFX(int deviceNumber, String canbus) {
-        this(deviceNumber, canbus, new PIDFFConfig());
+    public NAR_TalonFX(int deviceNumber, String canBus) {
+        this(deviceNumber, canBus, new PIDFFConfig());
     }
 
     /**
@@ -596,6 +594,7 @@ public class NAR_TalonFX extends NAR_Motor {
 
 
     /** Returns the Phoenix 6 {@code TalonFX}, for functionality this class does not cover. */
+    @Override
     public TalonFX getMotor() {
         return motor;
     }

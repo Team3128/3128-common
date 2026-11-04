@@ -6,13 +6,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import common.utility.Log.Type;
 import edu.wpi.first.hal.HAL;
 
 class LogTest {
@@ -29,18 +29,18 @@ class LogTest {
     @BeforeEach
     void captureOutput() {
         originalOut = System.out;
-        System.setOut(new PrintStream(output, true));
+        System.setOut(new PrintStream(output, true, StandardCharsets.UTF_8));
     }
 
     @AfterEach
     void restore() {
         System.setOut(originalOut);
         Log.logDebug = false;
-        Type.disable(Type.values());
+        Log.Type.disable(Log.Type.values());
     }
 
     private String printed() {
-        return output.toString().replace("\r", "");
+        return output.toString(StandardCharsets.UTF_8).replace("\r", "");
     }
 
     @Test
@@ -65,11 +65,11 @@ class LogTest {
 
     @Test
     void debugIsHiddenUntilDebugLoggingAndItsTypeAreBothOn() {
-        Log.debug(Type.MECHANISM, "Slider", "hidden");
+        Log.debug(Log.Type.MECHANISM, "Slider", "hidden");
         Log.logDebug = true;
-        Log.debug(Type.MECHANISM, "Slider", "still hidden, type is off");
-        Type.MECHANISM.enable();
-        Log.debug(Type.MECHANISM, "Slider", "shown");
+        Log.debug(Log.Type.MECHANISM, "Slider", "still hidden, type is off");
+        Log.Type.MECHANISM.enable();
+        Log.debug(Log.Type.MECHANISM, "Slider", "shown");
 
         assertEquals("\t\t\t\t[Debug] [Slider] shown\n", printed());
     }
@@ -77,10 +77,10 @@ class LogTest {
     @Test
     void stateMachineDebugIsIndentedOneMoreLevelOutsideTheRobot() {
         Log.logDebug = true;
-        Type.STATE_MACHINE_PRIMARY.enable();
+        Log.Type.STATE_MACHINE_PRIMARY.enable();
 
-        Log.debug(Type.STATE_MACHINE_PRIMARY, "Robot", "top");
-        Log.debug(Type.STATE_MACHINE_PRIMARY, "Intake", "nested");
+        Log.debug(Log.Type.STATE_MACHINE_PRIMARY, "Robot", "top");
+        Log.debug(Log.Type.STATE_MACHINE_PRIMARY, "Intake", "nested");
 
         assertEquals("\t\t[Debug] [Robot] top\n\t\t\t\t[Debug] [Intake] nested\n", printed());
     }
@@ -114,12 +114,12 @@ class LogTest {
     @Test
     void primaryDebugAndDividers() {
         Log.logDebug = true;
-        Type.enable(Type.PRIMARY);
+        Log.Type.enable(Log.Type.PRIMARY);
         Log.debug("Robot", "detail");
         Log.divider(5);
-        Type.disable(Type.PRIMARY);
+        Log.Type.disable(Log.Type.PRIMARY);
 
         assertEquals("[Debug] [Robot] detail\n-----\n", printed());
-        assertFalse(Type.PRIMARY.getEnabled());
+        assertFalse(Log.Type.PRIMARY.getEnabled());
     }
 }

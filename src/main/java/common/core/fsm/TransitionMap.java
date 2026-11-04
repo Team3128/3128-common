@@ -22,9 +22,8 @@ import static edu.wpi.first.wpilibj2.command.Commands.*;
  */
 public class TransitionMap<S extends Enum<S>> {
 
-    /** {@code adjacencyMap[from][to]} is the transition between those state ordinals, or null. */
-    private final Object[][] adjacencyMap;
-    @SuppressWarnings("unused")
+    /** {@code adjacencyMap.get(from).get(to)} is the transition between those states, or null. */
+    private final EnumMap<S, EnumMap<S, Transition<S>>> adjacencyMap;
     private final Class<S> enumType;
     private final List<S> states;
 
@@ -33,13 +32,13 @@ public class TransitionMap<S extends Enum<S>> {
         this.enumType = enumType;
         this.states = List.of(enumType.getEnumConstants());
 
-
-        adjacencyMap = new Object[states.size()][states.size()];
+        adjacencyMap = new EnumMap<>(enumType);
+        for (S state : states) {
+            adjacencyMap.put(state, new EnumMap<>(enumType));
+        }
     }
 
-    /**
-     * @return Whether no transitions have been added
-     */
+    /** Returns whether no transitions have been added. */
     public boolean isEmpty() {
         return getTransitionCount() == 0;
     }
@@ -50,10 +49,8 @@ public class TransitionMap<S extends Enum<S>> {
      */
     public int getTransitionCount() {
         int transitionCount = 0;
-        for(Object[] row : adjacencyMap){
-            for(Object transition : row) {
-                if(transition != null) transitionCount++;
-            }
+        for (EnumMap<S, Transition<S>> row : adjacencyMap.values()) {
+            transitionCount += row.size();
         }
         return transitionCount;
     }
@@ -69,8 +66,9 @@ public class TransitionMap<S extends Enum<S>> {
     }
 
     /** Adds several transitions. */
-    @SuppressWarnings("unchecked")
-    public void addTransitions(Transition<S>... transitions) {
+    // Safe because the array is only read, so callers don't each get an unchecked warning
+    @SafeVarargs
+    public final void addTransitions(Transition<S>... transitions) {
         for (Transition<S> transition : transitions) {
             addTransition(transition);
         }
@@ -494,11 +492,6 @@ public class TransitionMap<S extends Enum<S>> {
         addTransition(undefinedState, exitState, function);
     }
 
-    @SuppressWarnings("unchecked")
-    private Transition<S> getAsTransition(int x, int y) {
-        return (Transition<S>) adjacencyMap[x][y];
-    }
-
     /** Returns the state at this position in the enum, for example, 0 for the first. */
     public S fromOrdinal(int ordinal) {
         return states.get(ordinal);
@@ -506,13 +499,13 @@ public class TransitionMap<S extends Enum<S>> {
 
     /** Equivalent to {@link #addTransition(Transition)}. */
     public void setTransition(Transition<S> transition) {
-        if(transition.getOutgoingState().ordinal() == transition.getIncomingState().ordinal()) return;
-        adjacencyMap[transition.getOutgoingState().ordinal()][transition.getIncomingState().ordinal()] = transition;
+        if (transition.getOutgoingState() == transition.getIncomingState()) return;
+        adjacencyMap.get(transition.getOutgoingState()).put(transition.getIncomingState(), transition);
     }
 
     /** Removes the transition from {@code start} to {@code end}. */
     public void removeTransition(S start, S end) {
-        adjacencyMap[start.ordinal()][end.ordinal()] = null;
+        adjacencyMap.get(start).remove(end);
     }
 
     /** Removes every transition out of {@code start}. */
@@ -540,24 +533,19 @@ public class TransitionMap<S extends Enum<S>> {
 
     /** Returns the transition from {@code start} to {@code end}, or null if that transition is not allowed. */
     public Transition<S> getTransition(S start, S end) {
-        return getAsTransition(start.ordinal(), end.ordinal());
+        return adjacencyMap.get(start).get(end);
     }
 
-    /** Returns every transition out of {@code state}. */
+    /** Returns every transition out of {@code state}, in the order the states are declared. */
     public List<Transition<S>> getOutgoingTransitions(S state) {
-        List<Transition<S>> outgoing = new ArrayList<>();
-        for (int i = 0; i < adjacencyMap.length; i++) {
-            Transition<S> out = getAsTransition(state.ordinal(), i);
-            if (out != null) outgoing.add(out);
-        }
-        return outgoing;
+        return new ArrayList<>(adjacencyMap.get(state).values());
     }
 
-    /** Returns every transition into {@code state}. */
+    /** Returns every transition into {@code state}, in the order the states are declared. */
     public List<Transition<S>> getIncomingTransitions(S state) {
         List<Transition<S>> incoming = new ArrayList<>();
-        for (int i = 0; i < adjacencyMap.length; i++) {
-            Transition<S> in = getAsTransition(i, state.ordinal());
+        for (S from : states) {
+            Transition<S> in = adjacencyMap.get(from).get(state);
             if (in != null) incoming.add(in);
         }
         return incoming;
@@ -567,8 +555,10 @@ public class TransitionMap<S extends Enum<S>> {
     @Override
     public String toString() {
         StringBuilder out = new StringBuilder("Adjacency Map " + enumType.getCanonicalName());
-        for(Object[] row : adjacencyMap) {
-            out.append('\n').append(Arrays.toString(row));
+        for (S from : states) {
+            final List<Transition<S>> row = new ArrayList<>();
+            for (S to : states) row.add(adjacencyMap.get(from).get(to));
+            out.append('\n').append(row);
         }
         return out.toString();
     }

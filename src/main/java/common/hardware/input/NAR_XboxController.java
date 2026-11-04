@@ -216,8 +216,12 @@ public class NAR_XboxController extends XboxController {
 
     /** Adds a "Controller" Shuffleboard tab with an indicator for every button, for checking wiring and bindings. */
     public void initShuffleboard() {
-        for(XboxButton button : buttons.keySet()) {
-            NAR_Shuffleboard.addData("Controller", button.name(), ()-> buttons.get(button).getAsBoolean(), (button.ordinal() % 6), button.ordinal() / 6);
+        // Six indicators to a row, in the order the buttons are declared
+        final XboxButton[] allButtons = XboxButton.values();
+        for (int i = 0; i < allButtons.length; i++) {
+            final Trigger trigger = buttons.get(allButtons[i]);
+            if (trigger == null) continue;
+            NAR_Shuffleboard.addData("Controller", allButtons[i].name(), trigger::getAsBoolean, i % 6, i / 6);
         }
     }
 }

@@ -76,6 +76,7 @@ public class Transition<T extends Enum<T>> {
     }
 
     /** Returns a description such as {@code "NEUTRAL -> INTAKE"}. */
+    @Override
     public String toString() {
         return outgoingState.name() + " -> " + incomingState.name();
     }

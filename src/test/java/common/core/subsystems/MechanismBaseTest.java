@@ -315,13 +315,10 @@ class MechanismBaseTest {
     /** A mechanism whose control loop runs on the roboRIO, with a P controller and 1 V of feedforward. */
     private static class RioMechanism extends MechanismBase {
         static final double KP = 2, FEEDFORWARD_VOLTS = 1;
-        final AtomicInteger resets;
-
         RioMechanism(MockMotor motor, AtomicInteger resets) {
             super(new PIDFFConfig(), (measurement, setpoint) -> KP * (setpoint - measurement),
                 measurement -> resets.incrementAndGet(), motor::getPosition, 0.1, 0, CONFIG, motor);
             setName(uniqueName());
-            this.resets = resets;
         }
 
         @Override

@@ -59,10 +59,18 @@ public class PivotMechanism extends MechanismBase {
         /** Turns side to side about a vertical axis, with no gravity load. */
         TURRET(0, 0, 1);
 
-        private final Vector<N3> axis;
+        // Plain numbers rather than a Vector, which can be changed, so the enum stays constant
+        private final double axisX, axisY, axisZ;
 
         Orientation(double x, double y, double z) {
-            axis = VecBuilder.fill(x, y, z);
+            axisX = x;
+            axisY = y;
+            axisZ = z;
+        }
+
+        /** Returns the axis of rotation as a new vector, which callers may change. */
+        Vector<N3> axis() {
+            return VecBuilder.fill(axisX, axisY, axisZ);
         }
     }
 
@@ -198,7 +206,7 @@ public class PivotMechanism extends MechanismBase {
     public double getExtensionGravityVolts() {
         // The axis of rotation, which tilts with the parent
         final Rotation3d tilt = getParent() == null ? Rotation3d.kZero : getParent().getComponentPose().getRotation();
-        final Translation3d axis = new Translation3d(orientation.axis.get(0), orientation.axis.get(1), orientation.axis.get(2))
+        final Translation3d axis = new Translation3d(orientation.axisX, orientation.axisY, orientation.axisZ)
             .rotateBy(tilt);
         return holdingTorqueFromExtension(this, axis) * voltsPerNewtonMeter;
     }
@@ -223,7 +231,7 @@ public class PivotMechanism extends MechanismBase {
     @Override
     protected Pose3d getOwnComponentPose() {
         final double radians = (getPosition() - startPosition) * radiansPerUnit;
-        final Rotation3d rotation = new Rotation3d(orientation.axis, radians);
+        final Rotation3d rotation = new Rotation3d(orientation.axis(), radians);
         // Rotate about the pivot rather than the robot's origin
         return new Pose3d(pivot.minus(pivot.rotateBy(rotation)), rotation);
     }

@@ -253,7 +253,7 @@ public class NarwhalDashboard extends WebSocketServer implements AutoCloseable {
     public void onMessage(WebSocket conn, String message) {
         Log.info("NarwhalDashboard", message);
         // Message format: category:key:value or category:value, for example, auto:"exampleAuto"
-        final String[] parts = message.split(":");
+        final String[] parts = message.split(":", -1);
 
         if (!actionMap.containsKey(parts[0])) return;
 

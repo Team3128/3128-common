@@ -1,6 +1,6 @@
 package common.core.fsm;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -37,7 +37,7 @@ public abstract class FSMSubsystemBase<S extends Enum<S>> extends SubsystemBase 
     private final Class<S> enumType;
 
     /** The mechanisms this subsystem controls, for {@link #stop()} and {@link #reset()}. */
-    protected List<MechanismBase> mechanisms = new LinkedList<MechanismBase>();
+    protected List<MechanismBase> mechanisms = new ArrayList<>();
 
     private StringPublisher statePublisher;
 
@@ -87,8 +87,11 @@ public abstract class FSMSubsystemBase<S extends Enum<S>> extends SubsystemBase 
         NAR_Shuffleboard.addData(this.getName(), "Previous State", ()-> {if(getPreviousState() != null) return getPreviousState().name(); else return "Null";}, 1, 0);
         NAR_Shuffleboard.addData(this.getName(), "Current State", ()-> {if(getState() != null) return getState().name(); else return "Null";}, 2, 0);
         NAR_Shuffleboard.addData(this.getName(), "Valid Transition", ()-> getRequestTransition() != null, 3, 0);
-        for(S state : enumType.getEnumConstants()) {
-            NAR_Shuffleboard.addData(this.getName(), state.name(), ()-> stateEquals(state), (state.ordinal() % 8), state.ordinal() / 8 + 1);
+        // Eight indicators to a row, below the summary
+        final S[] states = enumType.getEnumConstants();
+        for (int i = 0; i < states.length; i++) {
+            final S state = states[i];
+            NAR_Shuffleboard.addData(this.getName(), state.name(), ()-> stateEquals(state), i % 8, i / 8 + 1);
         }
     }
 
@@ -160,7 +163,6 @@ public abstract class FSMSubsystemBase<S extends Enum<S>> extends SubsystemBase 
         previousState = currentState;
         currentState = nextState;
         logState();
-        return;
     }
 
     /** Returns a command that calls {@link #setState(Enum)} once, for button bindings and autos. */

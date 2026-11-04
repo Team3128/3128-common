@@ -167,10 +167,8 @@ public class Tester {
 
             final SystemsTest test = systemsTests.get(curIndex);
             switch(test.testState) {
-                case FAILED:
-                    state = TestState.FAILED;
-                    return;
-                case PASSED:
+                case FAILED -> state = TestState.FAILED;
+                case PASSED -> {
                     curIndex ++;
                     state = TestState.PASSED;
                     if (curIndex < systemsTests.size()) {
@@ -178,8 +176,8 @@ public class Tester {
                         testToSchedule = systemsTests.get(curIndex);
                         testToSchedule.testState = TestState.RUNNING;
                     }
-                    return;
-                default:
+                }
+                default -> { }
             }
         }
 
