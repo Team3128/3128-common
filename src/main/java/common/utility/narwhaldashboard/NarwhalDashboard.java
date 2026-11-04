@@ -199,7 +199,7 @@ public class NarwhalDashboard extends WebSocketServer implements AutoCloseable {
             localConn.send(obj.toJSONString());
         } catch (Exception e) {
             Log.recoverable("NarwhalDashboard", "Failed to send to the web page: " + e);
-            conn.close();
+            localConn.close();
         }
     }
 
@@ -221,7 +221,7 @@ public class NarwhalDashboard extends WebSocketServer implements AutoCloseable {
                 localConn.send(obj.toJSONString());
             } catch (Exception e) {
                 Log.recoverable("NarwhalDashboard", "Failed to send to the web page: " + e);
-                conn.close();
+                localConn.close();
             }
         }
     }
