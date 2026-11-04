@@ -122,18 +122,48 @@ tasks.named('spotbugsTest') {
 }
 
 // Test coverage: ./gradlew test jacocoTestReport, then open build/reports/jacoco/test/html/index.html
+// NarwhalDashboard is being replaced by Elastic and will be deleted, so it isn't counted
+def coverageExcludes = ['common/utility/narwhaldashboard/**']
+
 jacocoTestReport {
     dependsOn test
     reports {
         xml.required = true
         html.required = true
     }
-    // NarwhalDashboard is being replaced by Elastic and will be deleted, so it isn't counted here
     afterEvaluate {
         classDirectories.setFrom(files(classDirectories.files.collect {
-            fileTree(dir: it, exclude: 'common/utility/narwhaldashboard/**')
+            fileTree(dir: it, exclude: coverageExcludes)
         }))
     }
+}
+
+// ./gradlew check (and build) fails if overall coverage drops below these floors. New code is
+// held to a higher bar on pull requests: see the diff coverage step in .github/workflows/test.yml.
+// Raise these as coverage improves; don't lower them to get a change in.
+jacocoTestCoverageVerification {
+    dependsOn test
+    violationRules {
+        rule {
+            limit {
+                counter = 'LINE'
+                minimum = 0.95
+            }
+            limit {
+                counter = 'BRANCH'
+                minimum = 0.85
+            }
+        }
+    }
+    afterEvaluate {
+        classDirectories.setFrom(files(classDirectories.files.collect {
+            fileTree(dir: it, exclude: coverageExcludes)
+        }))
+    }
+}
+
+tasks.named('check') {
+    dependsOn jacocoTestCoverageVerification
 }
 
 // Simulation configuration (e.g. environment variables).
