@@ -76,10 +76,6 @@ public class DynamicCamera {
 
         for (final DynamicCamera dynamicCamera : dynamicCameras) {
             Optional<EstimatedRobotPose> curEst = Optional.empty();
-
-            if (dynamicCamera.isDynamic) {
-                dynamicCamera.poseEstimator.setRobotToCameraTransform(dynamicCamera.getRobotToCam());
-            }
     
             for (var result : dynamicCamera.photonCamera.getAllUnreadResults()) {
                 List<PhotonTrackedTarget> cleanList = new ArrayList<>();
@@ -127,22 +123,12 @@ public class DynamicCamera {
         enabled = false;
     }
 
-    // robot center -> turret pivot, rotated by the turret angle, then pivot -> camera
-    private Transform3d getRobotToCam() {
-        Transform3d robotToPivot = new Transform3d(
-            offset,
-            new Rotation3d(0, 0, angularOffset.get().getRadians())
-        );
-        
-        return robotToPivot.plus(pivotToCam);
-    }
-
     private static Pose2d offsetPose(Pose2d oldPose, DynamicCamera cam) {
         double robotHeading = oldPose.getRotation().getRadians() - cam.angularOffset.get().getRadians();
-        
-        Rotation2d newRotation = new Rotation2d(0, robotHeading);
-        double newX = oldPose.getX() + cam.offset.getX() * Math.cos(robotHeading) - cam.offset.getY() * Math.sin(robotHeading);
-        double newY = oldPose.getY() + cam.offset.getX() * Math.sin(robotHeading) + cam.offset.getY() * Math.cos(robotHeading);
+
+        Rotation2d newRotation = new Rotation2d(robotHeading);
+        double newX = oldPose.getX() - (cam.offset.getX() * Math.cos(robotHeading) - cam.offset.getY() * Math.sin(robotHeading));
+        double newY = oldPose.getY() - (cam.offset.getX() * Math.sin(robotHeading) + cam.offset.getY() * Math.cos(robotHeading));
 
         Pose2d newPose = new Pose2d(newX, newY, newRotation);
 
