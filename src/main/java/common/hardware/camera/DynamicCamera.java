@@ -22,6 +22,9 @@ import edu.wpi.first.math.geometry.Pose3d;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
+import edu.wpi.first.math.interpolation.TimeInterpolatableBuffer;
+import edu.wpi.first.wpilibj.Timer;
+
 public class DynamicCamera {
 
     //static variables
@@ -43,6 +46,9 @@ public class DynamicCamera {
     private Transform3d pivotToCam;
     private Translation3d offset;
     private Supplier<Rotation2d> angularOffset;
+
+    // each turret angle record is matched with the angle from when exactly in time it was captured
+    private final TimeInterpolatableBuffer<Rotation2d> angularOffsetHistory = TimeInterpolatableBuffer.createBuffer(1.5);
     private double minDistThreshold = 0, maxDistThreshold = 100, ambiguityThreshold = 0.2;
 
     // estConsumer sends estimated poses to the SwerveBase where they are factored into the robot's odometry
@@ -76,7 +82,11 @@ public class DynamicCamera {
 
         for (final DynamicCamera dynamicCamera : dynamicCameras) {
             Optional<EstimatedRobotPose> curEst = Optional.empty();
-    
+            
+            if (dynamicCamera.isDynamic) {
+                dynamicCamera.angularOffsetHistory.addSample(Timer.getFPGATimestamp(), dynamicCamera.angularOffset.get());
+            }
+
             for (var result : dynamicCamera.photonCamera.getAllUnreadResults()) {
                 List<PhotonTrackedTarget> cleanList = new ArrayList<>();
 
@@ -99,7 +109,7 @@ public class DynamicCamera {
 
                 if (curEst.isPresent()) {
                     if (dynamicCamera.isDynamic) {
-                        Pose2d modifiedPose = offsetPose(curEst.get().estimatedPose.toPose2d(), dynamicCamera);
+                        Pose2d modifiedPose = offsetPose(curEst.get().estimatedPose.toPose2d(), curEst.get().timestampSeconds, dynamicCamera);
                         dynamicCamera.estConsumer.accept(modifiedPose, curEst.get().timestampSeconds);
                     } else {
                         dynamicCamera.estConsumer.accept(curEst.get().estimatedPose.toPose2d(), curEst.get().timestampSeconds);
@@ -123,8 +133,9 @@ public class DynamicCamera {
         enabled = false;
     }
 
-    private static Pose2d offsetPose(Pose2d oldPose, DynamicCamera cam) {
-        double robotHeading = oldPose.getRotation().getRadians() - cam.angularOffset.get().getRadians();
+    private static Pose2d offsetPose(Pose2d oldPose, double timestamp, DynamicCamera cam) {
+        Rotation2d turretAngle = cam.angularOffsetHistory.getSample(timestamp).orElse(cam.angularOffset.get());
+        double robotHeading = oldPose.getRotation().getRadians() - turretAngle.getRadians();
 
         Rotation2d newRotation = new Rotation2d(robotHeading);
         double newX = oldPose.getX() - (cam.offset.getX() * Math.cos(robotHeading) - cam.offset.getY() * Math.sin(robotHeading));
