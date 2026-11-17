@@ -16,10 +16,10 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.geometry.Pose3d;
 import org.photonvision.targeting.PhotonPipelineResult;
+import org.photonvision.targeting.PhotonTrackedTarget;
 
 public class DynamicCamera {
 
@@ -72,9 +72,6 @@ public class DynamicCamera {
 
     public static void periodic() {
         if (!enabled) return;
-      
-   
-
 
         for (final DynamicCamera dynamicCamera : dynamicCameras) {
             Optional<EstimatedRobotPose> curEst = Optional.empty();
@@ -82,24 +79,27 @@ public class DynamicCamera {
             if (dynamicCamera.isDynamic) {
                 dynamicCamera.poseEstimator.setRobotToCameraTransform(dynamicCamera.getRobotToCam());
             }
-
+    
             for (var result : dynamicCamera.photonCamera.getAllUnreadResults()) {
+                List<PhotonTrackedTarget> cleanList = new ArrayList<>();
+
                 for (int i = 0; i < result.targets.size(); i++) {
-                    if (result.targets.get(i).poseAmbiguity > dynamicCamera.ambiguityThreshold 
+                    if (!(result.targets.get(i).poseAmbiguity > dynamicCamera.ambiguityThreshold 
                     || result.targets.get(i).bestCameraToTarget.getTranslation().getNorm() < dynamicCamera.minDistThreshold 
-                    || result.targets.get(i).bestCameraToTarget.getTranslation().getNorm() > dynamicCamera.maxDistThreshold) 
+                    || result.targets.get(i).bestCameraToTarget.getTranslation().getNorm() > dynamicCamera.maxDistThreshold))
                     {
-                        result.targets.remove(i);
-                        i--;
+                        cleanList.add(result.targets.get(i));
                     }                    
                 }
+
+                result.targets = cleanList;
 
                 // prefer the multi-tag estimate, single-tag is only a fallback
                 curEst = dynamicCamera.poseEstimator.estimateCoprocMultiTagPose(result);
                 if (curEst.isEmpty()) {
                     curEst = dynamicCamera.poseEstimator.estimateLowestAmbiguityPose(result);
                 }
-
+                
                 if (curEst.isPresent()) {
                     dynamicCamera.estConsumer.accept(curEst.get().estimatedPose.toPose2d(), curEst.get().timestampSeconds);
                 }
