@@ -16,6 +16,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.geometry.Pose3d;
 import org.photonvision.targeting.PhotonPipelineResult;
@@ -99,9 +100,14 @@ public class DynamicCamera {
                 if (curEst.isEmpty()) {
                     curEst = dynamicCamera.poseEstimator.estimateLowestAmbiguityPose(result);
                 }
-                
+
                 if (curEst.isPresent()) {
-                    dynamicCamera.estConsumer.accept(curEst.get().estimatedPose.toPose2d(), curEst.get().timestampSeconds);
+                    if (dynamicCamera.isDynamic) {
+                        Pose2d modifiedPose = offsetPose(curEst.get().estimatedPose.toPose2d(), dynamicCamera);
+                        dynamicCamera.estConsumer.accept(modifiedPose, curEst.get().timestampSeconds);
+                    } else {
+                        dynamicCamera.estConsumer.accept(curEst.get().estimatedPose.toPose2d(), curEst.get().timestampSeconds);
+                    }
                 }
             }
         }
@@ -125,8 +131,22 @@ public class DynamicCamera {
     private Transform3d getRobotToCam() {
         Transform3d robotToPivot = new Transform3d(
             offset,
-            new Rotation3d(0, 0, angularOffset.get().getRadians()));
+            new Rotation3d(0, 0, angularOffset.get().getRadians())
+        );
+        
         return robotToPivot.plus(pivotToCam);
+    }
+
+    private static Pose2d offsetPose(Pose2d oldPose, DynamicCamera cam) {
+        double robotHeading = oldPose.getRotation().getRadians() - cam.angularOffset.get().getRadians();
+        
+        Rotation2d newRotation = new Rotation2d(0, robotHeading);
+        double newX = oldPose.getX() + cam.offset.getX() * Math.cos(robotHeading) - cam.offset.getY() * Math.sin(robotHeading);
+        double newY = oldPose.getY() + cam.offset.getX() * Math.sin(robotHeading) + cam.offset.getY() * Math.cos(robotHeading);
+
+        Pose2d newPose = new Pose2d(newX, newY, newRotation);
+
+        return newPose;
     }
 
     public void initShuffleboard() {
