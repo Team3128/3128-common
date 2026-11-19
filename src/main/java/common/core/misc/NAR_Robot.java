@@ -5,6 +5,7 @@ import java.util.PriorityQueue;
 import common.hardware.motorcontroller.NAR_CANSpark;
 import common.hardware.motorcontroller.NAR_TalonFX;
 import common.utility.Log;
+import common.hardware.motorcontroller.NAR_Motor;
 import edu.wpi.first.hal.DriverStationJNI;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.NotifierJNI;
@@ -144,6 +145,7 @@ public class NAR_Robot extends IterativeRobotBase {
         if (isSimulation()) {
             simulationInit();
         }
+       
 
 
         // Tell the Driver Station that the robot is ready to be enabled
@@ -227,4 +229,8 @@ public class NAR_Robot extends IterativeRobotBase {
     public static void addPeriodic(Runnable callback, double periodSeconds, double offsetSeconds) {
         m_callbacks.add(new Callback(callback, m_startTime, periodSeconds, offsetSeconds));
     }
+     @Override
+        public void simulationPeriodic() {
+            NAR_Motor.updateSimulation(0.02);
+        }
 }

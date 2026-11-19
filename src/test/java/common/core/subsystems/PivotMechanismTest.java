@@ -115,6 +115,7 @@ class PivotMechanismTest {
         armMotor.rawPosition = 30 / DEGREES_PER_MOTOR_ROTATION;
         wristMotor.rawPosition = 30 / DEGREES_PER_MOTOR_ROTATION;
         wrist.setSetpoint(30);
+        arm.periodic();
         wrist.periodic();
 
         assertEquals(Math.toRadians(60), wrist.getRadiansAboveLevel(), 1e-9);
@@ -173,6 +174,7 @@ class PivotMechanismTest {
         // Elevator up 0.3 m, arm level: the 0.5 m arm's tip is in front of its raised pivot
         elevatorMotor.rawPosition = 0.3 / 0.01;
         armMotor.rawPosition = 0;
+        elevator.periodic();
         assertEquals(0, tipOf(arm, new Translation3d(0, 0, 0)).getDistance(new Translation3d(0.5, 0, 0.8)), 1e-6);
     }
 
@@ -219,7 +221,9 @@ class PivotMechanismTest {
 
         // Arm level, telescope 0.3 m out: its 2 kg, with the wrist, is 0.3 m further from the pivot
         armMotor.rawPosition = 0;
+    
         telescopeMotor.rawPosition = 0.3 / 0.01;
+        telescope.periodic();
         assertEquals(2 * 9.81 * 0.3 * voltsPerNewtonMeter, arm.getExtensionGravityVolts(), 1e-9);
 
         // It goes out with the arm's setpoint, on top of the kG the motor controller applies
@@ -252,6 +256,8 @@ class PivotMechanismTest {
         assertEquals(0, wristMotor.nativeKG, TOLERANCE);
         armMotor.rawPosition = 30 / DEGREES_PER_MOTOR_ROTATION;
         wristMotor.rawPosition = 20 / DEGREES_PER_MOTOR_ROTATION;
+        arm.periodic();
+        wrist.periodic();
         assertEquals(Math.toRadians(50), wrist.getRadiansAboveLevel(), 1e-9);
     }
 

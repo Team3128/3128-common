@@ -184,7 +184,8 @@ public class PivotMechanism extends MechanismBase {
      * turret, the angle counterclockwise from the front of the robot.
      */
     public double getRadiansAboveLevel() {
-        final double own = getPosition() * radiansPerUnit;
+        final double own = getSnapshotPosition() * radiansPerUnit;
+        //final double own = getPosition() * radiansPerUnit;
         return gravityParent != null ? own + gravityParent.getRadiansAboveLevel() : own;
     }
 

@@ -109,7 +109,7 @@ public class LinearMechanism extends MechanismBase {
 
     /** Returns the distance moved from the starting position, in meters. */
     public double getExtensionMeters() {
-        return (getPosition() - minPosition) * metersPerUnit;
+        return (getSnapshotPosition() - minPosition) * metersPerUnit;
     }
 
     /** Returns the mass moved when this mechanism extends, including everything mounted on it. */

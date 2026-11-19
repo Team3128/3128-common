@@ -1,5 +1,9 @@
 package common.core.subsystems;
 
+import static edu.wpi.first.units.Units.Volts;
+import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
+import static edu.wpi.first.wpilibj2.command.Commands.either;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -7,6 +11,8 @@ import java.util.function.BooleanSupplier;
 import java.util.function.DoubleBinaryOperator;
 import java.util.function.DoubleConsumer;
 import java.util.function.DoubleSupplier;
+
+import org.littletonrobotics.junction.Logger;
 
 import common.core.controllers.PIDFFConfig;
 import common.hardware.motorcontroller.NAR_Motor;
@@ -19,14 +25,11 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
-import static edu.wpi.first.units.Units.Volts;
-import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
-import static edu.wpi.first.wpilibj2.command.Commands.*;
 
 /**
  * Base class for mechanisms: one or more motors driven to a setpoint, with logging, Shuffleboard
@@ -42,6 +45,7 @@ public abstract class MechanismBase extends SubsystemBase {
     public static final double MAX_VOLTS = 12;
 
     protected final NAR_Motor[] motors;
+    private final MechanismIOInputsAutoLogged inputs = new MechanismIOInputsAutoLogged();
     /** The leader, plus any motor that cannot follow it on the motor controller. */
     private final NAR_Motor[] commandedMotors;
     protected final PIDFFConfig gains;
@@ -57,6 +61,8 @@ public abstract class MechanismBase extends SubsystemBase {
     /** Resets the controller's internal state, given the current measurement. */
     private final DoubleConsumer resetController;
     private final DoubleSupplier measurement;
+    private final MechanismIO io;
+    private double snapshotMeasurement;
     private final double tolerance;
     private final double resetPosition;
 
@@ -125,6 +131,7 @@ public abstract class MechanismBase extends SubsystemBase {
                             double resetPosition, MotorConfig motorConfig, NAR_Motor... motors) {
         requireNonNullParam(motors, "motors", "MechanismBase");
         requireNonNullParam(gains, "gains", "MechanismBase");
+        this.io = RobotBase.isSimulation() ? new MechanismIOSim() : new MechanismIOReal();
         if (motors.length == 0) {
             throw new IllegalArgumentException("MechanismBase requires at least one motor");
         }
@@ -240,15 +247,19 @@ public abstract class MechanismBase extends SubsystemBase {
      */
     @Override
     public void periodic() {
+        
+        
+        updateInputs();
         if (enabled) {
             if (controllerMode != null) {
                 // The motor controller runs PID and feedforward; this adds only what it cannot calculate
-                final double feedforward = calculateFeedforward(setpointValue - measurement.getAsDouble());
+                final double feedforward = calculateFeedforward(setpointValue - snapshotMeasurement);
+
                 for (NAR_Motor motor : commandedMotors) {
                     motor.set(setpointValue, controllerMode, feedforward);
                 }
             } else {
-                final double pidOutput = feedback.applyAsDouble(measurement.getAsDouble(), setpointValue);
+                final double pidOutput = feedback.applyAsDouble(snapshotMeasurement, setpointValue);
                 final double output = MathUtil.clamp(pidOutput + calculateFeedforward(pidOutput), -MAX_VOLTS, MAX_VOLTS);
                 for (NAR_Motor motor : commandedMotors) {
                     motor.setVolts(output);
@@ -261,6 +272,7 @@ public abstract class MechanismBase extends SubsystemBase {
                 NAR_Shuffleboard.addData(getName(), "AtSetpoint", true, 1, 0);
                 if (disableAtSetpoint) disable();
             }
+
         }
 
         NAR_Shuffleboard.addData(getName(), "Velocity", motors[0].getVelocity(), 5, 1);
@@ -341,7 +353,7 @@ public abstract class MechanismBase extends SubsystemBase {
 
     /** Returns whether the measurement is within the tolerance of the setpoint. */
     public boolean atSetpoint() {
-        return Math.abs(measurement.getAsDouble() - setpointValue) < tolerance;
+        return Math.abs(snapshotMeasurement - setpointValue) < tolerance;
     }
 
     /**
@@ -352,7 +364,7 @@ public abstract class MechanismBase extends SubsystemBase {
     public void enable() {
         if (controllerMode == null) {
             requireNonNullParam(feedback, "feedback", "MechanismBase.enable");
-            if (!enabled) resetController.accept(measurement.getAsDouble());
+            if (!enabled) resetController.accept(snapshotMeasurement);
         }
         enabled = true;
         safetyTimer.restart();
@@ -569,5 +581,14 @@ public abstract class MechanismBase extends SubsystemBase {
         if (controllerMode != null) {
             NAR_Shuffleboard.addCommand(getName(), "Apply Gains", runOnce(this::applyGains).ignoringDisable(true), x + 2, y + 2);
         }
+    }
+    protected final void updateInputs() {
+        snapshotMeasurement = measurement.getAsDouble();
+        io.updateInputs(inputs, motors[0], getSetpoint());
+
+        Logger.processInputs(getName(), inputs);
+    }
+    protected final double getSnapshotPosition() {
+        return inputs.position;
     }
 }

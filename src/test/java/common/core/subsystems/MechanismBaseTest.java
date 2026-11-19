@@ -2,9 +2,9 @@ package common.core.subsystems;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -102,9 +102,11 @@ class MechanismBaseTest {
         slider.setSetpoint(0.2);
 
         leader.rawPosition = 0.203 / METERS_PER_ROTATION;
+        slider.periodic();
         assertTrue(slider.atSetpoint());
 
         leader.rawPosition = 0.21 / METERS_PER_ROTATION;
+        slider.periodic();
         assertFalse(slider.atSetpoint());
     }
 
@@ -299,6 +301,7 @@ class MechanismBaseTest {
             min, MAX, 1, Math.toRadians(30), 2, KRAKEN, motor);
 
         motor.rawPosition = (min + 0.2) / METERS_PER_ROTATION; // 0.2 m out from where it starts
+        slider.periodic();
         final Pose3d pose = slider.getComponentPose();
 
         assertEquals(0.2 * Math.cos(Math.toRadians(30)), pose.getX(), 1e-6);
@@ -389,6 +392,7 @@ class MechanismBaseTest {
 
         mechanism.setSetpoint(1);
         motor.rawVelocity = 6000; // RPM; 1 cm per rotation is 1 m/s
+        mechanism.periodic();
 
         assertTrue(mechanism.atSetpoint());
     }
