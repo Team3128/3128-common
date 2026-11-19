@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Bug patterns SpotBugs should not report. See https://spotbugs.readthedocs.io/en/stable/filter.html -->
+<FindBugsFilter>
+    <!-- The "malicious code" category assumes untrusted callers, which robot code never has:
+         exposed mutable fields, non-final statics, returning internal arrays/collections -->
+    <Match>
+        <Bug category="MALICIOUS_CODE" />
+    </Match>
+
+    <!-- CT: only matters for finalizer attacks
+         PA: public tunables are intentional
+         ST: subsystems are held in statics on purpose
+         USO, AT: come from synchronized getInstance(); robot code runs on one thread -->
+    <Match>
+        <Bug pattern="CT_CONSTRUCTOR_THROW,PA_PUBLIC_PRIMITIVE_ATTRIBUTE,ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD,USO_UNSAFE_METHOD_SYNCHRONIZATION,USO_UNSAFE_STATIC_METHOD_SYNCHRONIZATION,AT_NONATOMIC_64BIT_PRIMITIVE" />
+    </Match>
+
+    <!-- NarwhalDashboard is being replaced by Elastic and will be deleted -->
+    <Match>
+        <Package name="common.utility.narwhaldashboard" />
+    </Match>
+</FindBugsFilter>
