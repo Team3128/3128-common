@@ -7,7 +7,7 @@ import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
 
-import common.utility.shuffleboard.NAR_Shuffleboard;
+import common.utility.elastic.NAR_Elastic;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Transform3d;
@@ -27,7 +27,7 @@ public class Camera2 {
     }
 
     public void initShuffleboard() {
-        NAR_Shuffleboard.addData(camera.getName(), "Enabled", () -> enabled, 0, 0);
+        NAR_Elastic.addData(camera.getName(), "Enabled", () -> enabled, 0, 0);
     }
 
     public void periodic() {

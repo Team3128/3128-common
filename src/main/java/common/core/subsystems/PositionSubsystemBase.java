@@ -7,7 +7,7 @@ import common.core.controllers.ControllerBase;
 import common.hardware.motorcontroller.NAR_Motor;
 import common.hardware.motorcontroller.NAR_Motor.Neutral;
 import common.utility.Log;
-import common.utility.shuffleboard.NAR_Shuffleboard;
+import common.utility.elastic.NAR_Elastic;
 import common.utility.sysid.CmdSysId;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -253,8 +253,8 @@ public abstract class PositionSubsystemBase extends NAR_PIDSubsystem implements 
     @Override
     public void initShuffleboard() {
         super.initShuffleboard();
-        NAR_Shuffleboard.addData(getName(), "Current", ()-> motors.get(0).getStallCurrent(), 5, 0);
-        NAR_Shuffleboard.addCommand(getName(), "Enable", either(startEnd(()-> startPID(setpoint.getAsDouble()), ()-> disable()), print("DEBUG NOT ON"), debug), 4, 0);
+        NAR_Elastic.addData(getName(), "Current", ()-> motors.get(0).getStallCurrent(), 5, 0);
+        NAR_Elastic.addCommand(getName(), "Enable", either(startEnd(()-> startPID(setpoint.getAsDouble()), ()-> disable()), print("DEBUG NOT ON"), debug), 4, 0);
         FFWidgets( controller,1,0);
         runVoltsWidgets("running", debug, 1, 0);
         resetWidget( debug, 1, 0);
@@ -263,10 +263,10 @@ public abstract class PositionSubsystemBase extends NAR_PIDSubsystem implements 
     }
 
     public void FFWidgets(ControllerBase controller, int x, int y) {
-        controller.getConfig().setkS(NAR_Shuffleboard.debug(getName(), "kS", controller.getConfig().getkS(), x, y+2));
-        controller.getConfig().setkV(NAR_Shuffleboard.debug(getName(), "kV", controller.getConfig().getkV(), x + 1, y+2));
-        controller.getConfig().setkA(NAR_Shuffleboard.debug(getName(), "kA", controller.getConfig().getkA(), x + 1, y + 3));
-        controller.getConfig().setkG(NAR_Shuffleboard.debug(getName(), "kG", controller.getConfig().getkG(), x, y + 3));
-        NAR_Shuffleboard.addCommand(getName(), "Characterize", this.characterization(1, 0.5), x-1, y+3).withSize(1, 1);
+        controller.getConfig().setkS(NAR_Elastic.debug(getName(), "kS", controller.getConfig().getkS(), x, y+2));
+        controller.getConfig().setkV(NAR_Elastic.debug(getName(), "kV", controller.getConfig().getkV(), x + 1, y+2));
+        controller.getConfig().setkA(NAR_Elastic.debug(getName(), "kA", controller.getConfig().getkA(), x + 1, y + 3));
+        controller.getConfig().setkG(NAR_Elastic.debug(getName(), "kG", controller.getConfig().getkG(), x, y + 3));
+        NAR_Elastic.addCommand(getName(), "Characterize", this.characterization(1, 0.5), x-1, y+3);
     }
 }

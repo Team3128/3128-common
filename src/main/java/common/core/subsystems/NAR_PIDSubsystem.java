@@ -11,7 +11,7 @@ import java.util.function.DoubleSupplier;
 import common.core.controllers.ControllerBase;
 import common.hardware.motorcontroller.NAR_Motor;
 import common.utility.Log;
-import common.utility.shuffleboard.NAR_Shuffleboard;
+import common.utility.elastic.NAR_Elastic;
 import common.utility.tester.Tester;
 import common.utility.tester.Tester.SystemsTest;
 import edu.wpi.first.wpilibj.Timer;
@@ -148,8 +148,8 @@ public abstract class NAR_PIDSubsystem extends SubsystemBase {
             final double measurement = controller.getMeasurement();
             final double velocity = (measurement - prevMeasurement) / updateTimer.get();
             final double acceleration = (velocity - prevVelocity) / updateTimer.get();
-            NAR_Shuffleboard.addData(getName(), "1stDerivative", velocity, 5, 1);
-            NAR_Shuffleboard.addData(getName(), "2ndDerivative", acceleration, 5, 2);
+            NAR_Elastic.addData(getName(), "1stDerivative", velocity, 5, 1);
+            NAR_Elastic.addData(getName(), "2ndDerivative", acceleration, 5, 2);
             prevMeasurement = measurement;
             prevVelocity = velocity;
             updateTimer.restart();
@@ -160,24 +160,24 @@ public abstract class NAR_PIDSubsystem extends SubsystemBase {
      */
     public void initShuffleboard() {
         shouldLog = true;
-        NAR_Shuffleboard.addData(getName(), "Enabled", this::isEnabled, 0, 0);
-        NAR_Shuffleboard.addData(getName(), "AtSetpoint", this::atSetpoint, 1, 0);
-        NAR_Shuffleboard.addData(getName(), "Measurement", controller::getMeasurement, 0, 1);
-        NAR_Shuffleboard.addData(getName(), "Setpoint", this::getSetpoint, 1, 1);
+        NAR_Elastic.addData(getName(), "Enabled", this::isEnabled, 0, 0);
+        NAR_Elastic.addData(getName(), "AtSetpoint", this::atSetpoint, 1, 0);
+        NAR_Elastic.addData(getName(), "Measurement", controller::getMeasurement, 0, 1);
+        NAR_Elastic.addData(getName(), "Setpoint", this::getSetpoint, 1, 1);
 
-        debug = NAR_Shuffleboard.debugSwitch(getName(), "DEBUG", false, 2, 0);
-        setpoint = NAR_Shuffleboard.debug(getName(), "Debug_Setpoint", 0, 2,1);
-        NAR_Shuffleboard.addData(getName(), "UseOutput", controller::useOutput, 0, 2);
+        debug = NAR_Elastic.debugSwitch(getName(), "DEBUG", false, 2, 0);
+        setpoint = NAR_Elastic.debug(getName(), "Debug_Setpoint", 0, 2,1);
+        NAR_Elastic.addData(getName(), "UseOutput", controller::useOutput, 0, 2);
 
-        NAR_Shuffleboard.addSendable(getName(), "PID_Controller", controller, 3, 1, 2, 3).withWidget(BuiltInWidgets.kPIDController);
+        NAR_Elastic.addSendable(getName(), "PID_Controller", controller, 3, 1, 2, 3);
 
-        // controller.getConfig().setkS(NAR_Shuffleboard.debug(getName(), "kS", controller.getConfig().getkS(), 0, 2));
-        // controller.getConfig().setkV(NAR_Shuffleboard.debug(getName(), "kV", controller.getConfig().getkV(), 1, 2));
-        // controller.getConfig().setkA(NAR_Shuffleboard.debug(getName(), "kA", controller.getConfig().getkA(), 1, 3));
-        // controller.getConfig().setkG(NAR_Shuffleboard.debug(getName(), "kG", controller.getConfig().getkG(), 0, 3));
+        // controller.getConfig().setkS(NAR_Elastic.debug(getName(), "kS", controller.getConfig().getkS(), 0, 2));
+        // controller.getConfig().setkV(NAR_Elastic.debug(getName(), "kV", controller.getConfig().getkV(), 1, 2));
+        // controller.getConfig().setkA(NAR_Elastic.debug(getName(), "kA", controller.getConfig().getkA(), 1, 3));
+        // controller.getConfig().setkG(NAR_Elastic.debug(getName(), "kG", controller.getConfig().getkG(), 0, 3));
 
-        NAR_Shuffleboard.addData(getName(), "Measurement Graph", controller::getMeasurement, 6, 0, 2, 2).withWidget(BuiltInWidgets.kGraph);
-        NAR_Shuffleboard.addData(getName(), "Setpoint Graph", controller::getSetpoint, 8, 0, 2, 2).withWidget(BuiltInWidgets.kGraph);
+        NAR_Elastic.addData(getName(), "Measurement Graph", controller::getMeasurement, 6, 0, 2, 2);
+        NAR_Elastic.addData(getName(), "Setpoint Graph", controller::getSetpoint, 8, 0, 2, 2);
     }
 
     /**

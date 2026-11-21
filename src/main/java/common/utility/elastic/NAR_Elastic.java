@@ -1,4 +1,4 @@
-package common.utility.shuffleboard;
+package common.utility.elastic;
 
 import java.util.HashMap;
 import java.util.function.BooleanSupplier;
@@ -26,7 +26,7 @@ import edu.wpi.first.wpilibj2.command.Command;
  *
  * @since 2026 
  */
-public class NAR_Dashboard {
+public class NAR_Elastic {
 
     /**
      * Root NetworkTables table. Must stay "SmartDashboard" so that Sendables
@@ -35,10 +35,10 @@ public class NAR_Dashboard {
     public static final String ROOT = "SmartDashboard";
 
     static {
-        NAR_Robot.addPeriodic(NAR_Dashboard::update, 0.02);
+        NAR_Robot.addPeriodic(NAR_Elastic::update, 0.02);
     }
 
-    private NAR_Dashboard() {}
+    private NAR_Elastic() {}
 
     /**
      * Storage class for NAR_Dashboard

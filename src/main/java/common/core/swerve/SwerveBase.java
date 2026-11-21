@@ -6,8 +6,8 @@ import java.util.function.DoubleSupplier;
 import common.hardware.motorcontroller.NAR_Motor;
 import common.hardware.motorcontroller.NAR_Motor.Control;
 import common.utility.Log;
+import common.utility.elastic.NAR_Elastic;
 import common.utility.narwhaldashboard.NarwhalDashboard;
-import common.utility.shuffleboard.NAR_Shuffleboard;
 import common.utility.sysid.CmdSysId;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Matrix;
@@ -59,18 +59,18 @@ public abstract class SwerveBase extends SubsystemBase {
 
     public void initShuffleboard() {
         for (final SwerveModule module : modules) {
-            NAR_Shuffleboard.addData("Swerve", "CANcoder " + module.moduleNumber, ()-> module.getAbsoluteAngle().getDegrees(), 0, module.moduleNumber);
-            NAR_Shuffleboard.addData("Swerve", "Angle Motor " + module.moduleNumber, ()-> module.getState().angle.getDegrees(), 1, module.moduleNumber);
-            NAR_Shuffleboard.addData("Swerve", "Drive Motor" + module.moduleNumber, ()-> module.getState().speedMetersPerSecond, 2, module.moduleNumber);
+            NAR_Elastic.addData("Swerve", "CANcoder " + module.moduleNumber, ()-> module.getAbsoluteAngle().getDegrees(), 0, module.moduleNumber);
+            NAR_Elastic.addData("Swerve", "Angle Motor " + module.moduleNumber, ()-> module.getState().angle.getDegrees(), 1, module.moduleNumber);
+            NAR_Elastic.addData("Swerve", "Drive Motor" + module.moduleNumber, ()-> module.getState().speedMetersPerSecond, 2, module.moduleNumber);
         }
-        NAR_Shuffleboard.addData("Swerve", "Pose", ()-> estimatedPose.toString(), 3, 0, 4, 1);
-        NAR_Shuffleboard.addData("Swerve", "Robot Velocity", ()-> getRobotVelocity().toString(), 3, 1, 4, 1);
-        NAR_Shuffleboard.addData("Swerve", "Velocity", ()-> getSpeed(), 3, 3, 1, 1);
-        NAR_Shuffleboard.addData("Swerve", "Angular Velocity", () -> getRobotVelocity().omegaRadiansPerSecond, 5, 3);
-        NAR_Shuffleboard.addData("Swerve", "Field Velocity", ()-> getFieldVelocity().toString(), 3, 2, 4, 1);
-        NAR_Shuffleboard.addData("Swerve", "Gyro", ()-> getYaw(), 7, 0, 2, 2).withWidget("Gyro");
-        NAR_Shuffleboard.addCommand("Swerve", "Reset Gyro", runOnce(()-> resetGyro(0)), 7, 2);
-        NAR_Shuffleboard.addCommand("Swerve", "Identify Offsets", identifyOffsetsCommand(), 7, 3);
+        NAR_Elastic.addData("Swerve", "Pose", ()-> estimatedPose.toString(), 3, 0, 4, 1);
+        NAR_Elastic.addData("Swerve", "Robot Velocity", ()-> getRobotVelocity().toString(), 3, 1, 4, 1);
+        NAR_Elastic.addData("Swerve", "Velocity", ()-> getSpeed(), 3, 3, 1, 1);
+        NAR_Elastic.addData("Swerve", "Angular Velocity", () -> getRobotVelocity().omegaRadiansPerSecond, 5, 3);
+        NAR_Elastic.addData("Swerve", "Field Velocity", ()-> getFieldVelocity().toString(), 3, 2, 4, 1);
+        NAR_Elastic.addData("Swerve", "Gyro", ()-> getYaw(), 7, 0, 2, 2);
+        NAR_Elastic.addCommand("Swerve", "Reset Gyro", runOnce(()-> resetGyro(0)), 7, 2);
+        NAR_Elastic.addCommand("Swerve", "Identify Offsets", identifyOffsetsCommand(), 7, 3);
     }
 
     public void drive(Translation2d translationVel, Rotation2d rotationVel) {

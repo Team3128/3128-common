@@ -7,7 +7,7 @@ import java.util.function.Consumer;
 import common.core.subsystems.NAR_Subsystem;
 import common.hardware.motorcontroller.NAR_Motor.Neutral;
 import common.utility.Log;
-import common.utility.shuffleboard.NAR_Shuffleboard;
+import common.utility.elastic.NAR_Elastic;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -45,12 +45,12 @@ public abstract class FSMSubsystemBase<S extends Enum<S>> extends SubsystemBase 
 
     @Override
     public void initShuffleboard() {
-        NAR_Shuffleboard.addData(this.getName(), "Transition Count", ()-> transitionMap.getTransitionCount(), 0, 0);
-        NAR_Shuffleboard.addData(this.getName(), "Previous State", ()-> {if(getPreviousState() != null) return getPreviousState().name(); else return "Null";}, 1, 0);
-        NAR_Shuffleboard.addData(this.getName(), "Current State", ()-> {if(getState() != null) return getState().name(); else return "Null";}, 2, 0);
-        NAR_Shuffleboard.addData(this.getName(), "Valid Transition", ()-> getRequestTransition() != null, 3, 0);
+        NAR_Elastic.addData(this.getName(), "Transition Count", ()-> transitionMap.getTransitionCount(), 0, 0);
+        NAR_Elastic.addData(this.getName(), "Previous State", ()-> {if(getPreviousState() != null) return getPreviousState().name(); else return "Null";}, 1, 0);
+        NAR_Elastic.addData(this.getName(), "Current State", ()-> {if(getState() != null) return getState().name(); else return "Null";}, 2, 0);
+        NAR_Elastic.addData(this.getName(), "Valid Transition", ()-> getRequestTransition() != null, 3, 0);
         for(S state : enumType.getEnumConstants()) {
-            NAR_Shuffleboard.addData(this.getName(), state.name(), ()-> stateEquals(state), (state.ordinal() % 8), state.ordinal() / 8 + 1);
+            NAR_Elastic.addData(this.getName(), state.name(), ()-> stateEquals(state), (state.ordinal() % 8), state.ordinal() / 8 + 1);
         }
     }
 
